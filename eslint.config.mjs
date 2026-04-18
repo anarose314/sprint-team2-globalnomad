@@ -42,7 +42,7 @@ const eslintConfig = defineConfig([
         {
           patterns: [
             {
-              group: ['./*', '../*'],
+              group: ['./**', '../**'],
               message: '상대경로 대신 절대경로(@/...)를 사용해주세요.',
             },
           ],
@@ -52,7 +52,9 @@ const eslintConfig = defineConfig([
       'simple-import-sort/imports': [
         'warn',
         {
-          groups: [['^react', '^@?\\w', '^@(/.*|$)', '^.+\\.s?css$']],
+          groups: [
+            ['^react', '^@?\\\\w', '^@(/.*|$)', '^\\\\.', '^.+\\\\.s?css$'],
+          ],
         },
       ],
       'simple-import-sort/exports': 'warn',
