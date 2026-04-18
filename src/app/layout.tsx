@@ -2,7 +2,9 @@ import '@/app/styles/globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://globalnomad-team2.vercel.app'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app'
+  ),
   title: {
     default: 'Global Nomad',
     template: '%s | Global Nomad',
