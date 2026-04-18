@@ -37,19 +37,27 @@ const eslintConfig = defineConfig([
         },
       ],
 
-      'simple-import-sort/imports': [
+      'no-restricted-imports': [
         'error',
         {
-          groups: [
-            ['^react', '^@?\\w'],
-            ['^@(/.*|$)'],
-            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-            ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-            ['^.+\\.s?css$'],
+          patterns: [
+            {
+              group: ['./**', '../**'],
+              message: '상대경로 대신 절대경로(@/...)를 사용해주세요.',
+            },
           ],
         },
       ],
-      'simple-import-sort/exports': 'error',
+
+      'simple-import-sort/imports': [
+        'warn',
+        {
+          groups: [
+            ['^react', '^@?\\\\w', '^@(/.*|$)', '^\\\\.', '^.+\\\\.s?css$'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'warn',
     },
   },
   eslintConfigPrettier,
