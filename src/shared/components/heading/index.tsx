@@ -18,13 +18,14 @@ export function Heading({
   textStyle = 'typo-2lg-bold',
   color = 'text-gray-950',
   className,
+  children,
   ...props
 }: HeadingProps) {
   const Tag = as;
 
   return (
     <Tag className={cn(textStyle, color, className)} {...props}>
-      {props.children}
+      {children}
     </Tag>
   );
 }
