@@ -1,7 +1,7 @@
 /**
  * Global Nomad API와 통신하기 위한 공용 fetch 래퍼(wrapper)
  *
- * - baseURL과 teamId는 환경변수에서 읽어와 자동으로 붙여준다.
+ * - baseURL은 환경변수에서 읽어와 자동으로 붙여준다.
  * - 클라이언트 사이드에서는 localStorage의 accessToken을 꺼내
  *   Authorization 헤더에 Bearer 토큰으로 실어 보낸다.
  * - JSON body를 자동으로 직렬화하고, FormData는 그대로 보낸다.
@@ -34,10 +34,10 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
  * });
  * ```
  */
-export async function fetchInstance<T>(
+export const fetchInstance = async <T>(
   endpoint: string,
   options: FetchInstanceOptions = {}
-): Promise<T> {
+): Promise<T> => {
   const { body, params, headers, ...rest } = options;
 
   // 1) 최종 URL 만들기 (baseURL + endpoint + ?쿼리)
@@ -76,21 +76,23 @@ export async function fetchInstance<T>(
     body: finalBody,
   });
 
-  // 6) 204 No Content는 본문이 없음 .json() 호출 시 터짐.
-  if (response.status === 204) {
-    return undefined as T;
-  }
+  // 6) 응답 본문을 안전하게 파싱
+  //    - 빈 본문(204, 빈 200 등)이면 undefined
+  //    - 본문이 있으면 JSON 파싱
+  //    - response.json()을 두 번 호출할 수 없으므로 한 번만 읽어 재사용
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : undefined;
 
   // 7) 실패 응답 처리
   if (!response.ok) {
-    const errorData = (await response
-      .json()
-      .catch(() => ({}))) as Partial<ApiErrorResponse>;
-    throw new Error(errorData.message ?? `API Error: ${response.status}`);
+    const errorMessage =
+      (data as Partial<ApiErrorResponse> | undefined)?.message ??
+      `API Error: ${response.status}`;
+    throw new Error(errorMessage);
   }
 
-  return (await response.json()) as T;
-}
+  return data as T;
+};
 
 /**
  * HTTP 메서드별 편의 함수 모음
