@@ -9,12 +9,14 @@
  *
  */
 
+import { ApiError } from '@/shared/apis/apiError';
+
 /** fetchInstance에서 추가로 받는 옵션들 */
 interface FetchInstanceOptions extends Omit<RequestInit, 'body'> {
   /** JSON으로 직렬화할 요청 바디 또는 FormData */
   body?: Record<string, unknown> | FormData;
   /** URL 쿼리 스트링으로 변환할 파라미터 객체 */
-  params?: Record<string, string | number | boolean | undefined>;
+  params?: Record<string, string | number | boolean | null | undefined>;
 }
 
 /** 서버가 내려주는 에러 응답의 표준 형태 */
@@ -41,10 +43,16 @@ export const fetchInstance = async <T>(
   const { body, params, headers, ...rest } = options;
 
   // 1) 최종 URL 만들기 (baseURL + endpoint + ?쿼리)
-  const url = new URL(`${BASE_URL}${endpoint}`);
+  //    - BASE_URL 끝의 '/'와 endpoint 앞의 '/'를 모두 제거하여 항상 단일 '/'로 이어붙임
+  const base = BASE_URL.replace(/\/$/, '');
+  const path = endpoint.replace(/^\//, '');
+  const url = new URL(`${base}/${path}`);
+
+  // 쿼리 파라미터 추가
+  // undefined/null/'' 세 가지는 제외하되, 0이나 false 같은 의미 있는 값은 통과시킴
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && value !== '') {
         url.searchParams.append(key, String(value));
       }
     });
@@ -88,7 +96,7 @@ export const fetchInstance = async <T>(
     const errorMessage =
       (data as Partial<ApiErrorResponse> | undefined)?.message ??
       `API Error: ${response.status}`;
-    throw new Error(errorMessage);
+    throw new ApiError(errorMessage, response.status, data);
   }
 
   return data as T;
