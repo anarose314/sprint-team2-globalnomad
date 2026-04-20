@@ -24,7 +24,14 @@ interface ApiErrorResponse {
   message: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!BASE_URL) {
+  throw new Error(
+    'NEXT_PUBLIC_API_BASE_URL 환경변수가 설정되지 않았습니다. ' +
+      '.env.local 파일 또는 Vercel Dashboard의 Environment Variables를 확인해주세요.'
+  );
+}
 
 /**
  * 프로젝트 전역에서 사용하는 fetch 래퍼.
