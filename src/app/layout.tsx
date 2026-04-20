@@ -1,5 +1,6 @@
-import '@/app/styles/globals.css';
 import type { Metadata } from 'next';
+import QueryProvider from '@/shared/components/query-provider';
+import '@/app/styles/globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -27,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={'h-full antialiased'}>
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

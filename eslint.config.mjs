@@ -53,7 +53,7 @@ const eslintConfig = defineConfig([
         'warn',
         {
           groups: [
-            ['^react', '^@?\\\\w', '^@(/.*|$)', '^\\\\.', '^.+\\\\.s?css$'],
+            ['^react', '^next', '^@?\\w', '^@(/.*|$)', '^\\.', '^.+\\.s?css$'],
           ],
         },
       ],
