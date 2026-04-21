@@ -5,16 +5,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IcEdit, IcProfile } from '@/shared/assets/icons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
-import { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
+
+// TODO: 내 정보 API 연동 후 실제 프로필 이미지 URL로 교체
+const MOCK_PROFILE_IMAGE_URL = '';
 
 /**
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
- *
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
- * - 프로필 이미지 수정/로그아웃 같은 동작은 props 핸들러로 외부에서 받는다.
+ * - 프로필 이미지, 프로필 이미지 수정, 로그아웃 등 사이드바 내부의 상태와 동작을 모두 자체적으로 관리한다.
  */
-export function Sidebar({ profileImageUrl }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
+  const profileImageUrl = MOCK_PROFILE_IMAGE_URL;
 
   const handleProfileEdit = () => {
     // TODO: 프로필 수정 버튼 이벤트 연동 후 콘솔 로그 지우기
