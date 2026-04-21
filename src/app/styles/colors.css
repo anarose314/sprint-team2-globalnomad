@@ -43,4 +43,5 @@
 
   /* Box Shadows */
   --shadow-custom: 0 4px 16px 0 rgba(31, 31, 34, 0.05);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
 }

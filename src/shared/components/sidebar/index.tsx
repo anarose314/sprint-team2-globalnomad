@@ -13,15 +13,21 @@ import { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
  * - 프로필 이미지 수정/로그아웃 같은 동작은 props 핸들러로 외부에서 받는다.
  */
-export function Sidebar({
-  profileImageUrl,
-  onProfileEdit,
-  onLogout,
-}: SidebarProps) {
+export function Sidebar({ profileImageUrl }: SidebarProps) {
   const pathname = usePathname();
 
+  const handleProfileEdit = () => {
+    // TODO: 프로필 수정 버튼 이벤트 연동 후 콘솔 로그 지우기
+    console.warn('프로필 수정 클릭');
+  };
+
+  const handleLogout = () => {
+    // TODO: 로그아웃 버튼 이벤트 연동 후 콘솔 로그 지우기
+    console.warn('로그아웃 클릭');
+  };
+
   return (
-    <aside className="h-129.5 w-72.5 rounded-xl border border-gray-50 bg-white p-3.75 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+    <aside className="shadow-card h-129.5 w-72.5 rounded-xl border border-gray-50 bg-white p-3.75">
       {/* 프로필 영역 */}
       <div className="relative mx-auto mt-3 mb-6 w-fit">
         <div className="relative h-28 w-28 overflow-hidden rounded-full bg-blue-50">
@@ -41,7 +47,7 @@ export function Sidebar({
 
         <button
           type="button"
-          onClick={onProfileEdit}
+          onClick={handleProfileEdit}
           aria-label="프로필 이미지 수정"
           className="absolute right-1 bottom-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
         >
@@ -72,9 +78,10 @@ export function Sidebar({
       </nav>
 
       {/* 로그아웃 버튼 */}
+      {/* TODO: 이후 공통 버튼 컴포넌트로 변경해야 함 */}
       <button
         type="button"
-        onClick={onLogout}
+        onClick={handleLogout}
         className="typo-lg-medium mt-4 w-full cursor-pointer rounded-2xl border border-gray-100 py-3.5 text-gray-400 transition-colors hover:bg-gray-50"
       >
         로그아웃
