@@ -11,7 +11,7 @@ const badgeStyle = cva(
         cancelled: 'bg-gray-100 text-gray-600',
         completed: 'bg-teal-100 text-teal-500',
         rejected: 'bg-red-100 text-red-500',
-        attended: 'text-primary-700 bg-primary-100',
+        attended: 'bg-primary-100 text-primary-700',
         approved: 'bg-teal-200 text-teal-700',
       },
     },
