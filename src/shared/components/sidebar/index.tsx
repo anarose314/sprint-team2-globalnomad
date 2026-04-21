@@ -3,58 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  IcCalendar,
-  IcEdit,
-  IcList,
-  IcProfile,
-  IcSetting,
-  IcUser,
-} from '@/shared/assets/icons';
-
-/**
- * 사이드바에 표시되는 메뉴 항목의 타입
- */
-type MenuItem = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-};
-
-/**
- * 사이드바에 표시할 메뉴 목록.
- * 메뉴가 추가/변경될 때 이 배열만 수정.
- */
-const MENU_ITEMS: MenuItem[] = [
-  { href: '/my/profile', label: '내 정보', icon: <IcUser /> },
-  {
-    href: '/my/reservations',
-    label: '예약 내역',
-    icon: <IcList />,
-  },
-  {
-    href: '/my/activities',
-    label: '내 체험 관리',
-    icon: <IcSetting />,
-  },
-  {
-    href: '/my/activities-dashboard',
-    label: '예약 현황',
-    icon: <IcCalendar />,
-  },
-];
-
-/**
- * 사이드바 컴포넌트의 Props
- */
-type SidebarProps = {
-  /** 프로필 이미지 URL. 없으면 기본 아이콘이 표시된다. */
-  profileImageUrl?: string;
-  /** 프로필 이미지 수정 버튼 클릭 시 호출되는 핸들러 */
-  onProfileEdit?: () => void;
-  /** 로그아웃 버튼 클릭 시 호출되는 핸들러 */
-  onLogout?: () => void;
-};
+import { IcEdit, IcProfile } from '@/shared/assets/icons';
+import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
+import { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
 
 /**
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
@@ -62,7 +13,7 @@ type SidebarProps = {
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
  * - 프로필 이미지 수정/로그아웃 같은 동작은 props 핸들러로 외부에서 받는다.
  */
-export default function Sidebar({
+export function Sidebar({
   profileImageUrl,
   onProfileEdit,
   onLogout,
@@ -113,7 +64,7 @@ export default function Sidebar({
                   : 'hover:bg-primary-100 text-gray-600 [&_svg]:text-gray-600'
               }`}
             >
-              {item.icon}
+              <item.Icon />
               <span>{item.label}</span>
             </Link>
           );

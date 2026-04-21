@@ -1,6 +1,6 @@
 'use client';
 
-import Sidebar from '@/shared/components/sidebar';
+import { Sidebar } from '@/shared/components/sidebar';
 
 export default function MyPageLayout({
   children,
