@@ -21,6 +21,14 @@ const badgeStyle = cva(
   }
 );
 
+/**
+ * 예약 및 체험의 진행 상태를 시각적으로 나타내는 뱃지 컴포넌트
+ * 상태값(`status`)에 따라 사전에 정의된 배경색과 텍스트 색상이 자동으로 매핑됩니다.
+ *
+ * @example
+ * // (예: '예약 완료' 뱃지)
+ * <StatusBadge status="completed" />
+ */
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span className={cn(badgeStyle({ status }), className)}>
