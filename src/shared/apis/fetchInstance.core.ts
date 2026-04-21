@@ -1,11 +1,11 @@
 /**
- * Global Nomad API와 통신하기 위한 공용 fetch 래퍼(wrapper)
+ * Global Nomad API와 통신하기 위한 공용 fetch 코어(core)
  *
  * - baseURL은 환경변수에서 읽어와 자동으로 붙여준다.
- * - 클라이언트 사이드에서는 localStorage의 accessToken을 꺼내
- *   Authorization 헤더에 Bearer 토큰으로 실어 보낸다.
+ * - accessToken은 호출부에서 옵션으로 주입받아 Authorization 헤더에 실는다.
+ *   (클라이언트는 js-cookie, 서버는 next/headers로 각자 읽어서 전달)
  * - JSON body를 자동으로 직렬화하고, FormData는 그대로 보낸다.
- * - 응답이 실패(4xx/5xx)면 서버 에러 메시지를 담은 Error를 throw한다.
+ * - 응답이 실패(4xx/5xx)면 ApiError를 throw한다.
  *
  */
 
@@ -17,6 +17,8 @@ interface FetchInstanceOptions extends Omit<RequestInit, 'body'> {
   body?: Record<string, unknown> | FormData;
   /** URL 쿼리 스트링으로 변환할 파라미터 객체 */
   params?: Record<string, string | number | boolean | null | undefined>;
+  /** 인증에 사용할 accessToken (클라/서버 래퍼에서 주입) */
+  accessToken?: string | null;
 }
 
 /** 서버가 내려주는 에러 응답의 표준 형태 */
@@ -34,12 +36,14 @@ if (!BASE_URL) {
 }
 
 /**
- * 프로젝트 전역에서 사용하는 fetch 래퍼.
+ * 환경 중립적인 fetch 래퍼.
+ * 토큰은 옵션으로 주입받아 Authorization 헤더에 실는다.
  *
  * @example
  * ```ts
  * const data = await fetchInstance<ActivitiesResponse>('/activities', {
  *   params: { method: 'offset', page: 1, size: 20 },
+ *   accessToken: Cookies.get('accessToken'),
  * });
  * ```
  */
@@ -47,7 +51,7 @@ export const fetchInstance = async <T>(
   endpoint: string,
   options: FetchInstanceOptions = {}
 ): Promise<T> => {
-  const { body, params, headers, ...rest } = options;
+  const { body, params, headers, accessToken, ...rest } = options;
 
   // 1) 최종 URL 만들기 (baseURL + endpoint + ?쿼리)
   //    - BASE_URL 끝의 '/'와 endpoint 앞의 '/'를 모두 제거하여 항상 단일 '/'로 이어붙임
@@ -65,11 +69,8 @@ export const fetchInstance = async <T>(
     });
   }
 
-  // 2) 토큰은 브라우저에서만 꺼냄 (SSR 환경에서 window 없음)
-  const accessToken =
-    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-
-  // 3) 헤더 조립 - FormData일 땐 Content-Type을 직접 넣지 않음
+  // 2) 헤더 조립 - FormData일 땐 Content-Type을 직접 넣지 않음
+  //    accessToken은 호출부에서 주입받은 값을 그대로 사용
   const isFormData = body instanceof FormData;
   const finalHeaders: HeadersInit = {
     ...(!isFormData && { 'Content-Type': 'application/json' }),
@@ -77,28 +78,28 @@ export const fetchInstance = async <T>(
     ...headers,
   };
 
-  // 4) body 직렬화
+  // 3) body 직렬화
   const finalBody = body
     ? isFormData
       ? (body as FormData)
       : JSON.stringify(body)
     : undefined;
 
-  // 5) 실제 요청
+  // 4) 실제 요청
   const response = await fetch(url.toString(), {
     ...rest,
     headers: finalHeaders,
     body: finalBody,
   });
 
-  // 6) 응답 본문을 안전하게 파싱
+  // 5) 응답 본문을 안전하게 파싱
   //    - 빈 본문(204, 빈 200 등)이면 undefined
   //    - 본문이 있으면 JSON 파싱
   //    - response.json()을 두 번 호출할 수 없으므로 한 번만 읽어 재사용
   const text = await response.text();
   const data = text ? JSON.parse(text) : undefined;
 
-  // 7) 실패 응답 처리
+  // 6) 실패 응답 처리
   if (!response.ok) {
     const errorMessage =
       (data as Partial<ApiErrorResponse> | undefined)?.message ??
@@ -109,14 +110,18 @@ export const fetchInstance = async <T>(
   return data as T;
 };
 
+export type { FetchInstanceOptions };
+
 /**
  * HTTP 메서드별 편의 함수 모음
- * 실제 API 모듈에서는 이 객체를 통해 호출하는 걸 권장
+ *
+ * 주의: 이 `api` 객체는 토큰을 자동으로 실어주지 않는다.
+ *    실제 인증이 필요한 곳에서는 클라이언트 컴포넌트에서
+ *    `fetchInstance.client.ts`의 래퍼를 사용할 것.
  *
  * @example
  * ```ts
- * const me = await api.get<User>('/users/me');
- * await api.post('/auth/signin', { email, password });
+ * const data = await api.get<PublicData>('/public-endpoint');
  * ```
  */
 export const api = {
