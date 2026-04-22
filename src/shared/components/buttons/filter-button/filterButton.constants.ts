@@ -21,13 +21,13 @@ export const CATEGORY_ICON_MAP = {
 } satisfies Record<string, CategoryIconComponent>;
 
 /**
- * 아이콘 크기 Tailwind 클래스.
+ * 아이콘 크기 Tailwind 클래스
  * 모바일(기본) 16px → PC/TB(md:) 24px 반응형
  */
 export const FILTER_ICON_CLASS = 'block shrink-0 w-4 h-4 md:w-6 md:h-6';
 
 /**
- * size variant 없이 반응형 단일 클래스로 처리.
+ * size variant 없이 반응형 단일 클래스로 처리
  * - 모바일(기본): h-[37px] gap-1 px-[14px] py-[10px] text-md
  * - PC/TB(md:): h-11 gap-1.5 px-4 text-lg
  */

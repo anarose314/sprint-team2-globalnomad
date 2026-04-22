@@ -7,7 +7,7 @@ export const BASE_CLASS =
  * primary / secondary / text 세 variant 와 lg / md / sm size 를
  * compound variants 로 통합한 단일 CVA
  */
-export const buttonVariants = cva(BASE_CLASS, {
+export const BUTTON_VARIANTS = cva(BASE_CLASS, {
   variants: {
     variant: {
       primary:

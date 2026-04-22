@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { VariantProps } from 'class-variance-authority';
-import { buttonVariants } from '@/shared/components/buttons/button/button.constants';
+import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 
 interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** 버튼 왼쪽에 표시할 아이콘 */
@@ -10,7 +10,7 @@ interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export interface PrimaryButtonProps
   extends
     BaseButtonProps,
-    Omit<VariantProps<typeof buttonVariants>, 'variant'> {
+    Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'> {
   variant?: 'primary';
   isActive?: never;
 }
@@ -18,7 +18,7 @@ export interface PrimaryButtonProps
 export interface SecondaryButtonProps
   extends
     BaseButtonProps,
-    Omit<VariantProps<typeof buttonVariants>, 'variant'> {
+    Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'> {
   variant: 'secondary';
   isActive?: never;
 }
@@ -26,7 +26,7 @@ export interface SecondaryButtonProps
 export interface TextButtonProps
   extends
     BaseButtonProps,
-    Omit<VariantProps<typeof buttonVariants>, 'variant'> {
+    Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'> {
   variant: 'text';
   /** 버튼 선택 여부 */
   isActive?: boolean;

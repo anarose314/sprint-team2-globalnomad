@@ -9,7 +9,7 @@ import {
   IcPlus,
 } from '@/shared/assets/icons';
 import {
-  buttonVariants,
+  BUTTON_VARIANTS,
   ICON_SIZE_CLASS,
 } from '@/shared/components/buttons/button/button.constants';
 import type {
@@ -154,19 +154,17 @@ export function Button(props: ButtonProps) {
     return (
       <button
         type="button"
+        aria-label={direction === 'left' ? '이전' : '다음'}
         className={cn(
-          'inline-flex cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
+          'inline-flex h-8 w-8 cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
           isActive
             ? 'text-gray-800 hover:text-gray-600'
             : 'text-gray-300 hover:text-gray-600',
           className
         )}
-        style={{ width: 32, height: 32 }}
         {...rest}
       >
-        <Icon
-          style={{ width: 32, height: 32, display: 'block', flexShrink: 0 }}
-        />
+        <Icon className="block h-8 w-8 shrink-0" />
       </button>
     );
   }
@@ -177,19 +175,17 @@ export function Button(props: ButtonProps) {
     return (
       <button
         type="button"
+        aria-label={direction === 'left' ? '이전' : '다음'}
         className={cn(
-          'inline-flex cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
+          'inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
           isActive
             ? 'text-gray-800 hover:text-gray-600'
             : 'text-gray-300 hover:text-gray-600',
           className
         )}
-        style={{ width: 40, height: 40 }}
         {...rest}
       >
-        <Icon
-          style={{ width: 40, height: 40, display: 'block', flexShrink: 0 }}
-        />
+        <Icon className="block h-10 w-10 shrink-0" />
       </button>
     );
   }
@@ -222,8 +218,9 @@ export function Button(props: ButtonProps) {
 
     return (
       <button
+        type="button"
         className={cn(
-          buttonVariants({ variant: 'text', size }),
+          BUTTON_VARIANTS({ variant: 'text', size }),
           isActive
             ? 'bg-primary-100 text-gray-900'
             : 'hover:bg-primary-100 bg-transparent text-gray-600 hover:text-black/20',
@@ -256,7 +253,7 @@ export function Button(props: ButtonProps) {
     return (
       <button
         className={cn(
-          buttonVariants({ variant: 'secondary', size }),
+          BUTTON_VARIANTS({ variant: 'secondary', size }),
           className
         )}
         {...buttonRest}
@@ -281,7 +278,7 @@ export function Button(props: ButtonProps) {
 
   return (
     <button
-      className={cn(buttonVariants({ variant: 'primary', size }), className)}
+      className={cn(BUTTON_VARIANTS({ variant: 'primary', size }), className)}
       {...buttonRest}
     >
       {styledIcon && (

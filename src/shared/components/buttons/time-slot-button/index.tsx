@@ -46,13 +46,7 @@ export function TimeSlotButton({
   return (
     <button
       type="button"
-      className={cn(
-        timeSlotVariants({ size }),
-        isActive
-          ? 'border-primary-500 bg-primary-100 text-primary-500'
-          : 'hover:border-primary-500 hover:bg-primary-100 hover:text-primary-500 border-gray-300 bg-white text-gray-950',
-        className
-      )}
+      className={cn(timeSlotVariants({ size, isActive }), className)}
       {...rest}
     >
       {children}
