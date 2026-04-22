@@ -54,8 +54,8 @@ export const Default: Story = {
 /** shimmer 슬라이딩 애니메이션 */
 export const Shimmer: Story = {
   args: {
-    width: '233',
-    height: '233',
+    width: 233,
+    height: 233,
     variant: 'shimmer',
     rounded: 'sm',
   },
@@ -73,7 +73,7 @@ export const NoAnimation: Story = {
 /** 원형 아바타 스켈레톤 */
 export const Circle: Story = {
   args: {
-    width: '500px',
+    width: 48,
     height: 48,
     rounded: 'full',
     variant: 'pulse',

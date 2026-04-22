@@ -71,7 +71,7 @@ export function Skeleton({
   return (
     <div
       className={cn(skeletonStyle({ variant, rounded, fullWidth }), className)}
-      style={{ width, height, ...style }}
+      style={{ width: fullWidth ? undefined : width, height, ...style }}
       aria-hidden="true"
       {...props}
     />
