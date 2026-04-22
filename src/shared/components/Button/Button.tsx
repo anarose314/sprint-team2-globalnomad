@@ -7,6 +7,7 @@ import {
   ReactNode,
   SVGProps,
 } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import {
   IcArrowLeft,
   IcArrowNaviLeft,
@@ -21,8 +22,6 @@ import {
   IcWellbeing,
 } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
-
-import { cva, type VariantProps } from 'class-variance-authority';
 
 /* ─────────────────────────────── Shared Base ─────────────────────────────── */
 
@@ -69,7 +68,7 @@ const textSizeVariants = cva('font-medium', {
   defaultVariants: { size: 'lg' },
 });
 
-const iconPxSize: Record<'lg' | 'md' | 'sm', number> = {
+const ICON_PX_SIZE: Record<'lg' | 'md' | 'sm', number> = {
   lg: 24,
   md: 20,
   sm: 16,
@@ -236,9 +235,8 @@ export function FilterButton({
   className,
   ...rest
 }: FilterButtonProps) {
-  const resolvedSize = size ?? 'pc';
   const IconComponent = category ? CATEGORY_ICON_MAP[category] : IcArt;
-  const iconSize = FILTER_ICON_SIZE[resolvedSize];
+  const iconSize = FILTER_ICON_SIZE[size ?? 'pc'];
 
   return (
     <button
@@ -250,7 +248,7 @@ export function FilterButton({
         <IconComponent
           width={iconSize}
           height={iconSize}
-          style={{ flexShrink: 0, display: 'block' }}
+          className="block shrink-0"
         />
       )}
       <span>{label}</span>
@@ -424,7 +422,6 @@ export function Button(props: ButtonProps) {
 
     const isPC = size === 'pc';
     const isMB = size === 'mb';
-    // size 미지정 → 반응형 (기본 MB, md: 이상 PC)
     const responsive = !isPC && !isMB;
 
     return (
@@ -434,43 +431,31 @@ export function Button(props: ButtonProps) {
           'group inline-flex cursor-pointer flex-col items-center',
           'rounded-2xl border border-gray-100 bg-white',
           'transition-colors duration-200 hover:border-gray-300',
-          /*
-           * PC/TB 128×128: pt 32 / icon 40 / gap 8 / text(line-height 16) / pb 32
-           * 32 + 40 + 8 + 16 + 32 = 128 ✓
-           */
           isPC && 'h-32 w-32 gap-2 pt-8 pb-8',
-          /*
-           * MB 80×80: pt 15 / icon 30 / gap 4 / text(line-height 16) / pb 15
-           * 15 + 30 + 4 + 16 + 15 = 80 ✓  (위아래 여백 균등)
-           */
           isMB && 'h-20 w-20 gap-1 pt-[15px] pb-[15px]',
-          /* 반응형: 기본 MB → md: PC */
           responsive &&
             'h-20 w-20 gap-1 pt-[15px] pb-[15px] md:h-32 md:w-32 md:gap-2 md:pt-8 md:pb-8',
           className
         )}
         {...rest}
       >
-        {/* 명시적 픽셀값 props로 전달 → SVG 고유 width="24" 어트리뷰트 완전 덮어쓰기 */}
         {isPC && (
           <IcPlus
             width={40}
             height={40}
-            className="shrink-0 text-gray-400 transition-colors duration-200 group-hover:text-gray-600"
-            style={{ display: 'block' }}
+            className="block shrink-0 text-gray-400 transition-colors duration-200 group-hover:text-gray-600"
           />
         )}
         {isMB && (
           <IcPlus
             width={30}
             height={30}
-            className="shrink-0 text-gray-400 transition-colors duration-200 group-hover:text-gray-600"
-            style={{ display: 'block' }}
+            className="block shrink-0 text-gray-400 transition-colors duration-200 group-hover:text-gray-600"
           />
         )}
         {responsive && (
           <span className="block h-[30px] w-[30px] shrink-0 text-gray-400 transition-colors duration-200 group-hover:text-gray-600 md:h-10 md:w-10">
-            <IcPlus width="100%" height="100%" style={{ display: 'block' }} />
+            <IcPlus width="100%" height="100%" className="block" />
           </span>
         )}
         <span
@@ -494,18 +479,15 @@ export function Button(props: ButtonProps) {
       <button
         type="button"
         className={cn(
-          'inline-flex cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
+          'inline-flex h-8 w-8 cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
           isActive
             ? 'text-gray-800 hover:text-gray-600'
             : 'text-gray-300 hover:text-gray-600',
           className
         )}
-        style={{ width: 32, height: 32 }}
         {...rest}
       >
-        <Icon
-          style={{ width: 32, height: 32, display: 'block', flexShrink: 0 }}
-        />
+        <Icon className="block h-8 w-8 shrink-0" />
       </button>
     );
   }
@@ -517,40 +499,35 @@ export function Button(props: ButtonProps) {
       <button
         type="button"
         className={cn(
-          'inline-flex cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
+          'inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 disabled:cursor-not-allowed disabled:text-gray-300',
           isActive
             ? 'text-gray-800 hover:text-gray-600'
             : 'text-gray-300 hover:text-gray-600',
           className
         )}
-        style={{ width: 40, height: 40 }}
         {...rest}
       >
-        <Icon
-          style={{ width: 40, height: 40, display: 'block', flexShrink: 0 }}
-        />
+        <Icon className="block h-10 w-10 shrink-0" />
       </button>
     );
   }
 
   const { variant = 'primary', icon, className, children, ...rest } = props;
 
-  // 현재 버튼 사이즈 추출 (기본값 lg)
   const resolvedSize = rest.size ?? 'lg';
-  const px = iconPxSize[resolvedSize];
+  const px = ICON_PX_SIZE[resolvedSize];
 
   const styledIcon =
     icon && isValidElement(icon)
       ? cloneElement(
           icon as React.ReactElement<React.SVGProps<SVGSVGElement>>,
           {
-            style: {
-              minWidth: `${px}px`,
-              width: `${px}px`,
-              height: `${px}px`,
-              flexShrink: 0,
-              display: 'block',
-            },
+            className: cn(
+              'block shrink-0',
+              `min-w-[${px}px] w-[${px}px] h-[${px}px]`,
+              (icon as React.ReactElement<{ className?: string }>).props
+                .className
+            ),
           }
         )
       : icon;
@@ -577,16 +554,11 @@ export function Button(props: ButtonProps) {
           <span
             className={cn(
               'flex shrink-0 items-center justify-center transition-colors duration-200',
+              `min-w-[${px}px] w-[${px}px] h-[${px}px]`,
               isActive
                 ? 'text-primary-500'
                 : 'group-hover:text-primary-500 text-gray-600'
             )}
-            style={{
-              minWidth: `${px}px`,
-              width: `${px}px`,
-              height: `${px}px`,
-              flexShrink: 0,
-            }}
           >
             {styledIcon}
           </span>
@@ -616,13 +588,10 @@ export function Button(props: ButtonProps) {
       >
         {styledIcon && (
           <span
-            className="flex shrink-0 items-center justify-center"
-            style={{
-              minWidth: `${px}px`,
-              width: `${px}px`,
-              height: `${px}px`,
-              flexShrink: 0,
-            }}
+            className={cn(
+              'flex shrink-0 items-center justify-center',
+              `min-w-[${px}px] w-[${px}px] h-[${px}px]`
+            )}
           >
             {styledIcon}
           </span>
@@ -650,13 +619,10 @@ export function Button(props: ButtonProps) {
     >
       {styledIcon && (
         <span
-          className="flex shrink-0 items-center justify-center"
-          style={{
-            minWidth: `${px}px`,
-            width: `${px}px`,
-            height: `${px}px`,
-            flexShrink: 0,
-          }}
+          className={cn(
+            'flex shrink-0 items-center justify-center',
+            `min-w-[${px}px] w-[${px}px] h-[${px}px]`
+          )}
         >
           {styledIcon}
         </span>
