@@ -1,9 +1,10 @@
 export type {
   ButtonProps,
   FilterCategory,
-} from '@/shared/components/Button/Button';
+  TimeSlotButtonProps,
+} from '@/shared/components/buttons';
 export {
   Button,
   FilterButton,
   TimeSlotButton,
-} from '@/shared/components/Button/Button';
+} from '@/shared/components/buttons';
