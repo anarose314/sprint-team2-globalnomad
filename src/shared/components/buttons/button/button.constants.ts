@@ -14,13 +14,21 @@ export const BASE_CLASS =
 export const BUTTON_VARIANTS = cva(BASE_CLASS, {
   variants: {
     variant: {
-      primary:
-        'bg-primary-500 hover:bg-primary-500/80 active:bg-primary-700 font-bold text-white hover:shadow-md active:scale-[0.98] disabled:scale-100 disabled:bg-gray-200 disabled:text-gray-50 disabled:shadow-none',
-      secondary:
-        'active:bg-primary-500! border border-gray-200 bg-white font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 active:scale-[0.98] active:border-0! active:text-white! active:shadow-none! disabled:scale-100 disabled:bg-white disabled:text-gray-200 disabled:shadow-none',
+      primary: [
+        'bg-primary-500 font-bold text-white',
+        'enabled:hover:bg-primary-500/80',
+        'enabled:active:bg-primary-700 enabled:active:scale-[0.98]',
+        'disabled:bg-gray-200 disabled:text-gray-50',
+      ],
+      secondary: [
+        'border border-gray-200 bg-white font-medium text-gray-600',
+        'enabled:hover:border-gray-300 enabled:hover:bg-gray-50',
+        'enabled:active:bg-primary-500 enabled:active:border-primary-500 enabled:active:scale-[0.98] enabled:active:text-white',
+        'disabled:border-gray-200 disabled:bg-white disabled:text-gray-200',
+      ],
     },
     size: {
-      lg: 'h-[54px] rounded-2xl px-[1em] text-lg',
+      lg: 'h-13.5 rounded-2xl px-[1em] text-lg',
       md: 'h-12 rounded-[14px] px-[1em] text-lg',
       sm: 'text-md h-10 rounded-xl px-[1em]',
     },

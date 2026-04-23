@@ -10,9 +10,9 @@ export const timeSlotVariants = cva(
        * - `'mb'` : 327×48 (border 포함), text-14px
        */
       size: {
-        pc: 'h-[54px] px-3 text-lg',
-        tb: 'text-md h-[54px] px-3',
-        mb: 'text-md h-[48px] px-3',
+        pc: 'h-13.5 px-3 text-lg',
+        tb: 'text-md h-13.5 px-3',
+        mb: 'text-md h-12 px-3',
       },
       isActive: {
         true: 'border-primary-500 bg-primary-100 text-primary-500',
