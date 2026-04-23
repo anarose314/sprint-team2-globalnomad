@@ -82,6 +82,7 @@ export function Sidebar() {
 
       {/* 로그아웃 버튼 */}
       <Button
+        type="button"
         onClick={handleLogout}
         className="mt-4 w-full"
         size="lg"
