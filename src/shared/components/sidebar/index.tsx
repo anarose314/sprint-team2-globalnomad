@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IcEdit, IcProfile } from '@/shared/assets/icons';
+import { Button } from '@/shared/components/buttons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 
 // TODO: 내 정보 API 연동 후 실제 프로필 이미지 URL로 교체
@@ -72,7 +73,7 @@ export function Sidebar() {
                   : 'hover:bg-primary-100 text-gray-600 [&_svg]:text-gray-600'
               }`}
             >
-              <item.Icon />
+              <item.Icon className="h-6 w-6" />
               <span>{item.label}</span>
             </Link>
           );
@@ -80,14 +81,14 @@ export function Sidebar() {
       </nav>
 
       {/* 로그아웃 버튼 */}
-      {/* TODO: 이후 공통 버튼 컴포넌트로 변경해야 함 */}
-      <button
-        type="button"
+      <Button
         onClick={handleLogout}
-        className="typo-lg-medium mt-4 w-full cursor-pointer rounded-2xl border border-gray-100 py-3.5 text-gray-400 transition-colors hover:bg-gray-50"
+        className="mt-4 w-full"
+        size="lg"
+        variant="secondary"
       >
         로그아웃
-      </button>
+      </Button>
     </aside>
   );
 }
