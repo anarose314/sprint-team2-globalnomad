@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import LogoIcon from '@/shared/assets/logos/logo-icon.svg';
+import LogoIcon from '@/shared/assets/logos/logo-vertical.svg';
+import { Button } from '@/shared/components/buttons';
+import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -15,9 +17,9 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="bg-gray-25 flex min-h-screen flex-col items-center justify-center px-6">
-      <Link href="/" className="mb-12" aria-label="홈으로 이동">
-        <LogoIcon width={72} height={72} />
+    <div className="bg-gray-25 flex min-h-screen flex-col items-center justify-center px-6 pb-32">
+      <Link href="/" className="mb-7" aria-label="홈으로 이동">
+        <LogoIcon width={120} height={120} />
       </Link>
 
       <div className="flex flex-col items-center gap-6 text-center">
@@ -33,15 +35,12 @@ export default function Error({ error, reset }: ErrorProps) {
         </div>
 
         <div className="mt-4 flex gap-3">
-          <button
-            onClick={reset}
-            className="typo-lg-semibold bg-primary-500 hover:bg-primary-600 active:bg-primary-700 rounded-xl px-8 py-3 text-white transition-colors"
-          >
+          <Button size="md" onClick={reset}>
             다시 시도
-          </button>
+          </Button>
           <Link
             href="/"
-            className="typo-lg-semibold border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100 rounded-xl border px-8 py-3 transition-colors"
+            className={BUTTON_VARIANTS({ variant: 'secondary', size: 'md' })}
           >
             홈으로 이동
           </Link>
