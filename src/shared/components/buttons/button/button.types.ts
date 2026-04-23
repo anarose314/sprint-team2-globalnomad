@@ -1,24 +1,25 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 import { VariantProps } from 'class-variance-authority';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 
-interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** 버튼 왼쪽에 표시할 아이콘 */
+type CustomButtonProps<T extends ElementType> = {
+  as?: T;
   icon?: ReactNode;
-}
+} & Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'>;
 
-export interface PrimaryButtonProps
-  extends
-    BaseButtonProps,
-    Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'> {
-  variant?: 'primary';
-}
+export type BaseButtonProps<T extends ElementType> = CustomButtonProps<T> &
+  Omit<ComponentPropsWithoutRef<T>, keyof CustomButtonProps<T>>;
 
-export interface SecondaryButtonProps
-  extends
-    BaseButtonProps,
-    Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'> {
-  variant: 'secondary';
-}
+export type PrimaryButtonProps<T extends ElementType = 'button'> =
+  BaseButtonProps<T> & {
+    variant?: 'primary';
+  };
 
-export type ButtonProps = PrimaryButtonProps | SecondaryButtonProps;
+export type SecondaryButtonProps<T extends ElementType = 'button'> =
+  BaseButtonProps<T> & {
+    variant: 'secondary';
+  };
+
+export type ButtonProps<T extends ElementType = 'button'> =
+  | PrimaryButtonProps<T>
+  | SecondaryButtonProps<T>;
