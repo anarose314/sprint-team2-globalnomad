@@ -32,7 +32,8 @@ export function Input({
   disabled,
   ...props
 }: InputProps) {
-  const inputId = id ?? label ?? props.name;
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
   const hasError = Boolean(errorMessage);
 
   return (
