@@ -1,7 +1,7 @@
 'use client';
 
-import { timeSlotVariants } from '@/shared/components/buttons/time-slot-button/timeSlotButton.constants';
-import type { TimeSlotButtonProps } from '@/shared/components/buttons/time-slot-button/timeSlotButton.types';
+import { timeSlotVariants } from '@/app/(main)/activity/[id]/components/time-slot-button/timeSlotButton.constants';
+import type { TimeSlotButtonProps } from '@/app/(main)/activity/[id]/components/time-slot-button/timeSlotButton.types';
 import { cn } from '@/shared/utils/cn';
 
 export type { TimeSlotButtonProps };

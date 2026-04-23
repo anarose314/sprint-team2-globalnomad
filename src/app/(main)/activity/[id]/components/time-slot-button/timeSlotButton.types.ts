@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from 'react';
 import { VariantProps } from 'class-variance-authority';
-import { timeSlotVariants } from '@/shared/components/buttons/time-slot-button/timeSlotButton.constants';
+import { timeSlotVariants } from '@/app/(main)/activity/[id]/components/time-slot-button/timeSlotButton.constants';
 
 export interface TimeSlotButtonProps
   extends

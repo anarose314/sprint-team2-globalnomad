@@ -28,11 +28,12 @@ export const FILTER_ICON_CLASS = 'block shrink-0 w-4 h-4 md:w-6 md:h-6';
 
 /**
  * size variant 없이 반응형 단일 클래스로 처리
- * - 모바일(기본): h-[37px] gap-1 px-[14px] py-[10px] text-md
- * - PC/TB(md:): h-11 gap-1.5 px-4 text-lg
+ * - 모바일(기본): h-[37px] gap-1 px-[1em] text-md
+ * - PC/TB(md:): h-11 gap-1.5 md:text-lg
+ * - px-[1em]: 폰트 크기에 비례한 좌우 패딩, py 불필요 (items-center 수직 정렬)
  */
 export const filterButtonVariants = cva(
-  'text-md inline-flex h-[37px] cursor-pointer items-center justify-center gap-1 rounded-full px-[14px] py-[10px] transition-all duration-200 md:h-11 md:gap-1.5 md:px-4 md:text-lg',
+  'text-md inline-flex h-[37px] cursor-pointer items-center justify-center gap-1 rounded-full px-[1em] transition-all duration-200 md:h-11 md:gap-1.5 md:text-lg',
   {
     variants: {
       state: {
