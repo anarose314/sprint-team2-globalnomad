@@ -57,7 +57,8 @@ export function Input({
           aria-describedby={hasError ? `${inputId}-error` : undefined}
           className={twMerge(
             clsx(
-              'typo-lg-medium h-13.5 w-full rounded-2xl border bg-white px-5 py-4 text-gray-950 transition-colors outline-none placeholder:text-gray-400',
+              'typo-lg-medium h-13.5 w-full rounded-2xl border bg-white py-4 text-gray-950 transition-colors outline-none placeholder:text-gray-400',
+              rightIcon ? 'pr-14 pl-5' : 'px-5',
               'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
               hasError
                 ? 'border-red-500 focus:border-red-500'
