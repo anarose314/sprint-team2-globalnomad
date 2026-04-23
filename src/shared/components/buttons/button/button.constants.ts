@@ -29,8 +29,8 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
 });
 
 /**
- * 아이콘 크기별 Tailwind 클래스 맵.
- * 동적 문자열(`w-[${px}px]`) 대신 정적 클래스를 사용해 빌드 시점 purge 오류를 방지합니다.
+ * 아이콘 크기별 Tailwind 클래스 맵
+ * 동적 문자열(`w-[${px}px]`) 대신 정적 클래스를 사용해 빌드 시점 purge 오류를 방지
  */
 export const ICON_SIZE_CLASS: Record<'lg' | 'md' | 'sm', string> = {
   lg: 'min-w-6 w-6 h-6',
