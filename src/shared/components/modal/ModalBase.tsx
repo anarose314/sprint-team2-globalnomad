@@ -19,7 +19,7 @@
  */
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/utils/cn';
-import IcClose from '@/shared/assets/icons/ic-close.svg';
+import { IcClose } from '@/shared/assets/icons';
 
 interface ModalBaseProps {
   title?: string;
