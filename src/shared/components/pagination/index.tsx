@@ -1,7 +1,7 @@
 // src/shared/components/pagination/index.tsx
 'use client';
 
-import { IcArrowNaviLeft, IcArrowNaviRight } from '@/shared/assets/icons';
+import { ArrowButton } from '@/shared/components/buttons';
 import { PaginationProps } from '@/shared/components/pagination/pagination.types';
 import { cn } from '@/shared/utils/cn';
 
@@ -54,16 +54,12 @@ export function Pagination({
       aria-label="페이지네이션"
     >
       {/* 이전 페이지 버튼 */}
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage - 1)}
+      <ArrowButton
+        variant="arrow_navigation"
+        direction="left"
         disabled={isFirstPage}
-        aria-label="이전 페이지"
-        className="cursor-pointer text-gray-800 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:text-gray-300"
-      >
-        <IcArrowNaviLeft />
-      </button>
-
+        onClick={() => onPageChange(currentPage - 1)}
+      />
       {/* 페이지 번호 목록 */}
       {pages.map((page) => {
         const isActive = page === currentPage;
@@ -88,15 +84,12 @@ export function Pagination({
       })}
 
       {/* 다음 페이지 버튼 */}
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage + 1)}
+      <ArrowButton
+        variant="arrow_navigation"
+        direction="right"
         disabled={isLastPage}
-        aria-label="다음 페이지"
-        className="cursor-pointer text-gray-800 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:text-gray-300"
-      >
-        <IcArrowNaviRight />
-      </button>
+        onClick={() => onPageChange(currentPage + 1)}
+      />
     </nav>
   );
 }
