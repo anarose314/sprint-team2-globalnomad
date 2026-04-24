@@ -19,6 +19,7 @@
  */
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/utils/cn';
+import IcClose from '@/shared/assets/icons/ic-close.svg';
 
 interface ModalBaseProps {
   title?: string;
@@ -67,7 +68,7 @@ export function ModalBase({
                 onClick={onClose}
                 className="absolute top-7 right-7 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
               >
-                <span className="text-xl leading-none">×</span>
+                <IcClose className="h-5 w-5" />
               </button>
             ) : null}
           </div>
