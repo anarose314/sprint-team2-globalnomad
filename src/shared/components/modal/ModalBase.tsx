@@ -20,6 +20,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { IcClose } from '@/shared/assets/icons';
+import { Heading } from '@/shared/components/heading';
 
 interface ModalBaseProps {
   title?: string;
@@ -56,9 +57,9 @@ export function ModalBase({
         {(title || showCloseButton) && (
           <div className="relative px-7 pt-7">
             {title ? (
-              <h2 id="modal-title" className="text-2xl font-bold text-gray-950">
+              <Heading id="modal-title" textStyle="typo-2xl-bold">
                 {title}
-              </h2>
+              </Heading>
             ) : null}
 
             {showCloseButton && onClose ? (
