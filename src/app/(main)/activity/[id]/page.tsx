@@ -18,45 +18,48 @@ const MOCK_ACTIVITY = {
   bannerImageUrl: '',
   subImageUrls: ['', ''],
   /** 내가 만든 체험 여부 — 로그인 유저 id와 체험 userId 비교로 결정 */
-  isOwner: false,
+  isOwner: true,
 };
 
 export default function ActivityDetailPage() {
   const activity = MOCK_ACTIVITY;
 
   return (
-    <main className="mx-auto max-w-[1200px] px-4 py-6 md:px-6 lg:px-8 lg:py-10">
-      {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
-      {/* 모바일·태블릿: 세로 스택 / 데스크탑(xl 1280px+): 이미지 좌 · 타이틀+예약카드 우 */}
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:gap-6">
-        {/* 이미지 갤러리 (데스크탑: 좌측) */}
-        <div className="xl:flex-3">
-          <ActivityImageGallery
-            bannerImageUrl={activity.bannerImageUrl}
-            subImageUrls={activity.subImageUrls}
-            title={activity.title}
-          />
+    <main className="py-6 md:py-8 lg:px-10 lg:py-10">
+      {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
+      <div className="mx-auto w-full max-w-[327px] md:max-w-[684px] lg:max-w-[1200px]">
+        {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
+        {/* 모바일·태블릿: 세로 스택 / 데스크탑(lg 1024px+): 이미지 좌 · 타이틀+예약카드 우 */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+          {/* 이미지 갤러리 (데스크탑: 좌측) */}
+          <div className="lg:flex-3">
+            <ActivityImageGallery
+              bannerImageUrl={activity.bannerImageUrl}
+              subImageUrls={activity.subImageUrls}
+              title={activity.title}
+            />
+          </div>
+
+          {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
+          <div className="flex flex-col gap-6 lg:flex-2">
+            <ActivityInfoHeader
+              category={activity.category}
+              title={activity.title}
+              rating={activity.rating}
+              reviewCount={activity.reviewCount}
+              address={activity.address}
+              isOwner={activity.isOwner}
+            />
+
+            {/* TODO: 예약 카드 (참여 인원, 캘린더, 시간 슬롯, 총합계, 예약하기 버튼) */}
+          </div>
         </div>
 
-        {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
-        <div className="flex flex-col gap-6 xl:flex-2">
-          <ActivityInfoHeader
-            category={activity.category}
-            title={activity.title}
-            rating={activity.rating}
-            reviewCount={activity.reviewCount}
-            address={activity.address}
-            isOwner={activity.isOwner}
-          />
-
-          {/* TODO: 예약 카드 (참여 인원, 캘린더, 시간 슬롯, 총합계, 예약하기 버튼) */}
-        </div>
+        {/* ── 하단 본문 ── */}
+        {/* TODO: 체험 설명 */}
+        {/* TODO: 카카오 지도 */}
+        {/* TODO: 체험 후기 (페이지네이션) */}
       </div>
-
-      {/* ── 하단 본문 ── */}
-      {/* TODO: 체험 설명 */}
-      {/* TODO: 카카오 지도 */}
-      {/* TODO: 체험 후기 (페이지네이션) */}
     </main>
   );
 }
