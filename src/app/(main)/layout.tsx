@@ -1,8 +1,8 @@
-export default function MainLayout({
-  children,
-}: Readonly<{
+type MainLayoutProps = Readonly<{
   children: React.ReactNode;
-}>) {
+}>;
+
+export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <>
       {/* TODO: 헤더 작업 */}
