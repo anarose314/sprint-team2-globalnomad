@@ -40,7 +40,7 @@ export default function Error({ error, reset }: ErrorProps) {
           </Button>
           <Link
             href="/"
-            className={BUTTON_VARIANTS({ variant: 'secondary', size: 'md' })}
+            className={`${BUTTON_VARIANTS({ variant: 'secondary', size: 'md' })} hover:bg-gray-100 hover:opacity-80`}
           >
             홈으로 이동
           </Link>
