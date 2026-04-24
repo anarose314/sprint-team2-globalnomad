@@ -93,7 +93,7 @@ function KebabDropdown({ onEdit, onDelete }: KebabDropdownProps) {
  * 체험 상세 페이지 상단 타이틀 영역
  *
  * 반응형 타이포그래피
- * - 카테고리 : 모바일 pretendard-13m gray-700 / PC·TB pretendard-14m gray-950
+ * - 카테고리 : 모바일 pretendard-13m gray-700 / PC·TB pretendard-14m gray-700
  * - 제목     : 모바일 pretendard-18B gray-950  / PC·TB pretendard-24B gray-950
  * - 별점     : IcStar 16×16 yellow-500, 텍스트 pretendard-14m gray-700
  * - 위치     : IcMap  16×16 black,      텍스트 pretendard-14m gray-700
@@ -122,9 +122,9 @@ export function ActivityInfoHeader({
       </div>
 
       {/* 제목 */}
-      <h1 className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-[-0.025em] text-gray-950">
+      <h2 className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-[-0.025em] text-gray-950">
         {title}
-      </h1>
+      </h2>
 
       {/* 별점 */}
       <div className="mt-1 flex items-center gap-1">

@@ -52,7 +52,7 @@ export function ActivityImageGallery({
         className
       )}
     >
-      <ImageSlot src={bannerImageUrl} alt={title} className="flex-2" />
+      <ImageSlot src={bannerImageUrl} alt={title} className="flex-[2]" />
       <div className="flex flex-1 flex-col gap-2">
         <ImageSlot
           src={subImage1}
