@@ -5,11 +5,11 @@ import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { Input } from '@/shared/components/input';
 import type { InputProps } from '@/shared/components/input/input.types';
 
+export type PasswordInputProps = Omit<InputProps, 'type' | 'rightIcon'>;
+
 /**
  * 비밀번호 입력 전용 Input 컴포넌트.
  * 공통 Input의 `rightIcon` prop에 보기/숨기기 토글 버튼을 주입한다.
- *
- * @remarks
  * 공통 Input에 비밀번호 토글이 내장되면 이 래퍼는 제거될 수 있다.
  *
  * @example
@@ -20,9 +20,8 @@ import type { InputProps } from '@/shared/components/input/input.types';
  *   onChange={(e) => setPassword(e.target.value)}
  * />
  */
-export default function PasswordInput(
-  props: Omit<InputProps, 'type' | 'rightIcon'>
-) {
+
+export function PasswordInput(props: PasswordInputProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleButton = (

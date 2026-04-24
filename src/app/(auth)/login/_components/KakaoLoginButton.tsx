@@ -3,16 +3,16 @@
 import { ButtonHTMLAttributes } from 'react';
 import { IcKakao } from '@/shared/assets/icons';
 
+export type KakaoLoginButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+
 /**
  * 카카오 소셜 로그인 전용 버튼.
  *
- * @remarks
  * 공통 Button 컴포넌트는 variant가 'primary' | 'secondary'만 지원하므로,
  * 소셜 로그인 전용 디자인은 별도 컴포넌트로 분리.
  */
-export default function KakaoLoginButton(
-  props: ButtonHTMLAttributes<HTMLButtonElement>
-) {
+
+export function KakaoLoginButton(props: KakaoLoginButtonProps) {
   return (
     <button
       type="button"

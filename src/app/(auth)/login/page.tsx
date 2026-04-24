@@ -2,8 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import KakaoLoginButton from '@/app/(auth)/login/_components/KakaoLoginButton';
-import PasswordInput from '@/app/(auth)/login/_components/PasswordInput';
+import { KakaoLoginButton } from '@/app/(auth)/login/_components/KakaoLoginButton';
+import { PasswordInput } from '@/app/(auth)/login/_components/PasswordInput';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
