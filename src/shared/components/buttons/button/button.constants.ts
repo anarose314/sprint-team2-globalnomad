@@ -9,7 +9,7 @@ export const BASE_CLASS =
  *
  * - height는 size별로 통일: lg=54px / md=48px / sm=40px
  * - 수직 정렬은 items-center + justify-center 에서 담당하므로 py 없음
- * - 좌우 패딩은 px-[1em] 으로 폰트 크기에 비례하여 자동 조정
+ * - 좌우 패딩은 px-em 으로 폰트 크기에 비례하여 자동 조정
  */
 export const BUTTON_VARIANTS = cva(BASE_CLASS, {
   variants: {
@@ -28,9 +28,9 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
       ],
     },
     size: {
-      lg: 'h-13.5 rounded-2xl px-[1em] text-lg',
-      md: 'h-12 rounded-[14px] px-[1em] text-lg',
-      sm: 'text-md h-10 rounded-xl px-[1em]',
+      lg: 'px-em h-13.5 rounded-2xl text-lg',
+      md: 'px-em h-12 rounded-[14px] text-lg',
+      sm: 'text-md px-em h-10 rounded-xl',
     },
   },
   defaultVariants: { variant: 'primary', size: 'lg' },
