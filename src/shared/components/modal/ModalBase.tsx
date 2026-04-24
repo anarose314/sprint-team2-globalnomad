@@ -61,7 +61,7 @@ export function ModalBase({
               </h2>
             ) : null}
 
-            {showCloseButton ? (
+            {showCloseButton && onClose ? (
               <button
                 type="button"
                 aria-label="닫기"
