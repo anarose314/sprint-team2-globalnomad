@@ -16,7 +16,7 @@ export type { ButtonProps };
 
 /**
  * 프로젝트 전반에서 사용하는 버튼 컴포넌트
- * `variant` prop으로 버튼 종류를 선택
+ * `variant` prop으로 버튼 종류를 선택, `as` prop을 통해 Link 등 다른 태그로 변경 가능
  *
  * ---
  *
@@ -27,6 +27,8 @@ export type { ButtonProps };
  *
  * @example
  * <Button size="lg" onClick={handleSubmit}>날짜 선택하기</Button>
+ * @example
+ * <Button as={Link} href="/add" size="md">체험 등록하러 가기</Button>
  *
  * ---
  *
@@ -39,11 +41,14 @@ export type { ButtonProps };
  * <Button variant="secondary" size="lg">취소</Button>
  * <Button variant="secondary" size="sm" icon={<IcEdit />}>수정</Button>
  */
-export function Button(props: ButtonProps) {
-  const { variant = 'primary', icon, className, children, ...rest } = props;
+export function Button<T extends React.ElementType = 'button'>(
+  props: ButtonProps<T>
+) {
+  const { as, variant = 'primary', icon, className, children, ...rest } = props;
+  const Component = as ?? 'button';
 
   const resolvedSize =
-    (rest as PrimaryButtonProps | SecondaryButtonProps).size ?? 'lg';
+    (rest as PrimaryButtonProps<T> | SecondaryButtonProps<T>).size ?? 'lg';
   const iconClass = ICON_SIZE_CLASS[resolvedSize];
 
   const styledIcon =
@@ -63,10 +68,10 @@ export function Button(props: ButtonProps) {
 
   /* ── Secondary Button ── */
   if (variant === 'secondary') {
-    const { size, ...buttonRest } = rest as SecondaryButtonProps;
+    const { size, ...buttonRest } = rest as SecondaryButtonProps<T>;
 
     return (
-      <button
+      <Component
         className={cn(
           BUTTON_VARIANTS({ variant: 'secondary', size }),
           className
@@ -84,15 +89,15 @@ export function Button(props: ButtonProps) {
           </span>
         )}
         <span className="truncate">{children}</span>
-      </button>
+      </Component>
     );
   }
 
-  /* ── Primary Button ── */
-  const { size, ...buttonRest } = rest as PrimaryButtonProps;
+  /* ── Primary Button ── */ const { size, ...buttonRest } =
+    rest as PrimaryButtonProps<T>;
 
   return (
-    <button
+    <Component
       className={cn(BUTTON_VARIANTS({ variant: 'primary', size }), className)}
       {...buttonRest}
     >
@@ -104,6 +109,6 @@ export function Button(props: ButtonProps) {
         </span>
       )}
       <span className="truncate">{children}</span>
-    </button>
+    </Component>
   );
 }
