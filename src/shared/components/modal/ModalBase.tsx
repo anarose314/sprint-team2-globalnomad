@@ -68,7 +68,7 @@ export function ModalBase({
                 onClick={onClose}
                 className="absolute top-7 right-7 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
               >
-                <IcClose className="h-5 w-5" />
+                <IcClose aria-hidden="true" className="h-5 w-5" />
               </button>
             ) : null}
           </div>
