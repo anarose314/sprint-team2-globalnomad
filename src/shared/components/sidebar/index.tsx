@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IcEdit, IcProfile } from '@/shared/assets/icons';
+import { Button } from '@/shared/components/buttons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 
 // TODO: 내 정보 API 연동 후 실제 프로필 이미지 URL로 교체
@@ -29,10 +30,10 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="shadow-card h-129.5 w-72.5 rounded-xl border border-gray-50 bg-white p-3.75">
+    <aside className="shadow-card hidden w-44.5 rounded-xl border border-gray-50 bg-white px-3.5 py-4 md:block lg:w-72.5 lg:py-6">
       {/* 프로필 영역 */}
-      <div className="relative mx-auto mt-3 mb-6 w-fit">
-        <div className="relative h-28 w-28 overflow-hidden rounded-full bg-blue-50">
+      <div className="relative mx-auto mb-3 w-fit lg:mb-6">
+        <div className="relative aspect-square w-17.5 overflow-hidden rounded-full bg-blue-50 lg:w-28">
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
@@ -42,7 +43,7 @@ export function Sidebar() {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-blue-200">
-              <IcProfile />
+              <IcProfile className="h-full w-full" />
             </div>
           )}
         </div>
@@ -51,14 +52,14 @@ export function Sidebar() {
           type="button"
           onClick={handleProfileEdit}
           aria-label="프로필 이미지 수정"
-          className="absolute right-1 bottom-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
+          className="absolute right-1 bottom-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 lg:h-7.5 lg:w-7.5"
         >
-          <IcEdit />
+          <IcEdit className="h-full w-full" />
         </button>
       </div>
 
       {/* 메뉴 영역 */}
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-3.5">
         {MENU_ITEMS.map((item) => {
           const isActive = pathname === item.href;
 
@@ -66,13 +67,13 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`typo-lg-medium mb-1 flex items-center gap-2 rounded-2xl px-5 py-3.75 transition-colors ${
+              className={`typo-lg-medium flex h-12 items-center gap-2 rounded-[14px] px-[1em] transition-colors lg:h-13.5 lg:rounded-2xl ${
                 isActive
                   ? 'bg-primary-100 [&_svg]:text-primary-500 text-gray-950'
                   : 'hover:bg-primary-100 text-gray-600 [&_svg]:text-gray-600'
               }`}
             >
-              <item.Icon />
+              <item.Icon className="h-6 w-6" />
               <span>{item.label}</span>
             </Link>
           );
@@ -80,14 +81,15 @@ export function Sidebar() {
       </nav>
 
       {/* 로그아웃 버튼 */}
-      {/* TODO: 이후 공통 버튼 컴포넌트로 변경해야 함 */}
-      <button
+      <Button
         type="button"
         onClick={handleLogout}
-        className="typo-lg-medium mt-4 w-full cursor-pointer rounded-2xl border border-gray-100 py-3.5 text-gray-400 transition-colors hover:bg-gray-50"
+        className="mt-3.5 h-12 w-full lg:h-13.5"
+        size="lg"
+        variant="secondary"
       >
         로그아웃
-      </button>
+      </Button>
     </aside>
   );
 }
