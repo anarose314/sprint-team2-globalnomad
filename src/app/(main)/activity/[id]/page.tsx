@@ -25,6 +25,7 @@ export default function ActivityDetailPage() {
   const activity = MOCK_ACTIVITY;
 
   return (
+<<<<<<< HEAD
     <main className="py-6 md:py-8 2xl:px-10 2xl:py-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
       <div className="mx-auto w-full max-w-80 md:max-w-2xl 2xl:max-w-6xl">
@@ -33,6 +34,16 @@ export default function ActivityDetailPage() {
         <div className="flex flex-col gap-4 2xl:mb-10 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-6">
           {/* 이미지 갤러리 (데스크탑: 좌측) */}
           <div className="2xl:col-span-3">
+=======
+    <main className="py-6 md:py-8 lg:px-10 lg:py-10">
+      {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
+      <div className="mx-auto w-full max-w-[327px] md:max-w-[684px] lg:max-w-[1200px]">
+        {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
+        {/* 모바일·태블릿: 세로 스택 / 데스크탑(lg 1024px+): 이미지 좌 · 타이틀+예약카드 우 */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+          {/* 이미지 갤러리 (데스크탑: 좌측) */}
+          <div className="lg:flex-3">
+>>>>>>> 279d6d9 (✨ Feat: 체험 상세페이지 상단 이미지 갤러리 및 우측 타이틀 마크업)
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={activity.subImageUrls}
@@ -41,6 +52,7 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
+<<<<<<< HEAD
           <div className="flex flex-col 2xl:col-span-2">
             <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-0 2xl:border-b-0 2xl:pb-0">
               <ActivityInfoHeader
@@ -52,6 +64,17 @@ export default function ActivityDetailPage() {
                 isOwner={activity.isOwner}
               />
             </div>
+=======
+          <div className="flex flex-col gap-6 lg:flex-2">
+            <ActivityInfoHeader
+              category={activity.category}
+              title={activity.title}
+              rating={activity.rating}
+              reviewCount={activity.reviewCount}
+              address={activity.address}
+              isOwner={activity.isOwner}
+            />
+>>>>>>> 279d6d9 (✨ Feat: 체험 상세페이지 상단 이미지 갤러리 및 우측 타이틀 마크업)
 
             {/* TODO: 예약 카드 (참여 인원, 캘린더, 시간 슬롯, 총합계, 예약하기 버튼) */}
           </div>
