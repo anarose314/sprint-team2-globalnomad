@@ -4,6 +4,7 @@ import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.const
 
 type CustomButtonProps<T extends ElementType> = {
   as?: T;
+  /** 버튼 왼쪽에 표시할 아이콘 */
   icon?: ReactNode;
 } & Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'>;
 
