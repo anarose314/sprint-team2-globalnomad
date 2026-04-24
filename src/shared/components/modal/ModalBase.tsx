@@ -18,8 +18,7 @@
  * </ModalBase>
  */
 import type { ReactNode } from 'react';
-import clsx from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/shared/utils/cn';
 
 interface ModalBaseProps {
   title?: string;
@@ -48,10 +47,8 @@ export function ModalBase({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
-        className={twMerge(
-          clsx(
-            'w-full max-w-135 rounded-3xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]'
-          ),
+        className={cn(
+          'w-full max-w-135 rounded-3xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]',
           className
         )}
       >
@@ -77,8 +74,9 @@ export function ModalBase({
         )}
 
         <div
-          className={twMerge(
-            clsx('px-7 py-6', title || showCloseButton ? 'pt-5' : 'p-7'),
+          className={cn(
+            'px-7 py-6',
+            title || showCloseButton ? 'pt-5' : 'p-7',
             bodyClassName
           )}
         >
@@ -87,7 +85,7 @@ export function ModalBase({
 
         {footer ? (
           <div
-            className={twMerge(
+            className={cn(
               'flex items-center justify-center gap-3 px-7 pb-7',
               footerClassName
             )}
