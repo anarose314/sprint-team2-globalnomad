@@ -3,7 +3,7 @@ import { ModalBase } from '@/shared/components/modal/ModalBase';
 interface OneButtonModalProps {
   title: string;
   buttonText?: string;
-  onConfirm?: () => void;
+  onConfirm: () => void;
 }
 
 export function OneButtonModal({
