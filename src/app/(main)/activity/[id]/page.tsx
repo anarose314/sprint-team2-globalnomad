@@ -30,9 +30,9 @@ export default function ActivityDetailPage() {
       <div className="mx-auto w-full max-w-[327px] md:max-w-[684px] lg:max-w-[1200px]">
         {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
         {/* 모바일·태블릿: 세로 스택 / 데스크탑(lg 1024px+): 이미지 좌 · 타이틀+예약카드 우 */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+        <div className="flex flex-col gap-4 lg:mb-10 lg:grid lg:grid-cols-[670px_minmax(0,1fr)] lg:items-start lg:gap-6">
           {/* 이미지 갤러리 (데스크탑: 좌측) */}
-          <div className="lg:flex-3">
+          <div>
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={activity.subImageUrls}
@@ -41,15 +41,17 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
-          <div className="flex flex-col gap-6 lg:flex-2">
-            <ActivityInfoHeader
-              category={activity.category}
-              title={activity.title}
-              rating={activity.rating}
-              reviewCount={activity.reviewCount}
-              address={activity.address}
-              isOwner={activity.isOwner}
-            />
+          <div className="flex flex-col">
+            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-[30px] md:pb-[30px] lg:mb-0 lg:border-b-0 lg:pb-0">
+              <ActivityInfoHeader
+                category={activity.category}
+                title={activity.title}
+                rating={activity.rating}
+                reviewCount={activity.reviewCount}
+                address={activity.address}
+                isOwner={activity.isOwner}
+              />
+            </div>
 
             {/* TODO: 예약 카드 (참여 인원, 캘린더, 시간 슬롯, 총합계, 예약하기 버튼) */}
           </div>
