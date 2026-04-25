@@ -16,15 +16,19 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
     variant: {
       primary: [
         'bg-primary-500 font-bold text-white',
-        'enabled:hover:bg-primary-500/80',
-        'enabled:active:bg-primary-700 enabled:active:scale-[0.98]',
+        'hover:bg-primary-500/80',
+        'active:bg-primary-700 active:scale-[0.98]',
         'disabled:bg-gray-200 disabled:text-gray-50',
+        'disabled:hover:bg-gray-200',
+        'disabled:active:scale-100 disabled:active:bg-gray-200',
       ],
       secondary: [
         'border border-gray-200 bg-white font-medium text-gray-600',
-        'enabled:hover:border-gray-300 enabled:hover:bg-gray-50',
-        'enabled:active:bg-primary-500 enabled:active:border-primary-500 enabled:active:scale-[0.98] enabled:active:text-white',
+        'hover:border-gray-300 hover:bg-gray-50',
+        'active:bg-primary-500 active:border-primary-500 active:scale-[0.98] active:text-white',
         'disabled:border-gray-200 disabled:bg-white disabled:text-gray-200',
+        'disabled:hover:border-gray-200 disabled:hover:bg-white',
+        'disabled:active:scale-100 disabled:active:border-gray-200 disabled:active:bg-white disabled:active:text-gray-200',
       ],
     },
     size: {
