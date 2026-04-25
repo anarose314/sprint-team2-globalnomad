@@ -2,8 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { KakaoLoginButton } from '@/app/(auth)/login/_components/KakaoLoginButton';
-import { PasswordInput } from '@/app/(auth)/login/_components/PasswordInput';
+import { KakaoLoginButton } from '@/app/(auth)/components/kakao-login-button';
+import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
@@ -17,6 +17,7 @@ import { Input } from '@/shared/components/input';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const isSubmitDisabled = !email || !password;
 
@@ -53,12 +54,33 @@ export default function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
         />
-        <PasswordInput
+        {/*
+         * TODO: 공통 Input(shared/components/input)에 비밀번호 토글 기능이 추가되면
+         *       아래 rightIcon 인라인 토글을 제거하고 <Input type="password" /> 한 줄로 단순화.
+         */}
+        <Input
           label="비밀번호"
+          type={isPasswordVisible ? 'text' : 'password'}
           placeholder="비밀번호를 입력해 주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setIsPasswordVisible((prev) => !prev)}
+              aria-label={
+                isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
+              }
+              className="text-gray-400 transition-colors hover:text-gray-600"
+            >
+              {isPasswordVisible ? (
+                <IcEyeOn className="h-5 w-5" />
+              ) : (
+                <IcEyeOff className="h-5 w-5" />
+              )}
+            </button>
+          }
         />
 
         <Button type="submit" size="lg" disabled={isSubmitDisabled}>
