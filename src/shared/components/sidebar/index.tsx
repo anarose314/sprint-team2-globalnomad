@@ -67,7 +67,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`typo-lg-medium px-em flex h-12 items-center gap-2 rounded-[14px] transition-colors lg:h-13.5 lg:rounded-2xl ${
+              className={`typo-lg-medium px-em flex h-12 items-center gap-2 rounded-2xl transition-colors lg:h-13.5 lg:rounded-2xl ${
                 isActive
                   ? 'bg-primary-100 [&_svg]:text-primary-500 text-gray-950'
                   : 'hover:bg-primary-100 text-gray-600 [&_svg]:text-gray-600'

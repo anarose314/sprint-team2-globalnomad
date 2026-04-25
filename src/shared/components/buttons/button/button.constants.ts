@@ -33,7 +33,7 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
     },
     size: {
       lg: 'px-em h-13.5 rounded-2xl text-lg',
-      md: 'px-em h-12 rounded-[14px] text-lg',
+      md: 'px-em h-12 rounded-2xl text-lg',
       sm: 'text-md px-em h-10 rounded-xl',
     },
   },
