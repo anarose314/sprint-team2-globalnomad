@@ -28,6 +28,7 @@ export function OneButtonModal({
 }: OneButtonModalProps) {
   return (
     <ModalBase
+      role="alertdialog"
       title={title}
       className="min-h-39 max-w-100 rounded-3xl"
       bodyClassName="px-10 pt-11 pb-0"

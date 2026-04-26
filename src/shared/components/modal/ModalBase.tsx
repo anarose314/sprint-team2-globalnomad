@@ -30,6 +30,7 @@ interface ModalBaseProps {
   bodyClassName?: string;
   footerClassName?: string;
   onClose?: () => void;
+  role?: 'dialog' | 'alertdialog';
 }
 
 export function ModalBase({
@@ -40,12 +41,13 @@ export function ModalBase({
   bodyClassName,
   footerClassName,
   onClose,
+  role = 'dialog',
 }: ModalBaseProps) {
   const isHeaderVisible = Boolean(title || onClose);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div
-        role="dialog"
+        role={role ?? 'dialog'}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
         className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
