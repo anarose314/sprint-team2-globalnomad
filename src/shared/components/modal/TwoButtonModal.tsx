@@ -33,7 +33,7 @@ export function TwoButtonModal({
 }: TwoButtonModalProps) {
   return (
     <ModalBase
-      className="min-h-39 max-w-100 rounded-3xl"
+      className="min-h-39 max-w-100"
       bodyClassName="px-10 pt-11 pb-0"
       footerClassName="px-10 pt-5 pb-10"
       footer={
