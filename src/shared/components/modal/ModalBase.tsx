@@ -49,10 +49,7 @@ export function ModalBase({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
-        className={cn(
-          'w-full max-w-135 rounded-3xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]',
-          className
-        )}
+        className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
       >
         {(title || showCloseButton) && (
           <div className="relative px-7 pt-7">
