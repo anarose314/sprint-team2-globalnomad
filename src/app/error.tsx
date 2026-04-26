@@ -5,6 +5,7 @@ import Link from 'next/link';
 import LogoIcon from '@/shared/assets/logos/logo-vertical.svg';
 import { Button } from '@/shared/components/buttons';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
+import { Heading } from '@/shared/components/heading';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -26,9 +27,9 @@ export default function Error({ error, reset }: ErrorProps) {
         <p className="typo-3xl-bold text-red-500">500</p>
 
         <div className="flex flex-col gap-2">
-          <h2 className="typo-2xl-bold text-gray-950">
+          <Heading as="h2" textStyle="typo-2xl-bold">
             서버에 문제가 발생했어요
-          </h2>
+          </Heading>
           <p className="typo-lg-regular text-gray-500">
             일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.
           </p>
