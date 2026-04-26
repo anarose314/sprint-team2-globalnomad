@@ -48,7 +48,7 @@ export function ActivityImageGallery({
   return (
     <div
       className={cn(
-        'flex h-[220px] gap-2 overflow-hidden rounded-3xl md:h-[310px] lg:h-[534px]',
+        'flex h-56 gap-2 overflow-hidden rounded-3xl md:h-80 2xl:h-128',
         className
       )}
     >
