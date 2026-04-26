@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { KakaoLoginButton } from '@/app/(auth)/components/kakao-login-button';
+import { KakaoAuthButton } from '@/app/(auth)/components/kakao-auth-button';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
@@ -100,7 +100,7 @@ export default function LoginPage() {
       </div>
 
       {/* 카카오 로그인 */}
-      <KakaoLoginButton />
+      <KakaoAuthButton>카카오 로그인</KakaoAuthButton>
 
       {/* 회원가입 링크 */}
       <p className="mt-8 text-sm text-gray-400">
