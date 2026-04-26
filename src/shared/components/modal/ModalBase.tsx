@@ -18,9 +18,9 @@
  * </ModalBase>
  */
 import type { ReactNode } from 'react';
-import { cn } from '@/shared/utils/cn';
 import { IcClose } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
 
 interface ModalBaseProps {
   title?: string;
