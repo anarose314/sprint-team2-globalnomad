@@ -22,10 +22,10 @@ export function KakaoAuthButton({ children, ...props }: KakaoAuthButtonProps) {
   return (
     <button
       type="button"
-      className="typo-lg-medium flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-4 text-base text-gray-600 transition-colors hover:bg-gray-50"
+      className="typo-lg-medium flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-4 text-gray-600 transition-colors hover:bg-gray-50"
       {...props}
     >
-      <IcKakao />
+      <IcKakao aria-hidden="true" />
       <span>{children}</span>
     </button>
   );
