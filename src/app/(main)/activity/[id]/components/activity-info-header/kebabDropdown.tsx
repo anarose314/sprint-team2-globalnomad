@@ -8,10 +8,7 @@ interface KebabDropdownProps {
   onDelete?: () => void;
 }
 
-export default function KebabDropdown({
-  onEdit,
-  onDelete,
-}: KebabDropdownProps) {
+export function KebabDropdown({ onEdit, onDelete }: KebabDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
