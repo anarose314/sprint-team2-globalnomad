@@ -29,7 +29,6 @@ interface ModalBaseProps {
   className?: string;
   bodyClassName?: string;
   footerClassName?: string;
-  showCloseButton?: boolean;
   onClose?: () => void;
 }
 
@@ -40,9 +39,9 @@ export function ModalBase({
   className,
   bodyClassName,
   footerClassName,
-  showCloseButton = false,
   onClose,
 }: ModalBaseProps) {
+  const isHeaderVisible = Boolean(title || onClose);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div
@@ -51,15 +50,14 @@ export function ModalBase({
         aria-labelledby={title ? 'modal-title' : undefined}
         className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
       >
-        {(title || showCloseButton) && (
+        {isHeaderVisible && (
           <div className="relative px-7 pt-7">
-            {title ? (
+            {title && (
               <Heading id="modal-title" textStyle="typo-2xl-bold">
                 {title}
               </Heading>
-            ) : null}
-
-            {showCloseButton && onClose ? (
+            )}
+            {onClose && (
               <button
                 type="button"
                 aria-label="닫기"
@@ -68,21 +66,21 @@ export function ModalBase({
               >
                 <IcClose aria-hidden="true" className="h-5 w-5" />
               </button>
-            ) : null}
+            )}
           </div>
         )}
 
         <div
           className={cn(
             'px-7 py-6',
-            title || showCloseButton ? 'pt-5' : 'p-7',
+            isHeaderVisible ? 'pt-5' : 'p-7',
             bodyClassName
           )}
         >
           {children}
         </div>
 
-        {footer ? (
+        {footer && (
           <div
             className={cn(
               'flex items-center justify-center gap-3 px-7 pb-7',
@@ -91,7 +89,7 @@ export function ModalBase({
           >
             {footer}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );
