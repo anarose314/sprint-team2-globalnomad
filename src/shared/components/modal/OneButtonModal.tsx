@@ -12,6 +12,7 @@
  *   onConfirm={handleClose}
  * />
  */
+import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface OneButtonModalProps {
@@ -32,13 +33,9 @@ export function OneButtonModal({
       bodyClassName="px-10 pt-11 pb-0"
       footerClassName="px-10 pt-5 pb-10"
       footer={
-        <button
-          type="button"
-          onClick={onConfirm}
-          className="bg-primary-500 h-12 w-full max-w-48 rounded-2xl text-lg font-bold text-white transition-opacity hover:opacity-90"
-        >
+        <Button size="lg" onClick={onConfirm} className="w-full max-w-48">
           {buttonText}
-        </button>
+        </Button>
       }
     >
       <p className="typo-2lg-bold text-center text-gray-950">{title}</p>
