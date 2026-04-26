@@ -11,7 +11,7 @@ interface TwoButtonModalProps {
 export function TwoButtonModal({
   title,
   cancelText = '아니오',
-  confirmText = '취소하기',
+  confirmText = '확인',
   onCancel,
   onConfirm,
 }: TwoButtonModalProps) {
