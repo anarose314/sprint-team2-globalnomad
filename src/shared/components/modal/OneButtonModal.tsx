@@ -27,6 +27,7 @@ export function OneButtonModal({
 }: OneButtonModalProps) {
   return (
     <ModalBase
+      title={title}
       className="min-h-39 max-w-100 rounded-3xl"
       bodyClassName="px-10 pt-11 pb-0"
       footerClassName="px-10 pt-5 pb-10"
@@ -40,7 +41,7 @@ export function OneButtonModal({
         </button>
       }
     >
-      <p className="text-2lg text-center font-bold text-gray-950">{title}</p>
+      <p className="typo-2lg-bold text-center text-gray-950">{title}</p>
     </ModalBase>
   );
 }
