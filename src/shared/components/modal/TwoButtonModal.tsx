@@ -17,7 +17,7 @@
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface TwoButtonModalProps {
-  title: string;
+  message: string;
   cancelText?: string;
   confirmText?: string;
   onCancel?: () => void;
@@ -25,7 +25,7 @@ interface TwoButtonModalProps {
 }
 
 export function TwoButtonModal({
-  title,
+  message: title,
   cancelText = '아니오',
   confirmText = '확인',
   onCancel,
