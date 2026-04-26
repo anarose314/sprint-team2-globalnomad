@@ -16,13 +16,13 @@ import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface OneButtonModalProps {
-  title: string;
+  message: string;
   buttonText?: string;
   onConfirm: () => void;
 }
 
 export function OneButtonModal({
-  title,
+  message: title,
   buttonText = '확인',
   onConfirm,
 }: OneButtonModalProps) {
