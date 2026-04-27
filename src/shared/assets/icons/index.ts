@@ -28,6 +28,10 @@ import IcSearch from '@/shared/assets/icons/ic-search.svg';
 import IcSetting from '@/shared/assets/icons/ic-setting.svg';
 import IcSport from '@/shared/assets/icons/ic-sport.svg';
 import IcStar from '@/shared/assets/icons/ic-star.svg';
+import IcToastError from '@/shared/assets/icons/ic-toast-error.svg';
+import IcToastInfo from '@/shared/assets/icons/ic-toast-info.svg';
+import IcToastSuccess from '@/shared/assets/icons/ic-toast-success.svg';
+import IcToastWarning from '@/shared/assets/icons/ic-toast-warning.svg';
 import IcTour from '@/shared/assets/icons/ic-tour.svg';
 import IcUser from '@/shared/assets/icons/ic-user.svg';
 import IcWellbeing from '@/shared/assets/icons/ic-wellbeing.svg';
@@ -63,6 +67,10 @@ export {
   IcSetting,
   IcSport,
   IcStar,
+  IcToastError,
+  IcToastInfo,
+  IcToastSuccess,
+  IcToastWarning,
   IcTour,
   IcUser,
   IcWellbeing,
