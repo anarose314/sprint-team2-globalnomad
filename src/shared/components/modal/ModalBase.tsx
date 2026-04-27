@@ -47,7 +47,7 @@ export function ModalBase({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div
-        role={role ?? 'dialog'}
+        role={role}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
         className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
