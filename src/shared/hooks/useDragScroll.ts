@@ -1,7 +1,10 @@
 import { useRef, useState } from 'react';
 
+const DRAG_THRESHOLD = 5;
+
 /**
  * 마우스 드래그를 통한 가로 스크롤 기능을 데스크탑에도 제공하는 커스텀 훅
+ * 드래그 중 실수로 내부 아이템이 클릭되는 오류 방지 포함
  *
  * * @example
  * ```tsx
@@ -20,14 +23,19 @@ import { useRef, useState } from 'react';
  */
 export function useDragScroll<T extends HTMLElement>() {
   const scrollRef = useRef<T>(null);
+
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+  const [clickStartX, setClickStartX] = useState(0);
+  const [isClickPrevented, setIsClickPrevented] = useState(false);
 
   const onDragStart = (e: React.MouseEvent) => {
-    e.preventDefault();
     setIsDragging(true);
+
     if (scrollRef.current) {
       setStartX(e.pageX + scrollRef.current.scrollLeft);
+      setClickStartX(e.pageX);
+      setIsClickPrevented(false);
     }
   };
 
@@ -35,7 +43,17 @@ export function useDragScroll<T extends HTMLElement>() {
 
   const onDragMove = (e: React.MouseEvent) => {
     if (isDragging && scrollRef.current) {
+      if (Math.abs(e.pageX - clickStartX) > DRAG_THRESHOLD) {
+        setIsClickPrevented(true);
+      }
       scrollRef.current.scrollLeft = startX - e.pageX;
+    }
+  };
+
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (isClickPrevented) {
+      e.stopPropagation();
+      e.preventDefault();
     }
   };
 
@@ -46,6 +64,7 @@ export function useDragScroll<T extends HTMLElement>() {
       onMouseUp: onDragEnd,
       onMouseLeave: onDragEnd,
       onMouseMove: onDragMove,
+      onClickCapture,
     },
   };
 }
