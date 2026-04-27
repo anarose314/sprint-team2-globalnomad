@@ -29,7 +29,7 @@ export function useDragScroll<T extends HTMLElement>() {
   const [clickStartX, setClickStartX] = useState(0);
   const [isClickPrevented, setIsClickPrevented] = useState(false);
 
-  const onDragStart = (e: React.MouseEvent) => {
+  const handleDragStart = (e: React.MouseEvent) => {
     setIsDragging(true);
 
     if (scrollRef.current) {
@@ -39,9 +39,9 @@ export function useDragScroll<T extends HTMLElement>() {
     }
   };
 
-  const onDragEnd = () => setIsDragging(false);
+  const handleDragEnd = () => setIsDragging(false);
 
-  const onDragMove = (e: React.MouseEvent) => {
+  const handleDragMove = (e: React.MouseEvent) => {
     if (isDragging && scrollRef.current) {
       if (Math.abs(e.pageX - clickStartX) > DRAG_THRESHOLD) {
         setIsClickPrevented(true);
@@ -50,7 +50,7 @@ export function useDragScroll<T extends HTMLElement>() {
     }
   };
 
-  const onClickCapture = (e: React.MouseEvent) => {
+  const handleClickCapture = (e: React.MouseEvent) => {
     if (isClickPrevented) {
       e.stopPropagation();
       e.preventDefault();
@@ -60,11 +60,11 @@ export function useDragScroll<T extends HTMLElement>() {
   return {
     scrollRef,
     events: {
-      onMouseDown: onDragStart,
-      onMouseUp: onDragEnd,
-      onMouseLeave: onDragEnd,
-      onMouseMove: onDragMove,
-      onClickCapture,
+      onMouseDown: handleDragStart,
+      onMouseUp: handleDragEnd,
+      onMouseLeave: handleDragEnd,
+      onMouseMove: handleDragMove,
+      onClickCapture: handleClickCapture,
     },
   };
 }
