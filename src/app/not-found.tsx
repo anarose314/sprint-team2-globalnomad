@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import LogoIcon from '@/shared/assets/logos/logo-vertical.svg';
 import { Button } from '@/shared/components/buttons';
