@@ -52,26 +52,19 @@ export function ReviewModal({
 }: ReviewModalProps) {
   return (
     <ModalBase
-      className="h-130.75 max-w-96.25 rounded-3xl"
-      bodyClassName="px-[30px] pt-6 pb-[30px]"
+      className="h-130.75 max-w-96.25"
+      bodyClassName="px-7.5 pt-6 pb-7.5"
       footerClassName="hidden"
+      showCloseButton
+      onClose={onClose}
     >
       <div className="relative flex h-full flex-col">
-        <button
-          type="button"
-          aria-label="닫기"
-          onClick={onClose}
-          className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center text-black"
-        >
-          <span className="text-[24px] leading-none">×</span>
-        </button>
-
         <div className="mt-8.5 flex flex-col items-center">
-          <h2 className="text-center text-lg leading-[1.4] font-bold text-gray-950">
+          <h2 className="typo-lg-bold text-center leading-[1.4] text-gray-950">
             {title}
           </h2>
 
-          <p className="text-md mt-1.5 text-center leading-normal font-medium text-gray-500">
+          <p className="typo-md-medium mt-1.5 text-center leading-normal text-gray-500">
             {dateText}
           </p>
         </div>
@@ -96,7 +89,7 @@ export function ReviewModal({
         </div>
 
         <div className="mt-7.5 flex flex-col gap-4">
-          <p className="text-2lg leading-[1.4] font-bold text-gray-950">
+          <p className="typo-2lg-bold leading-[1.4] text-gray-950">
             {sectionTitle}
           </p>
 
@@ -105,12 +98,12 @@ export function ReviewModal({
             onChange={(e) => onReviewTextChange?.(e.target.value)}
             maxLength={maxLength}
             placeholder={placeholder}
-            className="h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 text-lg leading-normal font-medium text-gray-950 outline-none placeholder:text-gray-400"
+            className="typo-lg-medium h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 leading-normal text-gray-950 outline-none placeholder:text-gray-400"
           />
         </div>
 
         <div className="mt-auto flex flex-col gap-4">
-          <p className="text-md mt-1 text-right leading-none font-medium text-gray-500">
+          <p className="typo-md-medium mt-1 text-right leading-none text-gray-500">
             {reviewText.length}/{maxLength}
           </p>
 
