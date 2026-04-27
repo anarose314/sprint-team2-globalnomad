@@ -33,7 +33,7 @@ export const FILTER_ICON_CLASS = 'block shrink-0 w-4 h-4 md:w-6 md:h-6';
  * - px-em: 폰트 크기에 비례한 좌우 패딩, py 불필요 (items-center 수직 정렬)
  */
 export const filterButtonVariants = cva(
-  'text-md inline-flex h-9.25 cursor-pointer items-center justify-center gap-1 rounded-full transition-all duration-200 md:h-11 md:gap-1.5 md:text-lg',
+  'text-md px-em inline-flex h-9.25 cursor-pointer items-center justify-center gap-1 rounded-full transition-all duration-200 md:h-11 md:gap-1.5 md:text-lg',
   {
     variants: {
       state: {
