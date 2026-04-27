@@ -13,7 +13,7 @@
  *   onConfirm={handleConfirm}
  * />
  */
-
+import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface TwoButtonModalProps {
@@ -38,25 +38,27 @@ export function TwoButtonModal({
       footerClassName="px-10 pt-5 pb-10"
       footer={
         <div className="flex w-full items-center justify-center gap-4.5">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="lg"
             onClick={onCancel}
-            className="h-12 w-full max-w-31.5 rounded-[14px] border border-gray-300 bg-white text-lg font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="w-full max-w-31.5"
           >
             {cancelText}
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="lg"
             onClick={onConfirm}
-            className="bg-primary-500 h-12 w-full max-w-31.5 rounded-[14px] text-lg font-semibold text-white transition-opacity hover:opacity-90"
+            className="w-full max-w-31.5"
           >
             {confirmText}
-          </button>
+          </Button>
         </div>
       }
     >
-      <p className="text-2lg text-center font-bold text-gray-950">{title}</p>
+      <p className="typo-2lg-bold text-center text-gray-950">{title}</p>
     </ModalBase>
   );
 }
