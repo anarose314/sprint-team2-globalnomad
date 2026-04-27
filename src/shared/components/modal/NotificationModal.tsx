@@ -1,6 +1,9 @@
+import { IcClose } from '@/shared/assets/icons';
+import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
+
 interface NotificationItem {
   id: number | string;
-
   title: string;
   timeText: string;
   activityTitle: string;
@@ -53,10 +56,11 @@ export function NotificationModal({
 }: NotificationModalProps) {
   return (
     <div className="w-57.75 overflow-hidden rounded-[10px] border border-gray-100 bg-white">
+      {/* 헤더 */}
       <div className="flex h-12 items-center justify-between border-b border-gray-100 px-4">
-        <h2 className="text-lg leading-none font-bold text-gray-950">
+        <Heading textStyle="typo-lg-bold">
           {title} {count}개
-        </h2>
+        </Heading>
 
         <button
           type="button"
@@ -64,10 +68,11 @@ export function NotificationModal({
           onClick={onClose}
           className="flex h-8 w-8 items-center justify-center text-gray-950"
         >
-          <span className="text-[24px] leading-none">×</span>
+          <IcClose aria-hidden="true" className="h-5 w-5" />
         </button>
       </div>
 
+      {/* 리스트 */}
       <ul>
         {notifications.map((notification, index) => {
           const {
@@ -86,13 +91,12 @@ export function NotificationModal({
           return (
             <li
               key={id}
-              className={[
+              className={cn(
                 'px-4 py-5',
-                index !== notifications.length - 1
-                  ? 'border-b border-gray-100'
-                  : '',
-                highlighted ? 'bg-[#eef4fa]' : 'bg-white',
-              ].join(' ')}
+                index !== notifications.length - 1 &&
+                  'border-b border-gray-100',
+                highlighted ? 'bg-[#eef4fa]' : 'bg-white'
+              )}
             >
               <div className="flex items-start justify-between">
                 <p className="text-md leading-none font-bold text-gray-950">
