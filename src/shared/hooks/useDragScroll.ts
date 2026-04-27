@@ -40,7 +40,12 @@ export const useDragScroll = <T extends HTMLElement>() => {
   }, []);
 
   const handleDragEnd = useCallback(() => {
-    dragState.current.isDragging = false;
+    dragState.current = {
+      isDragging: false,
+      startX: 0,
+      clickStartX: 0,
+      isClickPrevented: false,
+    };
   }, []);
 
   const handleDragMove = useCallback((e: React.MouseEvent) => {
