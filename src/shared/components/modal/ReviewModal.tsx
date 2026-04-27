@@ -1,4 +1,5 @@
 import type { SVGProps } from 'react';
+import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface ReviewModalProps {
@@ -107,13 +108,14 @@ export function ReviewModal({
             {reviewText.length}/{maxLength}
           </p>
 
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="lg"
             onClick={onSubmit}
-            className="bg-primary-500 h-14 w-full rounded-2xl text-lg font-bold text-white"
+            className="w-full"
           >
             작성하기
-          </button>
+          </Button>
         </div>
       </div>
     </ModalBase>
