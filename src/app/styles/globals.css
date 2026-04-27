@@ -34,10 +34,12 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-@utility scrollbar-hide {
-  -ms-overflow-style: none; /* Edge */
+/* 브라우저별 기본 스크롤바를 숨기는 유틸리티 클래스 */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
