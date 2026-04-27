@@ -15,12 +15,13 @@ import { Input } from '@/shared/components/input';
  * TODO: 내 정보 조회/수정 API 연동
  */
 export function ProfileForm() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] =
+    useState(false);
 
-  const toggleShowPassword = () => setShowPassword((prev) => !prev);
-  const toggleShowPasswordConfirm = () =>
-    setShowPasswordConfirm((prev) => !prev);
+  const handlePasswordToggle = () => setIsPasswordVisible((prev) => !prev);
+  const handlePasswordConfirmToggle = () =>
+    setIsPasswordConfirmVisible((prev) => !prev);
 
   return (
     <form className="flex flex-col gap-6">
@@ -35,34 +36,34 @@ export function ProfileForm() {
 
       <Input
         label="비밀번호"
-        type={showPassword ? 'text' : 'password'}
+        type={isPasswordVisible ? 'text' : 'password'}
         placeholder="8자 이상 입력해 주세요"
         rightIcon={
           <button
             type="button"
-            onClick={toggleShowPassword}
-            aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+            onClick={handlePasswordToggle}
+            aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 표시'}
             className="cursor-pointer"
           >
-            {showPassword ? <IcEyeOn /> : <IcEyeOff />}
+            {isPasswordVisible ? <IcEyeOn /> : <IcEyeOff />}
           </button>
         }
       />
 
       <Input
         label="비밀번호 확인"
-        type={showPasswordConfirm ? 'text' : 'password'}
+        type={isPasswordConfirmVisible ? 'text' : 'password'}
         placeholder="비밀번호를 한 번 더 입력해 주세요"
         rightIcon={
           <button
             type="button"
-            onClick={toggleShowPasswordConfirm}
+            onClick={handlePasswordConfirmToggle}
             aria-label={
-              showPasswordConfirm ? '비밀번호 숨기기' : '비밀번호 표시'
+              isPasswordConfirmVisible ? '비밀번호 숨기기' : '비밀번호 표시'
             }
             className="cursor-pointer"
           >
-            {showPasswordConfirm ? <IcEyeOn /> : <IcEyeOff />}
+            {isPasswordConfirmVisible ? <IcEyeOn /> : <IcEyeOff />}
           </button>
         }
       />

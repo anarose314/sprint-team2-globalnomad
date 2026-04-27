@@ -1,5 +1,10 @@
+import { Metadata } from 'next';
 import { MyPageHeader } from '@/app/(main)/my/components/my-page-header';
 import { ProfileForm } from '@/app/(main)/my/profile/components/profile-form';
+
+export const metadata: Metadata = {
+  title: '내 정보',
+};
 
 export default function ProfilePage() {
   return (
