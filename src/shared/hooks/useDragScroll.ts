@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 const DRAG_THRESHOLD = 5;
 
@@ -22,44 +22,42 @@ const DRAG_THRESHOLD = 5;
 export const useDragScroll = <T extends HTMLElement>() => {
   const scrollRef = useRef<T>(null);
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [clickStartX, setClickStartX] = useState(0);
-  const [isClickPrevented, setIsClickPrevented] = useState(false);
+  const dragState = useRef({
+    isDragging: false,
+    startX: 0,
+    clickStartX: 0,
+    isClickPrevented: false,
+  });
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
-    setIsDragging(true);
+    dragState.current.isDragging = true;
 
     if (scrollRef.current) {
-      setStartX(e.pageX + scrollRef.current.scrollLeft);
-      setClickStartX(e.pageX);
-      setIsClickPrevented(false);
+      dragState.current.startX = e.pageX + scrollRef.current.scrollLeft;
+      dragState.current.clickStartX = e.pageX;
+      dragState.current.isClickPrevented = false;
     }
   }, []);
 
-  const handleDragEnd = useCallback(() => setIsDragging(false), []);
+  const handleDragEnd = useCallback(() => {
+    dragState.current.isDragging = false;
+  }, []);
 
-  const handleDragMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (isDragging && scrollRef.current) {
-        if (Math.abs(e.pageX - clickStartX) > DRAG_THRESHOLD) {
-          setIsClickPrevented(true);
-        }
-        scrollRef.current.scrollLeft = startX - e.pageX;
+  const handleDragMove = useCallback((e: React.MouseEvent) => {
+    if (dragState.current.isDragging && scrollRef.current) {
+      if (Math.abs(e.pageX - dragState.current.clickStartX) > DRAG_THRESHOLD) {
+        dragState.current.isClickPrevented = true;
       }
-    },
-    [isDragging, startX, clickStartX]
-  );
+      scrollRef.current.scrollLeft = dragState.current.startX - e.pageX;
+    }
+  }, []);
 
-  const handleClickCapture = useCallback(
-    (e: React.MouseEvent) => {
-      if (isClickPrevented) {
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    },
-    [isClickPrevented]
-  );
+  const handleClickCapture = useCallback((e: React.MouseEvent) => {
+    if (dragState.current.isClickPrevented) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, []);
 
   const events = useMemo(
     () => ({
