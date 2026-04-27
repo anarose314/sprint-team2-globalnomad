@@ -72,10 +72,7 @@ export function Input({
       </div>
 
       {hasError && (
-        <p
-          id={`${inputId}-error`}
-          className="mt-2 text-sm font-medium text-red-500"
-        >
+        <p id={`${inputId}-error`} className="typo-sm-medium mt-2 text-red-500">
           {errorMessage}
         </p>
       )}
