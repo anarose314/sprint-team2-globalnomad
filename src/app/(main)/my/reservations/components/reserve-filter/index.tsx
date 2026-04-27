@@ -35,10 +35,10 @@ export function ReserveFilter() {
         ref={scrollRef}
         {...events}
         onScroll={handleScroll}
-        className="scrollbar-hide flex gap-2 overflow-x-auto px-6 [&>li]:shrink-0"
+        className="scrollbar-hide flex gap-2 overflow-x-auto px-6"
       >
         {FILTER_ORDER.map((label) => (
-          <li key={label}>
+          <li key={label} className="shrink-0">
             <FilterButton label={label} showIcon={false} className="h-10" />
           </li>
         ))}
