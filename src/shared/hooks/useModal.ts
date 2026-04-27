@@ -6,7 +6,6 @@ interface UseModalReturn {
   isOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
-  toggleModal: () => void;
 }
 
 /**
@@ -26,14 +25,9 @@ export const useModal = (defaultOpen = false): UseModalReturn => {
     setIsOpen(false);
   };
 
-  const toggleModal = () => {
-    setIsOpen((prev) => !prev);
-  };
-
   return {
     isOpen,
     openModal,
     closeModal,
-    toggleModal,
   };
 };
