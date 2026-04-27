@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 const DRAG_THRESHOLD = 5;
 
@@ -27,7 +27,7 @@ export const useDragScroll = <T extends HTMLElement>() => {
   const [clickStartX, setClickStartX] = useState(0);
   const [isClickPrevented, setIsClickPrevented] = useState(false);
 
-  const handleDragStart = (e: React.MouseEvent) => {
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);
 
     if (scrollRef.current) {
@@ -35,34 +35,45 @@ export const useDragScroll = <T extends HTMLElement>() => {
       setClickStartX(e.pageX);
       setIsClickPrevented(false);
     }
-  };
+  }, []);
 
-  const handleDragEnd = () => setIsDragging(false);
+  const handleDragEnd = useCallback(() => setIsDragging(false), []);
 
-  const handleDragMove = (e: React.MouseEvent) => {
-    if (isDragging && scrollRef.current) {
-      if (Math.abs(e.pageX - clickStartX) > DRAG_THRESHOLD) {
-        setIsClickPrevented(true);
+  const handleDragMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (isDragging && scrollRef.current) {
+        if (Math.abs(e.pageX - clickStartX) > DRAG_THRESHOLD) {
+          setIsClickPrevented(true);
+        }
+        scrollRef.current.scrollLeft = startX - e.pageX;
       }
-      scrollRef.current.scrollLeft = startX - e.pageX;
-    }
-  };
+    },
+    [isDragging, startX, clickStartX]
+  );
 
-  const handleClickCapture = (e: React.MouseEvent) => {
-    if (isClickPrevented) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-  };
+  const handleClickCapture = useCallback(
+    (e: React.MouseEvent) => {
+      if (isClickPrevented) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
+    [isClickPrevented]
+  );
 
-  return {
-    scrollRef,
-    events: {
+  const events = useMemo(
+    () => ({
       onMouseDown: handleDragStart,
       onMouseUp: handleDragEnd,
       onMouseLeave: handleDragEnd,
       onMouseMove: handleDragMove,
       onClickCapture: handleClickCapture,
-    },
+    }),
+    [handleDragStart, handleDragEnd, handleDragMove, handleClickCapture]
+  );
+
+  return {
+    scrollRef,
+    events,
   };
 };
