@@ -30,6 +30,7 @@ export const useDragScroll = <T extends HTMLElement = HTMLUListElement>() => {
   });
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0) return;
     dragState.current.isDragging = true;
 
     if (scrollRef.current) {
