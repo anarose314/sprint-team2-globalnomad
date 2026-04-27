@@ -21,7 +21,7 @@ const DRAG_THRESHOLD = 5;
  * );
  * ```
  */
-export function useDragScroll<T extends HTMLElement>() {
+export const useDragScroll = <T extends HTMLElement>() => {
   const scrollRef = useRef<T>(null);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -67,4 +67,4 @@ export function useDragScroll<T extends HTMLElement>() {
       onClickCapture: handleClickCapture,
     },
   };
-}
+};
