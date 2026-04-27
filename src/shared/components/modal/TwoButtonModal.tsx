@@ -6,7 +6,7 @@
  *
  * @example
  * <TwoButtonModal
- *   title="예약을 취소하시겠어요?"
+ *   message="예약을 취소하시겠어요?"
  *   cancelText="아니오"
  *   confirmText="네"
  *   onCancel={handleClose}
