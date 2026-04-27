@@ -8,7 +8,7 @@ import { Input } from '@/shared/components/input';
 /**
  * 마이페이지 - 내 정보 수정 폼.
  *
- * - 닉네임은 수정 가능, 이메일은 readOnly
+ * - 닉네임은 수정 가능, 이메일은 disabled
  * - 비밀번호와 비밀번호 확인 입력 필드 제공
  *
  * TODO: 폼 상태 관리 및 유효성 검사 추가
@@ -30,7 +30,6 @@ export function ProfileForm() {
         label="이메일"
         type="email"
         placeholder="codeit@codeit.com"
-        readOnly
         disabled
       />
 
