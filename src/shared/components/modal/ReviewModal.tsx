@@ -38,8 +38,8 @@ function StarIcon({ filled = false, ...props }: StarIconProps) {
 }
 
 export function ReviewModal({
-  title = '함께 배우면 즐거운 스트릿 댄스',
-  dateText = '2023. 02. 14 / 11:00 - 12:30 (10명)',
+  title,
+  dateText,
   sectionTitle = '소중한 경험을 들려주세요',
   placeholder = '체험에서 느낀 경험을 자유롭게 남겨주세요',
   reviewText = '',
@@ -79,7 +79,7 @@ export function ReviewModal({
         <div className="mt-5 flex items-center justify-center gap-2">
           {Array.from({ length: 5 }).map((_, index) => {
             const rating = index + 1;
-            const isFilled = index <= selectedRating;
+            const isFilled = rating <= selectedRating;
 
             return (
               <button
