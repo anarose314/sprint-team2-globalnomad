@@ -30,7 +30,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="shadow-card hidden w-44.5 rounded-xl border border-gray-50 bg-white px-3.5 py-4 md:block lg:w-72.5 lg:py-6">
+    <aside className="shadow-card hidden h-129.5 w-44.5 rounded-xl border border-gray-50 bg-white px-3.5 py-4 md:block lg:w-72.5 lg:py-6">
       {/* 프로필 영역 */}
       <div className="relative mx-auto mb-3 w-fit lg:mb-6">
         <div className="relative aspect-square w-17.5 overflow-hidden rounded-full bg-blue-50 lg:w-28">
