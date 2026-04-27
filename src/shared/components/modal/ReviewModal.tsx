@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { IcStar } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
@@ -14,28 +14,6 @@ interface ReviewModalProps {
   onReviewTextChange?: (value: string) => void;
   onClose?: () => void;
   onSubmit?: () => void;
-}
-
-interface StarIconProps extends SVGProps<SVGSVGElement> {
-  filled?: boolean;
-}
-
-function StarIcon({ filled = false, ...props }: StarIconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      fill={filled ? 'currentColor' : 'none'}
-      {...props}
-    >
-      <path
-        d="M12 2.8l2.6 5.27 5.82.85-4.21 4.1.99 5.78L12 16.9l-5.2 2.9.99-5.78-4.21-4.1 5.82-.85L12 2.8z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 export function ReviewModal({
@@ -81,9 +59,10 @@ export function ReviewModal({
                 type="button"
                 aria-label={`${rating}점`}
                 onClick={() => onRatingChange?.(rating)}
-                className={isFilled ? 'text-yellow-400' : 'text-gray-200'}
               >
-                <StarIcon filled={isFilled} className="h-10 w-10" />
+                <IcStar
+                  className={`h-10 w-10 ${isFilled ? 'text-yellow-400' : 'text-gray-200'}`}
+                />
               </button>
             );
           })}
