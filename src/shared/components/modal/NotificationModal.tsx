@@ -55,7 +55,7 @@ export function NotificationModal({
   onClose,
 }: NotificationModalProps) {
   return (
-    <div className="w-57.75 overflow-hidden rounded-[10px] border border-gray-100 bg-white">
+    <div className="w-57.75 overflow-hidden rounded-xl border border-gray-100 bg-white">
       {/* 헤더 */}
       <div className="flex h-12 items-center justify-between border-b border-gray-100 px-4">
         <Heading textStyle="typo-lg-bold">
@@ -95,29 +95,29 @@ export function NotificationModal({
                 'px-4 py-5',
                 index !== notifications.length - 1 &&
                   'border-b border-gray-100',
-                highlighted ? 'bg-[#eef4fa]' : 'bg-white'
+                highlighted ? 'bg-primary-50' : 'bg-white'
               )}
             >
               <div className="flex items-start justify-between">
-                <p className="text-md leading-none font-bold text-gray-950">
+                <p className="typo-md-bold leading-none text-gray-950">
                   {title}
                 </p>
 
-                <span className="text-xs leading-none font-medium text-gray-400">
+                <span className="typo-xs-medium leading-none text-gray-400">
                   {timeText}
                 </span>
               </div>
 
               <div className="mt-5 flex flex-col gap-3">
-                <p className="text-md leading-none font-semibold text-gray-800">
+                <p className="typo-md-semibold leading-none text-gray-800">
                   {activityTitle}
                 </p>
 
-                <p className="text-md leading-none font-medium text-gray-800">
+                <p className="typo-md-medium leading-none text-gray-800">
                   {scheduleText}
                 </p>
 
-                <p className="text-md leading-none font-medium text-gray-800">
+                <p className="typo-md-medium leading-none text-gray-800">
                   {resultPrefix}
                   <span
                     className={
