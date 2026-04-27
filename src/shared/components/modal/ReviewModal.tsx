@@ -9,6 +9,8 @@ interface ReviewModalProps {
   reviewText?: string;
   maxLength?: number;
   selectedRating?: number;
+  onRatingChange?: (rating: number) => void;
+  onReviewTextChange?: (value: string) => void;
   onClose?: () => void;
   onSubmit?: () => void;
 }
@@ -43,6 +45,8 @@ export function ReviewModal({
   reviewText = '',
   maxLength = 100,
   selectedRating = 0,
+  onRatingChange,
+  onReviewTextChange,
   onClose,
   onSubmit,
 }: ReviewModalProps) {
@@ -74,13 +78,15 @@ export function ReviewModal({
 
         <div className="mt-5 flex items-center justify-center gap-2">
           {Array.from({ length: 5 }).map((_, index) => {
-            const isFilled = index < selectedRating;
+            const rating = index + 1;
+            const isFilled = index <= selectedRating;
 
             return (
               <button
-                key={index}
+                key={rating}
                 type="button"
-                aria-label={`${index + 1}점`}
+                aria-label={`${rating}점`}
+                onClick={() => onRatingChange?.(rating)}
                 className={isFilled ? 'text-yellow-400' : 'text-gray-200'}
               >
                 <StarIcon filled={isFilled} className="h-10 w-10" />
@@ -96,6 +102,7 @@ export function ReviewModal({
 
           <textarea
             value={reviewText}
+            onChange={(e) => onReviewTextChange?.(e.target.value)}
             maxLength={maxLength}
             placeholder={placeholder}
             className="h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 text-lg leading-normal font-medium text-gray-950 outline-none placeholder:text-gray-400"
