@@ -1,17 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import {
+  FILTER_ORDER,
+  SCROLL_END_THRESHOLD,
+} from '@/app/(main)/my/reservations/components/reserve-filter/reserveFilter.constants';
 import { FilterButton } from '@/shared/components/buttons';
-import { STATUS_TEXT } from '@/shared/constants/status.constants';
 import { useDragScroll } from '@/shared/hooks/useDragScroll';
-
-const FILTER_ORDER = [
-  STATUS_TEXT.approved,
-  STATUS_TEXT.cancelled,
-  STATUS_TEXT.completed,
-  STATUS_TEXT.rejected,
-  STATUS_TEXT.attended,
-];
 
 export function ReserveFilter() {
   const { scrollRef, events } = useDragScroll<HTMLUListElement>();
@@ -20,7 +15,9 @@ export function ReserveFilter() {
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setIsScrollEnd(Math.abs(scrollWidth - clientWidth - scrollLeft) < 20);
+    setIsScrollEnd(
+      Math.abs(scrollWidth - clientWidth - scrollLeft) < SCROLL_END_THRESHOLD
+    );
   }, [scrollRef]);
 
   useEffect(() => {
