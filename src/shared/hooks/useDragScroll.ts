@@ -6,20 +6,18 @@ const DRAG_THRESHOLD = 5;
  * 마우스 드래그를 통한 가로 스크롤 기능을 데스크탑에도 제공하는 커스텀 훅
  * 드래그 중 실수로 내부 아이템이 클릭되는 오류 방지 포함
  *
- * * @example
- * ```tsx
+ * @example
  * const { scrollRef, events } = useDragScroll<HTMLUListElement>();
- * * return (
- * <ul
- * ref={scrollRef}
- * {...events}
- * className="flex overflow-x-auto"
- * >
- * <li>아이템 1</li>
- * <li>아이템 2</li>
- * </ul>
+ * return (
+ *   <ul
+ *     ref={scrollRef}
+ *     {...events}
+ *     className="flex overflow-x-auto"
+ *   >
+ *     <li>아이템 1</li>
+ *     <li>아이템 2</li>
+ *   </ul>
  * );
- * ```
  */
 export const useDragScroll = <T extends HTMLElement>() => {
   const scrollRef = useRef<T>(null);
