@@ -96,7 +96,6 @@ export function ReviewModal({
 
           <textarea
             value={reviewText}
-            readOnly
             maxLength={maxLength}
             placeholder={placeholder}
             className="h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 text-lg leading-normal font-medium text-gray-950 outline-none placeholder:text-gray-400"
