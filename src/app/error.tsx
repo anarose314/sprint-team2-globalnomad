@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import LogoIcon from '@/shared/assets/logos/logo-vertical.svg';
 import { Button } from '@/shared/components/buttons';
-import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 import { Heading } from '@/shared/components/heading';
 
 interface ErrorProps {
@@ -39,12 +38,9 @@ export default function Error({ error, reset }: ErrorProps) {
           <Button size="md" onClick={reset}>
             다시 시도
           </Button>
-          <Link
-            href="/"
-            className={`${BUTTON_VARIANTS({ variant: 'secondary', size: 'md' })} hover:bg-gray-100 hover:opacity-80`}
-          >
+          <Button as={Link} href="/" variant="secondary" size="md">
             홈으로 이동
-          </Link>
+          </Button>
         </div>
       </div>
     </div>

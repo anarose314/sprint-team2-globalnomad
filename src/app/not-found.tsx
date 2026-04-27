@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import LogoIcon from '@/shared/assets/logos/logo-vertical.svg';
-import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
+import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
 
 export default function NotFound() {
@@ -22,12 +22,9 @@ export default function NotFound() {
           </p>
         </div>
 
-        <Link
-          href="/"
-          className={`${BUTTON_VARIANTS({ variant: 'secondary', size: 'md' })} hover:bg-gray-100 hover:opacity-80`}
-        >
+        <Button as={Link} href="/" variant="secondary" size="md">
           홈으로 돌아가기
-        </Link>
+        </Button>
       </div>
     </div>
   );

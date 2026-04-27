@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '@/shared/components/buttons';
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -89,36 +90,12 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-          <button
-            onClick={reset}
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              backgroundColor: '#70acde',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '0.75rem',
-              padding: '0.75rem 2rem',
-              cursor: 'pointer',
-            }}
-          >
+          <Button size="md" onClick={reset}>
             다시 시도
-          </button>
-          <Link
-            href="/"
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              backgroundColor: 'transparent',
-              color: '#70acde',
-              border: '1px solid #70acde',
-              borderRadius: '0.75rem',
-              padding: '0.75rem 2rem',
-              textDecoration: 'none',
-            }}
-          >
+          </Button>
+          <Button as={Link} href="/" variant="secondary" size="md">
             홈으로 이동
-          </Link>
+          </Button>
         </div>
       </body>
     </html>
