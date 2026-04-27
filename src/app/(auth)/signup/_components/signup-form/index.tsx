@@ -29,7 +29,6 @@ export function SignupForm() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: 회원가입 API 연동 (별도 이슈)
-    // TODO: 폼 검증 — 이메일 형식, 비밀번호 8자 이상, 비밀번호 일치 (별도 이슈)
     console.log({ email, nickname, password, passwordConfirm });
   };
 
