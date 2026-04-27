@@ -19,7 +19,7 @@ const DRAG_THRESHOLD = 5;
  *   </ul>
  * );
  */
-export const useDragScroll = <T extends HTMLElement>() => {
+export const useDragScroll = <T extends HTMLElement = HTMLUListElement>() => {
   const scrollRef = useRef<T>(null);
 
   const dragState = useRef({
@@ -50,6 +50,8 @@ export const useDragScroll = <T extends HTMLElement>() => {
 
   const handleDragMove = useCallback((e: React.MouseEvent) => {
     if (dragState.current.isDragging && scrollRef.current) {
+      e.preventDefault();
+
       if (Math.abs(e.pageX - dragState.current.clickStartX) > DRAG_THRESHOLD) {
         dragState.current.isClickPrevented = true;
       }
