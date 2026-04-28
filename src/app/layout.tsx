@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { QueryProvider } from '@/shared/components/query-provider';
+import { ToastContainer } from '@/shared/components/toast/toast-container';
 import '@/app/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ko" className={'h-full antialiased'}>
       <body className="flex min-h-full flex-col font-sans">
+        <ToastContainer />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
