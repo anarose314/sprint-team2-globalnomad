@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function MyActivitiesDashboardPage() {
   return (
-    <section className="mx-auto mb-[66px] w-full max-w-[327px] md:mx-0 md:mb-[172px] md:max-w-[476px] 2xl:mb-[160px] 2xl:max-w-[640px]">
+    <section className="mx-auto mb-[66px] w-[327px] md:mb-[172px] md:w-[476px] 2xl:mb-[160px] 2xl:w-[640px]">
       <h2 className="typo-2lg-bold text-gray-950">예약 현황</h2>
       <p className="typo-md-medium mt-2.5 text-gray-500 md:mt-2">
         내 체험에 예약된 내역들을 한 눈에 확인할 수 있습니다.
@@ -37,7 +37,9 @@ export default function MyActivitiesDashboardPage() {
             >
               <IcArrowNaviLeft className="h-6 w-6" />
             </button>
-            <h3 className="typo-2lg-bold text-gray-950">2026년 9월</h3>
+            <h3 className="typo-2lg-medium md:typo-xl-medium text-gray-950">
+              2026년 9월
+            </h3>
             <button
               type="button"
               aria-label="다음 달"
