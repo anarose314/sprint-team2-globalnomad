@@ -3,27 +3,25 @@ import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface ReviewModalProps {
-  title?: string;
-  dateText?: string;
-  sectionTitle?: string;
-  placeholder?: string;
-  reviewText?: string;
-  maxLength?: number;
-  selectedRating?: number;
-  onRatingChange?: (rating: number) => void;
-  onReviewTextChange?: (value: string) => void;
-  onClose?: () => void;
-  onSubmit?: () => void;
+  title: string;
+  dateText: string;
+  reviewText: string;
+  selectedRating: number;
+  onRatingChange: (rating: number) => void;
+  onReviewTextChange: (value: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
 }
+
+const SECTION_TITLE = '소중한 경험을 들려주세요';
+const PLACEHOLDER = '체험에서 느낀 경험을 자유롭게 남겨주세요';
+const MAX_LENGTH = 100;
 
 export function ReviewModal({
   title,
   dateText,
-  sectionTitle = '소중한 경험을 들려주세요',
-  placeholder = '체험에서 느낀 경험을 자유롭게 남겨주세요',
-  reviewText = '',
-  maxLength = 100,
-  selectedRating = 0,
+  reviewText,
+  selectedRating,
   onRatingChange,
   onReviewTextChange,
   onClose,
@@ -33,7 +31,6 @@ export function ReviewModal({
     <ModalBase
       className="h-130.75 max-w-96.25"
       bodyClassName="px-7.5 pt-6 pb-7.5"
-      footerClassName="hidden"
       onClose={onClose}
     >
       <div className="relative flex h-full flex-col">
@@ -57,6 +54,7 @@ export function ReviewModal({
                 key={rating}
                 type="button"
                 aria-label={`${rating}점`}
+                aria-pressed={isFilled}
                 onClick={() => onRatingChange?.(rating)}
               >
                 <IcStar
@@ -69,21 +67,21 @@ export function ReviewModal({
 
         <div className="mt-7.5 flex flex-col gap-4">
           <p className="typo-2lg-bold leading-[1.4] text-gray-950">
-            {sectionTitle}
+            {SECTION_TITLE}
           </p>
 
           <textarea
             value={reviewText}
             onChange={(e) => onReviewTextChange?.(e.target.value)}
-            maxLength={maxLength}
-            placeholder={placeholder}
+            maxLength={MAX_LENGTH}
+            placeholder={PLACEHOLDER}
             className="typo-lg-medium h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 leading-normal text-gray-950 outline-none placeholder:text-gray-400"
           />
         </div>
 
         <div className="mt-auto flex flex-col gap-4">
           <p className="typo-md-medium mt-1 text-right leading-none text-gray-500">
-            {reviewText.length}/{maxLength}
+            {reviewText.length}/{MAX_LENGTH}
           </p>
 
           <Button
