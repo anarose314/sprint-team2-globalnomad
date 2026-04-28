@@ -6,7 +6,7 @@ export default function MyPageLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto mt-10 flex w-full max-w-245 md:gap-7.5 2xl:gap-12.5">
+    <div className="mx-auto mt-10 flex w-full max-w-245 items-start md:gap-7.5 2xl:gap-12.5">
       <Sidebar />
       <div className="flex-1">{children}</div>
     </div>
