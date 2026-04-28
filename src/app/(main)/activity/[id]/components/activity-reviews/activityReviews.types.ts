@@ -19,5 +19,15 @@ export interface ActivityReviewsProps {
   totalCount: number;
   reviews: ActivityReview[];
   totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}
+
+export interface ActivityReviewsSectionProps {
+  averageRating: number;
+  totalCount: number;
+  reviews: ActivityReview[];
+  totalPages: number;
   className?: string;
 }

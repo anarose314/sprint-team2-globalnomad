@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { ActivityReviewsProps } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviews.types';
 import { IcStar } from '@/shared/assets/icons';
 import { Pagination } from '@/shared/components/pagination';
@@ -41,9 +40,10 @@ export function ActivityReviews({
   totalCount,
   reviews,
   totalPages,
+  currentPage,
+  onPageChange,
   className,
 }: ActivityReviewsProps) {
-  const [currentPage, setCurrentPage] = useState(1);
   const safeAverageRating = formatRating(averageRating);
 
   return (
@@ -116,7 +116,7 @@ export function ActivityReviews({
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={onPageChange}
         />
       </div>
     </section>

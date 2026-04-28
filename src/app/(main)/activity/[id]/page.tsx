@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { ActivityDetailContent } from '@/app/(main)/activity/[id]/components/activity-detail-content';
 import { ActivityImageGallery } from '@/app/(main)/activity/[id]/components/activity-image-gallery';
 import { ActivityInfoHeader } from '@/app/(main)/activity/[id]/components/activity-info-header';
-import { ActivityReviews } from '@/app/(main)/activity/[id]/components/activity-reviews';
+import { ActivityReviewsSection } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviewsSection';
 
 // TODO: 추후 API 연동 후 동적 메타데이터로 변경
 export const metadata: Metadata = {
@@ -121,7 +121,7 @@ export default function ActivityDetailPage() {
               description={activity.description}
               address={activity.address}
             />
-            <ActivityReviews
+            <ActivityReviewsSection
               averageRating={MOCK_ACTIVITY_REVIEWS.averageRating}
               totalCount={MOCK_ACTIVITY_REVIEWS.totalCount}
               reviews={MOCK_ACTIVITY_REVIEWS.reviews}
