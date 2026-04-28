@@ -34,7 +34,7 @@ export const NoIcon: Story = {
   },
 };
 
-export const Categories: Story = {
+export const categories: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
       <FilterButton label="아트" category="art" />

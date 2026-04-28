@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { IcArrowLeft, IcArrowRight, IcEdit } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
 
-const iconOptions = {
+const ICON_OPTIONS = {
   none: undefined,
   arrowRight: <IcArrowRight />,
   arrowLeft: <IcArrowLeft />,
@@ -22,8 +22,8 @@ const meta: Meta<typeof Button> = {
   },
   argTypes: {
     icon: {
-      options: Object.keys(iconOptions),
-      mapping: iconOptions,
+      options: Object.keys(ICON_OPTIONS),
+      mapping: ICON_OPTIONS,
       control: { type: 'select' },
     },
   },
@@ -32,16 +32,16 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-export const Default: Story = {};
+export const defaultButton: Story = {};
 
-export const Secondary: Story = {
+export const secondaryButton: Story = {
   args: {
     variant: 'secondary',
     children: '취소',
   },
 };
 
-export const WithIcon: Story = {
+export const withIconButton: Story = {
   args: {
     variant: 'secondary',
     size: 'lg',
@@ -50,7 +50,7 @@ export const WithIcon: Story = {
   },
 };
 
-export const SecondarySelected: Story = {
+export const secondarySelected: Story = {
   args: {
     variant: 'secondary',
     size: 'lg',
