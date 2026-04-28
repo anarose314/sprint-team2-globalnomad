@@ -84,7 +84,7 @@ export function ModalOverlay({
   return createPortal(
     <div
       className={cn(
-        'z-modal-backdrop fixed inset-0 flex items-center justify-center bg-black/70 px-5 md:px-8.25',
+        'z-modal-backdrop fixed inset-0 flex items-center justify-center bg-black/70 px-5 md:px-8',
         className
       )}
       onMouseDown={handleOverlayMouseDown}
