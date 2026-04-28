@@ -6,6 +6,7 @@ import {
   SCROLL_END_THRESHOLD,
 } from '@/app/(main)/my/reservations/components/reserve-filter/reserveFilter.constants';
 import { FilterButton } from '@/shared/components/buttons';
+import { STATUS_TEXT } from '@/shared/constants/status.constants';
 import { useDragScroll } from '@/shared/hooks/useDragScroll';
 
 export function ReserveFilter() {
@@ -36,7 +37,11 @@ export function ReserveFilter() {
       >
         {FILTER_ORDER.map((label) => (
           <li key={label} className="shrink-0">
-            <FilterButton label={label} showIcon={false} className="h-10" />
+            <FilterButton
+              label={STATUS_TEXT[label]}
+              showIcon={false}
+              className="h-10"
+            />
           </li>
         ))}
       </ul>
