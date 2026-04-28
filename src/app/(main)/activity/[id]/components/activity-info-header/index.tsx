@@ -1,4 +1,4 @@
-import { KebabDropdown } from '@/app/(main)/activity/[id]/components/activity-info-header/kebabDropdown';
+import { KebabDropdown } from '@/app/(main)/activity/[id]/components/activity-info-header/kebab-dropdown';
 import { IcMap, IcStar } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 

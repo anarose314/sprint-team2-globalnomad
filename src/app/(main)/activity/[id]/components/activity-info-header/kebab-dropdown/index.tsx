@@ -40,7 +40,7 @@ export function KebabDropdown({ onEdit, onDelete }: KebabDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="z-dropdown absolute top-full right-0 mt-1 h-20 w-16 overflow-hidden rounded-lg border border-gray-100 bg-white md:h-28 md:w-24">
+        <div className="z-dropdown absolute top-full right-0 mt-1 w-max overflow-hidden rounded-lg border border-gray-100 bg-white">
           <div className="grid h-full grid-rows-2 divide-y divide-gray-100">
             <button
               type="button"
