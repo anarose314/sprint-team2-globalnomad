@@ -25,7 +25,7 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
       secondary: [
         'border border-gray-200 bg-white font-medium text-gray-600',
         'hover:border-gray-300 hover:bg-gray-50',
-        'active:bg-primary-500 active:border-primary-500 active:scale-[0.98] active:text-white',
+        'active:scale-[0.98] active:border-gray-400 active:bg-gray-400 active:text-white',
         'disabled:border-gray-200 disabled:bg-white disabled:text-gray-200',
         'disabled:hover:border-gray-200 disabled:hover:bg-white',
         'disabled:active:scale-100 disabled:active:border-gray-200 disabled:active:bg-white disabled:active:text-gray-200',
