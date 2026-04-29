@@ -33,11 +33,14 @@ export default function ActivityAddPage() {
         </section>
         <section>
           <ActivityFormTitle>배너 이미지 등록</ActivityFormTitle>
+          {/* TODO: 배너 이미지 등록 추가 */}
         </section>
         <section>
           <ActivityFormTitle>소개 이미지 등록</ActivityFormTitle>
+          {/* TODO: 소개 이미지 등록 추가 */}
         </section>
       </form>
+      ㄴ{/* TODO: 버튼 추가 */}
     </div>
   );
 }
