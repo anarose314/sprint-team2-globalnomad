@@ -75,7 +75,7 @@ export function ActivityReviews({
           {reviews.map((review) => (
             <article
               key={review.id}
-              className="rounded-3xl bg-white p-5 shadow-[0px_4px_24px_0px_rgba(156,180,202,0.2)]"
+              className="shadow-review-card rounded-3xl bg-white p-5"
             >
               <div>
                 <div className="flex items-center gap-2">
