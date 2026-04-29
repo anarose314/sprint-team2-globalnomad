@@ -38,6 +38,8 @@ export function ActivityReviews({
   className,
 }: ActivityReviewsProps) {
   const safeAverageRating = formatRating(averageRating);
+  // TODO: 평균 평점 구간에 따라 만족도 문구를 동적으로 노출하도록 구현
+  const ratingLabel = '매우 만족';
 
   return (
     <section className={cn('w-full', className)}>
@@ -51,11 +53,11 @@ export function ActivityReviews({
       </div>
 
       <div className="mt-6 flex flex-col items-center md:mt-10">
-        <strong className="typo-2xl-semibold md:typo-3xl-bold text-center leading-8 tracking-tight text-gray-950 md:leading-[42px]">
+        <strong className="typo-2xl-semibold md:typo-3xl-bold text-center leading-8 tracking-tight text-gray-950 md:leading-10.5">
           {safeAverageRating}
         </strong>
         <p className="typo-md-bold md:typo-lg-bold mt-1 text-center leading-6 tracking-tight text-gray-950 md:leading-none">
-          매우 만족
+          {ratingLabel}
         </p>
         <div className="mt-1 flex items-center gap-1">
           <IcStar
@@ -82,7 +84,7 @@ export function ActivityReviews({
                   </p>
                   <time
                     dateTime={review.createdAt}
-                    className="typo-xs-semibold md:typo-md-medium leading-[18px] tracking-tight text-gray-400 md:leading-none"
+                    className="typo-xs-semibold md:typo-md-medium leading-4.5 tracking-tight text-gray-400 md:leading-none"
                   >
                     {formatDate(review.createdAt)}
                   </time>
@@ -105,7 +107,7 @@ export function ActivityReviews({
         </p>
       )}
 
-      <div className="mt-[30px] md:mt-10">
+      <div className="mt-7.5 md:mt-10">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
