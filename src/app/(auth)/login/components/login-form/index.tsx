@@ -1,8 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import Link from 'next/link';
-import { KakaoAuthButton } from '@/app/(auth)/components/kakao-auth-button';
+import { AuthFooter } from '@/app/(auth)/components/auth-footer';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
@@ -88,25 +87,7 @@ export function LoginForm() {
         </Button>
       </form>
 
-      {/* SNS 구분선 */}
-      <div className="my-8 flex w-full items-center gap-4">
-        <hr className="flex-1 border-gray-100" aria-hidden="true" />
-        <span className="typo-sm-medium text-gray-600">
-          SNS 계정으로 로그인하기
-        </span>
-        <hr className="flex-1 border-gray-100" aria-hidden="true" />
-      </div>
-
-      {/* 카카오 로그인 */}
-      <KakaoAuthButton>카카오 로그인</KakaoAuthButton>
-
-      {/* 회원가입 링크 */}
-      <p className="typo-sm-medium mt-8 text-gray-400">
-        회원이 아니신가요?{' '}
-        <Link href="/signup" className="text-gray-400 underline">
-          회원가입하기
-        </Link>
-      </p>
+      <AuthFooter mode="login" />
     </main>
   );
 }

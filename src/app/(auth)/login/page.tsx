@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LoginForm } from '@/app/(auth)/login/_components/login-form';
+import { LoginForm } from '@/app/(auth)/login/components/login-form';
 
 export const metadata: Metadata = {
   title: '로그인 | GlobalNomad',

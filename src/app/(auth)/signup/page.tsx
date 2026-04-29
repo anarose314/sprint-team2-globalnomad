@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SignupForm } from '@/app/(auth)/signup/_components/signup-form';
+import { SignupForm } from '@/app/(auth)/signup/components/signup-form';
 
 export const metadata: Metadata = {
   title: '회원가입 | GlobalNomad',
