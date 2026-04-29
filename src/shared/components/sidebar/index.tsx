@@ -30,10 +30,10 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="shadow-card hidden w-44.5 rounded-xl border border-gray-50 bg-white px-3.5 py-4 md:block lg:w-72.5 lg:py-6">
+    <aside className="shadow-card hidden w-44.5 rounded-xl border border-gray-50 bg-white px-3.5 py-4 md:block 2xl:w-72.5 2xl:py-6">
       {/* 프로필 영역 */}
-      <div className="relative mx-auto mb-3 w-fit lg:mb-6">
-        <div className="relative aspect-square w-17.5 overflow-hidden rounded-full bg-blue-50 lg:w-28">
+      <div className="relative mx-auto mb-3 w-fit 2xl:mb-6">
+        <div className="relative aspect-square w-17.5 overflow-hidden rounded-full bg-blue-50 2xl:w-28">
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
@@ -52,7 +52,7 @@ export function Sidebar() {
           type="button"
           onClick={handleProfileEdit}
           aria-label="프로필 이미지 수정"
-          className="absolute right-1 bottom-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 lg:h-7.5 lg:w-7.5"
+          className="absolute right-1 bottom-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 2xl:h-7.5 2xl:w-7.5"
         >
           <IcEdit className="h-full w-full" />
         </button>
@@ -67,7 +67,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`typo-lg-medium flex h-12 items-center gap-2 rounded-[14px] px-[1em] transition-colors lg:h-13.5 lg:rounded-2xl ${
+              className={`typo-lg-medium px-em flex h-12 items-center gap-2 rounded-2xl transition-colors 2xl:h-13.5 2xl:rounded-2xl ${
                 isActive
                   ? 'bg-primary-100 [&_svg]:text-primary-500 text-gray-950'
                   : 'hover:bg-primary-100 text-gray-600 [&_svg]:text-gray-600'
@@ -84,7 +84,7 @@ export function Sidebar() {
       <Button
         type="button"
         onClick={handleLogout}
-        className="mt-3.5 h-12 w-full lg:h-13.5"
+        className="mt-3.5 h-12 w-full 2xl:h-13.5"
         size="lg"
         variant="secondary"
       >

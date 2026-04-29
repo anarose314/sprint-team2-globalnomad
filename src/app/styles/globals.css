@@ -4,6 +4,9 @@
 @import './colors.css';
 
 @theme {
+  /* Spacing */
+  --spacing-em: 1em;
+
   /* Z-Index */
   --z-index-base: 10; /* Base Content */
   --z-index-header: 100; /* Navigation & Layout */
