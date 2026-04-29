@@ -11,9 +11,14 @@ export function ReserveTime({
   className,
 }: ReserveTimeProps) {
   return (
-    <div className={cn('flex w-full items-end gap-3.5', className)}>
+    <div
+      className={cn(
+        'flex w-full flex-wrap items-end gap-3.5 md:flex-nowrap',
+        className
+      )}
+    >
       {/* 날짜 */}
-      <div className="flex-4">
+      <div className="w-full md:w-auto md:flex-4">
         {/* TODO: 달력 연동 */}
         <Input
           label={hasLabel ? '날짜' : undefined}
@@ -22,7 +27,7 @@ export function ReserveTime({
         />
       </div>
       {/* 시간 */}
-      <div className="flex flex-3 items-end gap-2.25">
+      <div className="flex flex-1 items-end gap-2.25 md:flex-3">
         <div className="flex-1">
           {/* TODO: 드롭다운 메뉴로 변경 */}
           <Input

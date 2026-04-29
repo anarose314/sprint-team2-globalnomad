@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ActivityAddPage() {
   return (
-    <div className="mt-7.5 md:mt-10">
+    <div className="mx-auto mt-7.5 max-w-175 md:mt-10">
       <Heading>내 체험 등록</Heading>
       <form className="mt-6 flex flex-col gap-7.5">
         <section className="flex flex-col gap-6">
