@@ -42,14 +42,12 @@ export function ModalOverlay({
       ? null
       : document.getElementById('modal-root');
 
-  // 모달이 열린 동안 배경 페이지가 스크롤되지 않도록 잠그고, unmount 시 원래 값으로 복구합니다.
+  // 모달이 열린 동안 배경 페이지가 스크롤되지 않도록 잠그고, unmount 시 원래 상태로 복구합니다.
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('overflow-hidden');
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.classList.remove('overflow-hidden');
     };
   }, []);
 
