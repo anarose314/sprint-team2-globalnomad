@@ -4,6 +4,7 @@ import { ActivityReviewsProps } from '@/app/(main)/activity/[id]/components/acti
 import { IcStar } from '@/shared/assets/icons';
 import { Pagination } from '@/shared/components/pagination';
 import { cn } from '@/shared/utils/cn';
+import { formatDate } from '@/shared/utils/formatDate';
 
 const MAX_RATING = 5;
 
@@ -11,14 +12,6 @@ const formatCount = (count: number) => count.toLocaleString('ko-KR');
 
 const formatRating = (rating: number) =>
   Number.isFinite(rating) ? rating.toFixed(1) : '0.0';
-
-const formatReviewDate = (isoDate: string) => {
-  const date = new Date(isoDate);
-
-  if (Number.isNaN(date.getTime())) return '-';
-
-  return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}`;
-};
 
 const renderStars = (rating: number) => {
   const filledStars = Math.max(0, Math.min(MAX_RATING, Math.round(rating)));
@@ -91,7 +84,7 @@ export function ActivityReviews({
                     dateTime={review.createdAt}
                     className="typo-xs-semibold md:typo-md-medium leading-[18px] tracking-tight text-gray-400 md:leading-none"
                   >
-                    {formatReviewDate(review.createdAt)}
+                    {formatDate(review.createdAt)}
                   </time>
                 </div>
 
