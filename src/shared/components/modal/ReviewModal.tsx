@@ -33,7 +33,6 @@ export function ReviewModal({
     <ModalBase
       className="h-130.75 max-w-96.25"
       bodyClassName="px-7.5 pt-6 pb-7.5"
-      footerClassName="hidden"
       onClose={onClose}
     >
       <div className="relative flex h-full flex-col">
