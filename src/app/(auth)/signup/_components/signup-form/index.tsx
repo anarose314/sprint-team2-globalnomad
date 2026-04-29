@@ -21,6 +21,7 @@ export function SignupForm() {
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] =
     useState(false);
 
@@ -36,8 +37,8 @@ export function SignupForm() {
     <main className="mx-auto flex min-h-screen w-full max-w-160 flex-col items-center justify-center px-6 py-10">
       {/* 로고 — 모바일은 아이콘만, 태블릿+ 는 세로형 */}
       <div className="mb-10 flex flex-col items-center gap-4">
-        <LogoIcon aria-hidden="true" className="md:hidden" />
-        <LogoVertical aria-hidden="true" className="hidden md:block" />
+        <LogoIcon aria-hidden="true" className="w-20 md:hidden" />
+        <LogoVertical aria-hidden="true" className="hidden w-63.75 md:block" />
         <h1 className="sr-only">GlobalNomad</h1>
       </div>
 
@@ -67,11 +68,27 @@ export function SignupForm() {
 
         <Input
           label="비밀번호"
-          type="password"
+          type={isPasswordVisible ? 'text' : 'password'}
           placeholder="8자 이상 입력해 주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="new-password"
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setIsPasswordVisible((prev) => !prev)}
+              aria-label={
+                isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
+              }
+              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
+            >
+              {isPasswordVisible ? (
+                <IcEyeOn className="h-5 w-5" />
+              ) : (
+                <IcEyeOff className="h-5 w-5" />
+              )}
+            </button>
+          }
         />
 
         {/*
@@ -93,7 +110,7 @@ export function SignupForm() {
               aria-label={
                 isPasswordConfirmVisible ? '비밀번호 숨기기' : '비밀번호 보기'
               }
-              className="text-gray-400 transition-colors hover:text-gray-600"
+              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
             >
               {isPasswordConfirmVisible ? (
                 <IcEyeOn className="h-5 w-5" />
@@ -112,7 +129,9 @@ export function SignupForm() {
       {/* SNS 구분선 */}
       <div className="my-8 flex w-full items-center gap-4">
         <hr className="flex-1 border-gray-100" aria-hidden="true" />
-        <span className="text-sm text-gray-600">SNS 계정으로 회원가입하기</span>
+        <span className="typo-sm-medium text-gray-600">
+          SNS 계정으로 회원가입하기
+        </span>
         <hr className="flex-1 border-gray-100" aria-hidden="true" />
       </div>
 
@@ -120,7 +139,7 @@ export function SignupForm() {
       <KakaoAuthButton>카카오 회원가입</KakaoAuthButton>
 
       {/* 로그인 링크 */}
-      <p className="mt-8 text-sm text-gray-400">
+      <p className="typo-sm-medium mt-8 text-gray-400">
         회원이신가요?{' '}
         <Link href="/login" className="text-gray-400 underline">
           로그인하기

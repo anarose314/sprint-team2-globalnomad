@@ -33,8 +33,8 @@ export function LoginForm() {
     <main className="mx-auto flex min-h-screen w-full max-w-160 flex-col items-center justify-center px-6 py-10">
       {/* 로고 — 모바일은 아이콘만, 태블릿+ 는 세로형 */}
       <div className="mb-10 flex flex-col items-center gap-4">
-        <LogoIcon aria-hidden="true" className="md:hidden" />
-        <LogoVertical aria-hidden="true" className="hidden md:block" />
+        <LogoIcon aria-hidden="true" className="w-20 md:hidden" />
+        <LogoVertical aria-hidden="true" className="hidden w-63.75 md:block" />
         <h1 className="sr-only">GlobalNomad</h1>
       </div>
 
@@ -91,7 +91,9 @@ export function LoginForm() {
       {/* SNS 구분선 */}
       <div className="my-8 flex w-full items-center gap-4">
         <hr className="flex-1 border-gray-100" aria-hidden="true" />
-        <span className="text-sm text-gray-600">SNS 계정으로 로그인하기</span>
+        <span className="typo-sm-medium text-gray-600">
+          SNS 계정으로 로그인하기
+        </span>
         <hr className="flex-1 border-gray-100" aria-hidden="true" />
       </div>
 
@@ -99,7 +101,7 @@ export function LoginForm() {
       <KakaoAuthButton>카카오 로그인</KakaoAuthButton>
 
       {/* 회원가입 링크 */}
-      <p className="mt-8 text-sm text-gray-400">
+      <p className="typo-sm-medium mt-8 text-gray-400">
         회원이 아니신가요?{' '}
         <Link href="/signup" className="text-gray-400 underline">
           회원가입하기
