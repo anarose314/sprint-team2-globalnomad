@@ -40,7 +40,7 @@ export default function ActivityAddPage() {
           {/* TODO: 소개 이미지 등록 추가 */}
         </section>
       </form>
-      ㄴ{/* TODO: 버튼 추가 */}
+      {/* TODO: 버튼 추가 */}
     </div>
   );
 }
