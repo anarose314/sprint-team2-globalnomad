@@ -28,14 +28,14 @@ export default function ActivityDetailPage() {
   const activity = MOCK_ACTIVITY;
 
   return (
-    <main className="py-6 md:py-8 lg:px-10 lg:py-10">
+    <div className="py-6 md:py-8 2xl:py-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
-      <div className="mx-auto w-full max-w-[327px] md:max-w-[684px] lg:max-w-[1200px]">
+      <div className="mx-auto w-full">
         {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
-        {/* 모바일·태블릿: 세로 스택 / 데스크탑(lg 1024px+): 이미지 좌 · 타이틀+예약카드 우 */}
-        <div className="flex flex-col gap-4 lg:mb-10 lg:grid lg:grid-cols-[670px_minmax(0,1fr)] lg:items-start lg:gap-6">
+        {/* 모바일·태블릿: 세로 스택 / 데스크탑(2xl 1536px+): 이미지 좌 · 타이틀+예약카드 우 */}
+        <div className="flex flex-col gap-4 2xl:mb-10 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-6">
           {/* 이미지 갤러리 (데스크탑: 좌측) */}
-          <div>
+          <div className="2xl:col-span-3">
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={activity.subImageUrls}
@@ -44,8 +44,8 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
-          <div className="flex flex-col">
-            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-[30px] md:pb-[30px] lg:mb-0 lg:border-b-0 lg:pb-0">
+          <div className="flex flex-col 2xl:col-span-2">
+            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-0 2xl:border-b-0 2xl:pb-0">
               <ActivityInfoHeader
                 category={activity.category}
                 title={activity.title}
@@ -61,8 +61,8 @@ export default function ActivityDetailPage() {
         </div>
 
         {/* ── 하단 본문 ── */}
-        <div className="lg:grid lg:grid-cols-[670px_minmax(0,1fr)] lg:gap-6">
-          {/* PC에서 이미지 갤러리와 동일한 670px 폭 */}
+        <div className="2xl:grid 2xl:grid-cols-5 2xl:gap-6">
+          {/* PC에서 이미지 갤러리와 동일한 비율(3/5) */}
           <div>
             <ActivityDetailContent
               description={activity.description}
@@ -71,10 +71,10 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* 우측 예약 영역 폭 확보 */}
-          <div className="hidden lg:block" />
+          <div className="hidden 2xl:col-span-2 2xl:block" />
         </div>
         {/* TODO: 체험 후기 (페이지네이션) */}
       </div>
-    </main>
+    </div>
   );
 }
