@@ -41,12 +41,12 @@ export const useDragScroll = <T extends HTMLElement = HTMLUListElement>() => {
   }, []);
 
   const handleDragEnd = useCallback(() => {
-    dragState.current = {
-      isDragging: false,
-      startX: 0,
-      clickStartX: 0,
-      isClickPrevented: false,
-    };
+    dragState.current.isDragging = false;
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    dragState.current.isDragging = false;
+    dragState.current.isClickPrevented = false;
   }, []);
 
   const handleDragMove = useCallback((e: React.MouseEvent) => {
@@ -64,6 +64,7 @@ export const useDragScroll = <T extends HTMLElement = HTMLUListElement>() => {
     if (dragState.current.isClickPrevented) {
       e.stopPropagation();
       e.preventDefault();
+      dragState.current.isClickPrevented = false;
     }
   }, []);
 
@@ -71,11 +72,17 @@ export const useDragScroll = <T extends HTMLElement = HTMLUListElement>() => {
     () => ({
       onMouseDown: handleDragStart,
       onMouseUp: handleDragEnd,
-      onMouseLeave: handleDragEnd,
+      onMouseLeave: handleDragLeave,
       onMouseMove: handleDragMove,
       onClickCapture: handleClickCapture,
     }),
-    [handleDragStart, handleDragEnd, handleDragMove, handleClickCapture]
+    [
+      handleDragStart,
+      handleDragEnd,
+      handleDragLeave,
+      handleDragMove,
+      handleClickCapture,
+    ]
   );
 
   return {
