@@ -88,6 +88,7 @@ export function Input({
             onClick={handleTogglePasswordVisibility}
             disabled={disabled}
             aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'}
+            aria-controls={inputId}
             className="absolute top-1/2 right-5 flex -translate-y-1/2 cursor-pointer items-center justify-center text-gray-400 disabled:cursor-not-allowed"
           >
             {isPasswordVisible ? <IcEyeOn /> : <IcEyeOff />}
