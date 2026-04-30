@@ -37,22 +37,20 @@ export function Textarea({
         </label>
       )}
 
-      <div className="relative">
-        <textarea
-          ref={ref}
-          id={inputId}
-          rows={rows}
-          aria-invalid={hasError}
-          aria-describedby={hasError ? `${inputId}-error` : undefined}
-          className={cn(
-            INPUT_STYLE,
-            hasError && INPUT_ERROR_STYLE,
-            'resize-none',
-            className
-          )}
-          {...props}
-        />
-      </div>
+      <textarea
+        ref={ref}
+        id={inputId}
+        rows={rows}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? `${inputId}-error` : undefined}
+        className={cn(
+          INPUT_STYLE,
+          hasError && INPUT_ERROR_STYLE,
+          'resize-none',
+          className
+        )}
+        {...props}
+      />
 
       {hasError && (
         <p id={`${inputId}-error`} className={INPUT_ERROR_MESSAGE_STYLE}>
