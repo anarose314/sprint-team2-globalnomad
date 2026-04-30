@@ -1,4 +1,4 @@
-import { ReserveTimeProps } from '@/app/(main)/activity/components/reserve-time/rserveTime.types';
+import { ReserveTimeProps } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
 import { IcCalendar, IcMinus, IcPlus } from '@/shared/assets/icons';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 import { Input } from '@/shared/components/input';
