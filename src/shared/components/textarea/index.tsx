@@ -1,18 +1,14 @@
 'use client';
 
-import { ComponentProps, useId } from 'react';
+import { useId } from 'react';
 import {
   INPUT_ERROR_MESSAGE_STYLE,
   INPUT_ERROR_STYLE,
   INPUT_LABEL_STYLE,
   INPUT_STYLE,
 } from '@/shared/components/input/input.constants';
+import { TextareaProps } from '@/shared/components/textarea/textarea.types';
 import { cn } from '@/shared/utils/cn';
-
-export interface TextareaProps extends ComponentProps<'textarea'> {
-  label?: string;
-  errorMessage?: string;
-}
 
 /**
  * 공통 Textarea 컴포넌트
@@ -45,7 +41,6 @@ export function Textarea({
         <textarea
           ref={ref}
           id={inputId}
-          name={inputId}
           rows={rows}
           aria-invalid={hasError}
           aria-describedby={hasError ? `${inputId}-error` : undefined}
