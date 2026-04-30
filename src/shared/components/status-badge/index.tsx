@@ -8,15 +8,15 @@ const badgeStyle = cva(
   {
     variants: {
       status: {
-        cancelled: 'bg-gray-100 text-gray-600',
-        completed: 'bg-teal-100 text-teal-500',
-        rejected: 'bg-red-100 text-red-500',
-        attended: 'bg-primary-100 text-primary-700',
-        approved: 'bg-teal-200 text-teal-700',
+        canceled: 'bg-gray-100 text-gray-600',
+        pending: 'bg-teal-100 text-teal-500',
+        declined: 'bg-red-100 text-red-500',
+        completed: 'bg-primary-100 text-primary-700',
+        confirmed: 'bg-teal-200 text-teal-700',
       },
     },
     defaultVariants: {
-      status: 'completed',
+      status: 'pending',
     },
   }
 );
@@ -27,7 +27,7 @@ const badgeStyle = cva(
  *
  * @example
  * // (예: '예약 완료' 뱃지)
- * <StatusBadge status="completed" />
+ * <StatusBadge status="pending" />
  */
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
