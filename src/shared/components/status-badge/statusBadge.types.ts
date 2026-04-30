@@ -1,8 +1,6 @@
-import { STATUS_TEXT } from '@/shared/constants/status.constants';
-
-export type Status = keyof typeof STATUS_TEXT;
+import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export interface StatusBadgeProps {
-  status: Status;
+  status: ReservationStatus;
   className?: string;
 }
