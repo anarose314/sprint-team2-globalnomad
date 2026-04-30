@@ -76,7 +76,7 @@ export function Input({
           aria-describedby={hasError ? `${inputId}-error` : undefined}
           className={cn(
             INPUT_STYLE,
-            hasRightElement && 'pr-14 pl-5',
+            hasRightElement && 'pr-14',
             hasError && INPUT_ERROR_STYLE,
             className
           )}
