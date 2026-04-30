@@ -34,6 +34,7 @@ export function ProfileForm() {
         disabled
       />
 
+      {/* TODO: 추후 공통 컴포넌트로 변경 */}
       <Input
         label="비밀번호"
         type={isPasswordVisible ? 'text' : 'password'}
