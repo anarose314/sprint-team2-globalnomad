@@ -40,15 +40,15 @@ export function KebabDropdown({ onEdit, onDelete }: KebabDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="z-dropdown absolute top-full right-0 mt-1 w-max overflow-hidden rounded-lg border border-gray-100 bg-white">
-          <div className="grid h-full grid-rows-2 divide-y divide-gray-100">
+        <div className="z-dropdown absolute top-full right-0 mt-1 min-w-20 overflow-hidden rounded-lg border border-gray-100 bg-white md:min-w-22 md:rounded-xl">
+          <div className="grid grid-rows-2 divide-y divide-gray-100">
             <button
               type="button"
               onClick={() => {
                 setIsOpen(false);
                 onEdit?.();
               }}
-              className="typo-md-medium hover:bg-gray-25 md:typo-lg-medium flex h-full w-full cursor-pointer items-center justify-center text-center text-gray-950 transition-colors"
+              className="typo-xs-semibold md:typo-md-medium hover:bg-gray-25 flex h-auto w-full cursor-pointer items-center justify-center px-2.5 py-2 text-center text-gray-950 transition-colors md:px-3 md:py-2.5"
             >
               수정하기
             </button>
@@ -58,7 +58,7 @@ export function KebabDropdown({ onEdit, onDelete }: KebabDropdownProps) {
                 setIsOpen(false);
                 onDelete?.();
               }}
-              className="typo-md-medium hover:bg-gray-25 md:typo-lg-medium flex h-full w-full cursor-pointer items-center justify-center text-center text-gray-950 transition-colors"
+              className="typo-xs-semibold md:typo-md-medium hover:bg-gray-25 flex h-auto w-full cursor-pointer items-center justify-center px-2.5 py-2 text-center text-gray-950 transition-colors md:px-3 md:py-2.5"
             >
               삭제하기
             </button>
