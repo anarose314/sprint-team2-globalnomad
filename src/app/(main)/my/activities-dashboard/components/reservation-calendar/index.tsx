@@ -1,44 +1,91 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import Calendar from 'react-calendar';
+import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
+import {
+  EVENT_COUNTS_BY_DATE,
+  WEEKDAY,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
+import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
+import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
 
-const DAYS_OF_WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as const;
+/**
+ * Date 객체를 예약 캘린더 이벤트 맵에서 사용하는 yyyy-mm-dd 키로 변환합니다.
+ */
+function toDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
+/**
+ * 예약 현황 페이지에서 월 단위 예약 상태를 보여주는 캘린더 컴포넌트입니다.
+ * 날짜별 예약/승인/완료 배지를 표시하며, 월 이동 상태를 내부에서 관리합니다.
+ */
 export function ReservationCalendar() {
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  const currentMonthTitle = useMemo(
+    () =>
+      `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`,
+    [currentDate]
+  );
+
   return (
-    <div className="md:shadow-card mt-4.5 min-h-[779px] w-full rounded-3xl border-0 bg-white pt-5 pb-2.5 shadow-none md:mt-6 2xl:mt-7.5">
-      <div className="flex h-full flex-col gap-7.5 px-5 md:px-8">
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            aria-label="이전 달"
-            className="flex h-8 w-8 items-center justify-center text-gray-950"
-          >
+    <div className="mt-7 w-full md:mt-6">
+      <Calendar
+        value={selectedDate}
+        onChange={(value) => setSelectedDate(value as Date)}
+        activeStartDate={currentDate}
+        onActiveStartDateChange={({ activeStartDate }) => {
+          if (activeStartDate) setCurrentDate(activeStartDate);
+        }}
+        showNeighboringMonth
+        prevLabel={
+          <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
             <IcArrowLeft className="h-6 w-6" />
-          </button>
-          <h3 className="typo-2lg-medium md:typo-xl-medium text-gray-950">
-            2026년 9월
-          </h3>
-          <button
-            type="button"
-            aria-label="다음 달"
-            className="flex h-8 w-8 items-center justify-center text-gray-950"
-          >
+          </span>
+        }
+        nextLabel={
+          <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
             <IcArrowRight className="h-6 w-6" />
-          </button>
-        </div>
+          </span>
+        }
+        prev2Label={null}
+        next2Label={null}
+        formatMonthYear={() => currentMonthTitle}
+        formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
+        formatDay={() => ''}
+        locale="en-US"
+        calendarType="gregory"
+        className="reservation-calendar"
+        tileClassName={({ view }) => {
+          if (view !== 'month') return undefined;
+          return 'reservation-calendar__day-tile';
+        }}
+        tileContent={({ date, view, activeStartDate }) => {
+          if (view !== 'month') return null;
 
-        <div className="grid grid-cols-7 border-b border-gray-50 pb-3">
-          {DAYS_OF_WEEK.map((day, index) => (
-            <span
-              key={`${day}-${index}`}
-              className="typo-lg-semibold flex items-center justify-center text-gray-950"
-            >
-              {day}
-            </span>
-          ))}
-        </div>
+          const visibleMonthDate = activeStartDate ?? currentDate;
+          const isCurrentMonth =
+            date.getMonth() === visibleMonthDate.getMonth() &&
+            date.getFullYear() === visibleMonthDate.getFullYear();
+          const eventCounts: ReservationEventCounts | undefined =
+            EVENT_COUNTS_BY_DATE[toDateKey(date)];
 
-        <div className="flex-1 rounded-2xl border-0 bg-white" />
-      </div>
+          return (
+            <ReservationCalendarDayTile
+              date={date}
+              isCurrentMonth={isCurrentMonth}
+              eventCounts={eventCounts}
+            />
+          );
+        }}
+      />
     </div>
   );
 }
