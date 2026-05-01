@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import {
@@ -26,14 +26,23 @@ function toDateKey(date: Date) {
  * 날짜별 예약/승인/완료 배지를 표시
  */
 export function ReservationCalendar() {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
 
   const currentMonthTitle = useMemo(
     () =>
       `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`,
     [currentDate]
   );
+
+  if (!isHydrated) {
+    return null;
+  }
 
   return (
     <div className="mt-7 w-full md:mt-6">
@@ -60,7 +69,7 @@ export function ReservationCalendar() {
         formatMonthYear={() => currentMonthTitle}
         formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
         formatDay={() => ''}
-        locale="en-US"
+        locale="ko-KR"
         calendarType="gregory"
         className="reservation-calendar"
         tileClassName={({ view }) => {

@@ -25,7 +25,7 @@
 }
 
 .reservation-calendar .react-calendar__month-view__weekdays__weekday {
-  @apply flex items-center justify-center text-sm font-bold text-gray-900;
+  @apply typo-sm-semibold flex items-center justify-center text-gray-900;
 }
 
 .reservation-calendar
@@ -149,7 +149,7 @@
   }
 
   .reservation-calendar__day-number {
-    @apply text-lg;
+    @apply typo-lg-medium;
   }
 
   .reservation-calendar__notification-dot {
@@ -157,7 +157,7 @@
   }
 
   .reservation-calendar__event-badge {
-    @apply text-md h-5 min-w-14;
+    @apply typo-md-medium h-5 min-w-14;
   }
 
   .reservation-calendar__event-badge--pending {
