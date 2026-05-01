@@ -8,12 +8,13 @@ export const metadata: Metadata = {
 
 export default function MyActivitiesDashboardPage() {
   return (
-    <section className="mx-auto mb-[66px] w-[327px] md:mb-[172px] md:w-[476px] 2xl:mb-[160px] 2xl:w-[640px]">
+    <section className="mx-auto mb-[66px] md:mb-[172px] 2xl:mb-[160px]">
       <h2 className="typo-2lg-bold text-gray-950">예약 현황</h2>
       <p className="typo-md-medium mt-2.5 text-gray-500 md:mt-2">
         내 체험에 예약된 내역들을 한 눈에 확인할 수 있습니다.
       </p>
 
+      {/* TODO: 드롭다운 공통 컴포넌트로 교체 */}
       <button
         type="button"
         className="shadow-custom mt-6 flex h-[54px] w-full cursor-pointer items-center justify-between rounded-2xl border border-gray-100 bg-white px-5 py-4 2xl:mt-7.5"
