@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import {
@@ -26,21 +26,28 @@ function toDateKey(date: Date) {
  * 날짜별 예약/승인/완료 배지를 표시
  */
 export function ReservationCalendar() {
-  const isHydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const now = new Date();
+      setCurrentDate(now);
+      setSelectedDate(now);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const currentMonthTitle = useMemo(
     () =>
-      `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`,
+      currentDate
+        ? `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`
+        : '',
     [currentDate]
   );
 
-  if (!isHydrated) {
+  if (!currentDate || !selectedDate) {
     return null;
   }
 

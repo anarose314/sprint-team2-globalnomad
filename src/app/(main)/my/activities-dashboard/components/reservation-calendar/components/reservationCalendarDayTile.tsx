@@ -12,6 +12,8 @@ interface ReservationCalendarDayTileProps {
   eventCounts?: ReservationEventCounts;
 }
 
+const STATUS_ORDER = Object.keys(STATUS_META) as ReservationEventStatus[];
+
 /**
  * 캘린더의 개별 날짜 셀 UI 렌더링
  * 날짜 숫자, 알림 점, 상태별 이벤트 배지 스택
@@ -45,14 +47,12 @@ export function ReservationCalendarDayTile({
         <div
           className={`reservation-calendar__event-badge-list ${isMuted ? 'reservation-calendar__meta--muted' : ''}`}
         >
-          {(Object.keys(STATUS_META) as ReservationEventStatus[]).map(
-            (status) => {
-              const count = eventCounts[status];
-              if (!count) return null;
+          {STATUS_ORDER.map((status) => {
+            const count = eventCounts[status];
+            if (!count) return null;
 
-              return <EventBadge key={status} status={status} count={count} />;
-            }
-          )}
+            return <EventBadge key={status} status={status} count={count} />;
+          })}
         </div>
       ) : null}
     </div>
