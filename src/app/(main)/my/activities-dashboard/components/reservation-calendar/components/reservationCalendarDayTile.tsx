@@ -12,11 +12,17 @@ interface ReservationCalendarDayTileProps {
   eventCounts?: ReservationEventCounts;
 }
 
+<<<<<<< HEAD
 const STATUS_ORDER = Object.keys(STATUS_META) as ReservationEventStatus[];
 
 /**
  * 캘린더의 개별 날짜 셀 UI 렌더링
  * 날짜 숫자, 알림 점, 상태별 이벤트 배지 스택
+=======
+/**
+ * 캘린더의 개별 날짜 셀 UI를 렌더링합니다.
+ * 날짜 숫자, 알림 점, 상태별 이벤트 배지 스택을 하나의 타일로 구성합니다.
+>>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
  */
 export function ReservationCalendarDayTile({
   date,
@@ -47,12 +53,23 @@ export function ReservationCalendarDayTile({
         <div
           className={`reservation-calendar__event-badge-list ${isMuted ? 'reservation-calendar__meta--muted' : ''}`}
         >
+<<<<<<< HEAD
           {STATUS_ORDER.map((status) => {
             const count = eventCounts[status];
             if (!count) return null;
 
             return <EventBadge key={status} status={status} count={count} />;
           })}
+=======
+          {(Object.keys(STATUS_META) as ReservationEventStatus[]).map(
+            (status) => {
+              const count = eventCounts[status];
+              if (!count) return null;
+
+              return <EventBadge key={status} status={status} count={count} />;
+            }
+          )}
+>>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
         </div>
       ) : null}
     </div>

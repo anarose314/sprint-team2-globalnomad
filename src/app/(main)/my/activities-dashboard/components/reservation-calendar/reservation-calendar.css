@@ -25,7 +25,11 @@
 }
 
 .reservation-calendar .react-calendar__month-view__weekdays__weekday {
+<<<<<<< HEAD
   @apply typo-sm-semibold flex items-center justify-center text-gray-900;
+=======
+  @apply flex items-center justify-center text-sm font-bold text-gray-900;
+>>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
 }
 
 .reservation-calendar
@@ -149,7 +153,11 @@
   }
 
   .reservation-calendar__day-number {
+<<<<<<< HEAD
     @apply typo-lg-medium;
+=======
+    @apply text-lg;
+>>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
   }
 
   .reservation-calendar__notification-dot {
@@ -157,7 +165,11 @@
   }
 
   .reservation-calendar__event-badge {
+<<<<<<< HEAD
     @apply typo-md-medium h-5 min-w-14;
+=======
+    @apply text-md h-5 min-w-14;
+>>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
   }
 
   .reservation-calendar__event-badge--pending {
