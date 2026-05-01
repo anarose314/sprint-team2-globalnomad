@@ -10,7 +10,7 @@ interface EventBadgeProps {
 }
 
 /**
- * 예약 상태별 색상/위치를 적용한 이벤트 배지 컴포넌트입니다.
+ * 이벤트 배지 컴포넌트 (예약 / 승인 / 완료)
  */
 export function EventBadge({ status, count }: EventBadgeProps) {
   return (

@@ -13,8 +13,8 @@ interface ReservationCalendarDayTileProps {
 }
 
 /**
- * 캘린더의 개별 날짜 셀 UI를 렌더링합니다.
- * 날짜 숫자, 알림 점, 상태별 이벤트 배지 스택을 하나의 타일로 구성합니다.
+ * 캘린더의 개별 날짜 셀 UI 렌더링
+ * 날짜 숫자, 알림 점, 상태별 이벤트 배지 스택
  */
 export function ReservationCalendarDayTile({
   date,
