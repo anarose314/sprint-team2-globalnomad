@@ -1,10 +1,6 @@
 'use client';
 
-<<<<<<< HEAD
 import { useEffect, useMemo, useState } from 'react';
-=======
-import { useMemo, useState } from 'react';
->>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import {
@@ -16,11 +12,7 @@ import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
 
 /**
-<<<<<<< HEAD
  * Date 객체를 예약 캘린더 이벤트 맵에서 사용하는 yyyy-mm-dd 키로 변환
-=======
- * Date 객체를 예약 캘린더 이벤트 맵에서 사용하는 yyyy-mm-dd 키로 변환합니다.
->>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
  */
 function toDateKey(date: Date) {
   const year = date.getFullYear();
@@ -30,7 +22,6 @@ function toDateKey(date: Date) {
 }
 
 /**
-<<<<<<< HEAD
  * 예약 현황 페이지에서 월 단위 예약 상태를 보여주는 캘린더 컴포넌트
  * 날짜별 예약/승인/완료 배지를 표시
  */
@@ -59,22 +50,6 @@ export function ReservationCalendar() {
   if (!currentDate || !selectedDate) {
     return null;
   }
-
-=======
- * 예약 현황 페이지에서 월 단위 예약 상태를 보여주는 캘린더 컴포넌트입니다.
- * 날짜별 예약/승인/완료 배지를 표시하며, 월 이동 상태를 내부에서 관리합니다.
- */
-export function ReservationCalendar() {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  const currentMonthTitle = useMemo(
-    () =>
-      `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`,
-    [currentDate]
-  );
-
->>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
   return (
     <div className="mt-7 w-full md:mt-6">
       <Calendar
@@ -100,11 +75,7 @@ export function ReservationCalendar() {
         formatMonthYear={() => currentMonthTitle}
         formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
         formatDay={() => ''}
-<<<<<<< HEAD
         locale="ko-KR"
-=======
-        locale="en-US"
->>>>>>> a863ace (✨ Feat: 이벤트 배지 컴포넌트 구현 및 캘린더 UI 마크업)
         calendarType="gregory"
         className="reservation-calendar"
         tileClassName={({ view }) => {
