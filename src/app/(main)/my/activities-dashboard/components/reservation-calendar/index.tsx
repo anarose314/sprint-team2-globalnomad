@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
+import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
 import {
   EVENT_COUNTS_BY_DATE,
+  RESERVATION_DETAIL_BY_DATE,
   WEEKDAY,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
@@ -28,6 +30,12 @@ function toDateKey(date: Date) {
 export function ReservationCalendar() {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [detailDate, setDetailDate] = useState<Date | null>(null);
+  const [desktopSheetPosition, setDesktopSheetPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const calendarRootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -47,14 +55,96 @@ export function ReservationCalendar() {
     [currentDate]
   );
 
+  const selectedDateKey = useMemo(
+    () => (detailDate ? toDateKey(detailDate) : null),
+    [detailDate]
+  );
+
+  const setDesktopSheetPositionFromTile = useCallback(
+    (tileElement: HTMLElement) => {
+      if (window.innerWidth < 768) {
+        setDesktopSheetPosition(null);
+        return;
+      }
+
+      const calendarRoot = calendarRootRef.current;
+      if (!calendarRoot) return;
+
+      const rootRect = calendarRoot.getBoundingClientRect();
+      const tileRect = tileElement.getBoundingClientRect();
+
+      const SHEET_WIDTH = 320;
+      const EDGE_OFFSET = -4;
+      const VERTICAL_OFFSET = 6;
+
+      const rightAlignedLeft = tileRect.right - rootRect.left + EDGE_OFFSET;
+      const rightAlignedViewportRight =
+        rootRect.left + rightAlignedLeft + SHEET_WIDTH;
+
+      const shouldOpenLeft = rightAlignedViewportRight > window.innerWidth;
+      const leftAlignedLeft =
+        tileRect.left - rootRect.left - SHEET_WIDTH - EDGE_OFFSET;
+
+      const nextLeft = shouldOpenLeft
+        ? Math.max(0, leftAlignedLeft)
+        : rightAlignedLeft;
+      const nextTop = tileRect.top - rootRect.top + VERTICAL_OFFSET;
+
+      setDesktopSheetPosition({
+        top: nextTop,
+        left: nextLeft,
+      });
+    },
+    []
+  );
+
+  const updateDesktopSheetPosition = useCallback(() => {
+    if (!detailDate || window.innerWidth < 768) {
+      setDesktopSheetPosition(null);
+      return;
+    }
+
+    const calendarRoot = calendarRootRef.current;
+    if (!calendarRoot) return;
+
+    const targetTile = calendarRoot.querySelector(
+      '.reservation-calendar__day-tile--detail-target'
+    ) as HTMLElement | null;
+
+    if (!targetTile) return;
+    setDesktopSheetPositionFromTile(targetTile);
+  }, [detailDate, setDesktopSheetPositionFromTile]);
+
+  useEffect(() => {
+    if (!detailDate) return;
+
+    const timerId = window.setTimeout(updateDesktopSheetPosition, 0);
+    const handleResize = () => updateDesktopSheetPosition();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [currentDate, detailDate, updateDesktopSheetPosition]);
+
   if (!currentDate || !selectedDate) {
     return null;
   }
   return (
-    <div className="mt-7 w-full md:mt-6">
+    <div ref={calendarRootRef} className="mt-7 w-full md:relative md:mt-6">
       <Calendar
         value={selectedDate}
         onChange={(value) => setSelectedDate(value as Date)}
+        onClickDay={(value, event) => {
+          const nextDate = value as Date;
+          setSelectedDate(nextDate);
+          setDetailDate(nextDate);
+
+          if (event.currentTarget instanceof HTMLElement) {
+            setDesktopSheetPositionFromTile(event.currentTarget);
+          }
+        }}
         activeStartDate={currentDate}
         onActiveStartDateChange={({ activeStartDate }) => {
           if (activeStartDate) setCurrentDate(activeStartDate);
@@ -78,10 +168,6 @@ export function ReservationCalendar() {
         locale="ko-KR"
         calendarType="gregory"
         className="reservation-calendar"
-        tileClassName={({ view }) => {
-          if (view !== 'month') return undefined;
-          return 'reservation-calendar__day-tile';
-        }}
         tileContent={({ date, view, activeStartDate }) => {
           if (view !== 'month') return null;
 
@@ -100,7 +186,28 @@ export function ReservationCalendar() {
             />
           );
         }}
+        tileClassName={({ date, view }) => {
+          if (view !== 'month') return undefined;
+
+          const isDetailTarget =
+            Boolean(selectedDateKey) && toDateKey(date) === selectedDateKey;
+
+          return `reservation-calendar__day-tile ${isDetailTarget ? 'reservation-calendar__day-tile--detail-target' : ''}`;
+        }}
       />
+      {detailDate && selectedDateKey ? (
+        <ReservationDetailSheet
+          key={selectedDateKey}
+          isOpen
+          selectedDate={detailDate}
+          detailData={RESERVATION_DETAIL_BY_DATE[selectedDateKey]}
+          desktopPosition={desktopSheetPosition}
+          onClose={() => {
+            setDetailDate(null);
+            setDesktopSheetPosition(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

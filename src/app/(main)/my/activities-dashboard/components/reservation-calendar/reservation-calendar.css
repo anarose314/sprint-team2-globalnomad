@@ -1,5 +1,6 @@
 @reference "../../../../../styles/globals.css";
 
+/* ===== 예약 캘린더 기본 프레임/헤더 ===== */
 .reservation-calendar {
   @apply w-full rounded-3xl border-0 bg-white px-6;
 }
@@ -17,9 +18,10 @@
 }
 
 .reservation-calendar .react-calendar__month-view {
-  @apply mt-2;
+  @apply mt-7.5;
 }
 
+/* ===== 요일(weekdays) 헤더 영역 ===== */
 .reservation-calendar .react-calendar__month-view__weekdays {
   @apply grid h-11 grid-cols-7 border-b border-gray-50;
 }
@@ -42,6 +44,7 @@
   @apply border-0 no-underline;
 }
 
+/* ===== 월(month) 날짜 그리드 ===== */
 .reservation-calendar .react-calendar__month-view__days {
   @apply grid grid-cols-7;
   grid-auto-rows: minmax(104px, auto);
@@ -57,12 +60,14 @@
   @apply hidden;
 }
 
+/* react-calendar 기본 활성/호버 배경 제거 */
 .reservation-calendar .react-calendar__tile:enabled:hover,
 .reservation-calendar .react-calendar__tile:enabled:focus,
 .reservation-calendar .react-calendar__tile--active {
   @apply bg-transparent;
 }
 
+/* ===== 날짜 셀(타일) 내부 구성 ===== */
 .reservation-calendar__day-tile {
   @apply relative h-full min-h-26 border-0 border-b border-gray-50 bg-transparent p-0 align-top;
 }
@@ -119,7 +124,119 @@
   @apply top-20;
 }
 
+/* ===== 예약 상세 레이어(모바일: 바텀시트) ===== */
+.reservation-detail-sheet__backdrop {
+  @apply fixed inset-0 z-50 flex items-end justify-center bg-black/40;
+}
+
+.reservation-detail-sheet {
+  @apply shadow-card h-[85vh] w-full rounded-t-3xl bg-white px-5 pb-6;
+}
+
+.reservation-detail-sheet__header {
+  @apply relative flex items-center justify-center pt-5 pb-3;
+}
+
+.reservation-detail-sheet__title {
+  @apply typo-2lg-bold text-gray-950;
+}
+
+.reservation-detail-sheet__close {
+  @apply absolute top-4 right-0 flex h-8 w-8 items-center justify-center rounded-full text-gray-900;
+}
+
+.reservation-detail-sheet__tabs {
+  @apply mb-6 flex border-b border-gray-100;
+}
+
+.reservation-detail-sheet__tab {
+  @apply typo-xl-medium relative mr-8 pb-2 text-gray-500;
+}
+
+.reservation-detail-sheet__tab--active {
+  @apply text-primary-500;
+}
+
+.reservation-detail-sheet__tab--active::after {
+  content: '';
+  @apply bg-primary-500 absolute -bottom-px left-1/2 h-0.5 w-14 -translate-x-1/2;
+}
+
+.reservation-detail-sheet__section {
+  @apply mb-7;
+}
+
+.reservation-detail-sheet__section-title {
+  @apply typo-2xl-bold mb-3 text-gray-950;
+}
+
+.reservation-detail-sheet__select-wrap {
+  @apply relative;
+}
+
+.reservation-detail-sheet__select {
+  @apply typo-lg-medium h-13 w-full appearance-none rounded-2xl border border-gray-100 px-4 text-gray-950 outline-none;
+}
+
+.reservation-detail-sheet__select-icon {
+  @apply pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-900;
+}
+
+.reservation-detail-sheet__request-list {
+  @apply space-y-3;
+}
+
+.reservation-detail-sheet__request-card {
+  @apply flex items-center justify-between rounded-2xl border border-gray-100 px-4 py-4;
+}
+
+.reservation-detail-sheet__request-info {
+  @apply space-y-2;
+}
+
+.reservation-detail-sheet__request-row {
+  @apply flex items-center;
+}
+
+.reservation-detail-sheet__request-label {
+  @apply typo-xl-bold inline-block w-16 text-gray-500;
+}
+
+.reservation-detail-sheet__request-value {
+  @apply typo-xl-medium text-gray-950;
+}
+
+.reservation-detail-sheet__actions {
+  @apply flex flex-col gap-2;
+}
+
+.reservation-detail-sheet__status-badge {
+  @apply typo-xs-semibold h-7 w-16;
+}
+
+.reservation-detail-sheet__action-button {
+  @apply typo-md-medium h-9 min-w-18 rounded-lg px-3 text-gray-600;
+}
+
+.reservation-detail-sheet__action-button--approve {
+  @apply border-gray-50 bg-white hover:bg-white active:bg-white active:text-gray-600;
+}
+
+.reservation-detail-sheet__action-button--reject {
+  @apply border-0 bg-gray-50 text-gray-600 hover:bg-gray-50 active:bg-gray-50;
+}
+
+.reservation-detail-sheet__action-button:disabled {
+  @apply border-0 bg-gray-100 text-gray-400;
+}
+
+.reservation-detail-sheet__empty {
+  @apply typo-lg-medium rounded-2xl border border-dashed border-gray-100 px-4 py-6 text-center whitespace-nowrap text-gray-400;
+}
+
+/* ===== 데스크톱(md 이상) 반응형 보정 ===== */
 @media (min-width: 768px) {
+  /* 캘린더 컨테이너/그리드 데스크톱 스케일 */
   .reservation-calendar {
     @apply shadow-card min-h-194.25 px-5 pt-6 pb-5.75;
   }
@@ -129,7 +246,7 @@
   }
 
   .reservation-calendar .react-calendar__month-view {
-    @apply mt-0;
+    @apply mt-7.5;
   }
 
   .reservation-calendar .react-calendar__month-view__weekdays__weekday {
@@ -170,5 +287,66 @@
 
   .reservation-calendar__event-badge--completed {
     @apply top-24;
+  }
+
+  /* 상세 레이어: 데스크톱에서는 날짜 옆 플로팅 패널 */
+  .reservation-detail-sheet__backdrop {
+    @apply absolute inset-0 items-start justify-start bg-transparent p-0;
+  }
+
+  .reservation-detail-sheet {
+    @apply absolute h-[581px] w-[320px] max-w-none rounded-3xl px-5 pb-5;
+  }
+
+  .reservation-detail-sheet__header {
+    @apply justify-start pt-5 pb-3;
+  }
+
+  .reservation-detail-sheet__title {
+    @apply typo-2lg-bold;
+  }
+
+  .reservation-detail-sheet__close {
+    @apply top-5 right-0;
+  }
+
+  .reservation-detail-sheet__section {
+    @apply mb-5;
+  }
+
+  .reservation-detail-sheet__section-title {
+    @apply typo-xl-bold mb-2.5;
+  }
+
+  .reservation-detail-sheet__tabs {
+    @apply mb-5;
+  }
+
+  .reservation-detail-sheet__tab {
+    @apply typo-md-medium mr-6;
+  }
+
+  .reservation-detail-sheet__select {
+    @apply typo-md-medium h-11 rounded-2xl;
+  }
+
+  .reservation-detail-sheet__request-card {
+    @apply rounded-2xl px-3 py-3;
+  }
+
+  .reservation-detail-sheet__request-label {
+    @apply typo-lg-bold;
+  }
+
+  .reservation-detail-sheet__request-value {
+    @apply typo-lg-medium;
+  }
+
+  .reservation-detail-sheet__empty {
+    @apply typo-lg-medium;
+  }
+
+  .reservation-detail-sheet__request-list {
+    @apply max-h-[250px] overflow-y-auto pr-1;
   }
 }
