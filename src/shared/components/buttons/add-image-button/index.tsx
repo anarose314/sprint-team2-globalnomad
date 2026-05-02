@@ -39,7 +39,7 @@ export function AddImageButton({
       <span className="flex h-7.5 w-7.5 shrink-0 items-center justify-center md:h-10 md:w-10">
         <IcPlus className="h-3.75 w-3.75 md:h-5 md:w-5" />
       </span>
-      <span className="md:text-md text-xs leading-4 font-medium">
+      <span className="typo-xs-medium md:typo-md-medium leading-4">
         이미지 등록
       </span>
     </label>
