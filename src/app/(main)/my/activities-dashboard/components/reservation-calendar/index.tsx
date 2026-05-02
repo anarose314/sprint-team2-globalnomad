@@ -13,6 +13,8 @@ import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/com
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
 
+const DESKTOP_FLOATING_SHEET_BREAKPOINT = 1536;
+
 /**
  * Date 객체를 예약 캘린더 이벤트 맵에서 사용하는 yyyy-mm-dd 키로 변환
  */
@@ -62,7 +64,7 @@ export function ReservationCalendar() {
 
   const setDesktopSheetPositionFromTile = useCallback(
     (tileElement: HTMLElement) => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < DESKTOP_FLOATING_SHEET_BREAKPOINT) {
         setDesktopSheetPosition(null);
         return;
       }
@@ -99,7 +101,7 @@ export function ReservationCalendar() {
   );
 
   const updateDesktopSheetPosition = useCallback(() => {
-    if (!detailDate || window.innerWidth < 768) {
+    if (!detailDate || window.innerWidth < DESKTOP_FLOATING_SHEET_BREAKPOINT) {
       setDesktopSheetPosition(null);
       return;
     }

@@ -130,11 +130,15 @@
 }
 
 .reservation-detail-sheet {
-  @apply shadow-card h-[85vh] w-full rounded-t-3xl bg-white px-5 pb-6;
+  @apply shadow-card h-[515px] w-full max-w-none rounded-t-2xl bg-white pb-6;
+}
+
+.reservation-detail-sheet__inner {
+  @apply mx-auto w-full max-w-[375px] px-5;
 }
 
 .reservation-detail-sheet__header {
-  @apply relative flex items-center justify-center pt-5 pb-3;
+  @apply relative flex items-center justify-start pt-5 pb-3;
 }
 
 .reservation-detail-sheet__title {
@@ -142,15 +146,15 @@
 }
 
 .reservation-detail-sheet__close {
-  @apply absolute top-4 right-0 flex h-8 w-8 items-center justify-center rounded-full text-gray-900;
+  @apply absolute top-4 right-0 hidden h-8 w-8 items-center justify-center rounded-full text-gray-900;
 }
 
 .reservation-detail-sheet__tabs {
-  @apply mb-6 flex border-b border-gray-100;
+  @apply mb-[11px] grid h-[41px] grid-cols-3 border-b border-gray-100;
 }
 
 .reservation-detail-sheet__tab {
-  @apply typo-xl-medium relative mr-8 pb-2 text-gray-500;
+  @apply typo-lg-medium relative flex h-[41px] items-center justify-center pb-2 text-gray-500;
 }
 
 .reservation-detail-sheet__tab--active {
@@ -159,7 +163,11 @@
 
 .reservation-detail-sheet__tab--active::after {
   content: '';
-  @apply bg-primary-500 absolute -bottom-px left-1/2 h-0.5 w-14 -translate-x-1/2;
+  @apply bg-primary-500 absolute -bottom-px left-0 h-0.5 w-full;
+}
+
+.reservation-detail-sheet__content {
+  @apply flex flex-col;
 }
 
 .reservation-detail-sheet__section {
@@ -167,7 +175,7 @@
 }
 
 .reservation-detail-sheet__section-title {
-  @apply typo-2xl-bold mb-3 text-gray-950;
+  @apply typo-lg-bold mb-3 text-gray-950;
 }
 
 .reservation-detail-sheet__select-wrap {
@@ -175,7 +183,7 @@
 }
 
 .reservation-detail-sheet__select {
-  @apply typo-lg-medium h-13 w-full appearance-none rounded-2xl border border-gray-100 px-4 text-gray-950 outline-none;
+  @apply typo-md-medium h-13 w-full appearance-none rounded-2xl border border-gray-100 px-4 text-gray-950 outline-none;
 }
 
 .reservation-detail-sheet__select-icon {
@@ -187,7 +195,7 @@
 }
 
 .reservation-detail-sheet__request-card {
-  @apply flex items-center justify-between rounded-2xl border border-gray-100 px-4 py-4;
+  @apply mx-auto flex h-[108px] w-[327px] items-center justify-between rounded-2xl border border-gray-100 px-4 py-4;
 }
 
 .reservation-detail-sheet__request-info {
@@ -199,11 +207,11 @@
 }
 
 .reservation-detail-sheet__request-label {
-  @apply typo-xl-bold inline-block w-16 text-gray-500;
+  @apply typo-md-bold inline-block w-13 text-gray-500;
 }
 
 .reservation-detail-sheet__request-value {
-  @apply typo-xl-medium text-gray-950;
+  @apply typo-md-medium text-gray-950;
 }
 
 .reservation-detail-sheet__actions {
@@ -215,7 +223,7 @@
 }
 
 .reservation-detail-sheet__action-button {
-  @apply typo-md-medium h-9 min-w-18 rounded-lg px-3 text-gray-600;
+  @apply typo-md-medium h-9 w-[69px] rounded-lg px-0 text-gray-600;
 }
 
 .reservation-detail-sheet__action-button--approve {
@@ -289,13 +297,52 @@
     @apply top-24;
   }
 
-  /* 상세 레이어: 데스크톱에서는 날짜 옆 플로팅 패널 */
+  /* 상세 레이어: 태블릿도 바텀시트 유지 */
+  .reservation-detail-sheet {
+    @apply h-[453px] pb-5;
+  }
+
+  .reservation-detail-sheet__inner {
+    @apply max-w-[744px];
+  }
+
+  .reservation-detail-sheet__tabs {
+    @apply mb-7.5;
+  }
+
+  .reservation-detail-sheet__content {
+    @apply grid grid-cols-[338px_338px] justify-between;
+  }
+
+  .reservation-detail-sheet__section {
+    @apply mb-0;
+  }
+
+  .reservation-detail-sheet__select-wrap {
+    @apply w-[338px];
+  }
+
+  .reservation-detail-sheet__request-card {
+    @apply mx-0 h-[116px] w-[338px];
+  }
+
+  .reservation-detail-sheet__action-button {
+    @apply h-10;
+  }
+}
+
+/* ===== 큰 데스크톱에서만 플로팅 상세 패널 ===== */
+@media (min-width: 1536px) {
   .reservation-detail-sheet__backdrop {
     @apply absolute inset-0 items-start justify-start bg-transparent p-0;
   }
 
   .reservation-detail-sheet {
-    @apply absolute h-[581px] w-[320px] max-w-none rounded-3xl px-5 pb-5;
+    @apply absolute h-[581px] w-[320px] max-w-none rounded-3xl pb-5;
+  }
+
+  .reservation-detail-sheet__inner {
+    @apply max-w-none px-5;
   }
 
   .reservation-detail-sheet__header {
@@ -307,7 +354,7 @@
   }
 
   .reservation-detail-sheet__close {
-    @apply top-5 right-0;
+    @apply top-5 right-0 flex;
   }
 
   .reservation-detail-sheet__section {
@@ -322,8 +369,16 @@
     @apply mb-5;
   }
 
+  .reservation-detail-sheet__content {
+    @apply flex flex-col;
+  }
+
   .reservation-detail-sheet__tab {
-    @apply typo-md-medium mr-6;
+    @apply typo-md-medium;
+  }
+
+  .reservation-detail-sheet__select-wrap {
+    @apply w-auto;
   }
 
   .reservation-detail-sheet__select {
@@ -331,11 +386,11 @@
   }
 
   .reservation-detail-sheet__request-card {
-    @apply rounded-2xl px-3 py-3;
+    @apply h-auto w-auto rounded-2xl px-3 py-3;
   }
 
   .reservation-detail-sheet__request-label {
-    @apply typo-lg-bold;
+    @apply typo-lg-bold w-16;
   }
 
   .reservation-detail-sheet__request-value {
