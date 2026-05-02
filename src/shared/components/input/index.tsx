@@ -2,6 +2,12 @@
 
 import { useId, useState } from 'react';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
+import {
+  INPUT_ERROR_MESSAGE_STYLE,
+  INPUT_ERROR_STYLE,
+  INPUT_LABEL_STYLE,
+  INPUT_STYLE,
+} from '@/shared/components/input/input.constants';
 import type { InputProps } from '@/shared/components/input/input.types';
 import { cn } from '@/shared/utils/cn';
 
@@ -55,7 +61,7 @@ export function Input({
   return (
     <div className="flex w-full flex-col">
       {label && (
-        <label htmlFor={inputId} className="typo-lg-medium mb-2 text-gray-950">
+        <label htmlFor={inputId} className={INPUT_LABEL_STYLE}>
           {label}
         </label>
       )}
@@ -69,12 +75,9 @@ export function Input({
           aria-invalid={hasError}
           aria-describedby={hasError ? `${inputId}-error` : undefined}
           className={cn(
-            'typo-lg-medium h-13.5 w-full rounded-2xl border bg-white py-4 text-gray-950 transition-colors outline-none placeholder:text-gray-400 focus:ring-1',
-            hasRightElement ? 'pr-14 pl-5' : 'px-5',
-            'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-            hasError
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'focus:border-primary-500 focus:ring-primary-500 border-gray-100',
+            INPUT_STYLE,
+            hasRightElement && 'pr-14',
+            hasError && INPUT_ERROR_STYLE,
             className
           )}
           {...props}
@@ -99,7 +102,7 @@ export function Input({
       </div>
 
       {hasError && (
-        <p id={`${inputId}-error`} className="typo-sm-medium mt-2 text-red-500">
+        <p id={`${inputId}-error`} className={INPUT_ERROR_MESSAGE_STYLE}>
           {errorMessage}
         </p>
       )}
