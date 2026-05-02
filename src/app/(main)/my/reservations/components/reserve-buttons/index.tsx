@@ -31,13 +31,9 @@ export function ReserveButtons({ status }: ReserveButtonsProps) {
         />
       )}
       {status === 'completed' && (
-        <ul className="flex gap-3 [&>li]:flex-1">
-          <li>
-            <Button size="md" className="w-full" onClick={handleOpenReview}>
-              후기 작성
-            </Button>
-          </li>
-        </ul>
+        <Button size="md" className="w-full" onClick={handleOpenReview}>
+          후기 작성
+        </Button>
       )}
     </>
   );
