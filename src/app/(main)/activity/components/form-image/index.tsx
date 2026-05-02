@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { FormImageProps } from '@/app/(main)/activity/components/form-image/FormImage.types';
 import { FormImagePreview } from '@/app/(main)/activity/components/form-image-preview';
 import { AddImageButton } from '@/shared/components/buttons';
+import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
 
 const MAX_IMAGE_COUNT = 4;
@@ -45,7 +46,10 @@ export function FormImage({
       const url = URL.createObjectURL(file);
       objectUrls.current.push(url);
       return {
-        id: crypto.randomUUID(),
+        id:
+          typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 11),
         url,
         file,
       };
@@ -131,7 +135,7 @@ export function FormImage({
       </div>
 
       {errorMessage && (
-        <p id={errorId} className="typo-lg-regular text-error">
+        <p id={errorId} className={INPUT_ERROR_MESSAGE_STYLE}>
           {errorMessage}
         </p>
       )}
