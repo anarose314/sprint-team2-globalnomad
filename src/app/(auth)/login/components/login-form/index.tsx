@@ -4,19 +4,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthFooter } from '@/app/(auth)/components/auth-footer';
-import { loginSchema } from '@/app/(auth)/login/components/login-form/login-form.schema';
+import {
+  type LoginFormValues,
+  loginSchema,
+} from '@/app/(auth)/login/components/login-form/login-form.schema';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
-
-/**
- * 로그인 폼에서 다루는 데이터의 타입.
- */
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
 
 /**
  * 로그인 폼 컴포넌트.
