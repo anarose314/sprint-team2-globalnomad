@@ -47,40 +47,44 @@ export function FormImage({
       };
     });
 
-    setImageFiles((prev) => {
-      if (!isMultiple && prev.length > 0) {
-        URL.revokeObjectURL(prev[0].url);
-      }
-      const updatedFiles = isMultiple
-        ? [...prev, ...newImageFiles]
-        : [...newImageFiles];
-
-      onChange?.(
-        isMultiple
-          ? updatedFiles.map((item) => item.file)
-          : updatedFiles[0].file
+    if (!isMultiple && imageFiles.length > 0) {
+      URL.revokeObjectURL(imageFiles[0].url);
+      objectUrls.current = objectUrls.current.filter(
+        (prevUrl) => prevUrl !== imageFiles[0].url
       );
-      return updatedFiles;
-    });
+    }
+
+    const updatedFiles = isMultiple
+      ? [...imageFiles, ...newImageFiles]
+      : [...newImageFiles];
+
+    setImageFiles(updatedFiles);
+    onChange?.(
+      isMultiple ? updatedFiles.map((item) => item.file) : updatedFiles[0].file
+    );
 
     if (inputRef.current) inputRef.current.value = '';
   };
 
   const handleImageDelete = (deleteImageId: string) => {
-    setImageFiles((prev) => {
-      const filteredFiles = prev.filter((image) => image.id !== deleteImageId);
+    const filteredFiles = imageFiles.filter(
+      (image) => image.id !== deleteImageId
+    );
+    const deletedImage = imageFiles.find((image) => image.id === deleteImageId);
 
-      const deletedImage = prev.find((image) => image.id === deleteImageId);
-      if (deletedImage) URL.revokeObjectURL(deletedImage.url);
-
-      onChange?.(
-        isMultiple
-          ? filteredFiles.map((item) => item.file)
-          : filteredFiles[0]?.file || null
+    if (deletedImage) {
+      URL.revokeObjectURL(deletedImage.url);
+      objectUrls.current = objectUrls.current.filter(
+        (prevUrl) => prevUrl !== deletedImage.url
       );
+    }
 
-      return filteredFiles;
-    });
+    setImageFiles(filteredFiles);
+    onChange?.(
+      isMultiple
+        ? filteredFiles.map((item) => item.file)
+        : filteredFiles[0]?.file || null
+    );
 
     if (inputRef.current) {
       inputRef.current.value = '';
