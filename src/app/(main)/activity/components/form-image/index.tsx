@@ -109,10 +109,8 @@ export function FormImage({
   };
 
   useEffect(() => {
-    const urlsToRevoke = objectUrls.current;
-
     return () => {
-      urlsToRevoke.forEach((url) => {
+      objectUrls.current.forEach((url) => {
         URL.revokeObjectURL(url);
       });
     };
