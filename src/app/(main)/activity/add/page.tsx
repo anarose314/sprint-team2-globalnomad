@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { ActivityFormTitle } from '@/app/(main)/activity/components/activity-form-title';
+import { FormImage } from '@/app/(main)/activity/components/form-image';
 import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
 import { Heading } from '@/shared/components/heading';
 import { Input } from '@/shared/components/input';
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ActivityAddPage() {
   return (
-    <div className="mx-auto mt-7.5 max-w-175 md:mt-10">
+    <div className="mx-auto mt-7.5 mb-9 max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
       <Heading>내 체험 등록</Heading>
       <form className="mt-6 flex flex-col gap-7.5">
         <section className="flex flex-col gap-6">
@@ -33,11 +34,11 @@ export default function ActivityAddPage() {
         </section>
         <section>
           <ActivityFormTitle>배너 이미지 등록</ActivityFormTitle>
-          {/* TODO: 배너 이미지 등록 추가 */}
+          <FormImage />
         </section>
         <section>
           <ActivityFormTitle>소개 이미지 등록</ActivityFormTitle>
-          {/* TODO: 소개 이미지 등록 추가 */}
+          <FormImage isMultiple />
         </section>
       </form>
       {/* TODO: 버튼 추가 */}
