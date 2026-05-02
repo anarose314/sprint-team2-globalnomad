@@ -8,47 +8,47 @@ const meta: Meta<typeof StatusBadge> = {
     layout: 'centered',
   },
   args: {
-    status: 'completed',
+    status: 'pending',
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof StatusBadge>;
 
-export const Completed: Story = {};
+export const Pending: Story = {};
 
-export const Cancelled: Story = {
+export const Canceled: Story = {
   args: {
-    status: 'cancelled',
+    status: 'canceled',
   },
 };
 
-export const Rejected: Story = {
+export const Declined: Story = {
   args: {
-    status: 'rejected',
+    status: 'declined',
   },
 };
 
-export const Attended: Story = {
+export const Completed: Story = {
   args: {
-    status: 'attended',
+    status: 'completed',
   },
 };
 
-export const Approved: Story = {
+export const Confirmed: Story = {
   args: {
-    status: 'approved',
+    status: 'confirmed',
   },
 };
 
 export const AllStatuses: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-2">
+      <StatusBadge status="pending" />
+      <StatusBadge status="canceled" />
+      <StatusBadge status="declined" />
       <StatusBadge status="completed" />
-      <StatusBadge status="cancelled" />
-      <StatusBadge status="rejected" />
-      <StatusBadge status="attended" />
-      <StatusBadge status="approved" />
+      <StatusBadge status="confirmed" />
     </div>
   ),
 };
