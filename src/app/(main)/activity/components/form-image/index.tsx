@@ -109,7 +109,7 @@ export function FormImage({
           errorId={errorId}
           errorMessage={errorMessage}
           disabled={isMaxReached}
-          onClick={() => {
+          onDisabledClick={() => {
             showToast({
               theme: 'error',
               message: `이미지는 최대 ${MAX_IMAGE_COUNT}장까지만 등록 가능합니다.`,

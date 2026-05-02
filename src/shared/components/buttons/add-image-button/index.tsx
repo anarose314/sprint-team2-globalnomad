@@ -9,7 +9,7 @@ export interface AddImageButtonProps {
   errorMessage?: string;
   className?: string;
   disabled?: boolean;
-  onClick?: () => void;
+  onDisabledClick?: () => void;
 }
 
 /**
@@ -24,7 +24,7 @@ export function AddImageButton({
   errorMessage,
   className,
   disabled,
-  onClick,
+  onDisabledClick,
 }: AddImageButtonProps) {
   return (
     <label
@@ -35,17 +35,17 @@ export function AddImageButton({
       onClick={(e) => {
         if (disabled) {
           e.preventDefault();
-          onClick?.();
+          onDisabledClick?.();
         }
       }}
       className={cn(
-        'group flex cursor-pointer flex-col items-center justify-center',
+        'group flex flex-col items-center justify-center',
         'aspect-square w-full gap-1 md:gap-2',
-        'rounded-2xl border border-gray-100 bg-white',
-        'text-gray-400 transition-colors duration-200 hover:border-gray-300 hover:text-gray-600',
+        'rounded-2xl border border-gray-100 bg-white text-gray-400',
+        'transition-colors duration-200',
         disabled
           ? 'cursor-not-allowed opacity-50'
-          : 'cursor-pointer text-gray-400 hover:border-gray-300 hover:text-gray-600',
+          : 'cursor-pointer hover:border-gray-300 hover:text-gray-600',
         className
       )}
     >
