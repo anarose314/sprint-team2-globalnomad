@@ -18,6 +18,8 @@ export function FormImage({
   >([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const objectUrls = useRef<string[]>([]);
+
   const showToast = useShowToast();
 
   const generatedId = useId();
@@ -37,11 +39,15 @@ export function FormImage({
       return;
     }
 
-    const newImageFiles = files.map((file) => ({
-      id: `${file.name} - ${Date.now()}`,
-      url: URL.createObjectURL(file),
-      file: file,
-    }));
+    const newImageFiles = files.map((file) => {
+      const url = URL.createObjectURL(file);
+      objectUrls.current.push(url);
+      return {
+        id: `${file.name} - ${Date.now()}`,
+        url,
+        file,
+      };
+    });
 
     setImageFiles((prev) => {
       const updatedFiles = isMultiple
@@ -81,12 +87,14 @@ export function FormImage({
   };
 
   useEffect(() => {
+    const urlsToRevoke = objectUrls.current;
+
     return () => {
-      imageFiles.forEach((image) => {
-        URL.revokeObjectURL(image.url);
+      urlsToRevoke.forEach((url) => {
+        URL.revokeObjectURL(url);
       });
     };
-  }, [imageFiles]);
+  }, []);
 
   return (
     <div className="flex w-full flex-col gap-4">
