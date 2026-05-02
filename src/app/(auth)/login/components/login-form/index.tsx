@@ -1,11 +1,22 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthFooter } from '@/app/(auth)/components/auth-footer';
+import { loginSchema } from '@/app/(auth)/login/components/login-form/login-form.schema';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
+
+/**
+ * 로그인 폼에서 다루는 데이터의 타입.
+ */
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 /**
  * 로그인 폼 컴포넌트.
@@ -13,19 +24,28 @@ import { Input } from '@/shared/components/input';
  * 페이지(page.tsx)는 서버 컴포넌트로 두고 metadata를 정의한 뒤,
  * 폼 상호작용 로직은 이 클라이언트 컴포넌트에서 처리한다.
  *
- * 검증 로직 및 API 연동은 별도 이슈에서 진행한다.
+ * 검증 규칙은 ./login-form.schema.ts 에 분리되어 있다.
+ * API 연동, 토큰 저장, 리다이렉트는 별도 이슈에서 진행한다.
  */
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const isSubmitDisabled = !email || !password;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<LoginFormValues>({
+    mode: 'onChange',
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = (data: LoginFormValues) => {
     // TODO: 로그인 API 연동 (별도 이슈)
-    console.log({ email, password });
+    console.log(data);
   };
 
   return (
@@ -39,7 +59,7 @@ export function LoginForm() {
 
       {/* 로그인 폼 */}
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex w-full flex-col gap-6"
         noValidate
       >
@@ -47,9 +67,9 @@ export function LoginForm() {
           label="이메일"
           type="email"
           placeholder="이메일을 입력해 주세요"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
+          errorMessage={errors.email?.message}
+          {...register('email')}
         />
 
         {/*
@@ -61,9 +81,9 @@ export function LoginForm() {
           label="비밀번호"
           type={isPasswordVisible ? 'text' : 'password'}
           placeholder="비밀번호를 입력해 주세요"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
+          errorMessage={errors.password?.message}
+          {...register('password')}
           rightIcon={
             <button
               type="button"
@@ -82,7 +102,7 @@ export function LoginForm() {
           }
         />
 
-        <Button type="submit" size="lg" disabled={isSubmitDisabled}>
+        <Button type="submit" size="lg" disabled={!isValid}>
           로그인하기
         </Button>
       </form>
