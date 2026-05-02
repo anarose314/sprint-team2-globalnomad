@@ -28,7 +28,7 @@ export function FormImagePreview({
         aria-label="업로드된 이미지 삭제"
         className="absolute -top-1.5 -right-1.5 flex h-6.5 w-6.5 cursor-pointer items-center justify-center rounded-full bg-gray-950"
       >
-        <IcClose className="w-[60%] text-white" />
+        <IcClose className="w-3/5 text-white" />
       </button>
     </>
   );
