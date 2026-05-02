@@ -8,6 +8,8 @@ export interface AddImageButtonProps {
   errorId?: string;
   errorMessage?: string;
   className?: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }
 
 /**
@@ -21,18 +23,29 @@ export function AddImageButton({
   errorId,
   errorMessage,
   className,
+  disabled,
+  onClick,
 }: AddImageButtonProps) {
   return (
     <label
       aria-label="이미지 업로드"
       aria-invalid={Boolean(errorMessage)}
       aria-describedby={errorMessage ? errorId : undefined}
-      htmlFor={id}
+      htmlFor={disabled ? undefined : id}
+      onClick={(e) => {
+        if (disabled) {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
       className={cn(
         'group flex cursor-pointer flex-col items-center justify-center',
         'aspect-square w-full gap-1 md:gap-2',
         'rounded-2xl border border-gray-100 bg-white',
         'text-gray-400 transition-colors duration-200 hover:border-gray-300 hover:text-gray-600',
+        disabled
+          ? 'cursor-not-allowed opacity-50'
+          : 'cursor-pointer text-gray-400 hover:border-gray-300 hover:text-gray-600',
         className
       )}
     >
