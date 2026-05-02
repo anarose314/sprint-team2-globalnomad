@@ -63,6 +63,25 @@ function formatNotificationTime(createdAt: string) {
   return `${diffDays}일 전`;
 }
 
+/**
+ * 알림 목록을 표시하는 드롭다운 컴포넌트
+ *
+ * - 알림 개수와 알림 목록을 표시한다.
+ * - 닫기 버튼 클릭 시 `onClose` 핸들러를 실행한다.
+ * - 각 알림은 내용과 생성 시간을 기준으로 한 상대 시간을 함께 보여준다.
+ *
+ * TODO: 알림 목록 API 연동 후 기본 mock 데이터 제거
+ * TODO: 알림 읽음 여부 API 연동 후 강조 표시 기준 변경
+ *
+ * @example
+ * <NotificationDropdown />
+ *
+ * @example
+ * <NotificationDropdown
+ *   data={notificationData}
+ *   onClose={handleCloseNotification}
+ * />
+ */
 export function NotificationDropdown({
   data = DEFAULT_NOTIFICATION_RESPONSE,
   onClose,
