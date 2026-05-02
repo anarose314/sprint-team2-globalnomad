@@ -18,9 +18,9 @@
  * </ModalBase>
  */
 import type { ReactNode } from 'react';
-import { cn } from '@/shared/utils/cn';
 import { IcClose } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
 
 interface ModalBaseProps {
   title?: string;
@@ -29,8 +29,8 @@ interface ModalBaseProps {
   className?: string;
   bodyClassName?: string;
   footerClassName?: string;
-  showCloseButton?: boolean;
   onClose?: () => void;
+  role?: 'dialog' | 'alertdialog';
 }
 
 export function ModalBase({
@@ -40,29 +40,26 @@ export function ModalBase({
   className,
   bodyClassName,
   footerClassName,
-  showCloseButton = false,
   onClose,
+  role = 'dialog',
 }: ModalBaseProps) {
+  const isHeaderVisible = Boolean(title || onClose);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div
-        role="dialog"
+        role={role}
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
-        className={cn(
-          'w-full max-w-135 rounded-3xl bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]',
-          className
-        )}
+        className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
       >
-        {(title || showCloseButton) && (
+        {isHeaderVisible && (
           <div className="relative px-7 pt-7">
-            {title ? (
+            {title && (
               <Heading id="modal-title" textStyle="typo-2xl-bold">
                 {title}
               </Heading>
-            ) : null}
-
-            {showCloseButton && onClose ? (
+            )}
+            {onClose && (
               <button
                 type="button"
                 aria-label="닫기"
@@ -71,21 +68,21 @@ export function ModalBase({
               >
                 <IcClose aria-hidden="true" className="h-5 w-5" />
               </button>
-            ) : null}
+            )}
           </div>
         )}
 
         <div
           className={cn(
             'px-7 py-6',
-            title || showCloseButton ? 'pt-5' : 'p-7',
+            isHeaderVisible ? 'pt-5' : 'p-7',
             bodyClassName
           )}
         >
           {children}
         </div>
 
-        {footer ? (
+        {footer && (
           <div
             className={cn(
               'flex items-center justify-center gap-3 px-7 pb-7',
@@ -94,7 +91,7 @@ export function ModalBase({
           >
             {footer}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

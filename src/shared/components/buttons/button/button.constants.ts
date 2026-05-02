@@ -9,28 +9,35 @@ export const BASE_CLASS =
  *
  * - height는 size별로 통일: lg=54px / md=48px / sm=40px
  * - 수직 정렬은 items-center + justify-center 에서 담당하므로 py 없음
- * - 좌우 패딩은 px-[1em] 으로 폰트 크기에 비례하여 자동 조정
+ * - 좌우 패딩은 px-em 으로 폰트 크기에 비례하여 자동 조정
  */
 export const BUTTON_VARIANTS = cva(BASE_CLASS, {
   variants: {
     variant: {
       primary: [
         'bg-primary-500 font-bold text-white',
-        'enabled:hover:bg-primary-500/80',
-        'enabled:active:bg-primary-700 enabled:active:scale-[0.98]',
+        'hover:bg-primary-500/80',
+        'active:bg-primary-700 active:scale-[0.98]',
         'disabled:bg-gray-200 disabled:text-gray-50',
+        'disabled:hover:bg-gray-200',
+        'disabled:active:scale-100 disabled:active:bg-gray-200',
       ],
       secondary: [
         'border border-gray-200 bg-white font-medium text-gray-600',
-        'enabled:hover:border-gray-300 enabled:hover:bg-gray-50',
-        'enabled:active:bg-primary-500 enabled:active:border-primary-500 enabled:active:scale-[0.98] enabled:active:text-white',
+        'hover:border-gray-300 hover:bg-gray-50',
+        'active:scale-[0.98] active:border-gray-400 active:bg-gray-400 active:text-white',
+        'aria-pressed:border-primary-500 aria-pressed:bg-primary-500 aria-pressed:text-white',
+        'aria-pressed:hover:border-primary-500 aria-pressed:hover:bg-primary-500',
         'disabled:border-gray-200 disabled:bg-white disabled:text-gray-200',
+        'disabled:hover:border-gray-200 disabled:hover:bg-white',
+        'disabled:aria-pressed:border-gray-200 disabled:aria-pressed:bg-white disabled:aria-pressed:text-gray-200',
+        'disabled:active:scale-100 disabled:active:border-gray-200 disabled:active:bg-white disabled:active:text-gray-200',
       ],
     },
     size: {
-      lg: 'h-13.5 rounded-2xl px-[1em] text-lg',
-      md: 'h-12 rounded-[14px] px-[1em] text-lg',
-      sm: 'text-md h-10 rounded-xl px-[1em]',
+      lg: 'px-em h-13.5 rounded-2xl text-lg',
+      md: 'px-em h-12 rounded-2xl text-lg',
+      sm: 'text-md px-em h-10 rounded-xl',
     },
   },
   defaultVariants: { variant: 'primary', size: 'lg' },
