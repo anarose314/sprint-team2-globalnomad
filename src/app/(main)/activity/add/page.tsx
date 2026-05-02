@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { ActivityFormTitle } from '@/app/(main)/activity/components/activity-form-title';
 import { FormImage } from '@/app/(main)/activity/components/form-image';
+import { FormTitle } from '@/app/(main)/activity/components/form-title';
 import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
 import { Heading } from '@/shared/components/heading';
 import { Input } from '@/shared/components/input';
@@ -29,15 +29,15 @@ export default function ActivityAddPage() {
           <Input label="주소" placeholder="주소를 입력해 주세요" />
         </section>
         <section>
-          <ActivityFormTitle>예약 가능한 시간대</ActivityFormTitle>
+          <FormTitle>예약 가능한 시간대</FormTitle>
           <ReserveTimeList />
         </section>
         <section>
-          <ActivityFormTitle>배너 이미지 등록</ActivityFormTitle>
+          <FormTitle>배너 이미지 등록</FormTitle>
           <FormImage />
         </section>
         <section>
-          <ActivityFormTitle>소개 이미지 등록</ActivityFormTitle>
+          <FormTitle>소개 이미지 등록</FormTitle>
           <FormImage isMultiple />
         </section>
       </form>
