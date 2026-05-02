@@ -6,6 +6,7 @@ import { FormImagePreview } from '@/app/(main)/activity/components/form-image-pr
 import { AddImageButton } from '@/shared/components/buttons';
 import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
+import { generateId } from '@/shared/utils/generateId';
 
 const MAX_IMAGE_COUNT = 4;
 
@@ -58,7 +59,7 @@ export function FormImage({
       const url = URL.createObjectURL(file);
       objectUrls.current.push(url);
       return {
-        id: crypto.randomUUID(),
+        id: generateId(),
         url,
         file,
       };
