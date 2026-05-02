@@ -6,6 +6,8 @@ import { FormImagePreview } from '@/app/(main)/activity/components/form-image-pr
 import { AddImageButton } from '@/shared/components/buttons';
 import { useShowToast } from '@/shared/store/useToastStore';
 
+const MAX_IMAGE_COUNT = 4;
+
 export function FormImage({
   id,
   errorMessage,
@@ -30,7 +32,7 @@ export function FormImage({
     const files = e.target.files ? Array.from(e.target.files) : null;
     if (!files) return;
 
-    if (isMultiple && imageFiles.length + files.length > 4) {
+    if (isMultiple && imageFiles.length + files.length > MAX_IMAGE_COUNT) {
       showToast({
         theme: 'error',
         message: '이미지는 최대 4장까지만 등록 가능합니다.',
@@ -43,13 +45,16 @@ export function FormImage({
       const url = URL.createObjectURL(file);
       objectUrls.current.push(url);
       return {
-        id: `${file.name} - ${Date.now()}`,
+        id: crypto.randomUUID(),
         url,
         file,
       };
     });
 
     setImageFiles((prev) => {
+      if (!isMultiple && prev.length > 0) {
+        URL.revokeObjectURL(prev[0].url);
+      }
       const updatedFiles = isMultiple
         ? [...prev, ...newImageFiles]
         : [...newImageFiles];
@@ -114,16 +119,15 @@ export function FormImage({
           multiple={isMultiple}
           {...props}
         />
-        {imageFiles &&
-          imageFiles.map((image) => (
-            <div className="relative aspect-square w-full" key={image.id}>
-              <FormImagePreview
-                imageUrl={image.url}
-                imageId={image.id}
-                onImageDelete={handleImageDelete}
-              />
-            </div>
-          ))}
+        {imageFiles.map((image) => (
+          <div className="relative aspect-square w-full" key={image.id}>
+            <FormImagePreview
+              imageUrl={image.url}
+              imageId={image.id}
+              onImageDelete={handleImageDelete}
+            />
+          </div>
+        ))}
       </div>
 
       {errorMessage && (
