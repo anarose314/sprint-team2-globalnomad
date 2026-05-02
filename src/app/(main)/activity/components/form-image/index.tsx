@@ -98,7 +98,7 @@ export function FormImage({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="grid h-31.5 w-full grid-cols-5 gap-3 2xl:gap-3.5">
+      <div className="grid w-full grid-cols-3 gap-3 md:grid-cols-5 2xl:gap-3.5">
         <AddImageButton
           id={inputId}
           errorId={errorId}
