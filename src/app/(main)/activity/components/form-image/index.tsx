@@ -121,10 +121,10 @@ export function FormImage({
     <div className="flex w-full flex-col gap-4">
       <div className="grid w-full grid-cols-3 gap-3 md:grid-cols-5 2xl:gap-3.5">
         <AddImageButton
-          id={inputId}
           errorId={errorId}
           errorMessage={errorMessage}
           disabled={isMaxReached}
+          inputRef={inputRef}
           onDisabledClick={() => {
             showToast({
               theme: 'error',

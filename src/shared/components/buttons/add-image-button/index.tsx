@@ -4,12 +4,12 @@ import { IcPlus } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 
 export interface AddImageButtonProps {
-  id: string;
   errorId?: string;
   errorMessage?: string;
   className?: string;
   disabled?: boolean;
   onDisabledClick?: () => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 /**
@@ -19,23 +19,23 @@ export interface AddImageButtonProps {
  * <AddImageButton id={id} errorId={errorId} errorMessage={errorMessage} />
  */
 export function AddImageButton({
-  id,
   errorId,
   errorMessage,
   className,
   disabled,
   onDisabledClick,
+  inputRef,
 }: AddImageButtonProps) {
   return (
-    <label
-      aria-label="이미지 업로드"
-      aria-invalid={Boolean(errorMessage)}
+    <button
+      type="button"
+      aria-disabled={disabled}
       aria-describedby={errorMessage ? errorId : undefined}
-      htmlFor={disabled ? undefined : id}
-      onClick={(e) => {
+      onClick={() => {
         if (disabled) {
-          e.preventDefault();
           onDisabledClick?.();
+        } else {
+          inputRef.current?.click();
         }
       }}
       className={cn(
@@ -55,6 +55,6 @@ export function AddImageButton({
       <span className="typo-xs-medium md:typo-md-medium leading-4">
         이미지 등록
       </span>
-    </label>
+    </button>
   );
 }
