@@ -14,7 +14,7 @@ const DEFAULT_MAX_VISIBLE_OPTIONS = 5;
 const TRIGGER_VARIANT_CLASS = {
   field:
     'h-14 w-full rounded-2xl border border-gray-300 bg-white px-5 typo-lg-medium text-gray-950',
-  chip: 'h-10 w-[86px] rounded-lg border border-gray-100 bg-white pl-4 pr-2.5 py-2.5 typo-lg-medium text-gray-950',
+  chip: 'h-10 w-22 rounded-lg border border-gray-100 bg-white pl-4 pr-2.5 py-2.5 typo-lg-medium text-gray-950',
 };
 
 const MENU_VARIANT_CLASS = {
@@ -160,7 +160,7 @@ export function Dropdown({
           id={listboxId}
           role="listbox"
           className={cn(
-            'absolute top-full left-0 z-20 overflow-y-auto bg-white',
+            'z-dropdown absolute top-full left-0 overflow-y-auto bg-white',
             MENU_VARIANT_CLASS[variant],
             menuClassName
           )}
@@ -178,7 +178,7 @@ export function Dropdown({
                   disabled={isOptionDisabled}
                   aria-selected={isSelected}
                   className={cn(
-                    'flex w-full items-center px-5 text-left text-base font-medium text-gray-950 transition-colors',
+                    'typo-lg-medium flex w-full items-center px-5 text-left text-gray-950 transition-colors',
                     'hover:bg-primary-100 hover:text-primary-500',
                     isSelected && 'bg-primary-100 text-primary-500',
                     isOptionDisabled &&
