@@ -16,7 +16,7 @@ export function ActivityButtons({
   onRightClick,
 }: ActivityButtonsProps) {
   return (
-    <ul className="flex gap-3 [&>li]:flex-1">
+    <ul className="flex gap-3 *:flex-1">
       <li>
         <Button
           variant="secondary"
