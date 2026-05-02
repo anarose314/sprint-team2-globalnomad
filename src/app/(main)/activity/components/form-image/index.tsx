@@ -32,16 +32,33 @@ export function FormImage({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : null;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    const newImageFiles = files.map((file) => {
+    let filesToAdd = files;
+    const remaining = MAX_IMAGE_COUNT - imageFiles.length;
+
+    if (isMultiple && remaining <= 0) {
+      showToast({
+        theme: 'error',
+        message: `이미지는 최대 ${MAX_IMAGE_COUNT}장까지만 등록 가능합니다.`,
+      });
+      if (inputRef.current) inputRef.current.value = '';
+      return;
+    }
+
+    if (isMultiple && files.length > remaining) {
+      showToast({
+        theme: 'error',
+        message: `${remaining}장만 추가되었습니다. 이미지는 최대 ${MAX_IMAGE_COUNT}장까지 등록 가능합니다.`,
+      });
+      filesToAdd = files.slice(0, remaining);
+    }
+
+    const newImageFiles = filesToAdd.map((file) => {
       const url = URL.createObjectURL(file);
       objectUrls.current.push(url);
       return {
-        id:
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : Math.random().toString(36).substring(2, 11),
+        id: crypto.randomUUID(),
         url,
         file,
       };
@@ -56,7 +73,7 @@ export function FormImage({
 
     const updatedFiles = isMultiple
       ? [...imageFiles, ...newImageFiles]
-      : [...newImageFiles];
+      : newImageFiles;
 
     setImageFiles(updatedFiles);
     onChange?.(
@@ -67,10 +84,10 @@ export function FormImage({
   };
 
   const handleImageDelete = (deleteImageId: string) => {
+    const deletedImage = imageFiles.find((image) => image.id === deleteImageId);
     const filteredFiles = imageFiles.filter(
       (image) => image.id !== deleteImageId
     );
-    const deletedImage = imageFiles.find((image) => image.id === deleteImageId);
 
     if (deletedImage) {
       URL.revokeObjectURL(deletedImage.url);

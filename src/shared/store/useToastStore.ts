@@ -11,10 +11,7 @@ const useToastStore = create(
     combine({ toasts: [] as ToastData[] }, (set) => ({
       actions: {
         showToast: (params: Omit<ToastData, 'id'>) => {
-          const id =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-              ? crypto.randomUUID()
-              : Math.random().toString(36).substring(2, 11);
+          const id = crypto.randomUUID();
           const newToast = {
             ...params,
             id,
