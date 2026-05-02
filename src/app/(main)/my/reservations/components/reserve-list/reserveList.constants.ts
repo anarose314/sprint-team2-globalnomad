@@ -1,5 +1,7 @@
+import { MyReservationsResponse } from '@/shared/types/myReservation.types';
+
 // TODO: API 연동 후 더미데이터 삭제
-export const DUMMY_RESERVATION_LIST = {
+export const DUMMY_RESERVATION_LIST: MyReservationsResponse = {
   cursorId: 0,
   reservations: [
     {

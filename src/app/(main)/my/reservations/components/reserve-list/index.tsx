@@ -4,7 +4,6 @@ import { ReserveButtons } from '@/app/(main)/my/reservations/components/reserve-
 import { DUMMY_RESERVATION_LIST } from '@/app/(main)/my/reservations/components/reserve-list/reserveList.constants';
 import { Heading } from '@/shared/components/heading';
 import { StatusBadge } from '@/shared/components/status-badge';
-import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export function ReserveList() {
   // TODO: API 데이터 연동
@@ -27,7 +26,7 @@ export function ReserveList() {
               {/* TODO: API 데이터 연동하면 해당 체험 url 넣기 */}
               <ActivityCard href="/">
                 <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
-                  <StatusBadge status={list.status as ReservationStatus} />
+                  <StatusBadge status={list.status} />
                   <div>
                     <Heading as="h3" className="typo-md-bold 2xl:typo-2lg-bold">
                       {list.activity.title}
@@ -54,7 +53,7 @@ export function ReserveList() {
                 </figure>
               </ActivityCard>
               {/* 버튼 */}
-              <ReserveButtons status={list.status as ReservationStatus} />
+              <ReserveButtons status={list.status} />
             </article>
           </li>
         ))}
