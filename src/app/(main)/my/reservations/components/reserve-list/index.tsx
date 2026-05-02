@@ -12,48 +12,53 @@ export function ReserveList() {
   return (
     <section className="mt-7.5">
       <ul className="flex flex-col gap-5 wrap-anywhere">
-        {reserveList.map((list) => (
-          <li key={list.id}>
+        {reserveList.map((reservation) => (
+          <li key={reservation.id}>
             <article className="flex flex-col gap-3 border-b border-b-gray-50 pb-7.5">
               {/* 날짜 */}
               <time
-                dateTime={list.date}
+                dateTime={reservation.date}
                 className="typo-lg-bold 2xl:typo-2lg-bold block"
               >
-                {list.date}
+                {reservation.date}
               </time>
               {/* 카드 */}
               {/* TODO: API 데이터 연동하면 해당 체험 url 넣기 */}
               <ActivityCard href="/">
                 <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
-                  <StatusBadge status={list.status} />
+                  <StatusBadge status={reservation.status} />
                   <div>
                     <Heading as="h3" className="typo-md-bold 2xl:typo-2lg-bold">
-                      {list.activity.title}
+                      {reservation.activity.title}
                     </Heading>
                     <p className="typo-sm-medium 2xl:typo-lg-medium text-gray-500">
-                      <time dateTime={list.startTime}>{list.startTime}</time> -{' '}
-                      <time dateTime={list.endTime}>{list.endTime}</time>
+                      <time dateTime={reservation.startTime}>
+                        {reservation.startTime}
+                      </time>{' '}
+                      -{' '}
+                      <time dateTime={reservation.endTime}>
+                        {reservation.endTime}
+                      </time>
                     </p>
                   </div>
                   <p className="typo-lg-bold 2xl:typo-2lg-bold flex items-center gap-1 text-gray-950">
-                    ₩{list.totalPrice.toLocaleString('ko-KR')}
+                    ₩{reservation.totalPrice.toLocaleString('ko-KR')}
                     <span className="typo-md-medium 2xl:typo-lg-medium text-gray-400">
-                      {list.headCount}명
+                      {reservation.headCount}명
                     </span>
                   </p>
                 </div>
                 <figure className="relative w-1/3 shrink-0 overflow-hidden md:w-1/4">
                   <Image
                     fill
-                    src={list.activity.bannerImageUrl}
-                    alt={list.activity.title}
+                    src={reservation.activity.bannerImageUrl}
+                    alt={reservation.activity.title}
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </figure>
               </ActivityCard>
               {/* 버튼 */}
-              <ReserveButtons status={list.status} />
+              <ReserveButtons status={reservation.status} />
             </article>
           </li>
         ))}
