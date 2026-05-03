@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ReservationCalendar } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar';
+import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/ReservationCalendarClient';
 import { IcArrowDown } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 
@@ -26,7 +26,7 @@ export default function MyActivitiesDashboardPage() {
         <IcArrowDown className="h-6 w-6 text-gray-950" />
       </button>
 
-      <ReservationCalendar />
+      <ReservationCalendarClient />
     </section>
   );
 }

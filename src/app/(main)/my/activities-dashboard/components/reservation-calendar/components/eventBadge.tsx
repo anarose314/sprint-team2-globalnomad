@@ -3,6 +3,7 @@ import {
   STATUS_POSITION_CLASS,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { ReservationEventStatus } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { cn } from '@/shared/utils/cn';
 
 interface EventBadgeProps {
   status: ReservationEventStatus;
@@ -15,7 +16,11 @@ interface EventBadgeProps {
 export function EventBadge({ status, count }: EventBadgeProps) {
   return (
     <span
-      className={`reservation-calendar__event-badge ${STATUS_POSITION_CLASS[status]} ${STATUS_META[status].className}`}
+      className={cn(
+        'reservation-calendar__event-badge',
+        STATUS_POSITION_CLASS[status],
+        STATUS_META[status].className
+      )}
     >
       {STATUS_META[status].label} {count}
     </span>

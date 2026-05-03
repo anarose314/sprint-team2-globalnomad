@@ -7,3 +7,7 @@ export const formatDate = (isoDate: string) => {
 
   return `${date.getFullYear()}. ${pad2(date.getMonth() + 1)}. ${pad2(date.getDate())}`;
 };
+
+export const formatDateKey = (date: Date) => {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+};

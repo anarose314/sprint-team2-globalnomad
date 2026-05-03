@@ -1,40 +1,37 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ReservationDetailMockData,
-  ReservationRequestStatus,
-} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+  EMPTY_TIME_SLOT,
+  formatDetailDate,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
+import { ReservationDetailSheetRequestList } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetRequestList';
+import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetTabs';
+import { useReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationDetailSheet';
+import { ReservationDetailMockData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowDown, IcClose } from '@/shared/assets/icons';
-import { Button } from '@/shared/components/buttons/button';
-import { StatusBadge } from '@/shared/components/status-badge';
+import { cn } from '@/shared/utils/cn';
 
 interface ReservationDetailSheetProps {
+  /** 상세 바텀시트/플로팅 패널 노출 여부 */
   isOpen: boolean;
+  /** 헤더에 표시할 선택 날짜 */
   selectedDate: Date;
+  /** 날짜별 예약 상세 데이터(시간 슬롯 + 요청 목록) */
   detailData?: ReservationDetailMockData;
+  /** 2xl 이상에서 달력 타일 기준으로 계산된 패널 절대 위치 */
   desktopPosition?: {
     top: number;
     left: number;
   } | null;
+  /** 외부 클릭/ESC/닫기 버튼에서 호출되는 닫기 핸들러 */
   onClose: () => void;
 }
 
-type ReservationTab = ReservationRequestStatus;
-
-const TAB_LABEL: Record<ReservationTab, string> = {
-  pending: '신청',
-  approved: '승인',
-  rejected: '거절',
-};
-
-function formatDetailDate(date: Date) {
-  return `${String(date.getFullYear()).slice(2)}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-}
-
-function toReservationBadgeStatus(status: ReservationRequestStatus) {
-  if (status === 'approved') return 'confirmed';
-  return 'declined';
-}
-
+/**
+ * 날짜별 예약 상세를 보여주는 바텀시트/플로팅 패널
+ *
+ * - 모바일/태블릿: 바텀시트
+ * - 대형 데스크톱: 달력 옆 플로팅 패널
+ * - 예약 내역 영역만 독립 스크롤 및 무한스크롤 뼈대 적용
+ */
 export function ReservationDetailSheet({
   isOpen,
   selectedDate,
@@ -42,55 +39,25 @@ export function ReservationDetailSheet({
   desktopPosition,
   onClose,
 }: ReservationDetailSheetProps) {
-  const sheetRef = useRef<HTMLElement>(null);
-  const [activeTab, setActiveTab] = useState<ReservationTab>('pending');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(
-    detailData?.timeSlots[0] ?? '예약 가능한 시간이 없습니다'
-  );
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscClose = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', handleEscClose);
-    return () => window.removeEventListener('keydown', handleEscClose);
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handlePointerDownOutside = (event: PointerEvent) => {
-      const sheetElement = sheetRef.current;
-      if (!sheetElement) return;
-      if (sheetElement.contains(event.target as Node)) return;
-      onClose();
-    };
-
-    document.addEventListener('pointerdown', handlePointerDownOutside);
-    return () =>
-      document.removeEventListener('pointerdown', handlePointerDownOutside);
-  }, [isOpen, onClose]);
-
-  const tabCount = useMemo(() => {
-    const base = { pending: 0, approved: 0, rejected: 0 };
-    if (!detailData) return base;
-
-    detailData.requests.forEach((request) => {
-      base[request.status] += 1;
-    });
-
-    return base;
-  }, [detailData]);
-
-  const filteredRequests = useMemo(
-    () =>
-      detailData?.requests.filter((request) => request.status === activeTab) ??
-      [],
-    [activeTab, detailData]
-  );
+  const {
+    activeTab,
+    filteredRequests,
+    hasMoreRequests,
+    requestListEndRef,
+    requestScrollRef,
+    selectedTimeSlot,
+    setActiveTab,
+    setSelectedTimeSlot,
+    setVisibleRequestCount,
+    sheetRef,
+    shouldUseFixedRequestViewport,
+    tabCount,
+    visibleRequests,
+  } = useReservationDetailSheet({
+    isOpen,
+    detailData,
+    onClose,
+  });
 
   if (!isOpen) return null;
 
@@ -123,18 +90,12 @@ export function ReservationDetailSheet({
             </button>
           </header>
 
-          <nav className="reservation-detail-sheet__tabs">
-            {(['pending', 'approved', 'rejected'] as const).map((tabKey) => (
-              <button
-                key={tabKey}
-                type="button"
-                onClick={() => setActiveTab(tabKey)}
-                className={`reservation-detail-sheet__tab ${activeTab === tabKey ? 'reservation-detail-sheet__tab--active' : ''}`}
-              >
-                {TAB_LABEL[tabKey]} {tabCount[tabKey]}
-              </button>
-            ))}
-          </nav>
+          <ReservationDetailSheetTabs
+            activeTab={activeTab}
+            tabCount={tabCount}
+            onChangeTab={setActiveTab}
+            onResetVisibleRequestCount={setVisibleRequestCount}
+          />
 
           <div className="reservation-detail-sheet__content">
             <div className="reservation-detail-sheet__section">
@@ -150,7 +111,7 @@ export function ReservationDetailSheet({
                 >
                   {(detailData?.timeSlots.length
                     ? detailData.timeSlots
-                    : ['예약 가능한 시간이 없습니다']
+                    : [EMPTY_TIME_SLOT]
                   ).map((timeSlot) => (
                     <option key={timeSlot} value={timeSlot}>
                       {timeSlot}
@@ -161,67 +122,26 @@ export function ReservationDetailSheet({
               </div>
             </div>
 
-            <div className="reservation-detail-sheet__section">
+            <div className="reservation-detail-sheet__section reservation-detail-sheet__section--requests">
               <p className="reservation-detail-sheet__section-title">
                 예약 내역
               </p>
-              {filteredRequests.length ? (
-                <ul className="reservation-detail-sheet__request-list">
-                  {filteredRequests.map((request) => (
-                    <li
-                      key={request.id}
-                      className="reservation-detail-sheet__request-card"
-                    >
-                      <div className="reservation-detail-sheet__request-info">
-                        <p className="reservation-detail-sheet__request-row">
-                          <span className="reservation-detail-sheet__request-label">
-                            닉네임
-                          </span>
-                          <span className="reservation-detail-sheet__request-value">
-                            {request.nickname}
-                          </span>
-                        </p>
-                        <p className="reservation-detail-sheet__request-row">
-                          <span className="reservation-detail-sheet__request-label">
-                            인원
-                          </span>
-                          <span className="reservation-detail-sheet__request-value">
-                            {request.headCount}명
-                          </span>
-                        </p>
-                      </div>
-                      {activeTab === 'pending' ? (
-                        <div className="reservation-detail-sheet__actions">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="reservation-detail-sheet__action-button reservation-detail-sheet__action-button--approve"
-                            disabled={request.status !== 'pending'}
-                          >
-                            승인하기
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="reservation-detail-sheet__action-button reservation-detail-sheet__action-button--reject"
-                            disabled={request.status !== 'pending'}
-                          >
-                            거절하기
-                          </Button>
-                        </div>
-                      ) : (
-                        <StatusBadge
-                          status={toReservationBadgeStatus(activeTab)}
-                          className="reservation-detail-sheet__status-badge"
-                        />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="reservation-detail-sheet__empty">
-                  해당 날짜에 예약 내역이 없습니다.
-                </p>
-              )}
+              <div
+                ref={requestScrollRef}
+                className={cn(
+                  'reservation-detail-sheet__request-scroll',
+                  shouldUseFixedRequestViewport &&
+                    'reservation-detail-sheet__request-scroll--fixed'
+                )}
+              >
+                <ReservationDetailSheetRequestList
+                  activeTab={activeTab}
+                  isEmpty={!filteredRequests.length}
+                  visibleRequests={visibleRequests}
+                  hasMoreRequests={hasMoreRequests}
+                  sentinelRef={requestListEndRef}
+                />
+              </div>
             </div>
           </div>
         </div>

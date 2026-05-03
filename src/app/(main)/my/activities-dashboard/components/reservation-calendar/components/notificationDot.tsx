@@ -1,3 +1,5 @@
+import { cn } from '@/shared/utils/cn';
+
 interface NotificationDotProps {
   isMuted: boolean;
 }
@@ -7,8 +9,15 @@ interface NotificationDotProps {
  */
 export function NotificationDot({ isMuted }: NotificationDotProps) {
   return (
-    <span
-      className={`reservation-calendar__notification-dot ${isMuted ? 'reservation-calendar__meta--muted' : ''}`}
-    />
+    <>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'reservation-calendar__notification-dot',
+          isMuted && 'reservation-calendar__meta--muted'
+        )}
+      />
+      <span className="sr-only">예약 있음</span>
+    </>
   );
 }
