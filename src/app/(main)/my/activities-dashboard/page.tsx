@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/ReservationCalendarClient';
+import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendarClient';
 import { IcArrowDown } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 

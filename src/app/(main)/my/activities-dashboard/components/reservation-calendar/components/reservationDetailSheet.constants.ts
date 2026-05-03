@@ -20,9 +20,9 @@ export const EMPTY_TIME_SLOT = '예약 가능한 시간이 없습니다';
  * @param date 표시할 원본 Date
  * @returns `26년 9월 1일` 형태의 문자열
  */
-export function formatDetailDate(date: Date) {
+export const formatDetailDate = (date: Date) => {
   return `${String(date.getFullYear()).slice(2)}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-}
+};
 
 /**
  * 예약 요청 상태를 공통 배지 상태로 매핑
@@ -30,9 +30,9 @@ export function formatDetailDate(date: Date) {
  * @param status 예약 요청 상태(`approved` | `rejected`)
  * @returns `StatusBadge` 컴포넌트에서 사용하는 상태값
  */
-export function toReservationBadgeStatus(
+export const toReservationBadgeStatus = (
   status: ReservationRequestStatus
-): ReservationStatus {
+): ReservationStatus => {
   if (status === 'approved') return 'confirmed';
   return 'declined';
-}
+};

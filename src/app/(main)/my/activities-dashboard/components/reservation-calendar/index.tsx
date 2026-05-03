@@ -11,6 +11,7 @@ import {
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
+import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
 
@@ -169,11 +170,12 @@ export function ReservationCalendar() {
         }}
         tileClassName={({ date, view }) => {
           if (view !== 'month') return undefined;
-
           const isDetailTarget =
             Boolean(selectedDateKey) && formatDateKey(date) === selectedDateKey;
-
-          return `reservation-calendar__day-tile ${isDetailTarget ? 'reservation-calendar__day-tile--detail-target' : ''}`;
+          return cn(
+            'reservation-calendar__day-tile',
+            isDetailTarget && 'reservation-calendar__day-tile--detail-target'
+          );
         }}
       />
       {detailDate && selectedDateKey ? (

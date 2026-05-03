@@ -18,11 +18,11 @@ interface UseReservationDetailSheetParams {
 /**
  * 예약 상세 패널의 상태/파생값/이벤트 사이드이펙트를 캡슐화
  */
-export function useReservationDetailSheet({
+export const useReservationDetailSheet = ({
   isOpen,
   detailData,
   onClose,
-}: UseReservationDetailSheetParams) {
+}: UseReservationDetailSheetParams) => {
   const sheetRef = useRef<HTMLElement>(null);
   const requestScrollRef = useRef<HTMLDivElement>(null);
   const requestListEndRef = useRef<HTMLDivElement>(null);
@@ -127,4 +127,4 @@ export function useReservationDetailSheet({
     tabCount,
     visibleRequests,
   };
-}
+};
