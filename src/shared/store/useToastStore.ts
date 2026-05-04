@@ -3,6 +3,7 @@ import { combine } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { MAX_TOASTS } from '@/shared/components/toast/toast.constants';
 import { ToastProps } from '@/shared/components/toast/toast.types';
+import { generateId } from '@/shared/utils/generateId';
 
 type ToastData = Omit<ToastProps, 'onClose'>;
 
@@ -11,10 +12,7 @@ const useToastStore = create(
     combine({ toasts: [] as ToastData[] }, (set) => ({
       actions: {
         showToast: (params: Omit<ToastData, 'id'>) => {
-          const id =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-              ? crypto.randomUUID()
-              : Math.random().toString(36).substring(2, 11);
+          const id = generateId();
           const newToast = {
             ...params,
             id,
