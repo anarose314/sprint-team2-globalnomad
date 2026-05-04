@@ -8,6 +8,7 @@ import {
   type LoginFormValues,
   loginSchema,
 } from '@/app/(auth)/login/components/login-form/login-form.schema';
+import { useLoginMutation } from '@/shared/apis/auth/use-login-mutation';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
@@ -24,6 +25,7 @@ import { Input } from '@/shared/components/input';
  */
 export function LoginForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { mutate, isPending } = useLoginMutation();
 
   const {
     register,
@@ -39,8 +41,15 @@ export function LoginForm() {
   });
 
   const onSubmit = (data: LoginFormValues) => {
-    // TODO: 로그인 API 연동 (별도 이슈)
-    console.log(data);
+    mutate(data, {
+      onError: (error) => {
+        // 임시 — 다음 PR 에서 토스트로 교체
+        console.error('로그인 실패:', error);
+        alert(
+          error instanceof Error ? error.message : '로그인에 실패했습니다.'
+        );
+      },
+    });
   };
 
   return (
@@ -97,8 +106,8 @@ export function LoginForm() {
           }
         />
 
-        <Button type="submit" size="lg" disabled={!isValid}>
-          로그인하기
+        <Button type="submit" size="lg" disabled={!isValid || isPending}>
+          {isPending ? '로그인 중...' : '로그인하기'}
         </Button>
       </form>
 
