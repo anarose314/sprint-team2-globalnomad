@@ -22,14 +22,13 @@ interface OneButtonModalProps {
 }
 
 export function OneButtonModal({
-  message: title,
+  message,
   buttonText = '확인',
   onConfirm,
 }: OneButtonModalProps) {
   return (
     <ModalBase
       role="alertdialog"
-      title={title}
       className="min-h-39 max-w-100 rounded-3xl"
       bodyClassName="px-10 pt-11 pb-0"
       footerClassName="px-10 pt-5 pb-10"
@@ -39,7 +38,7 @@ export function OneButtonModal({
         </Button>
       }
     >
-      <p className="typo-2lg-bold text-center text-gray-950">{title}</p>
+      <p className="typo-2lg-bold text-center text-gray-950">{message}</p>
     </ModalBase>
   );
 }

@@ -1,0 +1,174 @@
+@reference "../../../../../styles/globals.css";
+
+.reservation-calendar {
+  @apply w-full rounded-3xl border-0 bg-white px-6;
+}
+
+.reservation-calendar .react-calendar__navigation {
+  @apply m-0 flex h-11 items-center justify-between;
+}
+
+.reservation-calendar .react-calendar__navigation button {
+  @apply min-w-0 cursor-pointer border-0 bg-transparent;
+}
+
+.reservation-calendar .react-calendar__navigation__label {
+  @apply typo-2lg-bold pointer-events-none flex-1 text-center text-gray-950;
+}
+
+.reservation-calendar .react-calendar__month-view {
+  @apply mt-2;
+}
+
+.reservation-calendar .react-calendar__month-view__weekdays {
+  @apply grid h-11 grid-cols-7 border-b border-gray-50;
+}
+
+.reservation-calendar .react-calendar__month-view__weekdays__weekday {
+  @apply typo-sm-semibold flex items-center justify-center text-gray-900;
+}
+
+.reservation-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(1) {
+  @apply text-red-500;
+}
+
+.reservation-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(7) {
+  @apply text-primary-600;
+}
+
+.reservation-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  @apply border-0 no-underline;
+}
+
+.reservation-calendar .react-calendar__month-view__days {
+  @apply grid grid-cols-7;
+  grid-auto-rows: minmax(104px, auto);
+}
+
+.reservation-calendar
+  .react-calendar__month-view__days
+  button:nth-last-child(-n + 7) {
+  @apply border-b-0;
+}
+
+.reservation-calendar .react-calendar__tile > abbr {
+  @apply hidden;
+}
+
+.reservation-calendar .react-calendar__tile:enabled:hover,
+.reservation-calendar .react-calendar__tile:enabled:focus,
+.reservation-calendar .react-calendar__tile--active {
+  @apply bg-transparent;
+}
+
+.reservation-calendar__day-tile {
+  @apply relative h-full min-h-26 border-0 border-b border-gray-50 bg-transparent p-0 align-top;
+}
+
+.reservation-calendar__day-overlay {
+  @apply absolute inset-0;
+}
+
+.reservation-calendar__day-number-wrap {
+  @apply absolute top-2.5 left-1/2 flex -translate-x-1/2 leading-none;
+}
+
+.reservation-calendar__day-number {
+  @apply typo-xs-medium text-gray-800;
+}
+
+.reservation-calendar__day-number--sunday {
+  @apply text-red-500;
+}
+
+.reservation-calendar__day-number--saturday {
+  @apply text-primary-600;
+}
+
+.reservation-calendar__day-number--muted {
+  @apply text-gray-300;
+}
+
+.reservation-calendar__meta--muted {
+  @apply opacity-50;
+}
+
+.reservation-calendar__notification-dot {
+  @apply absolute -top-0.5 left-full ml-0.5 h-1 w-1 rounded-full bg-red-500;
+}
+
+.reservation-calendar__event-badge-list {
+  @apply absolute inset-0;
+}
+
+.reservation-calendar__event-badge {
+  @apply typo-xs-medium absolute left-1/2 flex h-5 min-w-13 -translate-x-1/2 items-center justify-center rounded px-2 py-0.5 whitespace-nowrap;
+}
+
+.reservation-calendar__event-badge--pending {
+  @apply top-8;
+}
+
+.reservation-calendar__event-badge--approved {
+  @apply top-14;
+}
+
+.reservation-calendar__event-badge--completed {
+  @apply top-20;
+}
+
+@media (min-width: 768px) {
+  .reservation-calendar {
+    @apply shadow-card min-h-194.25 px-5 pt-6 pb-5.75;
+  }
+
+  .reservation-calendar .react-calendar__month-view__weekdays {
+    @apply h-13.75;
+  }
+
+  .reservation-calendar .react-calendar__month-view {
+    @apply mt-0;
+  }
+
+  .reservation-calendar .react-calendar__month-view__weekdays__weekday {
+    @apply text-lg;
+  }
+
+  .reservation-calendar .react-calendar__month-view__days {
+    grid-auto-rows: minmax(124px, auto);
+  }
+
+  .reservation-calendar__day-tile {
+    @apply min-h-31;
+  }
+
+  .reservation-calendar__day-number-wrap {
+    @apply top-4;
+  }
+
+  .reservation-calendar__day-number {
+    @apply typo-lg-medium;
+  }
+
+  .reservation-calendar__notification-dot {
+    @apply ml-0.75 h-1.5 w-1.5;
+  }
+
+  .reservation-calendar__event-badge {
+    @apply typo-md-medium h-5 min-w-14;
+  }
+
+  .reservation-calendar__event-badge--pending {
+    @apply top-12;
+  }
+
+  .reservation-calendar__event-badge--approved {
+    @apply top-17.75;
+  }
+
+  .reservation-calendar__event-badge--completed {
+    @apply top-24;
+  }
+}

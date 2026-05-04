@@ -32,6 +32,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className="flex min-h-full flex-col font-sans">
         <ToastContainer />
         <QueryProvider>{children}</QueryProvider>
+        <div id="modal-root" />
       </body>
     </html>
   );
