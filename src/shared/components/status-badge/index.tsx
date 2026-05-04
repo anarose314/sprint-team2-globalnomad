@@ -26,8 +26,8 @@ const badgeStyle = cva(
  * 상태값(`status`)에 따라 사전에 정의된 배경색과 텍스트 색상이 자동으로 매핑됩니다.
  *
  * @example
- * // (예: '예약 완료' 뱃지)
- * <StatusBadge status="pending" />
+ * // (예: '예약 승인' 뱃지)
+ * <StatusBadge status="confirmed" />
  */
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (

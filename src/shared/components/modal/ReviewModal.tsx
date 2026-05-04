@@ -1,5 +1,6 @@
 import { IcStar } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
+import { Heading } from '@/shared/components/heading';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface ReviewModalProps {
@@ -24,8 +25,8 @@ const MAX_LENGTH = 100;
  * - 별점 선택, 텍스트 입력은 외부 상태로 제어되는 controlled 컴포넌트 방식으로 동작
  * - ModalBase를 기반으로 공통 모달 구조를 사용
  *
- * @example
- * <ReviewModal
+ * @example *
+ * <ReviewModal *
  *   title="함께 배우면 즐거운 스트릿 댄스"
  *   dateText="2023.02.14 / 11:00 - 12:30"
  *   reviewText={reviewText}
@@ -54,9 +55,13 @@ export function ReviewModal({
     >
       <div className="relative flex h-full flex-col">
         <div className="mt-8.5 flex flex-col items-center">
-          <h2 className="typo-lg-bold text-center leading-[1.4] text-gray-950">
+          <Heading
+            as="h2"
+            textStyle="typo-lg-bold"
+            className="text-center text-gray-950"
+          >
             {title}
-          </h2>
+          </Heading>
 
           <p className="typo-md-medium mt-1.5 text-center leading-normal text-gray-500">
             {dateText}
@@ -74,7 +79,7 @@ export function ReviewModal({
                 type="button"
                 aria-label={`${rating}점`}
                 aria-pressed={isFilled}
-                onClick={() => onRatingChange?.(rating)}
+                onClick={() => onRatingChange(rating)}
               >
                 <IcStar
                   className={`h-10 w-10 ${isFilled ? 'text-yellow-400' : 'text-gray-200'}`}
@@ -85,13 +90,11 @@ export function ReviewModal({
         </div>
 
         <div className="mt-7.5 flex flex-col gap-4">
-          <p className="typo-2lg-bold leading-[1.4] text-gray-950">
-            {SECTION_TITLE}
-          </p>
+          <p className="typo-2lg-bold text-gray-950">{SECTION_TITLE}</p>
 
           <textarea
             value={reviewText}
-            onChange={(e) => onReviewTextChange?.(e.target.value)}
+            onChange={(e) => onReviewTextChange(e.target.value)}
             maxLength={MAX_LENGTH}
             placeholder={PLACEHOLDER}
             className="typo-lg-medium h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 leading-normal text-gray-950 outline-none placeholder:text-gray-400"
