@@ -20,7 +20,11 @@ import type { HeaderProps } from '@/shared/components/header/header.types';
  * @example
  * <Header user={{ name: '정만철' }} hasNotification />
  */
-export function Header({ user, hasNotification = false }: HeaderProps) {
+export function Header({
+  user,
+  hasNotification = false,
+  onNotificationClick,
+}: HeaderProps) {
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
   return (
@@ -40,12 +44,12 @@ export function Header({ user, hasNotification = false }: HeaderProps) {
 
         {user ? (
           <div className="flex items-center gap-5">
-            {/* TODO: 알림 목록 기능 연동 시 클릭 이벤트 연결 */}
             <button
               type="button"
               aria-label={
                 hasNotification ? '새 알림이 있습니다' : '새 알림이 없습니다'
               }
+              onClick={onNotificationClick}
               className="flex h-8 w-8 items-center justify-center"
             >
               <BellIcon
