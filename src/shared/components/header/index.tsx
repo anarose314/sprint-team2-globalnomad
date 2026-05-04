@@ -24,7 +24,7 @@ export function Header({ user, hasNotification = false }: HeaderProps) {
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
   return (
-    <header className="sticky h-12 shrink-0 border-b border-gray-50 bg-white md:h-20">
+    <header className="sticky top-0 z-50 h-12 shrink-0 border-b border-gray-50 bg-white md:h-20">
       <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between px-4 md:px-10 2xl:px-0">
         <Link
           href="/"
