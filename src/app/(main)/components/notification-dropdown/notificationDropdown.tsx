@@ -1,27 +1,10 @@
+import type {
+  NotificationDropdownProps,
+  NotificationResponse,
+} from '@/app/(main)/components/notification-dropdown/notificationDropdown.types';
 import { IcClose } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
-
-interface NotificationItem {
-  id: number;
-  teamId: string;
-  userId: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-
-interface NotificationResponse {
-  cursorId: number;
-  notifications: NotificationItem[];
-  totalCount: number;
-}
-
-interface NotificationDropdownProps {
-  data?: NotificationResponse;
-  onClose?: () => void;
-}
 
 const DEFAULT_NOTIFICATION_RESPONSE: NotificationResponse = {
   cursorId: 0,
