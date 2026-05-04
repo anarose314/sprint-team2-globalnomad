@@ -1,3 +1,5 @@
+export type DropdownVariant = 'field' | 'chip';
+
 export interface DropdownOption {
   label: string;
   value: string;
@@ -9,7 +11,7 @@ export interface DropdownProps {
   value?: string;
   placeholder?: string;
   disabled?: boolean;
-  variant?: 'field' | 'chip';
+  variant?: DropdownVariant;
   optionHeight?: number;
   maxVisibleOptions?: number;
   className?: string;

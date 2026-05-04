@@ -2,25 +2,17 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { IcArrowDown } from '@/shared/assets/icons';
+import {
+  DEFAULT_MAX_VISIBLE_OPTIONS,
+  DEFAULT_OPTION_HEIGHT,
+  MENU_VARIANT_CLASS,
+  TRIGGER_VARIANT_CLASS,
+} from '@/shared/components/dropdown/dropdown.constants';
 import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
 import { cn } from '@/shared/utils/cn';
-
-const DEFAULT_OPTION_HEIGHT = 54;
-const DEFAULT_MAX_VISIBLE_OPTIONS = 5;
-
-const TRIGGER_VARIANT_CLASS = {
-  field:
-    'h-14 w-full rounded-2xl border border-gray-300 bg-white px-5 typo-lg-medium text-gray-950',
-  chip: 'h-10 w-22 rounded-lg border border-gray-100 bg-white pl-4 pr-2.5 py-2.5 typo-lg-medium text-gray-950',
-};
-
-const MENU_VARIANT_CLASS = {
-  field: 'w-full rounded-b-2xl border border-t-0 border-gray-300',
-  chip: 'min-w-36 rounded-lg border border-gray-100',
-};
 
 /**
  * 공통 드롭다운 컴포넌트
