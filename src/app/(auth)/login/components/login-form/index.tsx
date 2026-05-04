@@ -30,7 +30,7 @@ export function LoginForm() {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<LoginFormValues>({
-    mode: 'onChange',
+    mode: 'onTouched',
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
