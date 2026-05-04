@@ -72,14 +72,16 @@ export function NotificationDropdown({
   const { notifications, totalCount } = data;
 
   return (
-    <div className="w-57.75 overflow-hidden rounded-xl border border-gray-100 bg-white">
+    <div className="shadow-custom w-57.75 overflow-hidden rounded-xl border border-gray-100 bg-white">
       <div className="flex h-12 items-center justify-between border-b border-gray-100 px-4">
-        <Heading textStyle="typo-lg-bold">알림 {totalCount}개</Heading>
+        <Heading textStyle="typo-lg-bold" className="select-none">
+          알림 {totalCount}개
+        </Heading>
         <button
           type="button"
           aria-label="닫기"
           onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center text-gray-950"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center text-gray-950"
         >
           <IcClose aria-hidden="true" className="h-5 w-5" />
         </button>
