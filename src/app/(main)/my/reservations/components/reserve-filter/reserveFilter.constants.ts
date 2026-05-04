@@ -1,9 +1,9 @@
 import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export const FILTER_ORDER: ReservationStatus[] = [
-  'confirmed',
-  'canceled',
   'pending',
+  'canceled',
+  'confirmed',
   'declined',
   'completed',
 ];
