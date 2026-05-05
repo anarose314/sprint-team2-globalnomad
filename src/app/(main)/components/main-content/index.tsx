@@ -1,6 +1,9 @@
 import { MainBanner } from '@/app/(main)/components/main-banner';
 import { MainSearch } from '@/app/(main)/components/main-search';
+import { PopularActivitySection } from '@/app/(main)/components/popular-activity-section';
+import { POPULAR_ACTIVITIES } from '@/app/(main)/main.constants';
 
+/**
 /**
  * 메인 페이지 콘텐츠 조립 컴포넌트
  *
@@ -14,6 +17,7 @@ export function MainContent() {
     <div className="flex flex-col gap-16 pb-20">
       <MainBanner />
       <MainSearch />
+      <PopularActivitySection activities={POPULAR_ACTIVITIES} />
     </div>
   );
 }
