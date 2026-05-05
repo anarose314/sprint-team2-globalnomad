@@ -1,3 +1,4 @@
+import { AllActivitySection } from '@/app/(main)/components/all-activity-section';
 import { MainBanner } from '@/app/(main)/components/main-banner';
 import { MainSearch } from '@/app/(main)/components/main-search';
 import { PopularActivitySection } from '@/app/(main)/components/popular-activity-section';
@@ -18,6 +19,7 @@ export function MainContent() {
       <MainBanner />
       <MainSearch />
       <PopularActivitySection activities={POPULAR_ACTIVITIES} />
+      <AllActivitySection />
     </div>
   );
 }
