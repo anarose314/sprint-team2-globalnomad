@@ -5,13 +5,16 @@ import { ReserveTime } from '@/app/(main)/activity/components/reserve-time';
 import { Schedule } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
 import { generateId } from '@/shared/utils/generateId';
 
+const INITIAL_SCHEDULE: Schedule = {
+  id: '',
+  date: '',
+  startTime: '',
+  endTime: '',
+};
+
 export function ReserveTimeList() {
-  const [inputSchedule, setInputSchedule] = useState({
-    id: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-  });
+  const [inputSchedule, setInputSchedule] =
+    useState<Schedule>(INITIAL_SCHEDULE);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   const handleAdd = () => {
@@ -21,7 +24,7 @@ export function ReserveTimeList() {
       id: generateId(),
     };
     setSchedules((prev) => [...prev, newSchedule]);
-    setInputSchedule({ id: '', date: '', startTime: '', endTime: '' });
+    setInputSchedule(INITIAL_SCHEDULE);
   };
 
   const handleDelete = (id: string) => {

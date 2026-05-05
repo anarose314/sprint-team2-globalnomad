@@ -20,7 +20,7 @@ export function ReserveTimeDropdown({
       options={TIME_OPTIONS}
       value={value}
       placeholder="0:00"
-      onChange={onChange}
+      onChange={(value) => onChange(value)}
       triggerClassName="border-gray-100"
       menuClassName="border-gray-100"
     />
