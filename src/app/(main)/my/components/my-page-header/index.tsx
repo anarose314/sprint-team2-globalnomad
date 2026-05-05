@@ -27,7 +27,12 @@ export function MyPageHeader({
   className,
 }: MyPageHeaderProps) {
   return (
-    <div className={cn('flex items-center justify-between', className)}>
+    <div
+      className={cn(
+        'flex flex-col justify-between gap-2 md:flex-row md:items-center md:gap-0',
+        className
+      )}
+    >
       <div>
         <Heading>{title}</Heading>
         <p className="typo-md-medium mt-2 text-gray-500">{description}</p>
