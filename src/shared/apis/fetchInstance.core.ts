@@ -4,7 +4,6 @@
  * - baseURL은 환경변수에서 읽어와 자동으로 붙여준다.
  *   (단, `absoluteUrl: true` 옵션이면 endpoint 를 그대로 사용)
  * - accessToken은 호출부에서 옵션으로 주입받아 Authorization 헤더에 실는다.
- *   (클라이언트는 js-cookie, 서버는 next/headers로 각자 읽어서 전달)
  * - JSON body를 자동으로 직렬화하고, FormData는 그대로 보낸다.
  * - 응답이 실패(4xx/5xx)면 ApiError를 throw한다.
  *
