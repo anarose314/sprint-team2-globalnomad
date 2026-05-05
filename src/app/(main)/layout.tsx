@@ -1,3 +1,4 @@
+import { Footer } from '@/shared/components/footer';
 import { Header } from '@/shared/components/header';
 
 type MainLayoutProps = Readonly<{
@@ -14,10 +15,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
           {children}
         </main>
       </div>
-      {/* TODO: 푸터 작업 */}
-      <footer className="bg-primary-50 flex h-20 shrink-0 items-center px-4">
-        Footer
-      </footer>
+
+      <Footer />
     </>
   );
 }
