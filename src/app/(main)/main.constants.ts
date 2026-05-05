@@ -22,7 +22,8 @@ export const MAIN_CATEGORIES: MainCategory[] = [
 ];
 
 export const MAIN_SORT_OPTIONS: MainSortOption[] = [
-  { label: '가격', value: 'price' },
+  { label: '낮은 가격 순', value: 'price_asc' },
+  { label: '높은 가격 순', value: 'price_desc' },
 ];
 
 export const MAIN_ACTIVITIES: MainActivity[] = [
