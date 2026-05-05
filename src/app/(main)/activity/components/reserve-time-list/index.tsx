@@ -35,6 +35,8 @@ export function ReserveTimeList() {
 
   return (
     <div className="flex flex-col gap-5">
+      <input type="hidden" name="schedules" value={JSON.stringify(schedules)} />
+
       <ReserveTime
         value={inputSchedule}
         onChange={(newVal) => setInputSchedule(newVal)}

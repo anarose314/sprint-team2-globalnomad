@@ -19,4 +19,5 @@ export interface DropdownProps {
   menuClassName?: string;
   onChange: (value: string, option: DropdownOption) => void;
   label?: string;
+  name?: string;
 }

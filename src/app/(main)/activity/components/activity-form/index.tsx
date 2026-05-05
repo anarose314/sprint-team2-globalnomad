@@ -16,9 +16,15 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
   return (
     <form className="mt-6 flex flex-col gap-7.5" onSubmit={onSubmit}>
       <section className="flex flex-col gap-6">
-        <Input label="제목" placeholder="제목을 입력해 주세요" required />
+        <Input
+          label="제목"
+          name="title"
+          placeholder="제목을 입력해 주세요"
+          required
+        />
         <Dropdown
           label="카테고리"
+          name="category"
           options={CATEGORY_OPTIONS}
           value={category}
           placeholder="카테고리를 선택해 주세요"
@@ -28,17 +34,24 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
         />
         <Textarea
           label="설명"
+          name="description"
           placeholder="체험에 대한 설명을 입력해 주세요"
           required
         />
         <Input
           label="가격"
           type="number"
+          name="price"
           placeholder="체험 금액을 입력해 주세요"
           required
         />
         {/* TODO: 우편번호 서비스 연동 */}
-        <Input label="주소" placeholder="주소를 입력해 주세요" required />
+        <Input
+          label="주소"
+          name="address"
+          placeholder="주소를 입력해 주세요"
+          required
+        />
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>
@@ -46,11 +59,11 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
       </section>
       <section>
         <FormTitle>배너 이미지 등록</FormTitle>
-        <FormImage />
+        <FormImage name="bannerImageUrl" />
       </section>
       <section>
         <FormTitle>소개 이미지 등록</FormTitle>
-        <FormImage isMultiple />
+        <FormImage name="subImageUrls" isMultiple />
       </section>
       {children}
     </form>

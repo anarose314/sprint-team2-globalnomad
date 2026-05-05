@@ -34,6 +34,7 @@ import { cn } from '@/shared/utils/cn';
  */
 export function Dropdown({
   label,
+  name,
   options,
   value,
   placeholder = '선택해주세요',
@@ -114,6 +115,7 @@ export function Dropdown({
         className
       )}
     >
+      <input type="hidden" name={name} value={value} />
       {label && (
         <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
           {label}
