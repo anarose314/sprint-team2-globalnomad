@@ -15,8 +15,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError } from '@/shared/apis/apiError';
 import type {
+  LoginBackendResponse,
   LoginRequest,
-  LoginResponse,
 } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 
@@ -26,10 +26,13 @@ export const POST = async (request: NextRequest) => {
     const body: LoginRequest = await request.json();
 
     // 2) 백엔드 호출
-    const data = await fetchInstanceServer<LoginResponse>('/auth/login', {
-      method: 'POST',
-      body,
-    });
+    const data = await fetchInstanceServer<LoginBackendResponse>(
+      '/auth/login',
+      {
+        method: 'POST',
+        body,
+      }
+    );
 
     // 3) 응답 만들기 — 바디에는 user 정보만, 토큰은 httpOnly 쿠키로
     const response = NextResponse.json({ user: data.user }, { status: 200 });
