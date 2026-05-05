@@ -7,6 +7,7 @@ import { generateId } from '@/shared/utils/generateId';
 
 export function ReserveTimeList() {
   const [inputSchedule, setInputSchedule] = useState({
+    id: '',
     date: '',
     startTime: '',
     endTime: '',
@@ -16,20 +17,20 @@ export function ReserveTimeList() {
   const handleAdd = () => {
     // TODO: 유효성 검사 추가 (실행 시 시간이 비어 있음 or 시작 시간이 종료 시간보다 느림)
     const newSchedule = {
-      id: generateId(),
       ...inputSchedule,
+      id: generateId(),
     };
     setSchedules((prev) => [...prev, newSchedule]);
-    setInputSchedule({ date: '', startTime: '', endTime: '' });
+    setInputSchedule({ id: '', date: '', startTime: '', endTime: '' });
   };
 
-  const handleDelete = (index: number) => {
-    setSchedules((prev) => prev.filter((_, i) => i !== index));
+  const handleDelete = (id: string) => {
+    setSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
   };
 
-  const handleUpdate = (index: number, updatedSchedule: Schedule) => {
+  const handleUpdate = (id: string, updatedSchedule: Schedule) => {
     setSchedules((prev) =>
-      prev.map((item, i) => (i === index ? updatedSchedule : item))
+      prev.map((schedule) => (schedule.id === id ? updatedSchedule : schedule))
     );
   };
 
@@ -45,12 +46,12 @@ export function ReserveTimeList() {
         isAddAction
         className="border-b border-gray-100 pb-5"
       />
-      {schedules.map((item, index) => (
+      {schedules.map((item) => (
         <ReserveTime
           key={item.id}
           value={item}
-          onChange={(newVal) => handleUpdate(index, newVal)}
-          onClick={() => handleDelete(index)}
+          onChange={(newVal) => handleUpdate(item.id, newVal)}
+          onClick={() => handleDelete(item.id)}
         />
       ))}
     </div>
