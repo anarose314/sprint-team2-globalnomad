@@ -12,6 +12,7 @@ import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
+import { INPUT_LABEL_STYLE } from '@/shared/components/input/input.constants';
 import { cn } from '@/shared/utils/cn';
 
 /**
@@ -32,6 +33,7 @@ import { cn } from '@/shared/utils/cn';
  * />
  */
 export function Dropdown({
+  label,
   options,
   value,
   placeholder = '선택해주세요',
@@ -49,6 +51,7 @@ export function Dropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownId = useId();
   const listboxId = `${dropdownId}-listbox`;
+  const buttonId = `${dropdownId}-button`;
   const selectedOption = options.find((option) => option.value === value);
   const isDisabled = disabled || options.length === 0;
 
@@ -111,14 +114,20 @@ export function Dropdown({
         className
       )}
     >
+      {label && (
+        <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
+          {label}
+        </label>
+      )}
       <button
+        id={buttonId}
         type="button"
         disabled={isDisabled}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
         className={cn(
-          'flex items-center transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+          'flex cursor-pointer items-center transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
           variant === 'field'
             ? 'justify-between gap-3'
             : 'justify-center gap-1.5',
@@ -170,7 +179,7 @@ export function Dropdown({
                   disabled={isOptionDisabled}
                   aria-selected={isSelected}
                   className={cn(
-                    'typo-lg-medium flex w-full items-center px-5 text-left text-gray-950 transition-colors',
+                    'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
                     'hover:bg-primary-100 hover:text-primary-500',
                     isSelected && 'bg-primary-100 text-primary-500',
                     isOptionDisabled &&
