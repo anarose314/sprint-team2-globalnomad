@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
+import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
 import {
   EVENT_COUNTS_BY_DATE,
   RESERVATION_DETAIL_BY_DATE,
@@ -14,8 +15,6 @@ import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
-
-const DESKTOP_FLOATING_SHEET_BREAKPOINT = 1536;
 
 /**
  * 예약 현황 페이지의 월간 예약 캘린더
@@ -28,10 +27,6 @@ export function ReservationCalendar() {
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [detailDate, setDetailDate] = useState<Date | null>(null);
-  const [desktopSheetPosition, setDesktopSheetPosition] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
   const calendarRootRef = useRef<HTMLDivElement>(null);
 
   const currentMonthTitle = useMemo(
@@ -44,74 +39,15 @@ export function ReservationCalendar() {
     () => (detailDate ? formatDateKey(detailDate) : null),
     [detailDate]
   );
-
-  const setDesktopSheetPositionFromTile = useCallback(
-    (tileElement: HTMLElement) => {
-      if (window.innerWidth < DESKTOP_FLOATING_SHEET_BREAKPOINT) {
-        setDesktopSheetPosition(null);
-        return;
-      }
-
-      const calendarRoot = calendarRootRef.current;
-      if (!calendarRoot) return;
-
-      const rootRect = calendarRoot.getBoundingClientRect();
-      const tileRect = tileElement.getBoundingClientRect();
-
-      const SHEET_WIDTH = 320;
-      const EDGE_OFFSET = -4;
-      const VERTICAL_OFFSET = 6;
-
-      const rightAlignedLeft = tileRect.right - rootRect.left + EDGE_OFFSET;
-      const rightAlignedViewportRight =
-        rootRect.left + rightAlignedLeft + SHEET_WIDTH;
-
-      const shouldOpenLeft = rightAlignedViewportRight > window.innerWidth;
-      const leftAlignedLeft =
-        tileRect.left - rootRect.left - SHEET_WIDTH - EDGE_OFFSET;
-
-      const nextLeft = shouldOpenLeft
-        ? Math.max(0, leftAlignedLeft)
-        : rightAlignedLeft;
-      const nextTop = tileRect.top - rootRect.top + VERTICAL_OFFSET;
-
-      setDesktopSheetPosition({
-        top: nextTop,
-        left: nextLeft,
-      });
-    },
-    []
-  );
-
-  const updateDesktopSheetPosition = useCallback(() => {
-    if (!detailDate || window.innerWidth < DESKTOP_FLOATING_SHEET_BREAKPOINT) {
-      setDesktopSheetPosition(null);
-      return;
-    }
-
-    const calendarRoot = calendarRootRef.current;
-    if (!calendarRoot) return;
-
-    const targetTile = calendarRoot.querySelector(
-      '.reservation-calendar__day-tile--detail-target'
-    ) as HTMLElement | null;
-
-    if (!targetTile) return;
-    setDesktopSheetPositionFromTile(targetTile);
-  }, [detailDate, setDesktopSheetPositionFromTile]);
-
-  useEffect(() => {
-    if (!detailDate) return;
-
-    const timerId = window.setTimeout(updateDesktopSheetPosition, 0);
-    const handleResize = () => updateDesktopSheetPosition();
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.clearTimeout(timerId);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [currentDate, detailDate, updateDesktopSheetPosition]);
+  const {
+    desktopSheetPosition,
+    setDesktopSheetPositionFromTile,
+    clearDesktopSheetPosition,
+  } = useDesktopSheetPosition({
+    calendarRootRef,
+    currentDate,
+    detailDate,
+  });
 
   return (
     <div ref={calendarRootRef} className="mt-7 w-full md:relative md:mt-6">
@@ -187,7 +123,7 @@ export function ReservationCalendar() {
           desktopPosition={desktopSheetPosition}
           onClose={() => {
             setDetailDate(null);
-            setDesktopSheetPosition(null);
+            clearDesktopSheetPosition();
           }}
         />
       ) : null}
