@@ -1,4 +1,5 @@
 import { MainBanner } from '@/app/(main)/components/main-banner';
+import { MainSearch } from '@/app/(main)/components/main-search';
 
 /**
  * 메인 페이지 콘텐츠 조립 컴포넌트
@@ -12,6 +13,7 @@ export function MainContent() {
   return (
     <div className="flex flex-col gap-16 pb-20">
       <MainBanner />
+      <MainSearch />
     </div>
   );
 }

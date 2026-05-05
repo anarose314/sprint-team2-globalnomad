@@ -15,7 +15,7 @@ export function MainBanner() {
       <div className="relative h-45 overflow-hidden rounded-3xl bg-gray-300 md:h-80 2xl:h-125">
         <div className="absolute inset-0 bg-black/30" />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
+        <div className="px-5text-center absolute inset-0 flex flex-col items-center justify-center gap-2">
           <h1 className="typo-xl-bold md:typo-2xl-bold 2xl:typo-3xl-bold text-white">
             {MAIN_BANNER.title}
           </h1>
