@@ -1,20 +1,30 @@
+'use client';
+
+import { useState } from 'react';
 import { ActivityFormProps } from '@/app/(main)/activity/components/activity-form/activityForm.types';
 import { FormImage } from '@/app/(main)/activity/components/form-image';
 import { FormTitle } from '@/app/(main)/activity/components/form-title';
 import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
+import { Dropdown } from '@/shared/components/dropdown';
 import { Input } from '@/shared/components/input';
 import { Textarea } from '@/shared/components/textarea';
+import { CATEGORY_OPTIONS } from '@/shared/constants/category.constants';
 
 export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
+  const [category, setCategory] = useState('');
+
   return (
     <form className="mt-6 flex flex-col gap-7.5" onSubmit={onSubmit}>
       <section className="flex flex-col gap-6">
         <Input label="제목" placeholder="제목을 입력해 주세요" required />
-        {/* TODO: 드롭다운 메뉴로 변경 */}
-        <Input
+        <Dropdown
           label="카테고리"
+          options={CATEGORY_OPTIONS}
+          value={category}
           placeholder="카테고리를 선택해 주세요"
-          required
+          onChange={(value) => setCategory(value)}
+          triggerClassName="border-gray-100"
+          menuClassName="border-gray-100"
         />
         <Textarea
           label="설명"

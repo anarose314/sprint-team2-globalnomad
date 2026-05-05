@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import { ReserveTimeProps } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
+import { ReserveTimeDropdown } from '@/app/(main)/activity/components/reserve-time-dropdown';
 import { IcCalendar, IcMinus, IcPlus } from '@/shared/assets/icons';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 import { Input } from '@/shared/components/input';
@@ -10,6 +14,9 @@ export function ReserveTime({
   isAddAction = false,
   className,
 }: ReserveTimeProps) {
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+
   return (
     <div
       className={cn(
@@ -28,19 +35,19 @@ export function ReserveTime({
       </div>
       {/* 시간 */}
       <div className="flex flex-1 items-end gap-2.25 md:flex-3">
-        <div className="flex-1">
-          {/* TODO: 드롭다운 메뉴로 변경 */}
-          <Input
+        <div className="flex-1 md:w-31">
+          <ReserveTimeDropdown
             label={hasLabel ? '시작 시간' : undefined}
-            placeholder="0:00"
+            value={startTime}
+            onChange={(val) => setStartTime(val)}
           />
         </div>
         <span className="relative bottom-3.5 shrink-0">-</span>
-        <div className="flex-1">
-          {/* TODO: 드롭다운 메뉴로 변경 */}
-          <Input
+        <div className="flex-1 md:w-31">
+          <ReserveTimeDropdown
             label={hasLabel ? '종료 시간' : undefined}
-            placeholder="0:00"
+            value={endTime}
+            onChange={(val) => setEndTime(val)}
           />
         </div>
       </div>
