@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
   MAIN_ACTIVITIES,
@@ -9,6 +10,9 @@ import {
 import { FilterButton } from '@/shared/components/buttons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
+import { Pagination } from '@/shared/components/pagination';
+
+const TEMP_TOTAL_PAGES = 5;
 
 /**
  * 메인 페이지 모든 체험 섹션 컴포넌트
@@ -20,6 +24,8 @@ import { Heading } from '@/shared/components/heading';
  * <AllActivitySection />
  */
 export function AllActivitySection() {
+  const [currentPage, setCurrentPage] = useState(1);
+
   return (
     <section className="mx-auto w-full max-w-280 px-4 md:px-0">
       <div className="mb-5 flex items-center justify-between gap-4">
@@ -54,6 +60,14 @@ export function AllActivitySection() {
           </li>
         ))}
       </ul>
+
+      <div className="mt-10">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={TEMP_TOTAL_PAGES}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </section>
   );
 }
