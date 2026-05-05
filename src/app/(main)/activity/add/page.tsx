@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ActivityAddPage() {
   return (
-    <div className="mx-auto mt-7.5 mb-9 max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
+    <div className="mx-auto mt-7.5 mb-9 w-full max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
       <Heading>내 체험 등록</Heading>
       <ActivityAddForm />
     </div>

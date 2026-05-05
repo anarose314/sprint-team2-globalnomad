@@ -38,7 +38,7 @@ export function ReserveTime({
         />
       </div>
       {/* 시간 */}
-      <div className="flex flex-1 items-end gap-2.25 md:flex-3">
+      <div className="flex flex-1 flex-wrap items-end gap-2.25 md:flex-3 md:flex-nowrap">
         <div className="flex-1 md:w-31">
           <ReserveTimeDropdown
             label={hasLabel ? '시작 시간' : undefined}
@@ -54,23 +54,25 @@ export function ReserveTime({
             onChange={(val) => handleChange('endTime', val)}
           />
         </div>
+        {/* 버튼 */}
+        <button
+          type="button"
+          className={cn(
+            BUTTON_VARIANTS({ variant: isAddAction ? 'primary' : 'secondary' }),
+            'relative h-10.5 shrink-0 p-0!',
+            !isAddAction && 'bg-gray-25',
+            'bottom-0 w-full rounded-xl',
+            'xs:w-10.5 xs:rounded-full xs:bottom-1.5'
+          )}
+          onClick={onClick}
+        >
+          {isAddAction ? (
+            <IcPlus className="xs:w-1/3 w-5 text-white" />
+          ) : (
+            <IcMinus className="xs:w-1/3 w-5 text-gray-600" />
+          )}
+        </button>
       </div>
-      {/* 버튼 */}
-      <button
-        type="button"
-        className={cn(
-          BUTTON_VARIANTS({ variant: isAddAction ? 'primary' : 'secondary' }),
-          'relative bottom-1.5 h-10.5 w-10.5 shrink-0 rounded-full p-0!',
-          !isAddAction && 'bg-gray-25'
-        )}
-        onClick={onClick}
-      >
-        {isAddAction ? (
-          <IcPlus className="w-1/3 text-white" />
-        ) : (
-          <IcMinus className="w-1/3 text-gray-600" />
-        )}
-      </button>
     </div>
   );
 }
