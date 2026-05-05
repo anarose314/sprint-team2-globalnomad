@@ -13,12 +13,17 @@ import type { HeaderProps } from '@/shared/components/header/header.types';
  * - PC/태블릿에서는 가로형 로고를, 모바일에서는 아이콘 로고를 표시한다.
  * - 로그인 상태에서 알림, 프로필 아이콘, 유저 이름을 표시한다.
  * - 비로그인 상태에서는 로그인/회원가입 버튼을 표시한다.
+ * - 알림 목록 열기 동작은 `onNotificationClick` prop을 통해 외부에서 주입한다.
  *
  * @example
  * <Header />
  *
  * @example
- * <Header user={{ name: '정만철' }} hasNotification />
+ * <Header
+ *   user={{ name: '정만철' }}
+ *   hasNotification
+ *   onNotificationClick={handleNotificationClick}
+ * />
  */
 export function Header({
   user,
@@ -28,26 +33,29 @@ export function Header({
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
   return (
-    <header className="sticky top-0 z-50 h-12 shrink-0 border-b border-gray-50 bg-white md:h-20">
+    <header className="z-header sticky top-0 h-12 shrink-0 border-b border-gray-50 bg-white md:h-20">
       <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between px-4 md:px-10 2xl:px-0">
-        <Link
-          href="/"
-          aria-label="메인 페이지로 이동"
-          className="flex h-8 w-8 shrink-0 items-center justify-center md:h-7 md:w-43.5"
-        >
-          <LogoIcon className="block h-8 w-8 md:hidden" aria-hidden="true" />
-          <LogoHorizontal
-            className="hidden h-7 w-43.5 md:block"
-            aria-hidden="true"
-          />
-        </Link>
-
+        <h1>
+          <Link
+            href="/"
+            aria-label="메인 페이지로 이동"
+            className="flex h-8 w-8 shrink-0 items-center justify-center md:h-7 md:w-43.5"
+          >
+            <LogoIcon className="block h-8 w-8 md:hidden" aria-hidden="true" />
+            <LogoHorizontal
+              className="hidden h-7 w-43.5 md:block"
+              aria-hidden="true"
+            />
+          </Link>
+        </h1>
         {user ? (
           <div className="flex items-center gap-5">
             <button
               type="button"
               aria-label={
-                hasNotification ? '새 알림이 있습니다' : '새 알림이 없습니다'
+                hasNotification
+                  ? '새 알림이 있습니다. 알림 목록 열기'
+                  : '알림 목록 열기'
               }
               onClick={onNotificationClick}
               className="flex h-8 w-8 items-center justify-center"
