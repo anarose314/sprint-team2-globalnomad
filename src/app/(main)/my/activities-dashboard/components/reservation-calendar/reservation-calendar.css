@@ -116,7 +116,7 @@
   @apply top-8;
 }
 
-.reservation-calendar__event-badge--approved {
+.reservation-calendar__event-badge--confirmed {
   @apply top-14;
 }
 
@@ -311,7 +311,7 @@
     @apply top-12;
   }
 
-  .reservation-calendar__event-badge--approved {
+  .reservation-calendar__event-badge--confirmed {
     @apply top-17.75;
   }
 

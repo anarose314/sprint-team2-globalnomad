@@ -16,7 +16,7 @@ export const STATUS_META: Record<
     label: '예약',
     className: 'bg-primary-100 text-primary-500',
   },
-  approved: {
+  confirmed: {
     label: '승인',
     className: 'bg-orange-100 text-orange-700',
   },
@@ -29,15 +29,15 @@ export const STATUS_META: Record<
 /** 상태별 배지 세로 위치 클래스 매핑 */
 export const STATUS_POSITION_CLASS: Record<ReservationEventStatus, string> = {
   pending: 'reservation-calendar__event-badge--pending',
-  approved: 'reservation-calendar__event-badge--approved',
+  confirmed: 'reservation-calendar__event-badge--confirmed',
   completed: 'reservation-calendar__event-badge--completed',
 };
 
 /** 날짜별 예약 상태 개수 목데이터 */
 export const EVENT_COUNTS_BY_DATE: Record<string, ReservationEventCounts> = {
-  '2026-09-01': { pending: 1, approved: 1, completed: 1 },
+  '2026-09-01': { pending: 1, confirmed: 1, completed: 1 },
   '2026-09-03': { pending: 2 },
-  '2026-09-07': { approved: 1 },
+  '2026-09-07': { confirmed: 1 },
   '2026-09-15': { completed: 3 },
 };
 
@@ -56,17 +56,17 @@ export const RESERVATION_DETAIL_BY_DATE: Record<
   '2026-09-03': {
     timeSlots: ['11:00 - 12:00', '13:00 - 14:00'],
     requests: [
-      { id: 3, nickname: '민수', headCount: 4, status: 'approved' },
+      { id: 3, nickname: '민수', headCount: 4, status: 'confirmed' },
       { id: 4, nickname: '하늘', headCount: 2, status: 'pending' },
-      { id: 5, nickname: '다현', headCount: 6, status: 'rejected' },
+      { id: 5, nickname: '다현', headCount: 6, status: 'declined' },
     ],
   },
   '2026-09-07': {
     timeSlots: ['10:00 - 11:00'],
-    requests: [{ id: 6, nickname: '지은', headCount: 3, status: 'approved' }],
+    requests: [{ id: 6, nickname: '지은', headCount: 3, status: 'confirmed' }],
   },
   '2026-09-15': {
     timeSlots: ['16:00 - 17:00'],
-    requests: [{ id: 7, nickname: '현우', headCount: 5, status: 'rejected' }],
+    requests: [{ id: 7, nickname: '현우', headCount: 5, status: 'declined' }],
   },
 };

@@ -7,6 +7,7 @@ import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard
 import { useReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationDetailSheet';
 import { ReservationDetailMockData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowDown, IcClose } from '@/shared/assets/icons';
+import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
 interface ReservationDetailSheetProps {
@@ -77,9 +78,9 @@ export function ReservationDetailSheet({
       >
         <div className="reservation-detail-sheet__inner">
           <header className="reservation-detail-sheet__header">
-            <h3 className="reservation-detail-sheet__title">
+            <Heading as="h3" className="reservation-detail-sheet__title">
               {formatDetailDate(selectedDate)}
-            </h3>
+            </Heading>
             <button
               type="button"
               className="reservation-detail-sheet__close"

@@ -61,7 +61,7 @@ export const useReservationDetailSheet = ({
   }, [isOpen, onClose]);
 
   const tabCount = useMemo(() => {
-    const base = { pending: 0, approved: 0, rejected: 0 };
+    const base = { pending: 0, confirmed: 0, declined: 0 };
     if (!detailData) return base;
 
     detailData.requests.forEach((request) => {
