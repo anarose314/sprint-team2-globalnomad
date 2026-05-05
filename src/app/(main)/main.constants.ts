@@ -26,6 +26,9 @@ export const MAIN_SORT_OPTIONS: MainSortOption[] = [
   { label: '높은 가격 순', value: 'price_desc' },
 ];
 
+export const MAIN_ACTIVITY_GRID_CLASS =
+  'grid grid-cols-2 gap-x-4 gap-y-6 md:gap-6 2xl:grid-cols-4';
+
 export const MAIN_ACTIVITIES: MainActivity[] = [
   {
     id: 1,
@@ -33,7 +36,7 @@ export const MAIN_ACTIVITIES: MainActivity[] = [
     price: 38000,
     rating: 4.9,
     reviewCount: 703,
-    bannerImageUrl: DUMMY_IMAGE_URL,
+    bannerImageUrl: DUMMY_IMAGE_URL, // TODO: API 연동 시 실제 이미지 URL로 교체
     category: 'art',
   },
   {

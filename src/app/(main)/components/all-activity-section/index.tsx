@@ -1,6 +1,8 @@
 'use client';
 
+import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
+  MAIN_ACTIVITIES,
   MAIN_CATEGORIES,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
@@ -30,10 +32,11 @@ export function AllActivitySection() {
           options={MAIN_SORT_OPTIONS}
           placeholder="정렬"
           onChange={() => undefined}
+          // TODO: 추후 정렬 기능 연동 예정
         />
       </div>
 
-      <div className="scrollbar-hide flex gap-3 overflow-x-auto">
+      <div className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
         {MAIN_CATEGORIES.map((category) => (
           <FilterButton
             key={category.value}
@@ -43,6 +46,14 @@ export function AllActivitySection() {
           />
         ))}
       </div>
+
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
+        {MAIN_ACTIVITIES.map((activity) => (
+          <li key={activity.id}>
+            <ActivityCard activity={activity} />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
