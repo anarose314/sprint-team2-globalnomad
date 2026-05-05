@@ -3,7 +3,6 @@
  *
  * 로그인 BFF 엔드포인트.
  *
- * @remarks
  * 1. 클라이언트에서 보낸 email, password 를 받아
  * 2. 실제 백엔드(GlobalNomad API)에 로그인 요청을 보내고
  * 3. 받은 토큰을 httpOnly 쿠키로 저장해서 응답한다.
@@ -14,6 +13,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError } from '@/shared/apis/apiError';
+import {
+  ACCESS_TOKEN_COOKIE_NAME,
+  ACCESS_TOKEN_COOKIE_OPTIONS,
+  REFRESH_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_OPTIONS,
+} from '@/shared/apis/auth/auth.constants';
 import type {
   LoginBackendResponse,
   LoginRequest,
@@ -38,22 +43,18 @@ export const POST = async (request: NextRequest) => {
     const response = NextResponse.json({ user: data.user }, { status: 200 });
 
     // 4) accessToken 쿠키 설정 (httpOnly)
-    response.cookies.set('accessToken', data.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 1일
-      path: '/',
-    });
+    response.cookies.set(
+      ACCESS_TOKEN_COOKIE_NAME,
+      data.accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS
+    );
 
     // 5) refreshToken 쿠키 설정 (httpOnly)
-    response.cookies.set('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 30, // 30일
-      path: '/',
-    });
+    response.cookies.set(
+      REFRESH_TOKEN_COOKIE_NAME,
+      data.refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS
+    );
 
     return response;
   } catch (error) {

@@ -15,6 +15,7 @@
  */
 
 import { cookies } from 'next/headers';
+import { ACCESS_TOKEN_COOKIE_NAME } from '@/shared/apis/auth/auth.constants';
 import {
   fetchInstance,
   type FetchInstanceOptions,
@@ -38,7 +39,7 @@ export const fetchInstanceServer = async <T>(
 
   // 명시 안 됐으면 쿠키에서 자동으로 읽음
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
 
   return fetchInstance<T>(endpoint, {
     ...options,
