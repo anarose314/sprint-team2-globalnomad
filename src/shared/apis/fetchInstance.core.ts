@@ -77,7 +77,7 @@ export const fetchInstance = async <T>(
         endpoint,
         typeof window !== 'undefined'
           ? window.location.origin
-          : 'http://localhost:3000'
+          : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000')
       )
     : (() => {
         const base = BASE_URL.replace(/\/$/, '');
@@ -119,8 +119,17 @@ export const fetchInstance = async <T>(
   });
 
   // 5) 응답 본문을 안전하게 파싱
+  //    - 빈 본문(204, 빈 200 등)이면 undefined
+  //    - 본문이 있으면 JSON 파싱 시도
+  //    - JSON 형식이 아닌 응답(에러 페이지 HTML 등)이면 undefined 로 간주하고
+  //      response.ok 체크에서 ApiError 로 변환되도록 한다
   const text = await response.text();
-  const data = text ? JSON.parse(text) : undefined;
+  let data: unknown;
+  try {
+    data = text ? JSON.parse(text) : undefined;
+  } catch {
+    data = undefined;
+  }
 
   // 6) 실패 응답 처리
   if (!response.ok) {
