@@ -1,7 +1,7 @@
 import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
 
 // TODO: API 연동 후 더미데이터 삭제
-export const DUMMY_ACTIVITES_LIST: MyActivitiesResponse = {
+export const DUMMY_ACTIVITIES_LIST: MyActivitiesResponse = {
   cursorId: 0,
   totalCount: 6,
   activities: [

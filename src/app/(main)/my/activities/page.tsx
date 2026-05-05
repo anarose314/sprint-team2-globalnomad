@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import ActivitiesList from '@/app/(main)/my/activities/components/activities-list';
+import { ActivitiesList } from '@/app/(main)/my/activities/components/activities-list';
 import { MyPageHeader } from '@/app/(main)/my/components/my-page-header';
 import { Button } from '@/shared/components/buttons';
 

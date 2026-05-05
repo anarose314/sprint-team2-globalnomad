@@ -1,24 +1,19 @@
-import { Metadata } from 'next';
 import Image from 'next/image';
-import { DUMMY_ACTIVITES_LIST } from '@/app/(main)/my/activities/components/activities-list/activityList.constants';
+import { DUMMY_ACTIVITIES_LIST } from '@/app/(main)/my/activities/components/activities-list/activityList.constants';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { IcStar } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
 
-export const metadata: Metadata = {
-  title: '내 체험 관리',
-};
-
-export default function ActivitiesList() {
+export function ActivitiesList() {
   // TODO: API 데이터 연동
-  const activitesList = DUMMY_ACTIVITES_LIST.activities;
+  const activitiesList = DUMMY_ACTIVITIES_LIST.activities;
 
   return (
     <>
       <section className="mt-7.5">
         <ul className="flex flex-col gap-5 wrap-anywhere">
-          {activitesList.map((activity) => (
+          {activitiesList.map((activity) => (
             <li key={activity.id}>
               <article className="flex flex-col gap-3 border-b border-b-gray-50 pb-7.5">
                 {/* 카드 */}
