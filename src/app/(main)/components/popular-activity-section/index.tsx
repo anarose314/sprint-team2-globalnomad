@@ -21,7 +21,7 @@ export function PopularActivitySection({
   activities,
 }: PopularActivitySectionProps) {
   return (
-    <section className="mx-auto w-full max-w-280 px-4 md:px-0">
+    <section>
       <Heading
         as="h2"
         textStyle="typo-2lg-bold"
@@ -32,7 +32,6 @@ export function PopularActivitySection({
 
       <div className="relative">
         <ul className="scrollbar-hide flex gap-4 overflow-x-auto pb-4 md:gap-6">
-          {' '}
           {activities.map((activity) => (
             <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
               <ActivityCard activity={activity} />
