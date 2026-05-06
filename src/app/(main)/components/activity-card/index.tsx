@@ -15,7 +15,7 @@ import { Heading } from '@/shared/components/heading';
 export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
-      <div className="h-41.5 w-full bg-gray-200 md:h-86.75 2xl:h-72.5" />
+      <div className="relative aspect-square w-full bg-gray-200" />
 
       <div className="z-base relative -mt-8.5 flex h-27.5 flex-col justify-between bg-white px-4 pt-3 pb-4.25 md:-mt-15 md:h-34 md:px-5 md:pt-5 md:pb-7.5">
         <Heading
