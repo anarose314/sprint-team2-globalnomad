@@ -20,7 +20,7 @@ export function MainSearch() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-280 flex-col items-center gap-8 px-4 md:px-0">
+    <section className="flex flex-col items-center gap-8">
       <Heading
         as="h2"
         textStyle="typo-2lg-bold"
