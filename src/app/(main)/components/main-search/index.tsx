@@ -3,6 +3,7 @@
 import { FormEvent } from 'react';
 import { IcSearch } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
+import { Heading } from '@/shared/components/heading';
 
 /**
  * 메인 페이지 검색 영역 컴포넌트
@@ -20,9 +21,13 @@ export function MainSearch() {
 
   return (
     <section className="mx-auto flex w-full max-w-280 flex-col items-center gap-8 px-4 md:px-0">
-      <h2 className="typo-2lg-bold md:typo-3xl-bold 2xl:typo-3xl-bold text-center text-gray-950">
+      <Heading
+        as="h2"
+        textStyle="typo-2lg-bold"
+        className="md:typo-3xl-bold 2xl:typo-3xl-bold text-center text-gray-950"
+      >
         무엇을 체험하고 싶으신가요?
-      </h2>
+      </Heading>
 
       <form
         onSubmit={handleSubmit}

@@ -1,4 +1,5 @@
 import { MAIN_BANNER } from '@/app/(main)/main.constants';
+import { Heading } from '@/shared/components/heading';
 
 /**
  * 메인 페이지 상단 배너 컴포넌트
@@ -16,9 +17,13 @@ export function MainBanner() {
         <div className="absolute inset-0 bg-black/30" />
 
         <div className="absolute inset-0 flex translate-y-6 flex-col items-center justify-center gap-2 px-5 text-center md:translate-y-14 2xl:translate-y-18">
-          <h1 className="typo-xl-bold md:typo-2xl-bold 2xl:typo-3xl-bold text-white">
+          <Heading
+            as="h2"
+            textStyle="typo-xl-bold"
+            className="md:typo-2xl-bold 2xl:typo-3xl-bold text-white"
+          >
             {MAIN_BANNER.title}
-          </h1>
+          </Heading>
           <p className="typo-md-semibold md:typo-lg-semibold 2xl:typo-2lg-semibold text-white">
             {MAIN_BANNER.description}
           </p>
