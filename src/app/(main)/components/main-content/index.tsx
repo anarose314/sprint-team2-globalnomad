@@ -15,7 +15,7 @@ import { POPULAR_ACTIVITIES } from '@/app/(main)/main.constants';
  */
 export function MainContent() {
   return (
-    <div className="flex flex-col gap-16 pb-20">
+    <div className="mt-15 flex flex-col gap-16 pb-20">
       <MainBanner />
       <MainSearch />
       <PopularActivitySection activities={POPULAR_ACTIVITIES} />

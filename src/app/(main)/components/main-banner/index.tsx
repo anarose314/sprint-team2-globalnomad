@@ -12,7 +12,7 @@ import { Heading } from '@/shared/components/heading';
  */
 export function MainBanner() {
   return (
-    <section className="mt-15">
+    <section>
       <div className="relative h-45 overflow-hidden rounded-3xl bg-gray-300 md:h-93.75 2xl:h-125">
         <div className="absolute inset-0 bg-black/30" />
 
