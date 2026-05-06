@@ -14,6 +14,9 @@
   --z-index-modal-backdrop: 900; /* Full-screen Overlays */
   --z-index-modal: 1000; /* Full-screen Overlays */
   --z-index-toast: 1100; /* Toast */
+
+  /* BreakPoint */
+  --breakpoint-xs: 375px;
 }
 
 /* Skeleton shimmer animation */

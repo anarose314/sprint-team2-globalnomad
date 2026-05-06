@@ -1,11 +1,6 @@
 import { Metadata } from 'next';
-import { FormImage } from '@/app/(main)/activity/components/form-image';
-import { FormTitle } from '@/app/(main)/activity/components/form-title';
-import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
-import { Button } from '@/shared/components/buttons';
+import { ActivityAddForm } from '@/app/(main)/activity/add/components/activity-add-form';
 import { Heading } from '@/shared/components/heading';
-import { Input } from '@/shared/components/input';
-import { Textarea } from '@/shared/components/textarea';
 
 export const metadata: Metadata = {
   title: '내 체험 등록',
@@ -13,48 +8,9 @@ export const metadata: Metadata = {
 
 export default function ActivityAddPage() {
   return (
-    <div className="mx-auto mt-7.5 mb-9 max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
+    <div className="mx-auto mt-7.5 mb-9 w-full max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
       <Heading>내 체험 등록</Heading>
-      <form className="mt-6 flex flex-col gap-7.5">
-        <section className="flex flex-col gap-6">
-          <Input label="제목" placeholder="제목을 입력해 주세요" required />
-          {/* TODO: 드롭다운 메뉴로 변경 */}
-          <Input
-            label="카테고리"
-            placeholder="카테고리를 선택해 주세요"
-            required
-          />
-          <Textarea
-            label="설명"
-            placeholder="체험에 대한 설명을 입력해 주세요"
-            required
-          />
-          <Input
-            label="가격"
-            type="number"
-            placeholder="체험 금액을 입력해 주세요"
-            required
-          />
-          {/* TODO: 우편번호 서비스 연동 */}
-          <Input label="주소" placeholder="주소를 입력해 주세요" required />
-        </section>
-        <section>
-          <FormTitle>예약 가능한 시간대</FormTitle>
-          <ReserveTimeList />
-        </section>
-        <section>
-          <FormTitle>배너 이미지 등록</FormTitle>
-          <FormImage />
-        </section>
-        <section>
-          <FormTitle>소개 이미지 등록</FormTitle>
-          <FormImage isMultiple />
-        </section>
-        {/* TODO: 버튼 이벤트 등록, 상황에 따라 별도 컴포넌트로 분리 */}
-        <Button type="submit" size="md" className="mx-auto w-30">
-          등록하기
-        </Button>
-      </form>
+      <ActivityAddForm />
     </div>
   );
 }
