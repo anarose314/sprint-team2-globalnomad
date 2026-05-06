@@ -32,7 +32,6 @@ export function PopularActivitySection({
 
       <div className="relative">
         <ul className="scrollbar-hide -mx-6 flex gap-4 overflow-x-auto px-6 pb-4 after:w-px after:shrink-0 after:content-[''] md:-mx-7.5 md:gap-6 md:px-7.5 2xl:mx-0 2xl:px-0 2xl:after:w-0">
-          {' '}
           {activities.map((activity) => (
             <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
               <ActivityCard activity={activity} />
