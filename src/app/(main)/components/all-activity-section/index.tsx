@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
   MAIN_ACTIVITIES,
+  MAIN_ACTIVITY_CARD_ITEM_CLASS,
+  MAIN_ACTIVITY_GRID_CLASS,
   MAIN_CATEGORIES,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
@@ -28,6 +30,7 @@ export function AllActivitySection() {
 
   return (
     <section className="mx-auto w-full max-w-280 px-4 md:px-0">
+      {' '}
       <div className="mb-5 flex items-center justify-between gap-4">
         <Heading
           as="h2"
@@ -45,7 +48,6 @@ export function AllActivitySection() {
           // TODO: 추후 정렬 기능 연동 예정
         />
       </div>
-
       <div className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
         {MAIN_CATEGORIES.map((category) => (
           <FilterButton
@@ -56,15 +58,13 @@ export function AllActivitySection() {
           />
         ))}
       </div>
-
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
+      <ul className={MAIN_ACTIVITY_GRID_CLASS}>
         {MAIN_ACTIVITIES.map((activity) => (
-          <li key={activity.id}>
+          <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
             <ActivityCard activity={activity} />
           </li>
         ))}
       </ul>
-
       <div className="mt-10">
         <Pagination
           currentPage={currentPage}

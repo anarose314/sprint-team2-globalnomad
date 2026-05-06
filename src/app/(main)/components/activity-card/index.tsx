@@ -1,6 +1,7 @@
 import type { ActivityCardProps } from '@/app/(main)/components/activity-card/activityCard.types';
 import { IcStar } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+
 /**
  * 메인 페이지 체험 카드 컴포넌트
  *
@@ -14,13 +15,13 @@ import { Heading } from '@/shared/components/heading';
 export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
-      <div className="min-300:h-96 h-41.5 w-full bg-gray-200 md:h-86.75" />
+      <div className="h-41.5 w-full bg-gray-200 md:h-86.75 2xl:h-72.5" />
 
-      <div className="z-base relative -mt-8 flex h-27.5 flex-col justify-between bg-white px-4 pt-3 pb-4.25 md:-mt-15 md:h-34 md:px-5 md:pt-5 md:pb-7.5">
+      <div className="z-base relative -mt-8.5 flex h-27.5 flex-col justify-between bg-white px-4 pt-3 pb-4.25 md:-mt-15 md:h-34 md:px-5 md:pt-5 md:pb-7.5">
         <Heading
           as="h3"
           textStyle="typo-md-semibold"
-          className="min-300:typo-lg-semibold truncate text-gray-950"
+          className="md:typo-lg-semibold truncate text-gray-950"
         >
           {activity.title}
         </Heading>

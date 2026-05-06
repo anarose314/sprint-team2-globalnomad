@@ -1,4 +1,5 @@
 import { ActivityCard } from '@/app/(main)/components/activity-card';
+import { MAIN_ACTIVITY_CARD_ITEM_CLASS } from '@/app/(main)/main.constants';
 import type { MainActivity } from '@/app/(main)/main.types';
 import { Heading } from '@/shared/components/heading';
 
@@ -30,9 +31,10 @@ export function PopularActivitySection({
       </Heading>
 
       <div className="relative">
-        <ul className="scrollbar-hide flex gap-6 overflow-x-auto pb-4">
+        <ul className="scrollbar-hide flex gap-4 overflow-x-auto pb-4 md:gap-6">
+          {' '}
           {activities.map((activity) => (
-            <li key={activity.id} className="w-65.5 shrink-0">
+            <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
               <ActivityCard activity={activity} />
             </li>
           ))}
