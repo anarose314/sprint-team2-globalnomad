@@ -29,7 +29,11 @@ export function AllActivitySection() {
   return (
     <section className="mx-auto w-full max-w-280 px-4 md:px-0">
       <div className="mb-5 flex items-center justify-between gap-4">
-        <Heading as="h2" textStyle="typo-3xl-bold" color="text-gray-950">
+        <Heading
+          as="h2"
+          textStyle="typo-2lg-bold"
+          className="2xl:typo-3xl-bold md:typo-2xl-bold text-gray-950"
+        >
           모든 체험
         </Heading>
 

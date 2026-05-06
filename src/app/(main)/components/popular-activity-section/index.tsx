@@ -21,7 +21,11 @@ export function PopularActivitySection({
 }: PopularActivitySectionProps) {
   return (
     <section className="mx-auto w-full max-w-280 px-4 md:px-0">
-      <Heading as="h2" textStyle="typo-3xl-bold" className="mb-6 text-gray-950">
+      <Heading
+        as="h2"
+        textStyle="typo-2lg-bold"
+        className="2xl:typo-3xl-bold md:typo-2xl-bold mb-6 text-gray-950"
+      >
         인기 체험
       </Heading>
 

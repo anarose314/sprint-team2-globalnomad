@@ -11,15 +11,15 @@ import { MAIN_BANNER } from '@/app/(main)/main.constants';
  */
 export function MainBanner() {
   return (
-    <section className="mx-auto w-full max-w-280 px-4 md:px-0">
-      <div className="relative h-45 overflow-hidden rounded-3xl bg-gray-300 md:h-80 2xl:h-125">
+    <section className="mx-auto mt-15 w-full max-w-280 px-4 md:px-0">
+      <div className="relative h-45 overflow-hidden rounded-3xl bg-gray-300 md:h-93.75 2xl:h-125">
         <div className="absolute inset-0 bg-black/30" />
 
-        <div className="px-5text-center absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <div className="absolute inset-0 flex translate-y-6 flex-col items-center justify-center gap-2 px-5 text-center md:translate-y-14 2xl:translate-y-18">
           <h1 className="typo-xl-bold md:typo-2xl-bold 2xl:typo-3xl-bold text-white">
             {MAIN_BANNER.title}
           </h1>
-          <p className="typo-md-semibold md:typo-lg-semibold text-white">
+          <p className="typo-md-semibold md:typo-lg-semibold 2xl:typo-2lg-semibold text-white">
             {MAIN_BANNER.description}
           </p>
         </div>

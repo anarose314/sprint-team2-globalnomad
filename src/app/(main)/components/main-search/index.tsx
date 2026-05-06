@@ -20,7 +20,7 @@ export function MainSearch() {
 
   return (
     <section className="mx-auto flex w-full max-w-280 flex-col items-center gap-8 px-4 md:px-0">
-      <h2 className="typo-2xl-bold md:typo-3xl-bold text-center text-gray-950">
+      <h2 className="typo-2lg-bold md:typo-3xl-bold 2xl:typo-3xl-bold text-center text-gray-950">
         무엇을 체험하고 싶으신가요?
       </h2>
 
