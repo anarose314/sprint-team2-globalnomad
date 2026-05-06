@@ -31,6 +31,13 @@ export function FormImage({
   const errorId = `${inputId}-error`;
   const isMaxReached = isMultiple && imageFiles.length >= MAX_IMAGE_COUNT;
 
+  const syncInputFiles = (files: File[]) => {
+    if (!inputRef.current) return;
+    const dataTransfer = new DataTransfer();
+    files.forEach((file) => dataTransfer.items.add(file));
+    inputRef.current.files = dataTransfer.files;
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : null;
     if (!files || files.length === 0) return;
@@ -77,6 +84,8 @@ export function FormImage({
       : newImageFiles;
 
     setImageFiles(updatedFiles);
+    syncInputFiles(updatedFiles.map((item) => item.file));
+
     onChange?.(
       isMultiple ? updatedFiles.map((item) => item.file) : updatedFiles[0].file
     );
@@ -98,6 +107,8 @@ export function FormImage({
     }
 
     setImageFiles(filteredFiles);
+    syncInputFiles(filteredFiles.map((item) => item.file));
+
     onChange?.(
       isMultiple
         ? filteredFiles.map((item) => item.file)
