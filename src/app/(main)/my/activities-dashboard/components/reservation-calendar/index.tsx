@@ -1,61 +1,68 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
+import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
+import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
 import {
   EVENT_COUNTS_BY_DATE,
+  RESERVATION_DETAIL_BY_DATE,
   WEEKDAY,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
+import { cn } from '@/shared/utils/cn';
+import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
 
 /**
- * Date 객체를 예약 캘린더 이벤트 맵에서 사용하는 yyyy-mm-dd 키로 변환
- */
-function toDateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * 예약 현황 페이지에서 월 단위 예약 상태를 보여주는 캘린더 컴포넌트
- * 날짜별 예약/승인/완료 배지를 표시
+ * 예약 현황 페이지의 월간 예약 캘린더
+ *
+ * - 날짜별 상태 배지(예약/승인/완료) 렌더링
+ * - 날짜 클릭 시 상세 패널(바텀시트/플로팅) 오픈
+ * - 대형 화면에서는 클릭 타일 기준으로 상세 패널 위치 자동 보정
  */
 export function ReservationCalendar() {
-  const [currentDate, setCurrentDate] = useState<Date | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      const now = new Date();
-      setCurrentDate(now);
-      setSelectedDate(now);
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [detailDate, setDetailDate] = useState<Date | null>(null);
+  const calendarRootRef = useRef<HTMLDivElement>(null);
 
   const currentMonthTitle = useMemo(
     () =>
-      currentDate
-        ? `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`
-        : '',
+      `${currentDate.getFullYear()}년 ${String(currentDate.getMonth() + 1).padStart(2, '0')}월`,
     [currentDate]
   );
 
-  if (!currentDate || !selectedDate) {
-    return null;
-  }
+  const selectedDateKey = useMemo(
+    () => (detailDate ? formatDateKey(detailDate) : null),
+    [detailDate]
+  );
+  const {
+    desktopSheetPosition,
+    setDesktopSheetPositionFromTile,
+    clearDesktopSheetPosition,
+  } = useDesktopSheetPosition({
+    calendarRootRef,
+    currentDate,
+    detailDate,
+  });
 
   return (
-    <div className="mt-7 w-full md:mt-6">
+    <div ref={calendarRootRef} className="mt-7 w-full md:relative md:mt-6">
       <Calendar
         value={selectedDate}
         onChange={(value) => setSelectedDate(value as Date)}
+        onClickDay={(value, event) => {
+          const nextDate = value as Date;
+          setSelectedDate(nextDate);
+          setDetailDate(nextDate);
+
+          if (event.currentTarget instanceof HTMLElement) {
+            setDesktopSheetPositionFromTile(event.currentTarget);
+          }
+        }}
         activeStartDate={currentDate}
         onActiveStartDateChange={({ activeStartDate }) => {
           if (activeStartDate) setCurrentDate(activeStartDate);
@@ -79,10 +86,6 @@ export function ReservationCalendar() {
         locale="ko-KR"
         calendarType="gregory"
         className="reservation-calendar"
-        tileClassName={({ view }) => {
-          if (view !== 'month') return undefined;
-          return 'reservation-calendar__day-tile';
-        }}
         tileContent={({ date, view, activeStartDate }) => {
           if (view !== 'month') return null;
 
@@ -91,7 +94,7 @@ export function ReservationCalendar() {
             date.getMonth() === visibleMonthDate.getMonth() &&
             date.getFullYear() === visibleMonthDate.getFullYear();
           const eventCounts: ReservationEventCounts | undefined =
-            EVENT_COUNTS_BY_DATE[toDateKey(date)];
+            EVENT_COUNTS_BY_DATE[formatDateKey(date)];
 
           return (
             <ReservationCalendarDayTile
@@ -101,7 +104,29 @@ export function ReservationCalendar() {
             />
           );
         }}
+        tileClassName={({ date, view }) => {
+          if (view !== 'month') return undefined;
+          const isDetailTarget =
+            Boolean(selectedDateKey) && formatDateKey(date) === selectedDateKey;
+          return cn(
+            'reservation-calendar__day-tile',
+            isDetailTarget && 'reservation-calendar__day-tile--detail-target'
+          );
+        }}
       />
+      {detailDate && selectedDateKey ? (
+        <ReservationDetailSheet
+          key={selectedDateKey}
+          isOpen
+          selectedDate={detailDate}
+          detailData={RESERVATION_DETAIL_BY_DATE[selectedDateKey]}
+          desktopPosition={desktopSheetPosition}
+          onClose={() => {
+            setDetailDate(null);
+            clearDesktopSheetPosition();
+          }}
+        />
+      ) : null}
     </div>
   );
 }
