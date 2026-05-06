@@ -32,6 +32,7 @@ export const MAIN_ACTIVITY_CARD_ITEM_CLASS =
 export const MAIN_ACTIVITY_GRID_CLASS =
   'grid w-81 grid-cols-2 gap-x-4 gap-y-6 md:w-171.5 md:gap-6 2xl:w-280 2xl:grid-cols-4';
 
+// TODO: API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
   {
     id: 1,
