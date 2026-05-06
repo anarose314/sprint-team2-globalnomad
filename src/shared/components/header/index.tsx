@@ -33,22 +33,17 @@ export function Header({
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
   return (
-    <header className="z-header sticky top-0 h-12 shrink-0 border-b border-gray-50 bg-white px-6 md:h-20">
+    <header className="z-header sticky top-0 h-14 shrink-0 border-b border-gray-50 bg-white px-6 md:h-20">
       <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between">
-        <h1 className="m-0 flex h-10 w-10 shrink-0 items-center justify-center leading-none md:h-7 md:w-43.5">
+        <h1 className="flex shrink-0 items-center justify-center">
           <Link
             href="/"
             aria-label="메인 페이지로 이동"
-            className="flex h-full w-full items-center justify-center p-1 md:p-0"
+            className="flex w-9 items-center justify-center p-1 md:w-43.5 md:p-0"
           >
-            <span className="block h-10 w-10 overflow-hidden md:hidden">
-              <LogoIcon
-                className="mt-1 block h-20 w-20 origin-top-left scale-40"
-                aria-hidden="true"
-              />
-            </span>
+            <LogoIcon className="h-full w-full md:hidden" aria-hidden="true" />
             <LogoHorizontal
-              className="hidden h-full w-full shrink-0 md:block"
+              className="hidden h-full w-full md:block"
               aria-hidden="true"
             />
           </Link>
