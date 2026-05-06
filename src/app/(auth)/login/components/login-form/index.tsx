@@ -8,7 +8,7 @@ import {
   type LoginFormValues,
   loginSchema,
 } from '@/app/(auth)/login/components/login-form/login-form.schema';
-import { useLoginMutation } from '@/shared/apis/auth/use-login-mutation';
+import { useLoginMutation } from '@/shared/apis/auth/useLoginMutation';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
