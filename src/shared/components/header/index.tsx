@@ -33,8 +33,8 @@ export function Header({
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
   return (
-    <header className="z-header sticky top-0 h-12 shrink-0 border-b border-gray-50 bg-white md:h-20">
-      <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between px-4 md:px-10 2xl:px-0">
+    <header className="z-header sticky top-0 h-12 shrink-0 border-b border-gray-50 bg-white px-6 md:h-20">
+      <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between">
         <h1 className="m-0 flex h-10 w-10 shrink-0 items-center justify-center leading-none md:h-7 md:w-43.5">
           <Link
             href="/"
