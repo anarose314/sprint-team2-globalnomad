@@ -29,8 +29,7 @@ export function AllActivitySection() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <section className="mx-auto w-full max-w-280 px-4 md:px-0">
-      {' '}
+    <section>
       <div className="mb-5 flex items-center justify-between gap-4">
         <Heading
           as="h2"
@@ -48,16 +47,18 @@ export function AllActivitySection() {
           // TODO: 추후 정렬 기능 연동 예정
         />
       </div>
-      <div className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
+      <ul className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
         {MAIN_CATEGORIES.map((category) => (
-          <FilterButton
-            key={category.value}
-            label={category.label}
-            category={category.iconCategory}
-            className="shrink-0 whitespace-nowrap"
-          />
+          <li key={category.value} className="shrink-0">
+            <FilterButton
+              label={category.label}
+              category={category.iconCategory}
+              className="whitespace-nowrap"
+            />
+          </li>
         ))}
-      </div>
+      </ul>
+
       <ul className={MAIN_ACTIVITY_GRID_CLASS}>
         {MAIN_ACTIVITIES.map((activity) => (
           <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
@@ -65,6 +66,7 @@ export function AllActivitySection() {
           </li>
         ))}
       </ul>
+
       <div className="mt-10">
         <Pagination
           currentPage={currentPage}
