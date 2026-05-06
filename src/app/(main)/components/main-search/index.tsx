@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent } from 'react';
+import { SubmitEvent } from 'react';
 import { IcSearch } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
@@ -15,7 +15,7 @@ import { Heading } from '@/shared/components/heading';
  * <MainSearch />
  */
 export function MainSearch() {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
 
