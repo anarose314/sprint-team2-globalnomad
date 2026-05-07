@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ActivityButton } from '@/app/(main)/my/activities/components/activityAddButton';
+import { ActivityButton } from '@/app/(main)/my/activities/components/activity-add-button';
 import { MyActivitiesList } from '@/app/(main)/my/activities/components/my-activities-list';
 import { MyPageHeader } from '@/app/(main)/my/components/my-page-header';
 
