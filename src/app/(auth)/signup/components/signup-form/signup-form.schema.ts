@@ -17,10 +17,9 @@ export const signupSchema = z
       .transform((val) => val.trim().toLowerCase()),
     nickname: z
       .string()
+      .trim()
       .min(1, '닉네임을 입력해 주세요.')
-      .max(10, '닉네임은 10자 이내로 작성해 주세요.')
-      .transform((val) => val.trim())
-      .pipe(z.string().min(1, '닉네임을 입력해 주세요.').max(10, '...')),
+      .max(10, '닉네임은 10자 이내로 작성해 주세요.'),
     password: z
       .string()
       .min(1, '비밀번호를 입력해 주세요.')

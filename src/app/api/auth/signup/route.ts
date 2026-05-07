@@ -47,21 +47,17 @@ export const POST = async (request: NextRequest) => {
 
   // 회원가입 요청 — 실패 시 백엔드 에러 그대로 전달
   try {
-    await fetchInstanceServer<User>('/users', {
-      method: 'POST',
-      body,
-    });
+    await fetchInstanceServer<User>('/users', { method: 'POST', body });
   } catch (error) {
+    // 회원가입 실패 — 에러 그대로 전달
     if (error instanceof ApiError) {
       return NextResponse.json(
         { message: error.message },
         { status: error.status }
       );
     }
-
-    console.error('[signup] 회원가입 실패 (예상치 못한 에러):', error);
     return NextResponse.json(
-      { message: '서버 오류가 발생했습니다.' },
+      { message: '회원가입 중 오류가 발생했습니다.' },
       { status: 500 }
     );
   }
@@ -73,24 +69,20 @@ export const POST = async (request: NextRequest) => {
       method: 'POST',
       body: { email: body.email, password: body.password },
     });
-  } catch (error) {
-    // 회원가입은 됐지만 자동 로그인 실패
-    // 사용자에게 수동 로그인 안내 (201 Created — 가입 자체는 성공)
-    console.error('[signup] 자동 로그인 실패:', error);
+  } catch {
+    // 회원가입은 성공했지만 자동 로그인 실패
+    // → 200 으로 응답하되 user 없이, message 만 전달
     return NextResponse.json(
       {
         message:
           '회원가입은 완료되었으나 자동 로그인에 실패했습니다. 로그인 페이지에서 다시 시도해주세요.',
       },
-      { status: 201 }
+      { status: 200 }
     );
   }
 
   // 응답 — 바디는 user 정보, 토큰은 httpOnly 쿠키로
-  const response = NextResponse.json(
-    { user: loginData.user },
-    { status: 201 } // 회원가입 성공 = 새 리소스 생성
-  );
+  const response = NextResponse.json({ user: loginData.user }, { status: 200 });
 
   response.cookies.set(
     ACCESS_TOKEN_COOKIE_NAME,

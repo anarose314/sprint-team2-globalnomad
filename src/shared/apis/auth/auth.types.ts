@@ -53,7 +53,10 @@ export type SignupRequest = {
  *
  * Route Handler 가 회원가입 후 자동 로그인을 수행하므로,
  * 클라이언트는 LoginResponse 와 동일한 형태로 user 정보만 받는다.
+ * - 정상: { user } — 회원가입 + 자동 로그인 둘 다 성공
+ * - 부분 실패: { message } — 회원가입은 성공했지만 자동 로그인 실패
  */
 export type SignupResponse = {
-  user: User;
+  user?: User;
+  message?: string;
 };
