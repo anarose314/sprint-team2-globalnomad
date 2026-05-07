@@ -19,7 +19,7 @@ export const useMyActivitiesInfinite = (initialData: MyActivitiesResponse) => {
     queryFn: fetchMyActivities,
     initialPageParam: null,
 
-    getNextPageParam: (lastPage) => lastPage.cursorId || undefined,
+    getNextPageParam: (lastPage) => lastPage.cursorId ?? undefined,
 
     initialData: {
       pages: [initialData],

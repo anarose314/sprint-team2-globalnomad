@@ -14,7 +14,7 @@ export const fetchMyActivities = async ({
 }: FetchMyActivitiesProps) => {
   const params = {
     size: MY_ACTIVITIES_SIZE,
-    ...(pageParam && { cursorId: pageParam }),
+    ...(pageParam !== null && { cursorId: pageParam }),
   };
 
   return await fetchInstanceClient<MyActivitiesResponse>('/api/my-activities', {
