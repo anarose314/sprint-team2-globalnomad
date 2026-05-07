@@ -9,6 +9,7 @@ import {
   signupSchema,
 } from '@/app/(auth)/signup/components/signup-form/signup-form.schema';
 import { useSignupMutation } from '@/app/(auth)/signup/hooks/useSignupMutation';
+import { ApiError } from '@/shared/apis/apiError';
 import type { SignupRequest } from '@/shared/apis/auth/auth.types';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
@@ -32,6 +33,7 @@ export function SignupForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isValid },
   } = useForm<SignupFormValues>({
     mode: 'onTouched',
@@ -46,7 +48,6 @@ export function SignupForm() {
   const { mutate, isPending } = useSignupMutation();
 
   const onSubmit = (data: SignupFormValues) => {
-    // passwordConfirm 은 클라이언트 검증용 — API 에 안 보냄
     const signupData: SignupRequest = {
       email: data.email,
       nickname: data.nickname,
@@ -55,7 +56,14 @@ export function SignupForm() {
 
     mutate(signupData, {
       onError: (error) => {
-        // TODO: 이후 case 별 input 에러로 분기
+        // 409 Conflict — 이메일 중복
+        // (백엔드는 이메일만 unique 제약, 닉네임은 중복 OK)
+        if (error instanceof ApiError && error.status === 409) {
+          setError('email', { message: error.message });
+          return;
+        }
+
+        // 그 외 에러는 alert (fallback)
         console.error('회원가입 실패:', error);
         alert(
           error instanceof Error ? error.message : '회원가입에 실패했습니다.'
