@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ActivitiesList } from '@/app/(main)/my/activities/components/activities-list';
+import { MyActivitiesList } from '@/app/(main)/my/activities/components/my-activities-list';
 import { MyPageHeader } from '@/app/(main)/my/components/my-page-header';
 import { Button } from '@/shared/components/buttons';
 
@@ -16,7 +16,7 @@ export default function MyActivitiesPage() {
       >
         <Button className="w-full">체험 등록하기</Button>
       </MyPageHeader>
-      <ActivitiesList />
+      <MyActivitiesList />
     </>
   );
 }

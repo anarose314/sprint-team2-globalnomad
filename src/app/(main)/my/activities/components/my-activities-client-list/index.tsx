@@ -8,13 +8,13 @@ import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
 import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
 
-export interface ActivitiesClientListProps {
+export interface MyActivitiesClientListProps {
   initialData: MyActivitiesResponse;
 }
 
-export function ActivitiesClientList({
+export function MyActivitiesClientList({
   initialData,
-}: ActivitiesClientListProps) {
+}: MyActivitiesClientListProps) {
   const { data } = useMyActivitiesInfinite(initialData);
   const activitiesList = data.pages.flatMap((page) => page.activities);
 
