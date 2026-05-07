@@ -116,7 +116,7 @@ export default function ActivityDetailPage() {
         {/* ── 하단 본문 ── */}
         <div className="2xl:grid 2xl:grid-cols-5 2xl:gap-6">
           {/* PC에서 이미지 갤러리와 동일한 비율(3/5) */}
-          <div>
+          <div className="2xl:col-span-3">
             <ActivityDetailContent
               description={activity.description}
               address={activity.address}
