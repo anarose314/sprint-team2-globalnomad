@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useMyActivitiesInfinite } from '@/app/(main)/my/activities/apis/myActivities';
 import { MyActivitiesClientListProps } from '@/app/(main)/my/activities/components/my-activities-client-list/myActivitiesClientList.types';
+import { useMyActivitiesInfinite } from '@/app/(main)/my/activities/hooks/useMyActivitiesInfinite';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { IcStar } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
