@@ -84,22 +84,17 @@ export default function ActivityDetailPage() {
   return (
     <div className="py-6 md:py-8 2xl:py-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
-      <div className="mx-auto w-full 2xl:relative">
-        {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
-        {/* 모바일·태블릿: 세로 스택 / 데스크탑(2xl 1536px+): 이미지 좌 · 타이틀+예약카드 우 */}
-        <div className="flex flex-col gap-4 2xl:mb-10 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
-          {/* 이미지 갤러리 (데스크탑: 좌측) */}
+      <div className="mx-auto w-full">
+        <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
           <div className="2xl:col-span-3">
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={activity.subImageUrls}
               title={activity.title}
+              className="2xl:mb-10"
             />
-          </div>
 
-          {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
-          <div className="flex flex-col 2xl:relative 2xl:col-span-2 2xl:items-center">
-            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-[30px] 2xl:w-full 2xl:max-w-[410px] 2xl:border-b-0 2xl:pb-0">
+            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:hidden">
               <ActivityInfoHeader
                 category={activity.category}
                 title={activity.title}
@@ -109,16 +104,7 @@ export default function ActivityDetailPage() {
                 isOwner={activity.isOwner}
               />
             </div>
-            <div className="hidden 2xl:absolute 2xl:top-[calc(100%+30px)] 2xl:left-1/2 2xl:block 2xl:w-full 2xl:-translate-x-1/2">
-              <ActivityReservationCard />
-            </div>
-          </div>
-        </div>
 
-        {/* ── 하단 본문 ── */}
-        <div className="2xl:grid 2xl:grid-cols-5 2xl:gap-10">
-          {/* PC에서 이미지 갤러리와 동일한 비율(3/5) */}
-          <div className="2xl:col-span-3">
             <ActivityDetailContent
               description={activity.description}
               address={activity.address}
@@ -131,8 +117,21 @@ export default function ActivityDetailPage() {
             />
           </div>
 
-          {/* 우측 예약 영역 폭 확보 */}
-          <div className="hidden 2xl:col-span-2 2xl:block" />
+          <div className="hidden 2xl:col-span-2 2xl:block 2xl:self-stretch">
+            <div className="mb-[30px] w-full max-w-[410px]">
+              <ActivityInfoHeader
+                category={activity.category}
+                title={activity.title}
+                rating={activity.rating}
+                reviewCount={activity.reviewCount}
+                address={activity.address}
+                isOwner={activity.isOwner}
+              />
+            </div>
+            <div className="2xl:sticky 2xl:top-24">
+              <ActivityReservationCard />
+            </div>
+          </div>
         </div>
       </div>
     </div>
