@@ -8,12 +8,8 @@ export async function MyActivitiesList() {
   );
 
   return (
-    <>
-      <section className="mt-7.5">
-        <ul className="flex flex-col gap-5 wrap-anywhere">
-          <MyActivitiesClientList initialData={data} />
-        </ul>
-      </section>
-    </>
+    <section className="mt-7.5">
+      <MyActivitiesClientList initialData={data} />
+    </section>
   );
 }
