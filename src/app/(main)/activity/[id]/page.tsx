@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { ActivityDetailContent } from '@/app/(main)/activity/[id]/components/activity-detail-content';
 import { ActivityImageGallery } from '@/app/(main)/activity/[id]/components/activity-image-gallery';
 import { ActivityInfoHeader } from '@/app/(main)/activity/[id]/components/activity-info-header';
+import { ActivityReservationCard } from '@/app/(main)/activity/[id]/components/activity-reservation-card';
 import { ActivityReviewsSection } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviewsSection';
 
 // TODO: 추후 API 연동 후 동적 메타데이터로 변경
@@ -83,10 +84,10 @@ export default function ActivityDetailPage() {
   return (
     <div className="py-6 md:py-8 2xl:py-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
-      <div className="mx-auto w-full">
+      <div className="mx-auto w-full 2xl:relative">
         {/* ── 상단: 이미지 갤러리 + 타이틀 영역 ── */}
         {/* 모바일·태블릿: 세로 스택 / 데스크탑(2xl 1536px+): 이미지 좌 · 타이틀+예약카드 우 */}
-        <div className="flex flex-col gap-4 2xl:mb-10 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-6">
+        <div className="flex flex-col gap-4 2xl:mb-10 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
           {/* 이미지 갤러리 (데스크탑: 좌측) */}
           <div className="2xl:col-span-3">
             <ActivityImageGallery
@@ -97,8 +98,8 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* 타이틀 · 예약 카드 영역 (데스크탑: 우측) */}
-          <div className="flex flex-col 2xl:col-span-2">
-            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-0 2xl:border-b-0 2xl:pb-0">
+          <div className="flex flex-col 2xl:relative 2xl:col-span-2 2xl:items-center">
+            <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-[30px] 2xl:w-full 2xl:max-w-[410px] 2xl:border-b-0 2xl:pb-0">
               <ActivityInfoHeader
                 category={activity.category}
                 title={activity.title}
@@ -108,13 +109,14 @@ export default function ActivityDetailPage() {
                 isOwner={activity.isOwner}
               />
             </div>
-
-            {/* TODO: 예약 카드 (참여 인원, 캘린더, 시간 슬롯, 총합계, 예약하기 버튼) */}
+            <div className="hidden 2xl:absolute 2xl:top-[calc(100%+30px)] 2xl:left-1/2 2xl:block 2xl:w-full 2xl:-translate-x-1/2">
+              <ActivityReservationCard />
+            </div>
           </div>
         </div>
 
         {/* ── 하단 본문 ── */}
-        <div className="2xl:grid 2xl:grid-cols-5 2xl:gap-6">
+        <div className="2xl:grid 2xl:grid-cols-5 2xl:gap-10">
           {/* PC에서 이미지 갤러리와 동일한 비율(3/5) */}
           <div className="2xl:col-span-3">
             <ActivityDetailContent
