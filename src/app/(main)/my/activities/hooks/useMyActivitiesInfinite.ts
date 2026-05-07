@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchMyActivities } from '@/app/(main)/my/activities/apis/myActivities';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
 
 /**
@@ -14,7 +15,7 @@ import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
  */
 export const useMyActivitiesInfinite = (initialData: MyActivitiesResponse) => {
   return useInfiniteQuery({
-    queryKey: ['myActivities'],
+    queryKey: QUERY_KEYS.MY_ACTIVITIES,
     queryFn: fetchMyActivities,
     initialPageParam: null,
 
