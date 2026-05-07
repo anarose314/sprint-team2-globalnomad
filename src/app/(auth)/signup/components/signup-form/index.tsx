@@ -8,6 +8,8 @@ import {
   SignupFormValues,
   signupSchema,
 } from '@/app/(auth)/signup/components/signup-form/signup-form.schema';
+import { useSignupMutation } from '@/app/(auth)/signup/hooks/useSignupMutation';
+import type { SignupRequest } from '@/shared/apis/auth/auth.types';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
@@ -41,10 +43,25 @@ export function SignupForm() {
       passwordConfirm: '',
     },
   });
+  const { mutate, isPending } = useSignupMutation();
 
   const onSubmit = (data: SignupFormValues) => {
-    // TODO: 회원가입 API 연동 (이번 PR 다음 단계)
-    console.log(data);
+    // passwordConfirm 은 클라이언트 검증용 — API 에 안 보냄
+    const signupData: SignupRequest = {
+      email: data.email,
+      nickname: data.nickname,
+      password: data.password,
+    };
+
+    mutate(signupData, {
+      onError: (error) => {
+        // TODO: 이후 case 별 input 에러로 분기
+        console.error('회원가입 실패:', error);
+        alert(
+          error instanceof Error ? error.message : '회원가입에 실패했습니다.'
+        );
+      },
+    });
   };
 
   return (
@@ -133,8 +150,8 @@ export function SignupForm() {
           }
         />
 
-        <Button type="submit" size="lg" disabled={!isValid}>
-          회원가입하기
+        <Button type="submit" size="lg" disabled={!isValid || isPending}>
+          {isPending ? '회원가입 중...' : '회원가입하기'}
         </Button>
       </form>
 
