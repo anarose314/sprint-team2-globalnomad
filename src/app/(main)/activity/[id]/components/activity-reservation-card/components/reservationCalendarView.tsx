@@ -1,5 +1,5 @@
 import Calendar from 'react-calendar';
-import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
+import { WEEKDAY } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 
 interface ReservationCalendarViewProps {

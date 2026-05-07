@@ -13,3 +13,8 @@ export const MOCK_TIME_SLOTS = [
   '15:00-16:00',
   '16:00-17:00',
 ] as const satisfies readonly TimeSlot[];
+
+/**
+ * @description 예약 카드/바텀시트 캘린더 요일 헤더 약어
+ */
+export const WEEKDAY = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as const;
