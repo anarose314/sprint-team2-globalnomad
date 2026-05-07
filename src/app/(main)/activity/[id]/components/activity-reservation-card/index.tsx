@@ -28,7 +28,7 @@ import '@/app/(main)/activity/[id]/components/activity-reservation-card/reservat
 export function ActivityReservationCard() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(() => new Date());
-  const [headCount, setHeadCount] = useState(10);
+  const [headCount, setHeadCount] = useState(1);
   const [selectedTimeSlot, setSelectedTimeSlot] =
     useState<TimeSlot>('15:00-16:00');
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
@@ -36,7 +36,7 @@ export function ActivityReservationCard() {
     useState<MobileSheetStep>('dateTime');
   const [sheetCurrentDate, setSheetCurrentDate] = useState(() => new Date());
   const [sheetSelectedDate, setSheetSelectedDate] = useState<Date | null>(null);
-  const [sheetHeadCount, setSheetHeadCount] = useState(10);
+  const [sheetHeadCount, setSheetHeadCount] = useState(1);
   const [sheetSelectedTimeSlot, setSheetSelectedTimeSlot] =
     useState<TimeSlot | null>(null);
 
