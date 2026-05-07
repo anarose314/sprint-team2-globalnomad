@@ -27,9 +27,6 @@ function ImageSlot({
 /**
  * 체험 상세 페이지 이미지 갤러리
  *
- * - 배너 이미지(좌, 2/3 폭) + 서브 이미지 2장(우, 1/3 폭 각 1/2 높이)
- * - 이미지 URL이 없으면 회색 플레이스홀더로 대체 (API 연동 전)
- *
  * @example
  * <ActivityImageGallery
  *   bannerImageUrl={activity.bannerImageUrl}
