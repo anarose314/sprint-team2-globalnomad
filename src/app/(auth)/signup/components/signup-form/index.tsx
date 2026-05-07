@@ -47,7 +47,7 @@ export function SignupForm() {
   });
   const { mutate, isPending } = useSignupMutation();
 
-  const onSubmit = (data: SignupFormValues) => {
+  const handleSignupSubmit = (data: SignupFormValues) => {
     const signupData: SignupRequest = {
       email: data.email,
       nickname: data.nickname,
@@ -83,7 +83,7 @@ export function SignupForm() {
 
       {/* 회원가입 폼 */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleSignupSubmit)}
         className="flex w-full flex-col gap-6"
         noValidate
       >
@@ -122,7 +122,7 @@ export function SignupForm() {
               aria-label={
                 isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
               }
-              className="text-gray-400 transition-colors hover:text-gray-600"
+              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
             >
               {isPasswordVisible ? (
                 <IcEyeOn className="h-5 w-5" />
@@ -147,7 +147,7 @@ export function SignupForm() {
               aria-label={
                 isPasswordConfirmVisible ? '비밀번호 숨기기' : '비밀번호 보기'
               }
-              className="text-gray-400 transition-colors hover:text-gray-600"
+              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
             >
               {isPasswordConfirmVisible ? (
                 <IcEyeOn className="h-5 w-5" />
