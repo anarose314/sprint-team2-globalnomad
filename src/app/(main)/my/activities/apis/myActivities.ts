@@ -1,3 +1,4 @@
+import { MY_ACTIVITIES_SIZE } from '@/app/(main)/my/activities/activities.constants';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
 
@@ -12,7 +13,7 @@ export const fetchMyActivities = async ({
   pageParam = null,
 }: FetchMyActivitiesProps) => {
   const params = {
-    size: 5,
+    size: MY_ACTIVITIES_SIZE,
     ...(pageParam && { cursorId: pageParam }),
   };
 
