@@ -82,7 +82,7 @@ export default function ActivityDetailPage() {
   const activity = MOCK_ACTIVITY;
 
   return (
-    <div className="py-6 md:py-8 2xl:py-10">
+    <div className="py-6 pb-[154px] md:py-8 md:pb-[156px] 2xl:py-10 2xl:pb-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
       <div className="mx-auto w-full">
         <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
@@ -91,7 +91,7 @@ export default function ActivityDetailPage() {
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={activity.subImageUrls}
               title={activity.title}
-              className="2xl:mb-10"
+              className="mb-5 md:mb-6 2xl:mb-10"
             />
 
             <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:hidden">
@@ -117,8 +117,8 @@ export default function ActivityDetailPage() {
             />
           </div>
 
-          <div className="hidden 2xl:col-span-2 2xl:block 2xl:self-stretch">
-            <div className="mb-[30px] w-full max-w-[410px]">
+          <div className="2xl:col-span-2 2xl:self-stretch">
+            <div className="mb-[30px] hidden w-full max-w-[410px] 2xl:block">
               <ActivityInfoHeader
                 category={activity.category}
                 title={activity.title}

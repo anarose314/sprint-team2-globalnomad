@@ -91,3 +91,43 @@
 .activity-booking-calendar .react-calendar__tile--active:enabled:focus > abbr {
   @apply bg-primary-500 text-white;
 }
+
+.activity-booking-sheet-calendar {
+  @apply w-full md:w-[359px];
+}
+
+.activity-booking-sheet-calendar .react-calendar__navigation {
+  @apply h-12;
+}
+
+.activity-booking-sheet-calendar .react-calendar__month-view {
+  @apply mt-4;
+}
+
+@keyframes reservation-sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reservation-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-reservation-sheet-backdrop-in {
+  animation: reservation-sheet-backdrop-in 180ms ease-out;
+}
+
+.animate-reservation-sheet-in {
+  animation: reservation-sheet-in 220ms ease-out;
+}

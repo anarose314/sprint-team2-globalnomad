@@ -28,8 +28,8 @@ type RootLayoutProps = Readonly<{
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="ko" className={'antialiased'}>
-      <body className="flex min-h-screen flex-col font-sans">
+    <html lang="ko" className={'h-full antialiased'}>
+      <body className="flex min-h-full flex-col font-sans">
         <ToastContainer />
         <QueryProvider>{children}</QueryProvider>
         <div id="modal-root" />

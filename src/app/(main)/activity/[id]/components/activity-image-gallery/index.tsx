@@ -48,12 +48,16 @@ export function ActivityImageGallery({
   return (
     <div
       className={cn(
-        'flex h-56 gap-2 overflow-hidden rounded-3xl md:h-80 2xl:h-128',
+        'grid aspect-327/188 grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128',
         className
       )}
     >
-      <ImageSlot src={bannerImageUrl} alt={title} className="flex-2" />
-      <div className="flex flex-1 flex-col gap-2">
+      <ImageSlot
+        src={bannerImageUrl}
+        alt={title}
+        className="row-span-2 h-full"
+      />
+      <div className="row-span-2 flex h-full flex-col gap-2">
         <ImageSlot
           src={subImage1}
           alt={`${title} 추가 이미지 1`}
