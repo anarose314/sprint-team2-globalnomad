@@ -13,11 +13,11 @@ import { Spinner } from '@/shared/components/spinner';
 export function MyActivitiesClientList({
   initialData,
 }: MyActivitiesClientListProps) {
-  const { data, fetchNextPage, hasNextPage, isFetching } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useMyActivitiesInfinite(initialData);
   const { ref } = useInView({
     onChange: (inView) => {
-      if (inView && hasNextPage && !isFetching) {
+      if (inView && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     },
@@ -27,10 +27,13 @@ export function MyActivitiesClientList({
 
   return (
     <>
-      <ul className="flex flex-col gap-5 wrap-anywhere">
+      <ul className="flex flex-col gap-7.5 wrap-anywhere">
         {activitiesList.map((activity, index) => (
-          <li key={activity.id}>
-            <article className="flex flex-col gap-3 border-b border-b-gray-50 pb-7.5 last:border-b-0 last:pb-0">
+          <li
+            key={activity.id}
+            className="border-b border-b-gray-50 pb-7.5 last:border-b-0 last:pb-0"
+          >
+            <article className="flex flex-col gap-3">
               {/* 카드 */}
               <ActivityCard href={`/activity/${activity.id}`}>
                 <div className="flex flex-1 flex-col justify-center gap-1 px-4 py-4">
@@ -83,7 +86,7 @@ export function MyActivitiesClientList({
         ))}
       </ul>
       <div ref={ref} className="flex h-20 items-center justify-center">
-        {isFetching && <Spinner />}
+        {isFetchingNextPage && <Spinner />}
       </div>
     </>
   );

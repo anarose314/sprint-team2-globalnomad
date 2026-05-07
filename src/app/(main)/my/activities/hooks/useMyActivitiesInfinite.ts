@@ -9,7 +9,7 @@ import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
  * @example
  * ```ts
  * // 컴포넌트 내부에서 사용 시
- * const { data, fetchNextPage, hasNextPage, isFetching } = useMyActivitiesInfinite(initialData);
+ * const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyActivitiesInfinite(initialData);
  * ```
  */
 export const useMyActivitiesInfinite = (initialData: MyActivitiesResponse) => {
