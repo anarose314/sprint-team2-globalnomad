@@ -1,37 +1,43 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Calendar from 'react-calendar';
-import { TimeSlotButton } from '@/app/(main)/activity/[id]/components/time-slot-button';
-import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import {
-  IcArrowLeft,
-  IcArrowRight,
-  IcMinus,
-  IcPlus,
-} from '@/shared/assets/icons';
+  MOCK_PRICE_PER_PERSON,
+  MOCK_TIME_SLOTS,
+} from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
+import type {
+  MobileSheetStep,
+  TimeSlot,
+} from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
+import { DesktopReservationCard } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/desktopReservationCard';
+import { MobileReservationBottomBar } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/mobileReservationBottomBar';
+import { ReservationCalendarView } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/reservationCalendarView';
+import { TimeSlotButton } from '@/app/(main)/activity/[id]/components/time-slot-button';
+import { IcArrowLeft, IcMinus, IcPlus } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
+import { Heading } from '@/shared/components/heading';
 import '@/app/(main)/activity/[id]/components/activity-reservation-card/reservation-calendar.css';
 
-const MOCK_PRICE_PER_PERSON = 1000;
-const MOCK_TIME_SLOTS = ['14:00-15:00', '15:00-16:00', '16:00-17:00'] as const;
-
+/**
+ * @description
+ * 체험 상세 예약 카드/바텀시트 컴포넌트
+ * - PC: 우측 고정 예약 카드 렌더링
+ * - 모바일/태블릿: 하단 고정 바 + 날짜 선택 바텀시트 렌더링
+ */
 export function ActivityReservationCard() {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [headCount, setHeadCount] = useState(10);
   const [selectedTimeSlot, setSelectedTimeSlot] =
-    useState<(typeof MOCK_TIME_SLOTS)[number]>('15:00-16:00');
+    useState<TimeSlot>('15:00-16:00');
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
-  const [mobileSheetStep, setMobileSheetStep] = useState<
-    'dateTime' | 'headCount'
-  >('dateTime');
+  const [mobileSheetStep, setMobileSheetStep] =
+    useState<MobileSheetStep>('dateTime');
   const [sheetCurrentDate, setSheetCurrentDate] = useState(() => new Date());
   const [sheetSelectedDate, setSheetSelectedDate] = useState<Date | null>(null);
   const [sheetHeadCount, setSheetHeadCount] = useState(10);
-  const [sheetSelectedTimeSlot, setSheetSelectedTimeSlot] = useState<
-    (typeof MOCK_TIME_SLOTS)[number] | null
-  >(null);
+  const [sheetSelectedTimeSlot, setSheetSelectedTimeSlot] =
+    useState<TimeSlot | null>(null);
 
   const monthTitle = useMemo(
     () => `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`,
@@ -51,6 +57,10 @@ export function ActivityReservationCard() {
     () => MOCK_PRICE_PER_PERSON * sheetHeadCount,
     [sheetHeadCount]
   );
+
+  /**
+   * @description 바텀시트에서 선택한 날짜를 `yyyy.mm.dd` 형식으로 변환
+   */
   const selectedSheetDateText = useMemo(() => {
     if (!sheetSelectedDate) return '';
     const year = sheetSelectedDate.getFullYear();
@@ -59,71 +69,140 @@ export function ActivityReservationCard() {
     return `${year}.${month}.${day}`;
   }, [sheetSelectedDate]);
 
+  const handleOpenDateSheet = () => {
+    setMobileSheetStep('dateTime');
+    setIsDateSheetOpen(true);
+  };
+
+  /**
+   * @description 날짜 선택 바텀시트 close
+   */
+  const handleCloseDateSheet = () => {
+    setIsDateSheetOpen(false);
+  };
+
+  /**
+   * @description 바텀시트 내부 클릭 시 오버레이 클릭 이벤트 전파를 막음
+   */
+  const handleStopPropagation = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+  };
+
+  /**
+   * @description 모바일 바텀시트 단계를 인원 선택으로 이동
+   */
+  const handleMoveToHeadCountStep = () => {
+    setMobileSheetStep('headCount');
+  };
+
+  /**
+   * @description 모바일 바텀시트 단계를 날짜/시간 선택으로 되돌림
+   */
+  const handleMoveToDateTimeStep = () => {
+    setMobileSheetStep('dateTime');
+  };
+
+  /**
+   * @description 바텀시트 참여 인원을 1명 이상으로 감소
+   */
+  const handleDecreaseSheetHeadCount = () => {
+    setSheetHeadCount((prev) => Math.max(1, prev - 1));
+  };
+
+  /**
+   * @description 바텀시트 참여 인원을 증가
+   */
+  const handleIncreaseSheetHeadCount = () => {
+    setSheetHeadCount((prev) => prev + 1);
+  };
+
+  /**
+   * @description PC 카드 참여 인원을 1명 이상으로 감소
+   */
+  const handleDecreaseHeadCount = () => {
+    setHeadCount((prev) => Math.max(1, prev - 1));
+  };
+
+  /**
+   * @description PC 카드 참여 인원 증가
+   */
+  const handleIncreaseHeadCount = () => {
+    setHeadCount((prev) => prev + 1);
+  };
+
+  /**
+   * @description 바텀시트 시간 슬롯 선택 핸들러를 반환
+   */
+  const handleSelectSheetTimeSlot = (slot: TimeSlot) => () => {
+    setSheetSelectedTimeSlot(slot);
+  };
+
+  /**
+   * @description PC 카드 시간 슬롯 선택 핸들러를 반환
+   */
+  const handleSelectTimeSlot = (slot: TimeSlot) => () => {
+    setSelectedTimeSlot(slot);
+  };
+
+  /**
+   * @description 캘린더 값이 `Date`인 경우에만 바텀시트 선택 날짜 반영
+   */
+  const handleSheetDateChange = (value: unknown) => {
+    if (value instanceof Date) {
+      setSheetSelectedDate(value);
+    }
+  };
+
+  /**
+   * @description 바텀시트 캘린더의 현재 월 갱신
+   */
+  const handleSheetMonthChange = (activeStartDate?: Date | null) => {
+    if (activeStartDate) {
+      setSheetCurrentDate(activeStartDate);
+    }
+  };
+
+  /**
+   * @description 캘린더 값이 `Date`인 경우에만 PC 카드 선택 날짜 반영
+   */
+  const handleDateChange = (value: unknown) => {
+    if (value instanceof Date) {
+      setSelectedDate(value);
+    }
+  };
+
+  /**
+   * @description PC 카드 캘린더의 현재 월 갱신
+   */
+  const handleMonthChange = (activeStartDate?: Date | null) => {
+    if (activeStartDate) {
+      setCurrentDate(activeStartDate);
+    }
+  };
+
   return (
     <>
-      <aside className="z-header fixed inset-x-0 bottom-0 h-[138px] border-t border-gray-100 bg-white md:h-[132px] 2xl:hidden">
-        <div className="mx-auto flex h-full w-full items-end justify-center px-4 pb-5 md:px-6 md:pb-4">
-          <div className="flex w-full flex-col items-center gap-4 md:gap-3">
-            <div className="flex items-end">
-              <span className="typo-2lg-bold text-gray-950">₩1,000</span>
-              <span className="typo-lg-medium ml-1 text-gray-600">/ 인</span>
-            </div>
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                setMobileSheetStep('dateTime');
-                setIsDateSheetOpen(true);
-              }}
-            >
-              날짜 선택하기
-            </Button>
-          </div>
-        </div>
-      </aside>
+      <MobileReservationBottomBar onOpenDateSheet={handleOpenDateSheet} />
 
       {isDateSheetOpen ? (
         <div
           className="z-modal-backdrop animate-reservation-sheet-backdrop-in fixed inset-0 bg-black/60 2xl:hidden"
-          onClick={() => setIsDateSheetOpen(false)}
+          onClick={handleCloseDateSheet}
         >
           <section
-            className="animate-reservation-sheet-in absolute right-0 bottom-0 left-0 w-full rounded-t-2xl bg-white px-5 pt-14 pb-5 shadow-[0px_4px_24px_0px_#9CB4CA33] md:pt-7 md:pb-5"
-            onClick={(event) => event.stopPropagation()}
+            className="animate-reservation-sheet-in shadow-review-card absolute right-0 bottom-0 left-0 w-full rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5"
+            onClick={handleStopPropagation}
           >
-            <div className="mx-auto w-full max-w-[744px]">
+            <div className="mx-auto w-full max-w-186">
               <div className="md:hidden">
                 {mobileSheetStep === 'dateTime' ? (
                   <>
-                    <Calendar
+                    <ReservationCalendarView
                       value={sheetSelectedDate ?? new Date()}
-                      onChange={(value) => setSheetSelectedDate(value as Date)}
-                      onClickDay={(value) =>
-                        setSheetSelectedDate(value as Date)
-                      }
                       activeStartDate={sheetCurrentDate}
-                      onActiveStartDateChange={({ activeStartDate }) => {
-                        if (activeStartDate)
-                          setSheetCurrentDate(activeStartDate);
-                      }}
-                      showNeighboringMonth
-                      locale="ko-KR"
-                      calendarType="gregory"
-                      prevLabel={
-                        <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                          <IcArrowLeft className="h-5 w-5" />
-                        </span>
-                      }
-                      nextLabel={
-                        <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                          <IcArrowRight className="h-5 w-5" />
-                        </span>
-                      }
-                      prev2Label={null}
-                      next2Label={null}
-                      formatMonthYear={() => sheetMonthTitle}
-                      formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
-                      formatDay={(_, date) => String(date.getDate())}
+                      monthTitle={sheetMonthTitle}
+                      onDateChange={handleSheetDateChange}
+                      onMonthChange={handleSheetMonthChange}
                       className="activity-booking-calendar activity-booking-sheet-calendar"
                     />
 
@@ -138,7 +217,7 @@ export function ActivityReservationCard() {
                               key={slot}
                               size="tb"
                               isActive={sheetSelectedTimeSlot === slot}
-                              onClick={() => setSheetSelectedTimeSlot(slot)}
+                              onClick={handleSelectSheetTimeSlot(slot)}
                               className="w-full"
                             >
                               {slot}
@@ -152,7 +231,7 @@ export function ActivityReservationCard() {
                       size="lg"
                       className="mt-6 w-full"
                       disabled={!sheetSelectedDate || !sheetSelectedTimeSlot}
-                      onClick={() => setMobileSheetStep('headCount')}
+                      onClick={handleMoveToHeadCountStep}
                     >
                       확인
                     </Button>
@@ -163,19 +242,21 @@ export function ActivityReservationCard() {
                       <button
                         type="button"
                         aria-label="날짜 및 시간 선택 단계로 돌아가기"
-                        onClick={() => setMobileSheetStep('dateTime')}
+                        onClick={handleMoveToDateTimeStep}
                         className="inline-flex h-8 w-8 cursor-pointer items-center justify-center text-gray-950"
                       >
                         <IcArrowLeft className="h-5 w-5" />
                       </button>
-                      <h3 className="typo-2lg-bold text-gray-950">인원</h3>
+                      <Heading as="h3" textStyle="typo-2lg-bold">
+                        인원
+                      </Heading>
                     </div>
 
-                    <p className="typo-lg-medium mb-[14px] text-gray-800">
+                    <p className="typo-lg-medium mb-3.5 text-gray-800">
                       예약할 인원을 선택해주세요.
                     </p>
 
-                    <div className="bg-primary-50 mb-5 flex items-center justify-between rounded-[11px] px-6 py-4">
+                    <div className="bg-primary-50 mb-5 flex items-center justify-between rounded-xl px-6 py-4">
                       <span className="typo-md-bold text-gray-950">
                         {selectedSheetDateText}
                       </span>
@@ -184,15 +265,13 @@ export function ActivityReservationCard() {
                       </span>
                     </div>
 
-                    <div className="mb-[30px] flex items-center justify-between">
+                    <div className="mb-8 flex items-center justify-between">
                       <p className="typo-lg-bold text-gray-950">참여 인원 수</p>
                       <div className="flex h-12 w-36 items-center justify-between rounded-2xl border border-gray-100 px-4">
                         <button
                           type="button"
                           aria-label="인원 감소"
-                          onClick={() =>
-                            setSheetHeadCount((prev) => Math.max(1, prev - 1))
-                          }
+                          onClick={handleDecreaseSheetHeadCount}
                           className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                         >
                           <IcMinus className="h-4 w-4" />
@@ -203,7 +282,7 @@ export function ActivityReservationCard() {
                         <button
                           type="button"
                           aria-label="인원 증가"
-                          onClick={() => setSheetHeadCount((prev) => prev + 1)}
+                          onClick={handleIncreaseSheetHeadCount}
                           className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                         >
                           <IcPlus className="h-4 w-4" />
@@ -220,42 +299,19 @@ export function ActivityReservationCard() {
               </div>
 
               <div className="hidden md:block">
-                <div className="grid grid-cols-[359px_301px] items-start justify-center gap-6">
-                  <div className="w-[359px]">
-                    <Calendar
+                <div className="flex items-start justify-center gap-6">
+                  <div className="w-90">
+                    <ReservationCalendarView
                       value={sheetSelectedDate ?? new Date()}
-                      onChange={(value) => setSheetSelectedDate(value as Date)}
-                      onClickDay={(value) =>
-                        setSheetSelectedDate(value as Date)
-                      }
                       activeStartDate={sheetCurrentDate}
-                      onActiveStartDateChange={({ activeStartDate }) => {
-                        if (activeStartDate)
-                          setSheetCurrentDate(activeStartDate);
-                      }}
-                      showNeighboringMonth
-                      locale="ko-KR"
-                      calendarType="gregory"
-                      prevLabel={
-                        <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                          <IcArrowLeft className="h-5 w-5" />
-                        </span>
-                      }
-                      nextLabel={
-                        <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                          <IcArrowRight className="h-5 w-5" />
-                        </span>
-                      }
-                      prev2Label={null}
-                      next2Label={null}
-                      formatMonthYear={() => sheetMonthTitle}
-                      formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
-                      formatDay={(_, date) => String(date.getDate())}
+                      monthTitle={sheetMonthTitle}
+                      onDateChange={handleSheetDateChange}
+                      onMonthChange={handleSheetMonthChange}
                       className="activity-booking-calendar activity-booking-sheet-calendar"
                     />
                   </div>
 
-                  <div className="h-[408px] w-[301px] overflow-y-auto overscroll-contain rounded-3xl bg-white p-5 shadow-[0px_4px_24px_0px_#9CB4CA33]">
+                  <div className="shadow-review-card h-102 w-75 overflow-y-auto overscroll-contain rounded-3xl bg-white p-5">
                     <p className="typo-lg-bold text-gray-950">
                       예약 가능한 시간
                     </p>
@@ -267,7 +323,7 @@ export function ActivityReservationCard() {
                               key={slot}
                               size="tb"
                               isActive={sheetSelectedTimeSlot === slot}
-                              onClick={() => setSheetSelectedTimeSlot(slot)}
+                              onClick={handleSelectSheetTimeSlot(slot)}
                               className="w-full"
                             >
                               {slot}
@@ -282,11 +338,7 @@ export function ActivityReservationCard() {
                             <button
                               type="button"
                               aria-label="인원 감소"
-                              onClick={() =>
-                                setSheetHeadCount((prev) =>
-                                  Math.max(1, prev - 1)
-                                )
-                              }
+                              onClick={handleDecreaseSheetHeadCount}
                               className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                             >
                               <IcMinus className="h-4 w-4" />
@@ -297,9 +349,7 @@ export function ActivityReservationCard() {
                             <button
                               type="button"
                               aria-label="인원 증가"
-                              onClick={() =>
-                                setSheetHeadCount((prev) => prev + 1)
-                              }
+                              onClick={handleIncreaseSheetHeadCount}
                               className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                             >
                               <IcPlus className="h-4 w-4" />
@@ -325,103 +375,19 @@ export function ActivityReservationCard() {
         </div>
       ) : null}
 
-      <aside className="hidden w-full 2xl:block">
-        <div className="mx-auto w-full max-w-[410px] overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0px_4px_24px_0px_#9CB4CA33]">
-          <div className="max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain p-[30px]">
-            <div className="mx-auto w-[350px]">
-              <div className="flex items-end">
-                <span className="typo-2xl-bold text-gray-950">₩1,000</span>
-                <span className="typo-xl-medium ml-1 text-gray-600">/ 인</span>
-              </div>
-
-              <div className="mt-6">
-                <Calendar
-                  value={selectedDate}
-                  onChange={(value) => setSelectedDate(value as Date)}
-                  activeStartDate={currentDate}
-                  onActiveStartDateChange={({ activeStartDate }) => {
-                    if (activeStartDate) setCurrentDate(activeStartDate);
-                  }}
-                  showNeighboringMonth
-                  locale="ko-KR"
-                  calendarType="gregory"
-                  prevLabel={
-                    <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                      <IcArrowLeft className="h-5 w-5" />
-                    </span>
-                  }
-                  nextLabel={
-                    <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
-                      <IcArrowRight className="h-5 w-5" />
-                    </span>
-                  }
-                  prev2Label={null}
-                  next2Label={null}
-                  formatMonthYear={() => monthTitle}
-                  formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
-                  formatDay={(_, date) => String(date.getDate())}
-                  className="activity-booking-calendar"
-                />
-              </div>
-
-              <div className="mt-6 flex h-10 items-center justify-between">
-                <span className="typo-lg-bold text-gray-950">참여 인원 수</span>
-                <div className="flex h-10 w-[140px] items-center justify-between rounded-3xl border border-gray-200 px-[9px]">
-                  <button
-                    type="button"
-                    aria-label="인원 감소"
-                    onClick={() =>
-                      setHeadCount((prev) => Math.max(1, prev - 1))
-                    }
-                    className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
-                  >
-                    <IcMinus className="h-4 w-4" />
-                  </button>
-                  <span className="typo-lg-bold text-gray-800">
-                    {headCount}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="인원 증가"
-                    onClick={() => setHeadCount((prev) => prev + 1)}
-                    className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
-                  >
-                    <IcPlus className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
-                <div className="mt-[14px] mb-6 flex flex-col gap-3">
-                  {MOCK_TIME_SLOTS.map((slot) => (
-                    <TimeSlotButton
-                      key={slot}
-                      size="pc"
-                      isActive={selectedTimeSlot === slot}
-                      onClick={() => setSelectedTimeSlot(slot)}
-                    >
-                      {slot}
-                    </TimeSlotButton>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex h-[78px] items-center justify-between border-t border-gray-100">
-                <div className="flex items-end gap-1">
-                  <span className="typo-xl-medium text-gray-600">총 합계</span>
-                  <span className="typo-xl-bold text-gray-950">
-                    {new Intl.NumberFormat('ko-KR').format(totalPrice)}원
-                  </span>
-                </div>
-                <Button size="sm" className="w-[120px]">
-                  예약하기
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <DesktopReservationCard
+        selectedDate={selectedDate}
+        currentDate={currentDate}
+        monthTitle={monthTitle}
+        headCount={headCount}
+        totalPrice={totalPrice}
+        selectedTimeSlot={selectedTimeSlot}
+        onDateChange={handleDateChange}
+        onMonthChange={handleMonthChange}
+        onDecreaseHeadCount={handleDecreaseHeadCount}
+        onIncreaseHeadCount={handleIncreaseHeadCount}
+        onSelectTimeSlot={handleSelectTimeSlot}
+      />
     </>
   );
 }

@@ -82,7 +82,7 @@ export default function ActivityDetailPage() {
   const activity = MOCK_ACTIVITY;
 
   return (
-    <div className="py-6 pb-[154px] md:py-8 md:pb-[156px] 2xl:py-10 2xl:pb-10">
+    <div className="py-6 pb-40 md:py-8 md:pb-40 2xl:py-10 2xl:pb-10">
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
       <div className="mx-auto w-full">
         <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
@@ -118,7 +118,7 @@ export default function ActivityDetailPage() {
           </div>
 
           <div className="2xl:col-span-2 2xl:self-stretch">
-            <div className="mb-[30px] hidden w-full max-w-[410px] 2xl:block">
+            <div className="mb-8 hidden w-full max-w-103 2xl:block">
               <ActivityInfoHeader
                 category={activity.category}
                 title={activity.title}
