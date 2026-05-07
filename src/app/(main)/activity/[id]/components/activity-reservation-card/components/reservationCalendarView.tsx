@@ -1,5 +1,6 @@
 import Calendar from 'react-calendar';
 import { WEEKDAY } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
+import type { CalendarValue } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 
 interface ReservationCalendarViewProps {
@@ -7,7 +8,7 @@ interface ReservationCalendarViewProps {
   activeStartDate: Date;
   monthTitle: string;
   className: string;
-  onDateChange: (value: unknown) => void;
+  onDateChange: (value: CalendarValue) => void;
   onMonthChange: (activeStartDate?: Date | null) => void;
 }
 

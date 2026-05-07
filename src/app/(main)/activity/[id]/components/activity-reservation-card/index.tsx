@@ -6,6 +6,7 @@ import {
   MOCK_TIME_SLOTS,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
 import type {
+  CalendarValue,
   MobileSheetStep,
   TimeSlot,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
@@ -147,7 +148,7 @@ export function ActivityReservationCard() {
   /**
    * @description 캘린더 값이 `Date`인 경우에만 바텀시트 선택 날짜 반영
    */
-  const handleSheetDateChange = (value: unknown) => {
+  const handleSheetDateChange = (value: CalendarValue) => {
     if (value instanceof Date) {
       setSheetSelectedDate(value);
     }
@@ -165,7 +166,7 @@ export function ActivityReservationCard() {
   /**
    * @description 캘린더 값이 `Date`인 경우에만 PC 카드 선택 날짜 반영
    */
-  const handleDateChange = (value: unknown) => {
+  const handleDateChange = (value: CalendarValue) => {
     if (value instanceof Date) {
       setSelectedDate(value);
     }

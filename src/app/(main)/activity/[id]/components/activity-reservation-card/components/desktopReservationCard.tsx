@@ -1,5 +1,8 @@
 import { MOCK_TIME_SLOTS } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
-import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
+import type {
+  CalendarValue,
+  TimeSlot,
+} from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { ReservationCalendarView } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/reservationCalendarView';
 import { TimeSlotButton } from '@/app/(main)/activity/[id]/components/time-slot-button';
 import { IcMinus, IcPlus } from '@/shared/assets/icons';
@@ -12,7 +15,7 @@ interface DesktopReservationCardProps {
   headCount: number;
   totalPrice: number;
   selectedTimeSlot: TimeSlot;
-  onDateChange: (value: unknown) => void;
+  onDateChange: (value: CalendarValue) => void;
   onMonthChange: (activeStartDate?: Date | null) => void;
   onDecreaseHeadCount: () => void;
   onIncreaseHeadCount: () => void;
