@@ -2,15 +2,11 @@
 
 import Image from 'next/image';
 import { useMyActivitiesInfinite } from '@/app/(main)/my/activities/apis/myActivities';
+import { MyActivitiesClientListProps } from '@/app/(main)/my/activities/components/my-activities-client-list/myActivitiesClientList.types';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { IcStar } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
-import { MyActivitiesResponse } from '@/shared/types/myActivities.types';
-
-export interface MyActivitiesClientListProps {
-  initialData: MyActivitiesResponse;
-}
 
 export function MyActivitiesClientList({
   initialData,
