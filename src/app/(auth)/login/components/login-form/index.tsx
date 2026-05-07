@@ -8,7 +8,7 @@ import {
   type LoginFormValues,
   loginSchema,
 } from '@/app/(auth)/login/components/login-form/login-form.schema';
-import { useLoginMutation } from '@/shared/apis/auth/useLoginMutation';
+import { useLoginMutation } from '@/app/(auth)/login/hooks/useLoginMutation';
 import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
@@ -43,7 +43,7 @@ export function LoginForm() {
   const onSubmit = (data: LoginFormValues) => {
     mutate(data, {
       onError: (error) => {
-        // 임시 — 다음 PR 에서 토스트로 교체
+        // TODO: 임시 — 다음 PR 에서 토스트로 교체
         console.error('로그인 실패:', error);
         alert(
           error instanceof Error ? error.message : '로그인에 실패했습니다.'
