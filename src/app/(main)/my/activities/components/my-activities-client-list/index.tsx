@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 import { MyActivitiesClientListProps } from '@/app/(main)/my/activities/components/my-activities-client-list/myActivitiesClientList.types';
@@ -14,17 +13,17 @@ import { Spinner } from '@/shared/components/spinner';
 export function MyActivitiesClientList({
   initialData,
 }: MyActivitiesClientListProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetching } =
     useMyActivitiesInfinite(initialData);
-  const { ref, inView } = useInView();
+  const { ref } = useInView({
+    onChange: (inView) => {
+      if (inView && hasNextPage && !isFetching) {
+        fetchNextPage();
+      }
+    },
+  });
 
   const activitiesList = data.pages.flatMap((page) => page.activities);
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
 
   return (
     <>
@@ -83,12 +82,8 @@ export function MyActivitiesClientList({
           </li>
         ))}
       </ul>
-      <div ref={ref}>
-        {isFetchingNextPage && (
-          <div className="flex justify-center py-5">
-            <Spinner className="" />
-          </div>
-        )}
+      <div ref={ref} className="flex h-20 items-center justify-center">
+        {isFetching && <Spinner />}
       </div>
     </>
   );
