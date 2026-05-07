@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MyActivitiesPage() {
   return (
-    <>
+    <section className="pb-16 2xl:pb-40">
       <MyPageHeader
         title="내 체험 관리"
         description="체험을 등록하거나 수정 및 삭제가 가능합니다."
@@ -17,6 +17,6 @@ export default function MyActivitiesPage() {
         <Button className="w-full">체험 등록하기</Button>
       </MyPageHeader>
       <MyActivitiesList />
-    </>
+    </section>
   );
 }
