@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { Value } from 'react-calendar/dist/shared/types.js';
 import { FormCalendarProps } from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
-import { IcCalendar } from '@/shared/assets/icons';
+import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
+import { IcArrowLeft, IcArrowRight, IcCalendar } from '@/shared/assets/icons';
 import { Input } from '@/shared/components/input';
 import { formatDateKey } from '@/shared/utils/formatDate';
+import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
 export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -61,6 +63,21 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
             calendarType="gregory"
             className="form-calendar"
             onChange={handleCalendarClick}
+            value={date ? new Date(date) : null}
+            prev2Label={null}
+            next2Label={null}
+            prevLabel={
+              <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
+                <IcArrowLeft className="h-4 w-4" />
+              </span>
+            }
+            nextLabel={
+              <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
+                <IcArrowRight className="h-4 w-4" />
+              </span>
+            }
+            formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
+            formatDay={(_, date) => date.getDate().toString()}
           />
         </div>
       )}
