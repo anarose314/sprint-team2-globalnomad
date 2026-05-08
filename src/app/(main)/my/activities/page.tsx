@@ -35,9 +35,11 @@ export default async function MyActivitiesPage() {
       >
         <ActivityButton />
       </MyPageHeader>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <MyActivitiesList />
-      </HydrationBoundary>
+      <section className="mt-7.5">
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <MyActivitiesList />
+        </HydrationBoundary>
+      </section>
     </section>
   );
 }
