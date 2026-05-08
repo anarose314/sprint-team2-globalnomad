@@ -2,6 +2,7 @@ import { ActivityCard } from '@/app/(main)/components/activity-card';
 import { MAIN_ACTIVITY_CARD_ITEM_CLASS } from '@/app/(main)/main.constants';
 import type { MainActivity } from '@/app/(main)/main.types';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
 
 interface PopularActivitySectionProps {
   activities: MainActivity[];
@@ -31,7 +32,18 @@ export function PopularActivitySection({
       </Heading>
 
       <div className="relative">
-        <ul className="scrollbar-hide -mx-6 flex gap-4 overflow-x-auto px-6 pb-4 after:w-px after:shrink-0 after:content-[''] md:-mx-7.5 md:gap-6 md:px-7.5 2xl:mx-0 2xl:px-0 2xl:after:w-0">
+        <ul
+          className={cn(
+            'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4',
+            // 모바일
+            '-mx-6 auto-cols-[calc((100%-4rem)/2)] gap-4 px-6',
+            // 태블릿
+            'md:mx-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:px-0',
+            // 데스크탑
+            '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible',
+            "after:w-px after:shrink-0 after:content-[''] xl:after:hidden"
+          )}
+        >
           {activities.map((activity) => (
             <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
               <ActivityCard activity={activity} />

@@ -26,11 +26,10 @@ export const MAIN_SORT_OPTIONS: MainSortOption[] = [
   { label: '높은 가격 순', value: 'price_desc' },
 ];
 
-export const MAIN_ACTIVITY_CARD_ITEM_CLASS =
-  'h-60.5 w-38.5 shrink-0 md:h-105.75 md:w-82.75 2xl:h-91.5 2xl:w-65.5';
+export const MAIN_ACTIVITY_CARD_ITEM_CLASS = 'w-full';
 
 export const MAIN_ACTIVITY_GRID_CLASS =
-  'grid w-full grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-[repeat(auto-fit,minmax(16.375rem,1fr))] md:gap-6';
+  'grid w-full grid-cols-2 gap-4 gap-y-6 md:grid-cols-3 md:gap-6 2xl:grid-cols-4';
 
 // TODO: API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
