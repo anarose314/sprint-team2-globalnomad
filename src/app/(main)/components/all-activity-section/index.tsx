@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
   MAIN_ACTIVITIES,
-  MAIN_ACTIVITY_GRID_CLASS,
   MAIN_CATEGORIES,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
@@ -58,7 +57,7 @@ export function AllActivitySection() {
         ))}
       </ul>
 
-      <ul className={MAIN_ACTIVITY_GRID_CLASS}>
+      <ul className="grid w-full grid-cols-2 gap-4 gap-y-6 md:grid-cols-3 md:gap-6 2xl:grid-cols-4">
         {MAIN_ACTIVITIES.map((activity) => (
           <li key={activity.id}>
             <ActivityCard activity={activity} />

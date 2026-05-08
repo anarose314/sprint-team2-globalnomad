@@ -1,5 +1,4 @@
 import { ActivityCard } from '@/app/(main)/components/activity-card';
-import { MAIN_ACTIVITY_CARD_ITEM_CLASS } from '@/app/(main)/main.constants';
 import type { MainActivity } from '@/app/(main)/main.types';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
@@ -45,7 +44,7 @@ export function PopularActivitySection({
           )}
         >
           {activities.map((activity) => (
-            <li key={activity.id} className={MAIN_ACTIVITY_CARD_ITEM_CLASS}>
+            <li key={activity.id} className="w-full">
               <ActivityCard activity={activity} />
             </li>
           ))}

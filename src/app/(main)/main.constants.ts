@@ -26,11 +26,6 @@ export const MAIN_SORT_OPTIONS: MainSortOption[] = [
   { label: '높은 가격 순', value: 'price_desc' },
 ];
 
-export const MAIN_ACTIVITY_CARD_ITEM_CLASS = 'w-full';
-
-export const MAIN_ACTIVITY_GRID_CLASS =
-  'grid w-full grid-cols-2 gap-4 gap-y-6 md:grid-cols-3 md:gap-6 2xl:grid-cols-4';
-
 // TODO: API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
   {
