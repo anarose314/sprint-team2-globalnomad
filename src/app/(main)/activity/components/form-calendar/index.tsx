@@ -6,9 +6,9 @@ import {
   FormCalendarProps,
   Value,
 } from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
-import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { IcArrowLeft, IcArrowRight, IcCalendar } from '@/shared/assets/icons';
 import { Input } from '@/shared/components/input';
+import { WEEKDAY } from '@/shared/constants/calendar.constants';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
