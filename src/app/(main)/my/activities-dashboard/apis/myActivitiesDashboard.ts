@@ -18,30 +18,28 @@ export const fetchAllMyActivitiesForDashboard = async (): Promise<
   const seenCursorIds = new Set<number>();
 
   while (hasNext) {
-    const data = await fetchInstanceClient<MyActivitiesResponse>(
-      '/api/my-activities',
-      {
+    const response: MyActivitiesResponse =
+      await fetchInstanceClient<MyActivitiesResponse>('/api/my-activities', {
         params: {
           size: DASHBOARD_MY_ACTIVITIES_SIZE,
           ...(cursorId !== null && { cursorId }),
         },
-      }
-    );
+      });
 
-    mergedActivities.push(...data.activities);
-    hasNext = data.cursorId !== null;
+    mergedActivities.push(...response.activities);
+    hasNext = response.cursorId !== null;
 
-    if (data.cursorId === null) {
+    if (response.cursorId === null) {
       cursorId = null;
       continue;
     }
 
-    if (seenCursorIds.has(data.cursorId)) {
+    if (seenCursorIds.has(response.cursorId)) {
       break;
     }
 
-    seenCursorIds.add(data.cursorId);
-    cursorId = data.cursorId;
+    seenCursorIds.add(response.cursorId);
+    cursorId = response.cursorId;
   }
 
   return mergedActivities;
