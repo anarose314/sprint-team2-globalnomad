@@ -1,6 +1,6 @@
 'use client';
 
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { IcKakao } from '@/shared/assets/icons';
 
 export type KakaoAuthButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -8,17 +8,23 @@ export type KakaoAuthButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 };
 /**
- * 카카오 소셜 로그인 전용 버튼.
+ * 카카오 소셜 연동 전용 버튼.
  *
  * 공통 Button 컴포넌트는 variant가 'primary' | 'secondary'만 지원하므로,
  * 소셜 로그인 전용 디자인은 별도 컴포넌트로 분리.
+ *
+ * 클릭 시 동작은 부모가 onClick으로 주입한다.
+ * 회원가입/로그인 페이지에서 각각 적절한 핸들러를 넘겨서 사용한다.
  *
  * @example
  * <KakaoAuthButton onClick={handleKakaoLogin}>카카오 로그인</KakaoAuthButton>
  * <KakaoAuthButton onClick={handleKakaoSignup}>카카오 회원가입</KakaoAuthButton>
  */
 
-export function KakaoAuthButton({ children, ...props }: KakaoAuthButtonProps) {
+export const KakaoAuthButton = ({
+  children,
+  ...props
+}: KakaoAuthButtonProps) => {
   return (
     <button
       type="button"
@@ -29,4 +35,4 @@ export function KakaoAuthButton({ children, ...props }: KakaoAuthButtonProps) {
       <span>{children}</span>
     </button>
   );
-}
+};
