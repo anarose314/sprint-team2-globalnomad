@@ -34,41 +34,26 @@ export function ActivityReservationCard() {
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
   const [mobileSheetStep, setMobileSheetStep] =
     useState<MobileSheetStep>('dateTime');
-  const [sheetCurrentDate, setSheetCurrentDate] = useState(() => new Date());
-  const [sheetSelectedDate, setSheetSelectedDate] = useState<Date | null>(null);
-  const [sheetHeadCount, setSheetHeadCount] = useState(1);
-  const [sheetSelectedTimeSlot, setSheetSelectedTimeSlot] =
-    useState<TimeSlot | null>(null);
 
   const monthTitle = useMemo(
     () => `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`,
     [currentDate]
-  );
-  const sheetMonthTitle = useMemo(
-    () =>
-      `${sheetCurrentDate.getFullYear()}년 ${sheetCurrentDate.getMonth() + 1}월`,
-    [sheetCurrentDate]
   );
 
   const totalPrice = useMemo(
     () => MOCK_PRICE_PER_PERSON * headCount,
     [headCount]
   );
-  const sheetTotalPrice = useMemo(
-    () => MOCK_PRICE_PER_PERSON * sheetHeadCount,
-    [sheetHeadCount]
-  );
 
   /**
    * @description 바텀시트에서 선택한 날짜를 `yyyy.mm.dd` 형식으로 변환
    */
-  const selectedSheetDateText = useMemo(() => {
-    if (!sheetSelectedDate) return '';
-    const year = sheetSelectedDate.getFullYear();
-    const month = String(sheetSelectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(sheetSelectedDate.getDate()).padStart(2, '0');
+  const selectedDateText = useMemo(() => {
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
     return `${year}.${month}.${day}`;
-  }, [sheetSelectedDate]);
+  }, [selectedDate]);
 
   const handleOpenDateSheet = () => {
     setMobileSheetStep('dateTime');
@@ -104,67 +89,28 @@ export function ActivityReservationCard() {
   };
 
   /**
-   * @description 바텀시트 참여 인원을 1명 이상으로 감소
-   */
-  const handleDecreaseSheetHeadCount = () => {
-    setSheetHeadCount((prev) => Math.max(1, prev - 1));
-  };
-
-  /**
-   * @description 바텀시트 참여 인원을 증가
-   */
-  const handleIncreaseSheetHeadCount = () => {
-    setSheetHeadCount((prev) => prev + 1);
-  };
-
-  /**
-   * @description PC 카드 참여 인원을 1명 이상으로 감소
+   * @description 참여 인원을 1명 이상으로 감소
    */
   const handleDecreaseHeadCount = () => {
     setHeadCount((prev) => Math.max(1, prev - 1));
   };
 
   /**
-   * @description PC 카드 참여 인원 증가
+   * @description 참여 인원을 증가
    */
   const handleIncreaseHeadCount = () => {
     setHeadCount((prev) => prev + 1);
   };
 
   /**
-   * @description 바텀시트 시간 슬롯 선택 핸들러를 반환
-   */
-  const handleSelectSheetTimeSlot = (slot: TimeSlot) => () => {
-    setSheetSelectedTimeSlot(slot);
-  };
-
-  /**
-   * @description PC 카드 시간 슬롯 선택 핸들러를 반환
+   * @description 시간 슬롯 선택 핸들러를 반환
    */
   const handleSelectTimeSlot = (slot: TimeSlot) => () => {
     setSelectedTimeSlot(slot);
   };
 
   /**
-   * @description 캘린더 값이 `Date`인 경우에만 바텀시트 선택 날짜 반영
-   */
-  const handleSheetDateChange = (value: CalendarValue) => {
-    if (value instanceof Date) {
-      setSheetSelectedDate(value);
-    }
-  };
-
-  /**
-   * @description 바텀시트 캘린더의 현재 월 갱신
-   */
-  const handleSheetMonthChange = (activeStartDate?: Date | null) => {
-    if (activeStartDate) {
-      setSheetCurrentDate(activeStartDate);
-    }
-  };
-
-  /**
-   * @description 캘린더 값이 `Date`인 경우에만 PC 카드 선택 날짜 반영
+   * @description 캘린더 값이 `Date`인 경우에만 선택 날짜 반영
    */
   const handleDateChange = (value: CalendarValue) => {
     if (value instanceof Date) {
@@ -173,7 +119,7 @@ export function ActivityReservationCard() {
   };
 
   /**
-   * @description PC 카드 캘린더의 현재 월 갱신
+   * @description 캘린더의 현재 월 갱신
    */
   const handleMonthChange = (activeStartDate?: Date | null) => {
     if (activeStartDate) {
@@ -199,39 +145,37 @@ export function ActivityReservationCard() {
                 {mobileSheetStep === 'dateTime' ? (
                   <>
                     <ReservationCalendarView
-                      value={sheetSelectedDate ?? new Date()}
-                      activeStartDate={sheetCurrentDate}
-                      monthTitle={sheetMonthTitle}
-                      onDateChange={handleSheetDateChange}
-                      onMonthChange={handleSheetMonthChange}
+                      value={selectedDate}
+                      activeStartDate={currentDate}
+                      monthTitle={monthTitle}
+                      onDateChange={handleDateChange}
+                      onMonthChange={handleMonthChange}
                       className="activity-booking-calendar activity-booking-sheet-calendar"
                     />
 
-                    {sheetSelectedDate ? (
-                      <div className="mt-6">
-                        <p className="typo-lg-bold text-gray-950">
-                          예약 가능한 시간
-                        </p>
-                        <div className="mt-3 flex flex-col gap-3">
-                          {MOCK_TIME_SLOTS.map((slot) => (
-                            <TimeSlotButton
-                              key={slot}
-                              size="tb"
-                              isActive={sheetSelectedTimeSlot === slot}
-                              onClick={handleSelectSheetTimeSlot(slot)}
-                              className="w-full"
-                            >
-                              {slot}
-                            </TimeSlotButton>
-                          ))}
-                        </div>
+                    <div className="mt-6">
+                      <p className="typo-lg-bold text-gray-950">
+                        예약 가능한 시간
+                      </p>
+                      <div className="mt-3 flex flex-col gap-3">
+                        {MOCK_TIME_SLOTS.map((slot) => (
+                          <TimeSlotButton
+                            key={slot}
+                            size="tb"
+                            isActive={selectedTimeSlot === slot}
+                            onClick={handleSelectTimeSlot(slot)}
+                            className="w-full"
+                          >
+                            {slot}
+                          </TimeSlotButton>
+                        ))}
                       </div>
-                    ) : null}
+                    </div>
 
                     <Button
                       size="lg"
                       className="mt-6 w-full"
-                      disabled={!sheetSelectedDate || !sheetSelectedTimeSlot}
+                      disabled={!selectedTimeSlot}
                       onClick={handleMoveToHeadCountStep}
                     >
                       확인
@@ -259,10 +203,10 @@ export function ActivityReservationCard() {
 
                     <div className="bg-primary-50 mb-5 flex items-center justify-between rounded-xl px-6 py-4">
                       <span className="typo-md-bold text-gray-950">
-                        {selectedSheetDateText}
+                        {selectedDateText}
                       </span>
                       <span className="typo-xs-medium text-gray-400">
-                        {sheetSelectedTimeSlot ?? '-'}
+                        {selectedTimeSlot}
                       </span>
                     </div>
 
@@ -272,18 +216,18 @@ export function ActivityReservationCard() {
                         <button
                           type="button"
                           aria-label="인원 감소"
-                          onClick={handleDecreaseSheetHeadCount}
+                          onClick={handleDecreaseHeadCount}
                           className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                         >
                           <IcMinus className="h-4 w-4" />
                         </button>
                         <span className="typo-lg-bold text-gray-800">
-                          {sheetHeadCount}
+                          {headCount}
                         </span>
                         <button
                           type="button"
                           aria-label="인원 증가"
-                          onClick={handleIncreaseSheetHeadCount}
+                          onClick={handleIncreaseHeadCount}
                           className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                         >
                           <IcPlus className="h-4 w-4" />
@@ -292,7 +236,7 @@ export function ActivityReservationCard() {
                     </div>
 
                     <Button size="lg" className="w-full">
-                      {new Intl.NumberFormat('ko-KR').format(sheetTotalPrice)}원
+                      {new Intl.NumberFormat('ko-KR').format(totalPrice)}원
                       예약하기
                     </Button>
                   </>
@@ -303,11 +247,11 @@ export function ActivityReservationCard() {
                 <div className="flex items-start justify-center gap-6">
                   <div className="w-90">
                     <ReservationCalendarView
-                      value={sheetSelectedDate ?? new Date()}
-                      activeStartDate={sheetCurrentDate}
-                      monthTitle={sheetMonthTitle}
-                      onDateChange={handleSheetDateChange}
-                      onMonthChange={handleSheetMonthChange}
+                      value={selectedDate}
+                      activeStartDate={currentDate}
+                      monthTitle={monthTitle}
+                      onDateChange={handleDateChange}
+                      onMonthChange={handleMonthChange}
                       className="activity-booking-calendar activity-booking-sheet-calendar"
                     />
                   </div>
@@ -316,59 +260,48 @@ export function ActivityReservationCard() {
                     <p className="typo-lg-bold text-gray-950">
                       예약 가능한 시간
                     </p>
-                    {sheetSelectedDate ? (
-                      <>
-                        <div className="mt-3 flex flex-col gap-3">
-                          {MOCK_TIME_SLOTS.map((slot) => (
-                            <TimeSlotButton
-                              key={slot}
-                              size="tb"
-                              isActive={sheetSelectedTimeSlot === slot}
-                              onClick={handleSelectSheetTimeSlot(slot)}
-                              className="w-full"
-                            >
-                              {slot}
-                            </TimeSlotButton>
-                          ))}
-                        </div>
-                        <div className="mt-7">
-                          <p className="typo-lg-bold text-gray-950">
-                            참여 인원 수
-                          </p>
-                          <div className="mt-3 flex h-12 w-full items-center justify-between rounded-2xl border border-gray-200 px-5">
-                            <button
-                              type="button"
-                              aria-label="인원 감소"
-                              onClick={handleDecreaseSheetHeadCount}
-                              className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
-                            >
-                              <IcMinus className="h-4 w-4" />
-                            </button>
-                            <span className="typo-2lg-bold text-gray-800">
-                              {sheetHeadCount}
-                            </span>
-                            <button
-                              type="button"
-                              aria-label="인원 증가"
-                              onClick={handleIncreaseSheetHeadCount}
-                              className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
-                            >
-                              <IcPlus className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <p className="typo-lg-medium mt-24 text-center text-gray-500">
-                        날짜를 선택해주세요.
-                      </p>
-                    )}
+                    <div className="mt-3 flex flex-col gap-3">
+                      {MOCK_TIME_SLOTS.map((slot) => (
+                        <TimeSlotButton
+                          key={slot}
+                          size="tb"
+                          isActive={selectedTimeSlot === slot}
+                          onClick={handleSelectTimeSlot(slot)}
+                          className="w-full"
+                        >
+                          {slot}
+                        </TimeSlotButton>
+                      ))}
+                    </div>
+                    <div className="mt-7">
+                      <p className="typo-lg-bold text-gray-950">참여 인원 수</p>
+                      <div className="mt-3 flex h-12 w-full items-center justify-between rounded-2xl border border-gray-200 px-5">
+                        <button
+                          type="button"
+                          aria-label="인원 감소"
+                          onClick={handleDecreaseHeadCount}
+                          className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
+                        >
+                          <IcMinus className="h-4 w-4" />
+                        </button>
+                        <span className="typo-2lg-bold text-gray-800">
+                          {headCount}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label="인원 증가"
+                          onClick={handleIncreaseHeadCount}
+                          className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
+                        >
+                          <IcPlus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <Button size="lg" className="mt-6 w-full">
-                  {new Intl.NumberFormat('ko-KR').format(sheetTotalPrice)}원
-                  예약하기
+                  {new Intl.NumberFormat('ko-KR').format(totalPrice)}원 예약하기
                 </Button>
               </div>
             </div>
