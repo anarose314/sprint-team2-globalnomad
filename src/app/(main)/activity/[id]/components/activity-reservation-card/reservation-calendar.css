@@ -1,0 +1,196 @@
+@reference "../../../../../styles/globals.css";
+
+/**
+ * @description
+ * 체험 상세 예약 캘린더(`react-calendar`) 커스텀
+ * - PC 예약 카드 캘린더(`.activity-booking-calendar`)
+ * - 모바일/태블릿 바텀시트 캘린더(`.activity-booking-sheet-calendar`)
+ * - 바텀시트 진입 애니메이션
+ */
+
+/**
+ * @description
+ * 캘린더 기본 컨테이너(PC 기준 너비/배경/패딩 초기화)
+ */
+.activity-booking-calendar {
+  @apply w-88 border-0 bg-white p-0;
+}
+
+/**
+ * @description
+ * 상단 네비게이션 영역 레이아웃
+ */
+.activity-booking-calendar .react-calendar__navigation {
+  @apply m-0 flex h-11 items-center justify-between;
+}
+
+/**
+ * @description
+ * 네비게이션 버튼 기본 스타일 리셋
+ */
+.activity-booking-calendar .react-calendar__navigation button {
+  @apply min-w-0 cursor-pointer border-0 bg-transparent p-0;
+}
+
+/**
+ * @description
+ * 월 타이틀 텍스트 스타일
+ */
+.activity-booking-calendar .react-calendar__navigation__label {
+  @apply typo-xl-medium pointer-events-none flex-1 text-center text-gray-950;
+}
+
+/**
+ * @description
+ * 월 뷰 전체와 요일 헤더(SM~SA) 영역
+ */
+.activity-booking-calendar .react-calendar__month-view {
+  @apply mt-6;
+}
+
+.activity-booking-calendar .react-calendar__month-view__weekdays {
+  @apply grid h-11.5 grid-cols-7;
+}
+
+.activity-booking-calendar .react-calendar__month-view__weekdays__weekday {
+  @apply typo-lg-semibold flex h-11.5 items-center justify-center text-gray-800;
+}
+
+/**
+ * @description
+ * 요일 헤더 주말 컬러(일요일/토요일)
+ */
+.activity-booking-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(1) {
+  @apply text-red-500;
+}
+
+.activity-booking-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(7) {
+  @apply text-primary-600;
+}
+
+.activity-booking-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  @apply no-underline;
+}
+
+/**
+ * @description
+ * 날짜 그리드(일자 셀) 구조와 기본 셀 스타일
+ */
+.activity-booking-calendar .react-calendar__month-view__days {
+  @apply grid grid-cols-7 gap-y-1;
+}
+
+.activity-booking-calendar .react-calendar__tile {
+  @apply flex h-11.5 items-center justify-center border-0 bg-transparent p-0;
+}
+
+.activity-booking-calendar .react-calendar__tile > abbr {
+  @apply typo-lg-medium flex h-8 w-8 items-center justify-center rounded-full text-gray-800;
+}
+
+/**
+ * @description
+ * 날짜 셀 주말 컬러(일요일/토요일)
+ */
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button:nth-child(7n + 1)
+  > abbr {
+  @apply text-red-500;
+}
+
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button:nth-child(7n)
+  > abbr {
+  @apply text-primary-600;
+}
+
+.activity-booking-calendar
+  .react-calendar__month-view__days__day--neighboringMonth
+  > abbr {
+  @apply text-gray-300;
+}
+
+/**
+ * @description
+ * 날짜 상태 스타일
+ * - 오늘(`--now`)
+ * - 선택(`--active`)
+ * - hover/focus
+ */
+.activity-booking-calendar .react-calendar__tile--now > abbr {
+  @apply typo-lg-bold bg-primary-100 text-primary-500;
+}
+
+.activity-booking-calendar .react-calendar__tile--active > abbr {
+  @apply typo-lg-bold bg-primary-500 text-white;
+}
+
+.activity-booking-calendar .react-calendar__tile:enabled:hover > abbr,
+.activity-booking-calendar .react-calendar__tile:enabled:focus > abbr {
+  @apply bg-primary-100 text-primary-500;
+}
+
+.activity-booking-calendar .react-calendar__tile--active:enabled:hover > abbr,
+.activity-booking-calendar .react-calendar__tile--active:enabled:focus > abbr {
+  @apply bg-primary-500 text-white;
+}
+
+/**
+ * @description
+ * 바텀시트 전용 캘린더 스케일 조정(너비/상단 간격)
+ */
+.activity-booking-sheet-calendar {
+  @apply w-full md:w-90;
+}
+
+.activity-booking-sheet-calendar .react-calendar__navigation {
+  @apply h-12;
+}
+
+.activity-booking-sheet-calendar .react-calendar__month-view {
+  @apply mt-4;
+}
+
+/**
+ * @description
+ * 바텀시트 오버레이 페이드 인 애니메이션
+ */
+@keyframes reservation-sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/**
+ * @description
+ * 바텀시트 본문 슬라이드 업 + 페이드 인 애니메이션
+ */
+@keyframes reservation-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * @description
+ * 바텀시트 애니메이션 유틸리티 클래스
+ */
+.animate-reservation-sheet-backdrop-in {
+  animation: reservation-sheet-backdrop-in 180ms ease-out;
+}
+
+.animate-reservation-sheet-in {
+  animation: reservation-sheet-in 220ms ease-out;
+}

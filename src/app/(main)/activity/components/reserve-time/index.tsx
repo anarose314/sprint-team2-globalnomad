@@ -1,10 +1,10 @@
 'use client';
 
+import { FormCalendar } from '@/app/(main)/activity/components/form-calendar';
 import { ReserveTimeProps } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
 import { ReserveTimeDropdown } from '@/app/(main)/activity/components/reserve-time-dropdown';
-import { IcCalendar, IcMinus, IcPlus } from '@/shared/assets/icons';
+import { IcMinus, IcPlus } from '@/shared/assets/icons';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
-import { Input } from '@/shared/components/input';
 import { cn } from '@/shared/utils/cn';
 
 export function ReserveTime({
@@ -27,16 +27,11 @@ export function ReserveTime({
       )}
     >
       {/* 날짜 */}
-      <div className="w-full md:w-auto md:flex-4">
-        {/* TODO: 달력 연동 */}
-        <Input
-          label={hasLabel ? '날짜' : undefined}
-          placeholder="날짜를 선택해 주세요"
-          value={value.date}
-          onChange={(e) => handleChange('date', e.target.value)}
-          rightIcon={<IcCalendar className="text-black" />}
-        />
-      </div>
+      <FormCalendar
+        onChange={handleChange}
+        hasLabel={hasLabel}
+        date={value.date}
+      />
       {/* 시간 */}
       <div className="flex flex-1 flex-wrap items-end gap-2.25 md:flex-3 md:flex-nowrap">
         <div className="flex-1 md:w-31">

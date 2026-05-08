@@ -36,6 +36,7 @@ export function Input({
   rightIcon,
   id,
   className,
+  rightIconClassName,
   disabled,
   type = 'text',
   ref,
@@ -95,7 +96,12 @@ export function Input({
             {isPasswordVisible ? <IcEyeOn /> : <IcEyeOff />}
           </button>
         ) : rightIcon ? (
-          <span className="absolute top-1/2 right-5 -translate-y-1/2 text-gray-400">
+          <span
+            className={cn(
+              'absolute top-1/2 right-5 -translate-y-1/2 text-gray-400',
+              rightIconClassName
+            )}
+          >
             {rightIcon}
           </span>
         ) : null}

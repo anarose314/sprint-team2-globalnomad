@@ -1,6 +1,9 @@
 {
   "name": "03-globalnomad",
   "version": "0.1.0",
+  "imports": {
+    "#styles/*": "./src/app/styles/*"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
