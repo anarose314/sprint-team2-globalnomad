@@ -1,0 +1,86 @@
+@reference "#styles/globals.css";
+
+/* ===== 폼 입력 팝업용 미니 캘린더 (.form-calendar) ===== */
+.form-calendar {
+  /* 팝업 컨테이너 레이아웃 및 그림자 */
+  @apply shadow-card w-full max-w-90 rounded-2xl border border-gray-100 bg-white p-4;
+}
+
+/* 상단 네비게이션 (월 이동) */
+.form-calendar .react-calendar__navigation {
+  @apply mb-3 flex h-8 items-center justify-between;
+}
+
+.form-calendar .react-calendar__navigation button {
+  @apply flex min-w-8 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50;
+}
+
+.form-calendar .react-calendar__navigation__label {
+  @apply typo-md-bold pointer-events-none flex-1 text-center text-gray-950;
+}
+
+/* 요일 헤더 */
+.form-calendar .react-calendar__month-view__weekdays {
+  @apply mb-2 grid grid-cols-7 text-center;
+}
+
+.form-calendar .react-calendar__month-view__weekdays__weekday {
+  @apply typo-xs-medium flex items-center justify-center text-gray-900;
+}
+
+.form-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  @apply border-0 no-underline;
+}
+
+/* 주말 색상 포인트 (선택사항) */
+.form-calendar .react-calendar__month-view__weekdays__weekday:nth-child(1) {
+  @apply text-red-500;
+}
+.form-calendar .react-calendar__month-view__weekdays__weekday:nth-child(7) {
+  @apply text-primary-600;
+}
+
+/* 날짜 그리드 */
+.form-calendar .react-calendar__month-view__days {
+  @apply grid grid-cols-7 gap-y-1;
+}
+
+.form-calendar .react-calendar__tile > abbr {
+  @apply border-0 no-underline;
+}
+
+/* 개별 날짜 타일 (기본) */
+.form-calendar .react-calendar__tile {
+  @apply typo-sm-medium flex aspect-square items-center justify-center rounded-full border-0 bg-transparent text-gray-800 transition-colors;
+}
+
+/* 날짜 호버 상태 */
+.form-calendar .react-calendar__tile:enabled:hover,
+.form-calendar .react-calendar__tile:enabled:focus {
+  @apply bg-gray-100 text-gray-950;
+}
+
+/* 오늘 날짜 타일 */
+.form-calendar .react-calendar__tile--now {
+  @apply bg-primary-50 text-primary-500;
+}
+.form-calendar .react-calendar__tile--now:enabled:hover {
+  @apply bg-primary-100 text-primary-600;
+}
+
+/* 선택된 날짜 (Active) */
+.form-calendar .react-calendar__tile--active,
+.form-calendar .react-calendar__tile--active:enabled:hover,
+.form-calendar .react-calendar__tile--active:enabled:focus {
+  @apply bg-primary-500 font-semibold text-white;
+}
+
+/* 이전/다음 달의 날짜 (Muted) */
+.form-calendar .react-calendar__month-view__days__day--neighboringMonth {
+  @apply text-gray-300;
+}
+
+/* 비활성화된 날짜 */
+.form-calendar .react-calendar__tile:disabled {
+  @apply cursor-not-allowed bg-transparent text-gray-300;
+}
