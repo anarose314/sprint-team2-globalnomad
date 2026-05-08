@@ -2,6 +2,10 @@
 
 import dynamic from 'next/dynamic';
 
+interface ReservationCalendarClientProps {
+  activityId: number | null;
+}
+
 const ReservationCalendar = dynamic(
   () =>
     import('@/app/(main)/my/activities-dashboard/components/reservation-calendar').then(
@@ -23,6 +27,8 @@ const ReservationCalendar = dynamic(
  *
  * SSR을 비활성화하고, 로딩 중에는 스켈레톤 UI를 노출
  */
-export function ReservationCalendarClient() {
-  return <ReservationCalendar />;
+export function ReservationCalendarClient({
+  activityId,
+}: ReservationCalendarClientProps) {
+  return <ReservationCalendar activityId={activityId} />;
 }
