@@ -137,7 +137,7 @@ export function ActivityReservationCard() {
           onClick={handleCloseDateSheet}
         >
           <section
-            className="animate-reservation-sheet-in shadow-review-card absolute right-0 bottom-0 left-0 w-full rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5"
+            className="animate-reservation-sheet-in shadow-review-card absolute right-0 bottom-0 left-0 max-h-[90dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5"
             onClick={handleStopPropagation}
           >
             <div className="mx-auto w-full max-w-186">
