@@ -2,8 +2,8 @@
  * Global Nomad API와 통신하기 위한 공용 fetch 코어(core)
  *
  * - baseURL은 환경변수에서 읽어와 자동으로 붙여준다.
+ *   (단, `absoluteUrl: true` 옵션이면 endpoint 를 그대로 사용)
  * - accessToken은 호출부에서 옵션으로 주입받아 Authorization 헤더에 실는다.
- *   (클라이언트는 js-cookie, 서버는 next/headers로 각자 읽어서 전달)
  * - JSON body를 자동으로 직렬화하고, FormData는 그대로 보낸다.
  * - 응답이 실패(4xx/5xx)면 ApiError를 throw한다.
  *
@@ -19,6 +19,15 @@ interface FetchInstanceOptions extends Omit<RequestInit, 'body'> {
   params?: Record<string, string | number | boolean | null | undefined>;
   /** 인증에 사용할 accessToken (클라/서버 래퍼에서 주입) */
   accessToken?: string | null;
+  /**
+   * true 면 BASE_URL 을 prepend 하지 않고 endpoint 를 그대로 사용한다.
+   *
+   * BFF (Next.js Route Handler) 같은 same-origin 호출에 활용.
+   * - false (기본): `${BASE_URL}/${endpoint}` 로 외부 백엔드 호출
+   * - true: endpoint 그대로 (예: `/api/auth/login`)
+   *
+   */
+  absoluteUrl?: boolean;
 }
 
 /** 서버가 내려주는 에러 응답의 표준 형태 */
@@ -41,9 +50,15 @@ if (!BASE_URL) {
  *
  * @example
  * ```ts
+ * 외부 백엔드 호출
  * const data = await fetchInstance<ActivitiesResponse>('/activities', {
  *   params: { method: 'offset', page: 1, size: 20 },
  *   accessToken: Cookies.get('accessToken'),
+ * });
+ *
+ * BFF 호출 (same-origin)
+ * const data = await fetchInstance<UserResponse>('/api/users/me', {
+ *   absoluteUrl: true,
  * });
  * ```
  */
@@ -51,13 +66,23 @@ export const fetchInstance = async <T>(
   endpoint: string,
   options: FetchInstanceOptions = {}
 ): Promise<T> => {
-  const { body, params, headers, accessToken, ...rest } = options;
+  const { body, params, headers, accessToken, absoluteUrl, ...rest } = options;
 
-  // 1) 최종 URL 만들기 (baseURL + endpoint + ?쿼리)
-  //    - BASE_URL 끝의 '/'와 endpoint 앞의 '/'를 모두 제거하여 항상 단일 '/'로 이어붙임
-  const base = BASE_URL.replace(/\/$/, '');
-  const path = endpoint.replace(/^\//, '');
-  const url = new URL(`${base}/${path}`);
+  // 1) 최종 URL 만들기
+  //    - absoluteUrl: true 면 endpoint 그대로 (BFF 같은 same-origin 호출용)
+  //    - 그 외에는 BASE_URL + endpoint + ?쿼리
+  const url = absoluteUrl
+    ? new URL(
+        endpoint,
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000')
+      )
+    : (() => {
+        const base = BASE_URL.replace(/\/$/, '');
+        const path = endpoint.replace(/^\//, '');
+        return new URL(`${base}/${path}`);
+      })();
 
   // 쿼리 파라미터 추가
   // undefined/null/'' 세 가지는 제외하되, 0이나 false 같은 의미 있는 값은 통과시킴
@@ -94,10 +119,16 @@ export const fetchInstance = async <T>(
 
   // 5) 응답 본문을 안전하게 파싱
   //    - 빈 본문(204, 빈 200 등)이면 undefined
-  //    - 본문이 있으면 JSON 파싱
-  //    - response.json()을 두 번 호출할 수 없으므로 한 번만 읽어 재사용
+  //    - 본문이 있으면 JSON 파싱 시도
+  //    - JSON 형식이 아닌 응답(에러 페이지 HTML 등)이면 undefined 로 간주하고
+  //      response.ok 체크에서 ApiError 로 변환되도록 한다
   const text = await response.text();
-  const data = text ? JSON.parse(text) : undefined;
+  let data: unknown;
+  try {
+    data = text ? JSON.parse(text) : undefined;
+  } catch {
+    data = undefined;
+  }
 
   // 6) 실패 응답 처리
   if (!response.ok) {

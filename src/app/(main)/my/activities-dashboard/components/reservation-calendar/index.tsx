@@ -8,10 +8,10 @@ import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/co
 import {
   EVENT_COUNTS_BY_DATE,
   RESERVATION_DETAIL_BY_DATE,
-  WEEKDAY,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
+import { WEEKDAY } from '@/shared/constants/calendar.constants';
 import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';

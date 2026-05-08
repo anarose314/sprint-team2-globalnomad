@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const timeSlotVariants = cva(
-  'inline-flex w-full cursor-pointer items-center justify-center rounded-[11px] border font-medium transition-colors duration-200',
+  'inline-flex w-full cursor-pointer items-center justify-center rounded-xl border font-medium transition-colors duration-200',
   {
     variants: {
       /**
