@@ -190,7 +190,7 @@
 
 .reservation-detail-sheet__select-wrap {
   @apply relative;
-  z-index: 50;
+  @apply z-dropdown;
 }
 
 .reservation-detail-sheet__select {
