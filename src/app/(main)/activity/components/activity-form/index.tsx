@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ActivityFormProps } from '@/app/(main)/activity/components/activity-form/activityForm.types';
 import { FormImage } from '@/app/(main)/activity/components/form-image';
 import { FormTitle } from '@/app/(main)/activity/components/form-title';
+import { KakaoPostcode } from '@/app/(main)/activity/components/kakao-postcode';
 import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Input } from '@/shared/components/input';
@@ -12,6 +13,7 @@ import { CATEGORY_OPTIONS } from '@/shared/constants/category.constants';
 
 export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
   const [category, setCategory] = useState('');
+  const [address, setAddress] = useState('');
 
   return (
     <form className="mt-6 flex flex-col gap-7.5" onSubmit={onSubmit}>
@@ -45,13 +47,7 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
           placeholder="체험 금액을 입력해 주세요"
           required
         />
-        {/* TODO: 우편번호 서비스 연동 */}
-        <Input
-          label="주소"
-          name="address"
-          placeholder="주소를 입력해 주세요"
-          required
-        />
+        <KakaoPostcode address={address} onAddressChange={setAddress} />
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>

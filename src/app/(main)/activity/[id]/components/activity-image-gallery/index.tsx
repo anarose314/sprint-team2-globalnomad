@@ -27,9 +27,6 @@ function ImageSlot({
 /**
  * 체험 상세 페이지 이미지 갤러리
  *
- * - 배너 이미지(좌, 2/3 폭) + 서브 이미지 2장(우, 1/3 폭 각 1/2 높이)
- * - 이미지 URL이 없으면 회색 플레이스홀더로 대체 (API 연동 전)
- *
  * @example
  * <ActivityImageGallery
  *   bannerImageUrl={activity.bannerImageUrl}
@@ -48,12 +45,16 @@ export function ActivityImageGallery({
   return (
     <div
       className={cn(
-        'flex h-56 gap-2 overflow-hidden rounded-3xl md:h-80 2xl:h-128',
+        'grid aspect-327/188 grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128',
         className
       )}
     >
-      <ImageSlot src={bannerImageUrl} alt={title} className="flex-2" />
-      <div className="flex flex-1 flex-col gap-2">
+      <ImageSlot
+        src={bannerImageUrl}
+        alt={title}
+        className="row-span-2 h-full"
+      />
+      <div className="row-span-2 flex h-full flex-col gap-2">
         <ImageSlot
           src={subImage1}
           alt={`${title} 추가 이미지 1`}
