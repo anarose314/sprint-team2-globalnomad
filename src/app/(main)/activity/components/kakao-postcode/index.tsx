@@ -1,29 +1,38 @@
 'use client';
 
-import { useState } from 'react';
 import { Address, useKakaoPostcodePopup } from 'react-daum-postcode';
+import { KakaoPostcodeProps } from '@/app/(main)/activity/components/kakao-postcode/kakaoPostcode.types';
 import { Input } from '@/shared/components/input';
 
-export function KakaoPostcode() {
-  const [address, setAddress] = useState('');
+/**
+ * 카카오 우편번호 검색 팝업을 띄우고 결과를 반환하는 제어 컴포넌트
+ *
+ * * @example
+ * ```tsx
+ * const [address, setAddress] = useState('');
+ *
+ * <KakaoPostcode
+ * address={address}
+ * onAddressChange={setAddress}
+ * />
+ * ```
+ */
+export function KakaoPostcode({
+  address,
+  onAddressChange,
+}: KakaoPostcodeProps) {
   const open = useKakaoPostcodePopup();
 
   const handleComplete = (data: Address) => {
-    let fullAddress = data.address;
-    let extraAddress = '';
+    const { address, addressType, bname, buildingName } = data;
+    let fullAddress = address;
 
-    if (data.addressType === 'R') {
-      if (data.bname !== '') {
-        extraAddress += data.bname;
-      }
-      if (data.buildingName !== '') {
-        extraAddress +=
-          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
-      }
-      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+    if (addressType === 'R') {
+      const extraAddress = [bname, buildingName].filter(Boolean).join(', ');
+      fullAddress += extraAddress ? ` (${extraAddress})` : '';
     }
 
-    setAddress(fullAddress);
+    onAddressChange(fullAddress);
   };
 
   const handleClick = () => {

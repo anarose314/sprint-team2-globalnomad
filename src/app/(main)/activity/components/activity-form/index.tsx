@@ -13,6 +13,7 @@ import { CATEGORY_OPTIONS } from '@/shared/constants/category.constants';
 
 export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
   const [category, setCategory] = useState('');
+  const [address, setAddress] = useState('');
 
   return (
     <form className="mt-6 flex flex-col gap-7.5" onSubmit={onSubmit}>
@@ -46,7 +47,7 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
           placeholder="체험 금액을 입력해 주세요"
           required
         />
-        <KakaoPostcode />
+        <KakaoPostcode address={address} onAddressChange={setAddress} />
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>
