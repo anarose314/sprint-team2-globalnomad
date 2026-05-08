@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import {
@@ -10,11 +12,12 @@ import { Input } from '@/shared/components/input';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
   const handleOpen = () => {
     setIsOpen(!isOpen);
