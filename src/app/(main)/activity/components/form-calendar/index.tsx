@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import {
-  CalendarValue,
   FormCalendarProps,
+  Value,
 } from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
 import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { IcArrowLeft, IcArrowRight, IcCalendar } from '@/shared/assets/icons';
@@ -11,34 +11,34 @@ import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
 export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const handleCalendarOpen = () => {
-    setIsCalendarOpen(!isCalendarOpen);
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
   };
 
-  const handleCalendarClick = (val: CalendarValue) => {
+  const handleClick = (val: Value) => {
     if (val instanceof Date) {
       onChange('date', formatDateKey(val));
-      setIsCalendarOpen(false);
+      setIsOpen(false);
     }
   };
 
   useEffect(() => {
-    if (!isCalendarOpen) return;
+    if (!isOpen) return;
     const handleClickOutside = (event: PointerEvent) => {
-      if (!calendarContainerRef.current) return;
-      if (!calendarContainerRef.current.contains(event.target as Node)) {
-        setIsCalendarOpen(false);
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsCalendarOpen(false);
+        setIsOpen(false);
       }
     };
 
@@ -49,22 +49,19 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
       document.removeEventListener('pointerdown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCalendarOpen]);
+  }, [isOpen]);
 
   return (
-    <div
-      className="relative w-full md:w-auto md:flex-4"
-      ref={calendarContainerRef}
-    >
+    <div className="relative w-full md:w-auto md:flex-4" ref={containerRef}>
       <Input
         label={hasLabel ? '날짜' : undefined}
         placeholder="날짜를 선택해 주세요"
         value={date}
-        onClick={handleCalendarOpen}
+        onClick={handleOpen}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            handleCalendarOpen();
+            handleOpen();
           }
         }}
         rightIcon={<IcCalendar className="text-black" />}
@@ -73,15 +70,15 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
         required
         readOnly
         aria-haspopup="grid"
-        aria-expanded={isCalendarOpen}
+        aria-expanded={isOpen}
       />
-      {isCalendarOpen && (
+      {isOpen && (
         <div className="z-dropdown absolute mt-2">
           <Calendar
             locale="ko-KR"
             calendarType="gregory"
             className="form-calendar"
-            onChange={handleCalendarClick}
+            onChange={handleClick}
             value={date ? new Date(date + 'T00:00:00') : null}
             prev2Label={null}
             next2Label={null}
