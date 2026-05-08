@@ -34,13 +34,14 @@ export function PopularActivitySection({
         <ul
           className={cn(
             'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4',
-            // 모바일
-            '-mx-6 auto-cols-[calc((100%-4rem)/2)] gap-4 px-6',
+            // 초소형 모바일
+            '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
+            // 일반 모바일
+            'xs:auto-cols-[calc((100%-1rem)/2.1)]',
             // 태블릿
             'md:mx-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:px-0',
             // 데스크탑
-            '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible',
-            "after:w-px after:shrink-0 after:content-[''] xl:after:hidden"
+            '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible'
           )}
         >
           {activities.map((activity) => (

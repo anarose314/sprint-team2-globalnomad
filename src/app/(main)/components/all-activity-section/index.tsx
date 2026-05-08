@@ -11,6 +11,7 @@ import { FilterButton } from '@/shared/components/buttons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
 import { Pagination } from '@/shared/components/pagination';
+import { cn } from '@/shared/utils/cn';
 
 const TEMP_TOTAL_PAGES = 5;
 
@@ -57,7 +58,18 @@ export function AllActivitySection() {
         ))}
       </ul>
 
-      <ul className="grid w-full grid-cols-2 gap-4 gap-y-6 md:grid-cols-3 md:gap-6 2xl:grid-cols-4">
+      <ul
+        className={cn(
+          // 초소형 모바일
+          'grid w-full grid-cols-1 gap-4 gap-y-6',
+          // 일반 모바일
+          'xs:grid-cols-2',
+          // 태블릿
+          'md:grid-cols-3 md:gap-6',
+          // 데스크탑
+          '2xl:grid-cols-4'
+        )}
+      >
         {MAIN_ACTIVITIES.map((activity) => (
           <li key={activity.id}>
             <ActivityCard activity={activity} />
