@@ -30,7 +30,7 @@ export const MAIN_ACTIVITY_CARD_ITEM_CLASS =
   'h-60.5 w-38.5 shrink-0 md:h-105.75 md:w-82.75 2xl:h-91.5 2xl:w-65.5';
 
 export const MAIN_ACTIVITY_GRID_CLASS =
-  'grid w-81 grid-cols-2 gap-x-4 gap-y-6 md:w-171.5 md:gap-6 2xl:w-280 2xl:grid-cols-4';
+  'grid w-full grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-[repeat(auto-fit,minmax(16.375rem,1fr))] md:gap-6';
 
 // TODO: API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
@@ -91,5 +91,13 @@ export const MAIN_ACTIVITIES: MainActivity[] = [
 ];
 
 export const POPULAR_ACTIVITIES = MAIN_ACTIVITIES.slice(0, 4);
+
+// TODO: API 연동 시 모든 체험 목록은 별도 응답 데이터로 교체
+export const ALL_ACTIVITIES = MAIN_ACTIVITIES.filter(
+  (activity) =>
+    !POPULAR_ACTIVITIES.some(
+      (popularActivity) => popularActivity.id === activity.id
+    )
+);
 
 export const MAIN_PAGE_SIZE = 6;
