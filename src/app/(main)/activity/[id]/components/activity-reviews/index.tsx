@@ -95,14 +95,14 @@ export function ActivityReviews({
                 </div>
               </div>
 
-              <p className="typo-md-medium md:typo-lg-medium mt-2 leading-6 tracking-tight text-gray-950 md:mt-3 md:leading-[180%]">
+              <p className="typo-md-medium md:typo-lg-medium mt-2 leading-6 tracking-tight text-gray-950 md:mt-3 md:leading-7">
                 {review.content}
               </p>
             </article>
           ))}
         </div>
       ) : (
-        <p className="typo-md-medium md:typo-lg-medium bg-gray-25 mt-6 rounded-3xl p-8 text-center leading-6 tracking-tight text-gray-600 md:mt-8 md:leading-[180%]">
+        <p className="typo-md-medium md:typo-lg-medium bg-gray-25 mt-6 rounded-3xl p-8 text-center leading-6 tracking-tight text-gray-600 md:mt-8 md:leading-7">
           아직 등록된 후기가 없습니다.
         </p>
       )}
