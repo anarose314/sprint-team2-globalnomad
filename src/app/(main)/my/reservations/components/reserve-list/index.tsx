@@ -5,15 +5,15 @@ import Image from 'next/image';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { MyPageEmpty } from '@/app/(main)/my/components/my-page-empty';
 import { ReserveButtons } from '@/app/(main)/my/reservations/components/reserve-buttons';
-import { ReserveListProps } from '@/app/(main)/my/reservations/components/reserve-list/ReserveList.types';
 import { useMyReservations } from '@/app/(main)/my/reservations/hooks/useMyReservations';
 import { Heading } from '@/shared/components/heading';
 import { Spinner } from '@/shared/components/spinner';
 import { StatusBadge } from '@/shared/components/status-badge';
 
-export function ReserveList({ initialData }: ReserveListProps) {
+export function ReserveList() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMyReservations(initialData);
+    useMyReservations();
+
   const { ref } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {

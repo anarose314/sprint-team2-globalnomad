@@ -2,7 +2,6 @@
 
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
-import { MyActivitiesClientListProps } from '@/app/(main)/my/activities/components/my-activities-client-list/myActivitiesClientList.types';
 import { useMyActivitiesInfinite } from '@/app/(main)/my/activities/hooks/useMyActivitiesInfinite';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { MyPageEmpty } from '@/app/(main)/my/components/my-page-empty';
@@ -11,11 +10,10 @@ import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
 import { Spinner } from '@/shared/components/spinner';
 
-export function MyActivitiesClientList({
-  initialData,
-}: MyActivitiesClientListProps) {
+export function MyActivitiesClientList() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMyActivitiesInfinite(initialData);
+    useMyActivitiesInfinite();
+
   const { ref } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
