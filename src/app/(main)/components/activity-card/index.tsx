@@ -39,7 +39,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
           </span>
         </div>
 
-        <p className="typo-lg-bold 2xl:typo-xl-bold mt-1 text-gray-950">
+        <p className="typo-lg-bold 2xl:typo-xl-bold mt-1 wrap-anywhere text-gray-950">
           {'₩' + activity.price.toLocaleString()}
           <span className="typo-md-medium 2xl:typo-lg-medium text-gray-400">
             {' /인'}
