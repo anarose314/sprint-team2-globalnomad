@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
-import { Value } from 'react-calendar/dist/shared/types.js';
-import { FormCalendarProps } from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
+import {
+  CalendarValue,
+  FormCalendarProps,
+} from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
 import { WEEKDAY } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.constants';
 import { IcArrowLeft, IcArrowRight, IcCalendar } from '@/shared/assets/icons';
 import { Input } from '@/shared/components/input';
@@ -16,7 +18,7 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
     setIsCalendarOpen(!isCalendarOpen);
   };
 
-  const handleCalendarClick = (val: Value) => {
+  const handleCalendarClick = (val: CalendarValue) => {
     if (val instanceof Date) {
       onChange('date', formatDateKey(val));
       setIsCalendarOpen(false);
@@ -49,7 +51,12 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
         placeholder="날짜를 선택해 주세요"
         value={date}
         onClick={handleCalendarOpen}
-        onKeyDown={(e) => e.key === 'Enter' && handleCalendarOpen()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCalendarOpen();
+          }
+        }}
         rightIcon={<IcCalendar className="text-black" />}
         rightIconClassName="pointer-events-none"
         className="cursor-pointer"
@@ -63,7 +70,7 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
             calendarType="gregory"
             className="form-calendar"
             onChange={handleCalendarClick}
-            value={date ? new Date(date) : null}
+            value={date ? new Date(date + 'T00:00:00') : null}
             prev2Label={null}
             next2Label={null}
             prevLabel={
