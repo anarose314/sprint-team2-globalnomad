@@ -46,10 +46,16 @@ export function KakaoPostcode({
       placeholder="주소를 입력해 주세요"
       value={address}
       onClick={handleClick}
-      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       className="cursor-pointer"
       required
       readOnly
+      aria-haspopup="dialog"
     />
   );
 }
