@@ -13,6 +13,8 @@ import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const handleCalendarOpen = () => {
     setIsCalendarOpen(!isCalendarOpen);
@@ -34,10 +36,18 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsCalendarOpen(false);
+      }
+    };
+
     document.addEventListener('pointerdown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('pointerdown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isCalendarOpen]);
 
@@ -62,9 +72,11 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
         className="cursor-pointer"
         required
         readOnly
+        aria-haspopup="grid"
+        aria-expanded={isCalendarOpen}
       />
       {isCalendarOpen && (
-        <div className="z-base absolute mt-2">
+        <div className="z-dropdown absolute mt-2">
           <Calendar
             locale="ko-KR"
             calendarType="gregory"
@@ -85,6 +97,7 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
             }
             formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
             formatDay={(_, date) => date.getDate().toString()}
+            minDate={today}
           />
         </div>
       )}
