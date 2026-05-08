@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+<<<<<<< HEAD
 import { fetchMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
+=======
+import { fetchAllMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
+>>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
 import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendarClient';
 import { Dropdown } from '@/shared/components/dropdown';
 import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
@@ -15,7 +19,11 @@ export function MyActivitiesDashboardContent() {
 
   const { data: activities = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.MY_ACTIVITIES_DASHBOARD,
+<<<<<<< HEAD
     queryFn: fetchMyActivitiesForDashboard,
+=======
+    queryFn: fetchAllMyActivitiesForDashboard,
+>>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
   });
 
   const activityOptions = useMemo<DropdownOption[]>(
