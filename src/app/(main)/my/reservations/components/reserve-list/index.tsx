@@ -46,8 +46,7 @@ export function ReserveList() {
                   {reservation.date}
                 </time>
                 {/* 카드 */}
-                {/* TODO: API 데이터 연동하면 해당 체험 url 넣기 */}
-                <ActivityCard href="/">
+                <ActivityCard href={`/activity/${reservation.activity.id}`}>
                   <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
                     <StatusBadge status={reservation.status} />
                     <div>
