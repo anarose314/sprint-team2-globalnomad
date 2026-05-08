@@ -1,7 +1,7 @@
 import Calendar from 'react-calendar';
-import { WEEKDAY } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
 import type { CalendarValue } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
+import { WEEKDAY } from '@/shared/constants/calendar.constants';
 
 interface ReservationCalendarViewProps {
   value: Date;
