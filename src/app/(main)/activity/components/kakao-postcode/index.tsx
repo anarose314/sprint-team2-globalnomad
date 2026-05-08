@@ -46,6 +46,8 @@ export function KakaoPostcode({
       placeholder="주소를 입력해 주세요"
       value={address}
       onClick={handleClick}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      className="cursor-pointer"
       required
       readOnly
     />
