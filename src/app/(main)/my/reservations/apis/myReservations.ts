@@ -18,7 +18,7 @@ export const fetchMyReservations = async ({
   };
 
   return await fetchInstanceClient<MyReservationsResponse>(
-    '/api/my-reservations',
+    '/api/proxy/my-reservations',
     {
       params,
     }

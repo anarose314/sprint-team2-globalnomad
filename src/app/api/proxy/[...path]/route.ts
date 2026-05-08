@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) => {
   try {
+    const resolvedParams = await params;
+    const joinedPath = resolvedParams.path.join('/');
+
     const searchParams = request.nextUrl.searchParams;
     const queryString = searchParams.toString();
     const endpoint = queryString
-      ? `/my-reservations?${queryString}`
-      : '/my-reservations';
+      ? `/${joinedPath}?${queryString}`
+      : `/${joinedPath}`;
 
     const data = await fetchInstanceServer(endpoint, {
       method: 'GET',
