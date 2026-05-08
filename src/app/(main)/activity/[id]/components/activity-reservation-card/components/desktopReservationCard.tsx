@@ -41,7 +41,7 @@ export function DesktopReservationCard({
   return (
     <aside className="hidden w-full 2xl:block">
       <div className="shadow-review-card mx-auto w-full max-w-103 overflow-hidden rounded-3xl border border-gray-100 bg-white">
-        <div className="max-h-dvh overflow-y-auto overscroll-contain p-8">
+        <div className="max-h-[calc(100dvh-(--spacing(24))-(--spacing(10)))] overflow-y-auto overscroll-contain p-8">
           <div className="mx-auto w-88">
             <div className="flex items-end">
               <span className="typo-2xl-bold text-gray-950">₩1,000</span>
