@@ -7,7 +7,7 @@ export default function MyPageLayout({
 }) {
   return (
     <div className="mx-auto mt-10 flex w-full max-w-245 items-start md:gap-7.5 2xl:gap-12.5">
-      <div className="md:sticky md:top-10 md:self-start">
+      <div className="hidden h-fit md:sticky md:top-24 md:block md:self-start">
         <Sidebar />
       </div>
       <div className="flex-1">{children}</div>
