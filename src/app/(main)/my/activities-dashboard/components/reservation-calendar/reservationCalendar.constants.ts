@@ -4,9 +4,6 @@ import {
   ReservationEventStatus,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 
-/** 요일 헤더 렌더링에 사용되는 영문 약어 목록 */
-export const WEEKDAY = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as const;
-
 /** 상태별 배지 라벨/색상 매핑 */
 export const STATUS_META: Record<
   ReservationEventStatus,
