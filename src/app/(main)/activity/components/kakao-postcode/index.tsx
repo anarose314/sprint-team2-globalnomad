@@ -1,7 +1,8 @@
 'use client';
 
-import { Address, useKakaoPostcodePopup } from 'react-daum-postcode';
-import { KakaoPostcodeProps } from '@/app/(main)/activity/components/kakao-postcode/kakaoPostcode.types';
+import type { Address } from 'react-daum-postcode';
+import { useKakaoPostcodePopup } from 'react-daum-postcode';
+import type { KakaoPostcodeProps } from '@/app/(main)/activity/components/kakao-postcode/kakaoPostcode.types';
 import { Input } from '@/shared/components/input';
 
 /**
@@ -24,8 +25,8 @@ export function KakaoPostcode({
   const open = useKakaoPostcodePopup();
 
   const handleComplete = (data: Address) => {
-    const { address, addressType, bname, buildingName } = data;
-    let fullAddress = address;
+    const { address: selectedAddress, addressType, bname, buildingName } = data;
+    let fullAddress = selectedAddress;
 
     if (addressType === 'R') {
       const extraAddress = [bname, buildingName].filter(Boolean).join(', ');
