@@ -199,10 +199,14 @@
 .reservation-detail-sheet__select-wrap {
   @apply relative;
 <<<<<<< HEAD
+<<<<<<< HEAD
   @apply z-dropdown;
 =======
   z-index: 50;
 >>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
+=======
+  @apply z-dropdown;
+>>>>>>> f37b6e7 (♻️ Refactor: 팀 컨벤션 준수)
 }
 
 .reservation-detail-sheet__select {
