@@ -1,16 +1,30 @@
+'use client';
+
+import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { ReserveButtons } from '@/app/(main)/my/reservations/components/reserve-buttons';
-import { DUMMY_RESERVATION_LIST } from '@/app/(main)/my/reservations/components/reserve-list/reserveList.constants';
+import { ReserveListProps } from '@/app/(main)/my/reservations/components/reserve-list/ReserveList.types';
+import { useMyReservations } from '@/app/(main)/my/reservations/hooks/useMyReservations';
 import { Heading } from '@/shared/components/heading';
+import { Spinner } from '@/shared/components/spinner';
 import { StatusBadge } from '@/shared/components/status-badge';
 
-export function ReserveList() {
-  // TODO: API 데이터 연동
-  const reserveList = DUMMY_RESERVATION_LIST.reservations;
+export function ReserveList({ initialData }: ReserveListProps) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMyReservations(initialData);
+  const { ref } = useInView({
+    onChange: (inView) => {
+      if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+  });
+
+  const reserveList = data.pages.flatMap((page) => page.reservations);
 
   return (
-    <section className="mt-7.5">
+    <>
       <ul className="flex flex-col gap-5 wrap-anywhere">
         {reserveList.map((reservation) => (
           <li key={reservation.id}>
@@ -63,6 +77,9 @@ export function ReserveList() {
           </li>
         ))}
       </ul>
-    </section>
+      <div ref={ref} className="flex h-20 items-center justify-center">
+        {isFetchingNextPage && <Spinner />}
+      </div>
+    </>
   );
 }
