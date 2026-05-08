@@ -12,14 +12,24 @@ import { Input } from '@/shared/components/input';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+const getToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
 
 export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [today, setToday] = useState(getToday);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = () => {
+    if (!isOpen) {
+      const currentToday = getToday();
+      if (currentToday.getTime() !== today.getTime()) {
+        setToday(currentToday);
+      }
+    }
     setIsOpen(!isOpen);
   };
 
