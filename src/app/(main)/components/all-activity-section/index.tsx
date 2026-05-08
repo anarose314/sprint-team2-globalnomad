@@ -43,6 +43,7 @@ export function AllActivitySection() {
           options={MAIN_SORT_OPTIONS}
           placeholder="정렬"
           onChange={() => undefined}
+          menuClassName="left-auto right-0"
           // TODO: 추후 정렬 기능 연동 예정
         />
       </div>
