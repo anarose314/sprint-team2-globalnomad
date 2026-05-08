@@ -12,6 +12,7 @@ import type { HeaderProps } from '@/shared/components/header/header.types';
  * - 메인 라우트 그룹에서 공통으로 사용하는 상단 내비게이션 영역
  * - PC/태블릿에서는 가로형 로고를, 모바일에서는 아이콘 로고를 표시한다.
  * - 로그인 상태에서 알림, 프로필 아이콘, 유저 이름을 표시한다.
+ * - 모바일 로그인 상태에서는 프로필 아이콘 클릭 시 외부에서 주입한 메뉴 열기 동작을 실행할 수 있다.
  * - 비로그인 상태에서는 로그인/회원가입 버튼을 표시한다.
  * - 알림 목록 열기 동작은 `onNotificationClick` prop을 통해 외부에서 주입한다.
  *
@@ -29,6 +30,9 @@ export function Header({
   user,
   hasNotification = false,
   onNotificationClick,
+  onProfileClick,
+  isProfileMenuOpen = false,
+  profileMenuId,
 }: HeaderProps) {
   const BellIcon = hasNotification ? IcBellOn : IcBellOff;
 
@@ -48,6 +52,7 @@ export function Header({
             />
           </Link>
         </h1>
+
         {user ? (
           <div className="flex items-center gap-5">
             <button
@@ -68,16 +73,35 @@ export function Header({
 
             <div className="hidden h-5 w-px bg-gray-100 md:block" />
 
+            {onProfileClick ? (
+              <button
+                type="button"
+                onClick={onProfileClick}
+                aria-label={`${user.name}님의 마이페이지 메뉴 열기`}
+                aria-expanded={isProfileMenuOpen}
+                aria-controls={profileMenuId}
+                className="flex items-center gap-2 md:hidden"
+              >
+                <IcProfile className="h-8 w-8" aria-hidden="true" />
+              </button>
+            ) : (
+              <Link
+                href="/my/profile"
+                className="flex items-center gap-2 md:hidden"
+                aria-label={`${user.name}님의 마이페이지로 이동`}
+              >
+                <IcProfile className="h-8 w-8" aria-hidden="true" />
+              </Link>
+            )}
+
             <Link
               href="/my/profile"
-              className="flex items-center gap-2 md:gap-3"
+              className="hidden items-center gap-3 md:flex"
               aria-label={`${user.name}님의 마이페이지로 이동`}
             >
               <IcProfile className="h-8 w-8" aria-hidden="true" />
 
-              <span className="typo-md-medium hidden text-gray-950 md:block">
-                {user.name}
-              </span>
+              <span className="typo-md-medium text-gray-950">{user.name}</span>
             </Link>
           </div>
         ) : (
