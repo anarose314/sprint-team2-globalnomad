@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAllMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
+import { fetchMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
 import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendarClient';
 import { Dropdown } from '@/shared/components/dropdown';
 import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
@@ -15,7 +15,7 @@ export function MyActivitiesDashboardContent() {
 
   const { data: activities = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.MY_ACTIVITIES_DASHBOARD,
-    queryFn: fetchAllMyActivitiesForDashboard,
+    queryFn: fetchMyActivitiesForDashboard,
   });
 
   const activityOptions = useMemo<DropdownOption[]>(
