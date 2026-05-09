@@ -7,7 +7,7 @@ interface ActivityScheduleItem {
 }
 
 interface ActivityDetailWithSchedules {
-  schedules?: unknown[];
+  schedules: ActivityScheduleItem[];
 }
 
 interface FetchActivitySchedulesProps {
@@ -21,36 +21,8 @@ export const fetchActivitySchedules = async ({
   activityId,
 }: FetchActivitySchedulesProps): Promise<ActivityScheduleItem[]> => {
   const response = await fetchInstanceClient<ActivityDetailWithSchedules>(
-    `/api/activities/${activityId}`
+    `/api/proxy/activities/${activityId}`
   );
 
-  const schedules = Array.isArray(response?.schedules)
-    ? response.schedules
-    : [];
-
-  return schedules
-    .map((item) => {
-      if (!item || typeof item !== 'object') return null;
-
-      const schedule = item as {
-        date?: unknown;
-        startTime?: unknown;
-        endTime?: unknown;
-      };
-
-      if (
-        typeof schedule.date !== 'string' ||
-        typeof schedule.startTime !== 'string' ||
-        typeof schedule.endTime !== 'string'
-      ) {
-        return null;
-      }
-
-      return {
-        date: schedule.date,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-      } satisfies ActivityScheduleItem;
-    })
-    .filter((item): item is ActivityScheduleItem => item !== null);
+  return response.schedules;
 };
