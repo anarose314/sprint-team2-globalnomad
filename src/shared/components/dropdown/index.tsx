@@ -210,7 +210,9 @@ export function Dropdown({
       )}
 
       {errorMessage && (
-        <p className={INPUT_ERROR_MESSAGE_STYLE}>{errorMessage}</p>
+        <p className={cn(INPUT_ERROR_MESSAGE_STYLE, 'absolute top-full')}>
+          {errorMessage}
+        </p>
       )}
     </div>
   );
