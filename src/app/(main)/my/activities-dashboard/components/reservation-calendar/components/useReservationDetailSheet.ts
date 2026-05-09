@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import {
   EMPTY_TIME_SLOT,
-  REQUESTS_PAGE_SIZE,
   ReservationTab,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
 import {
-  ReservationDetailMockData,
+  ReservationDetailData,
   ReservationRequestItem,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
 interface UseReservationDetailSheetParams {
+  activityId: number;
   isOpen: boolean;
-  detailData?: ReservationDetailMockData;
+  detailData?: ReservationDetailData;
   onClose: () => void;
 }
 
@@ -19,6 +22,7 @@ interface UseReservationDetailSheetParams {
  * 예약 상세 패널의 상태/파생값/이벤트 사이드이펙트를 캡슐화
  */
 export const useReservationDetailSheet = ({
+  activityId,
   isOpen,
   detailData,
   onClose,
@@ -28,11 +32,8 @@ export const useReservationDetailSheet = ({
   const requestListEndRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<ReservationTab>('pending');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(
-    detailData?.timeSlots[0] ?? EMPTY_TIME_SLOT
-  );
-  const [visibleRequestCount, setVisibleRequestCount] =
-    useState(REQUESTS_PAGE_SIZE);
+  const [manualSelectedTimeSlotValue, setManualSelectedTimeSlotValue] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -60,30 +61,77 @@ export const useReservationDetailSheet = ({
       document.removeEventListener('pointerdown', handlePointerDownOutside);
   }, [isOpen, onClose]);
 
-  const tabCount = useMemo(() => {
-    const base = { pending: 0, confirmed: 0, declined: 0 };
-    if (!detailData) return base;
+  const selectedTimeSlotValue = useMemo(() => {
+    const timeSlots = detailData?.timeSlots ?? [];
+    if (!timeSlots.length) return EMPTY_TIME_SLOT;
 
-    detailData.requests.forEach((request) => {
-      base[request.status] += 1;
-    });
+    const hasManualSelected =
+      manualSelectedTimeSlotValue !== null &&
+      timeSlots.some(
+        (timeSlot) => timeSlot.value === manualSelectedTimeSlotValue
+      );
 
-    return base;
-  }, [detailData]);
+    return hasManualSelected ? manualSelectedTimeSlotValue : timeSlots[0].value;
+  }, [detailData, manualSelectedTimeSlotValue]);
 
-  const filteredRequests = useMemo(
+  const selectedTimeSlot = useMemo(
     () =>
-      detailData?.requests.filter((request) => request.status === activeTab) ??
-      [],
-    [activeTab, detailData]
+      detailData?.timeSlots.find(
+        (timeSlot) => timeSlot.value === selectedTimeSlotValue
+      ) ?? null,
+    [detailData, selectedTimeSlotValue]
   );
 
-  const visibleRequests = useMemo<ReservationRequestItem[]>(
-    () => filteredRequests.slice(0, visibleRequestCount),
-    [filteredRequests, visibleRequestCount]
+  const selectedScheduleId = selectedTimeSlot?.scheduleId ?? null;
+
+  const {
+    data,
+    isLoading: isLoadingRequests,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: [
+      ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
+      activityId,
+      selectedScheduleId,
+      activeTab,
+    ],
+    queryFn: ({ pageParam }) =>
+      fetchActivityReservations({
+        activityId,
+        scheduleId: selectedScheduleId as number,
+        status: activeTab,
+        cursorId: pageParam as number | null,
+      }),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) => lastPage.cursorId ?? undefined,
+    enabled: isOpen && selectedScheduleId !== null,
+  });
+
+  const requests = useMemo<ReservationRequestItem[]>(
+    () =>
+      (data?.pages.flatMap((page) => page.reservations) ?? [])
+        .slice()
+        .sort((a, b) => {
+          const createdAtA = Date.parse(a.createdAt);
+          const createdAtB = Date.parse(b.createdAt);
+
+          if (Number.isNaN(createdAtA) || Number.isNaN(createdAtB)) {
+            return b.id - a.id;
+          }
+
+          return createdAtB - createdAtA;
+        }),
+    [data]
   );
 
-  const hasMoreRequests = visibleRequests.length < filteredRequests.length;
+  const hasMoreRequests = Boolean(hasNextPage);
+
+  const tabCount = useMemo(() => {
+    return selectedTimeSlot?.count ?? { pending: 0, confirmed: 0, declined: 0 };
+  }, [selectedTimeSlot]);
+
   const shouldUseFixedRequestViewport = useMemo(
     () => Object.values(tabCount).some((count) => count >= 2),
     [tabCount]
@@ -91,6 +139,7 @@ export const useReservationDetailSheet = ({
 
   useEffect(() => {
     if (!hasMoreRequests) return;
+    if (isFetchingNextPage) return;
 
     const observerTarget = requestListEndRef.current;
     if (!observerTarget) return;
@@ -98,9 +147,7 @@ export const useReservationDetailSheet = ({
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
-        setVisibleRequestCount((previousCount) =>
-          Math.min(previousCount + REQUESTS_PAGE_SIZE, filteredRequests.length)
-        );
+        fetchNextPage();
       },
       {
         root: requestScrollRef.current,
@@ -110,21 +157,25 @@ export const useReservationDetailSheet = ({
 
     observer.observe(observerTarget);
     return () => observer.disconnect();
-  }, [filteredRequests.length, hasMoreRequests]);
+  }, [fetchNextPage, hasMoreRequests, isFetchingNextPage]);
+
+  const handleTimeSlotChange = (nextValue: string) => {
+    setManualSelectedTimeSlotValue(nextValue);
+  };
 
   return {
     activeTab,
-    filteredRequests,
+    requests,
+    isLoadingRequests,
+    isFetchingNextPage,
     hasMoreRequests,
     requestListEndRef,
     requestScrollRef,
-    selectedTimeSlot,
+    selectedTimeSlotValue,
+    handleTimeSlotChange,
     setActiveTab,
-    setSelectedTimeSlot,
-    setVisibleRequestCount,
     sheetRef,
     shouldUseFixedRequestViewport,
     tabCount,
-    visibleRequests,
   };
 };

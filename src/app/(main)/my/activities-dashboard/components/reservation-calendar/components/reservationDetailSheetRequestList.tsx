@@ -10,8 +10,10 @@ import { StatusBadge } from '@/shared/components/status-badge';
 interface ReservationDetailSheetRequestListProps {
   activeTab: ReservationTab;
   isEmpty: boolean;
-  visibleRequests: ReservationRequestItem[];
+  isLoading: boolean;
+  requests: ReservationRequestItem[];
   hasMoreRequests: boolean;
+  isFetchingNextPage: boolean;
   sentinelRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -24,10 +26,20 @@ interface ReservationDetailSheetRequestListProps {
 export function ReservationDetailSheetRequestList({
   activeTab,
   isEmpty,
-  visibleRequests,
+  isLoading,
+  requests,
   hasMoreRequests,
+  isFetchingNextPage,
   sentinelRef,
 }: ReservationDetailSheetRequestListProps) {
+  if (isLoading) {
+    return (
+      <p className="reservation-detail-sheet__empty">
+        예약 내역을 불러오는 중입니다.
+      </p>
+    );
+  }
+
   if (isEmpty) {
     return (
       <p className="reservation-detail-sheet__empty">
@@ -39,7 +51,7 @@ export function ReservationDetailSheetRequestList({
   return (
     <>
       <ul className="reservation-detail-sheet__request-list">
-        {visibleRequests.map((request) => (
+        {requests.map((request) => (
           <li
             key={request.id}
             className="reservation-detail-sheet__request-card"
@@ -96,6 +108,11 @@ export function ReservationDetailSheetRequestList({
           className="reservation-detail-sheet__list-sentinel"
           aria-hidden="true"
         />
+      ) : null}
+      {isFetchingNextPage ? (
+        <p className="reservation-detail-sheet__loading-more">
+          더 불러오는 중입니다...
+        </p>
       ) : null}
     </>
   );

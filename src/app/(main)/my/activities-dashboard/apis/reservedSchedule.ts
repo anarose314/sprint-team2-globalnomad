@@ -72,6 +72,11 @@ export const fetchReservedSchedule = async ({
         id?: unknown;
         startTime?: unknown;
         endTime?: unknown;
+        count?: {
+          declined?: unknown;
+          confirmed?: unknown;
+          pending?: unknown;
+        };
       };
 
       const scheduleId =
@@ -93,6 +98,20 @@ export const fetchReservedSchedule = async ({
         scheduleId,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
+        count: {
+          declined:
+            typeof schedule.count?.declined === 'number'
+              ? schedule.count.declined
+              : 0,
+          confirmed:
+            typeof schedule.count?.confirmed === 'number'
+              ? schedule.count.confirmed
+              : 0,
+          pending:
+            typeof schedule.count?.pending === 'number'
+              ? schedule.count.pending
+              : 0,
+        },
       } satisfies ReservedScheduleItem;
     })
     .filter((item): item is ReservedScheduleItem => item !== null);

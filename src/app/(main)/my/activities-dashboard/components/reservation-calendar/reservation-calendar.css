@@ -146,7 +146,7 @@
 }
 
 .reservation-detail-sheet__close {
-  @apply absolute top-4 right-0 hidden h-8 w-8 items-center justify-center rounded-full text-gray-900;
+  @apply absolute top-4 right-0 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-900;
 }
 
 .reservation-detail-sheet__tabs {
@@ -227,7 +227,8 @@
 
 .reservation-detail-sheet__request-scroll {
   /* 모바일/태블릿 기본: 예약 내역 영역만 독립 스크롤 */
-  @apply max-h-60 w-full overflow-y-auto pr-1;
+  @apply w-full overflow-y-auto pr-1;
+  max-height: 248px;
 }
 
 .reservation-detail-sheet__request-scroll--fixed {
@@ -285,6 +286,10 @@
 
 .reservation-detail-sheet__empty {
   @apply typo-lg-medium rounded-2xl border border-dashed border-gray-100 px-4 py-6 text-center text-gray-400;
+}
+
+.reservation-detail-sheet__loading-more {
+  @apply typo-sm-medium mt-2 text-center text-gray-500;
 }
 
 /* ===== 데스크톱(md 이상) 반응형 보정 ===== */
@@ -370,7 +375,7 @@
 
   .reservation-detail-sheet__request-scroll {
     /* 태블릿에서도 예약 내역 영역만 스크롤 컨테이너 유지 */
-    @apply max-h-60;
+    max-height: 248px;
   }
 
   .reservation-detail-sheet__select-wrap {
@@ -418,6 +423,11 @@
     @apply mb-5;
   }
 
+  /*  PC 예약 현황 카드 하단 여백 */
+  .reservation-detail-sheet__section--requests {
+    @apply mb-1;
+  }
+
   .reservation-detail-sheet__section-title {
     @apply typo-xl-bold mb-2.5;
   }
@@ -461,7 +471,7 @@
 
   .reservation-detail-sheet__request-scroll--fixed {
     /* 2건 기준 뷰포트 + 하단 여백을 유지해 데스크톱 가독성 확보 */
-    max-height: 240px;
-    padding-bottom: 30px;
+    max-height: 243px;
+    padding-bottom: 20px;
   }
 }
