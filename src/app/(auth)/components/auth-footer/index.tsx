@@ -55,7 +55,7 @@ const MODE_TO_KAKAO_INTENT: Record<AuthFooterMode, KakaoAuthIntent> = {
  * 카카오 버튼 클릭 시 인가 URL을 생성하고 카카오 인증 페이지로 리다이렉트한다.
  *
  * @example
- * <AuthFooter mode="login" />
+ * <AuthFooter mode="signin" />
  * <AuthFooter mode="signup" />
  */
 export function AuthFooter({ mode }: AuthFooterProps) {

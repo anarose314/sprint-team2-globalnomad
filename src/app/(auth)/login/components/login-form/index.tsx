@@ -111,7 +111,7 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <AuthFooter mode="login" />
+      <AuthFooter mode="signin" />
     </main>
   );
 }
