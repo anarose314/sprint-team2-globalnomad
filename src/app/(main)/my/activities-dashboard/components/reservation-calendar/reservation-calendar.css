@@ -170,12 +170,12 @@
   @apply flex flex-col;
   /* 자식 스크롤 영역이 높이를 정상 계산하도록 축소 허용 */
   min-height: 0;
-  overflow: visible !important;
+  @apply overflow-visible;
 }
 
 .reservation-detail-sheet__section {
   @apply mb-7;
-  overflow: visible !important;
+  @apply overflow-visible;
 }
 
 .reservation-detail-sheet__section--requests {
