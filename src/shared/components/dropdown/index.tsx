@@ -13,7 +13,11 @@ import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
-import { INPUT_LABEL_STYLE } from '@/shared/components/input/input.constants';
+import {
+  INPUT_ERROR_MESSAGE_STYLE,
+  INPUT_ERROR_STYLE,
+  INPUT_LABEL_STYLE,
+} from '@/shared/components/input/input.constants';
 import { cn } from '@/shared/utils/cn';
 
 /**
@@ -36,7 +40,6 @@ import { cn } from '@/shared/utils/cn';
  */
 export function Dropdown({
   label,
-  name,
   options,
   value,
   placeholder = '선택해주세요',
@@ -47,6 +50,7 @@ export function Dropdown({
   className,
   triggerClassName,
   menuClassName,
+  errorMessage,
   onChange,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -118,7 +122,6 @@ export function Dropdown({
         className
       )}
     >
-      <input type="hidden" name={name} value={value} />
       {label && (
         <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
           {label}
@@ -140,7 +143,8 @@ export function Dropdown({
           triggerClassName,
           // 추가 상태
           isOpen && isFieldVariant && 'rounded-b-none',
-          isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS
+          isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS,
+          errorMessage && INPUT_ERROR_STYLE
         )}
         onClick={handleToggle}
       >
@@ -203,6 +207,10 @@ export function Dropdown({
             );
           })}
         </ul>
+      )}
+
+      {errorMessage && (
+        <p className={INPUT_ERROR_MESSAGE_STYLE}>{errorMessage}</p>
       )}
     </div>
   );
