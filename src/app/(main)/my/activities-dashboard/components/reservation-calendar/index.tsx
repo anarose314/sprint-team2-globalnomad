@@ -4,10 +4,14 @@ import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { useQuery } from '@tanstack/react-query';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { fetchActivitySchedules } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
 =======
 import { fetchActivitySchedulesByDate } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
 >>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
+=======
+import { fetchActivitySchedules } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
+>>>>>>> c158411 (♻️ Refactor: 쿼리 키 activityId 기반으로 변경, 날짜별 필터링 수정)
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
@@ -112,19 +116,18 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     enabled: activityId !== null && Boolean(reservedScheduleDateKey),
   });
 
-  const { data: activitySchedulesByDate = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES,
-      activityId,
-      reservedScheduleDateKey,
-    ],
+  const { data: activitySchedules = [] } = useQuery({
+    queryKey: [...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES, activityId],
     queryFn: () =>
-      fetchActivitySchedulesByDate({
+      fetchActivitySchedules({
         activityId: activityId as number,
-        date: reservedScheduleDateKey as string,
       }),
+<<<<<<< HEAD
     enabled: activityId !== null && Boolean(reservedScheduleDateKey),
 >>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
+=======
+    enabled: activityId !== null,
+>>>>>>> c158411 (♻️ Refactor: 쿼리 키 activityId 기반으로 변경, 날짜별 필터링 수정)
   });
 
   const eventCountsByDate = useMemo<
@@ -153,16 +156,25 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
 
   const detailData = useMemo(() => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     const filteredActivitySchedules = selectedDateKey
       ? activitySchedules.filter(
           (schedule) => schedule.date === selectedDateKey
+=======
+    const filteredActivitySchedules = reservedScheduleDateKey
+      ? activitySchedules.filter(
+          (schedule) => schedule.date === reservedScheduleDateKey
+>>>>>>> c158411 (♻️ Refactor: 쿼리 키 activityId 기반으로 변경, 날짜별 필터링 수정)
         )
       : [];
 
     const timeSlots = [...reservedSchedules, ...filteredActivitySchedules]
+<<<<<<< HEAD
 =======
     const timeSlots = [...reservedSchedules, ...activitySchedulesByDate]
 >>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
+=======
+>>>>>>> c158411 (♻️ Refactor: 쿼리 키 activityId 기반으로 변경, 날짜별 필터링 수정)
       .map((schedule) => `${schedule.startTime} - ${schedule.endTime}`)
       .filter((timeSlot): timeSlot is string => Boolean(timeSlot));
     const uniqueTimeSlots = [...new Set(timeSlots)];
@@ -172,10 +184,14 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
       requests: [],
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
   }, [activitySchedules, selectedDateKey, reservedSchedules]);
 =======
   }, [activitySchedulesByDate, reservedSchedules]);
 >>>>>>> e124db3 (✨ Feat: 월별 예약 API연동 및 이벤트 뱃지 상태관리)
+=======
+  }, [activitySchedules, reservedScheduleDateKey, reservedSchedules]);
+>>>>>>> c158411 (♻️ Refactor: 쿼리 키 activityId 기반으로 변경, 날짜별 필터링 수정)
 
   if (activityId === null) {
     return (
