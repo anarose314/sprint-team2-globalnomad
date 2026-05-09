@@ -13,7 +13,7 @@ export const fetchMyActivitiesForDashboard = async (): Promise<
   Activities[]
 > => {
   const response = await fetchInstanceClient<MyActivitiesResponse>(
-    '/api/my-activities',
+    '/api/proxy/my-activities',
     {
       params: {
         size: DASHBOARD_MY_ACTIVITIES_SIZE,
