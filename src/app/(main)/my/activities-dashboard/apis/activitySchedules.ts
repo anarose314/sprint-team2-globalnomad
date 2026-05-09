@@ -10,18 +10,16 @@ interface ActivityDetailWithSchedules {
   schedules?: unknown[];
 }
 
-interface FetchActivitySchedulesByDateProps {
+interface FetchActivitySchedulesProps {
   activityId: number;
-  date: string;
 }
 
 /**
- * 체험 상세 스케줄 중 선택 날짜에 해당하는 시간대를 조회한다.
+ * 체험 상세 스케줄 전체를 조회한다.
  */
-export const fetchActivitySchedulesByDate = async ({
+export const fetchActivitySchedules = async ({
   activityId,
-  date,
-}: FetchActivitySchedulesByDateProps) => {
+}: FetchActivitySchedulesProps): Promise<ActivityScheduleItem[]> => {
   const response = await fetchInstanceClient<ActivityDetailWithSchedules>(
     `/api/activities/${activityId}`
   );
@@ -54,8 +52,5 @@ export const fetchActivitySchedulesByDate = async ({
         endTime: schedule.endTime,
       } satisfies ActivityScheduleItem;
     })
-    .filter(
-      (item): item is ActivityScheduleItem =>
-        item !== null && item.date === date
-    );
+    .filter((item): item is ActivityScheduleItem => item !== null);
 };

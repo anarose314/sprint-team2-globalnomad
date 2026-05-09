@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { useQuery } from '@tanstack/react-query';
-import { fetchActivitySchedulesByDate } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
+import { fetchActivitySchedules } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
@@ -90,18 +90,13 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     enabled: activityId !== null && Boolean(reservedScheduleDateKey),
   });
 
-  const { data: activitySchedulesByDate = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES,
-      activityId,
-      reservedScheduleDateKey,
-    ],
+  const { data: activitySchedules = [] } = useQuery({
+    queryKey: [...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES, activityId],
     queryFn: () =>
-      fetchActivitySchedulesByDate({
+      fetchActivitySchedules({
         activityId: activityId as number,
-        date: reservedScheduleDateKey as string,
       }),
-    enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+    enabled: activityId !== null,
   });
 
   const eventCountsByDate = useMemo<
@@ -129,7 +124,13 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
   }, [reservationDashboard]);
 
   const detailData = useMemo(() => {
-    const timeSlots = [...reservedSchedules, ...activitySchedulesByDate]
+    const filteredActivitySchedules = reservedScheduleDateKey
+      ? activitySchedules.filter(
+          (schedule) => schedule.date === reservedScheduleDateKey
+        )
+      : [];
+
+    const timeSlots = [...reservedSchedules, ...filteredActivitySchedules]
       .map((schedule) => `${schedule.startTime} - ${schedule.endTime}`)
       .filter((timeSlot): timeSlot is string => Boolean(timeSlot));
     const uniqueTimeSlots = [...new Set(timeSlots)];
@@ -138,7 +139,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
       timeSlots: uniqueTimeSlots,
       requests: [],
     };
-  }, [activitySchedulesByDate, reservedSchedules]);
+  }, [activitySchedules, reservedScheduleDateKey, reservedSchedules]);
 
   if (activityId === null) {
     return (
