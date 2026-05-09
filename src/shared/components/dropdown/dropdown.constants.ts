@@ -10,9 +10,7 @@ export const FIELD_INPUT_FOCUS_CLASS = cn(
   'border-primary-500 ring-primary-500 ring-1'
 );
 
-export const FIELD_INPUT_ERROR_FOCUS_CLASS = cn(
-  'border-red-500 ring-1 ring-red-500'
-);
+export const FIELD_INPUT_ERROR_FOCUS_CLASS = cn('border-red-500 ring-red-500');
 
 export const TRIGGER_VARIANT_CLASS: Record<DropdownVariant, string> = {
   field: cn(

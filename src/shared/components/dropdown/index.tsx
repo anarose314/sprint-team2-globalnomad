@@ -115,112 +115,112 @@ export function Dropdown({
   }, [isOpen]);
 
   return (
-    <div
-      ref={dropdownRef}
-      className={cn(
-        'relative',
-        isFieldVariant ? 'w-full' : 'inline-block',
-        className
-      )}
-    >
-      {label && (
-        <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
-          {label}
-        </label>
-      )}
-      <button
-        id={buttonId}
-        type="button"
-        disabled={isDisabled}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-controls={isOpen ? listboxId : undefined}
+    <div>
+      <div
+        ref={dropdownRef}
         className={cn(
-          // 공통 필수 속성 및 비활성화 상태
-          'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
-          'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
-          // 상수 파일의 디자인 및 커스텀 클래스
-          TRIGGER_VARIANT_CLASS[variant],
-          triggerClassName,
-          // 추가 상태
-          isOpen && isFieldVariant && 'rounded-b-none',
-          isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS,
-          errorMessage && INPUT_ERROR_STYLE,
-          errorMessage &&
-            variant === 'fieldInput' &&
-            FIELD_INPUT_ERROR_FOCUS_CLASS
+          'relative',
+          isFieldVariant ? 'w-full' : 'inline-block',
+          className
         )}
-        onClick={handleToggle}
       >
-        <span
-          className={cn(
-            variant === 'chip' ? 'shrink-0 whitespace-nowrap' : 'truncate',
-            isPlaceholder && 'text-gray-400'
-          )}
-        >
-          {triggerLabel}
-        </span>
-
-        <IcArrowDown
-          aria-hidden="true"
-          className={cn(
-            'shrink-0 transition-transform',
-            variant === 'chip' ? 'size-5' : 'size-6',
-            isOpen && 'rotate-180'
-          )}
-        />
-      </button>
-
-      {isOpen && (
-        <ul
-          id={listboxId}
-          role="listbox"
+        {label && (
+          <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
+            {label}
+          </label>
+        )}
+        <button
+          id={buttonId}
+          type="button"
+          disabled={isDisabled}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? listboxId : undefined}
           className={cn(
             // 공통 필수 속성 및 비활성화 상태
-            'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
+            'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
+            'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
             // 상수 파일의 디자인 및 커스텀 클래스
-            MENU_VARIANT_CLASS[variant],
-            menuClassName,
+            TRIGGER_VARIANT_CLASS[variant],
+            triggerClassName,
             // 추가 상태
-            errorMessage &&
+            isOpen && isFieldVariant && 'rounded-b-none',
+            isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS,
+            errorMessage && INPUT_ERROR_STYLE,
+            isOpen &&
+              errorMessage &&
               variant === 'fieldInput' &&
               FIELD_INPUT_ERROR_FOCUS_CLASS
           )}
-          style={{ maxHeight: menuMaxHeight }}
+          onClick={handleToggle}
         >
-          {options.map((option) => {
-            const isSelected = option.value === value;
-            const isOptionDisabled = option.disabled;
+          <span
+            className={cn(
+              variant === 'chip' ? 'shrink-0 whitespace-nowrap' : 'truncate',
+              isPlaceholder && 'text-gray-400'
+            )}
+          >
+            {triggerLabel}
+          </span>
 
-            return (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  role="option"
-                  disabled={isOptionDisabled}
-                  aria-selected={isSelected}
-                  className={cn(
-                    'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
-                    'hover:bg-primary-100 hover:text-primary-500',
-                    isSelected && 'bg-primary-100 text-primary-500',
-                    isOptionDisabled &&
-                      'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400'
-                  )}
-                  style={{ height: optionHeight }}
-                  onClick={() => handleOptionClick(option)}
-                >
-                  <span className="truncate">{option.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+          <IcArrowDown
+            aria-hidden="true"
+            className={cn(
+              'shrink-0 transition-transform',
+              variant === 'chip' ? 'size-5' : 'size-6',
+              isOpen && 'rotate-180'
+            )}
+          />
+        </button>
 
+        {isOpen && (
+          <ul
+            id={listboxId}
+            role="listbox"
+            className={cn(
+              // 공통 필수 속성 및 비활성화 상태
+              'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
+              // 상수 파일의 디자인 및 커스텀 클래스
+              MENU_VARIANT_CLASS[variant],
+              menuClassName,
+              // 추가 상태
+              errorMessage &&
+                variant === 'fieldInput' &&
+                FIELD_INPUT_ERROR_FOCUS_CLASS
+            )}
+            style={{ maxHeight: menuMaxHeight }}
+          >
+            {options.map((option) => {
+              const isSelected = option.value === value;
+              const isOptionDisabled = option.disabled;
+
+              return (
+                <li key={option.value}>
+                  <button
+                    type="button"
+                    role="option"
+                    disabled={isOptionDisabled}
+                    aria-selected={isSelected}
+                    className={cn(
+                      'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
+                      'hover:bg-primary-100 hover:text-primary-500',
+                      isSelected && 'bg-primary-100 text-primary-500',
+                      isOptionDisabled &&
+                        'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400'
+                    )}
+                    style={{ height: optionHeight }}
+                    onClick={() => handleOptionClick(option)}
+                  >
+                    <span className="truncate">{option.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
       {errorMessage && (
-        <p className={cn(INPUT_ERROR_MESSAGE_STYLE, 'absolute top-full')}>
-          {errorMessage}
-        </p>
+        <p className={INPUT_ERROR_MESSAGE_STYLE}>{errorMessage}</p>
       )}
     </div>
   );
