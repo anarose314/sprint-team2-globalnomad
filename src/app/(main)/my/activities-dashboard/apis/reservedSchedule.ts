@@ -6,6 +6,39 @@ interface FetchReservedScheduleProps {
   date: string;
 }
 
+interface ReservedScheduleResponseLike {
+  schedules?: unknown;
+  reservedSchedule?: unknown;
+  data?: unknown;
+}
+
+const extractReservedScheduleList = (response: unknown): unknown[] => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (!response || typeof response !== 'object') {
+    return [];
+  }
+
+  const { schedules, reservedSchedule, data } =
+    response as ReservedScheduleResponseLike;
+
+  if (Array.isArray(schedules)) {
+    return schedules;
+  }
+
+  if (Array.isArray(reservedSchedule)) {
+    return reservedSchedule;
+  }
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  return [];
+};
+
 /**
  * 선택한 날짜에 예약 관련 데이터가 있는 스케줄 목록을 조회한다.
  */
@@ -28,17 +61,7 @@ export const fetchReservedSchedule = async ({
 <<<<<<< HEAD
 =======
 
-  const candidateList = Array.isArray(response)
-    ? response
-    : Array.isArray((response as { schedules?: unknown[] })?.schedules)
-      ? (response as { schedules: unknown[] }).schedules
-      : Array.isArray(
-            (response as { reservedSchedule?: unknown[] })?.reservedSchedule
-          )
-        ? (response as { reservedSchedule: unknown[] }).reservedSchedule
-        : Array.isArray((response as { data?: unknown[] })?.data)
-          ? (response as { data: unknown[] }).data
-          : [];
+  const candidateList = extractReservedScheduleList(response);
 
   return candidateList
     .map((item) => {

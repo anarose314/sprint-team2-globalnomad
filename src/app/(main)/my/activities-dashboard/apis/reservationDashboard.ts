@@ -7,6 +7,33 @@ interface FetchReservationDashboardProps {
   month: number;
 }
 
+interface ReservationDashboardResponseLike {
+  reservations?: unknown;
+  data?: unknown;
+}
+
+const extractReservationDashboardList = (response: unknown): unknown[] => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  if (!response || typeof response !== 'object') {
+    return [];
+  }
+
+  const { reservations, data } = response as ReservationDashboardResponseLike;
+
+  if (Array.isArray(reservations)) {
+    return reservations;
+  }
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  return [];
+};
+
 /**
  * 선택한 내 체험의 월별 예약 현황을 조회한다.
  */
@@ -39,13 +66,7 @@ export const fetchReservationDashboard = async ({
     }
   );
 
-  const candidateList = Array.isArray(response)
-    ? response
-    : Array.isArray((response as { reservations?: unknown[] })?.reservations)
-      ? (response as { reservations: unknown[] }).reservations
-      : Array.isArray((response as { data?: unknown[] })?.data)
-        ? (response as { data: unknown[] }).data
-        : [];
+  const candidateList = extractReservationDashboardList(response);
 
   return candidateList
     .map((item) => {
