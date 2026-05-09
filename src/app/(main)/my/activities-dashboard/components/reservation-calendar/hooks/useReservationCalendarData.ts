@@ -9,7 +9,7 @@ import {
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
-interface UseReservationCalendarDataParams {
+interface UseReservationCalendarDataProps {
   activityId: number | null;
   currentYear: number;
   currentMonth: number;
@@ -24,16 +24,13 @@ const EMPTY_RESERVATION_COUNT = {
 
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
- *
- * @param params - 조회 조건(체험, 현재 연월, 선택 날짜 키)
- * @returns 날짜별 이벤트 카운트와 상세 패널용 시간 슬롯 데이터
  */
 export const useReservationCalendarData = ({
   activityId,
   currentYear,
   currentMonth,
   reservedScheduleDateKey,
-}: UseReservationCalendarDataParams) => {
+}: UseReservationCalendarDataProps) => {
   const { data: reservationDashboard = [] } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,

@@ -83,6 +83,17 @@ export function MyActivitiesDashboardContent() {
     searchParams,
   ]);
 
+  const handleActivityChange = (value: string) => {
+    const nextActivityId = Number(value);
+    if (!Number.isInteger(nextActivityId) || nextActivityId <= 0) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('activityId', String(nextActivityId));
+    params.delete('date');
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <>
       <Dropdown
@@ -100,16 +111,7 @@ export function MyActivitiesDashboardContent() {
         disabled={isLoading || !activityOptions.length}
         className="mt-6 2xl:mt-7.5"
         triggerClassName="shadow-custom"
-        onChange={(value) => {
-          const nextActivityId = Number(value);
-          if (!Number.isInteger(nextActivityId) || nextActivityId <= 0) return;
-
-          const params = new URLSearchParams(searchParams.toString());
-          params.set('activityId', String(nextActivityId));
-          params.delete('date');
-
-          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-        }}
+        onChange={handleActivityChange}
       />
 
       <ReservationCalendarClient activityId={resolvedSelectedActivityId} />
