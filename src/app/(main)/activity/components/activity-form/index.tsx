@@ -26,7 +26,6 @@ export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
         />
         <Dropdown
           label="카테고리"
-          name="category"
           options={CATEGORY_OPTIONS}
           value={category}
           placeholder="카테고리를 선택해 주세요"
