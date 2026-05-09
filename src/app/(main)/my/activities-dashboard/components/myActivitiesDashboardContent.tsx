@@ -13,6 +13,12 @@ import { Dropdown } from '@/shared/components/dropdown';
 import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
+/**
+ * 예약 현황 페이지의 체험 선택 / 캘린더 영역 렌더링
+ *
+ * URL 쿼리의 `activityId`를 단일 선택 상태로 사용하며,
+ * 유효하지 않은 값은 첫 번째 체험 ID로 보정
+ */
 export function MyActivitiesDashboardContent() {
   const router = useRouter();
   const pathname = usePathname();
