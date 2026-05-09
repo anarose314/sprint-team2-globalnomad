@@ -1,3 +1,5 @@
+import { MainContent } from '@/app/(main)/components/main-content';
+
 export default function HomePage() {
-  return <main>HomePage</main>;
+  return <MainContent />;
 }
