@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 <<<<<<< HEAD
 import { fetchMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
@@ -13,9 +14,9 @@ import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
 export function MyActivitiesDashboardContent() {
-  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
-    null
-  );
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const { data: activities = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.MY_ACTIVITIES_DASHBOARD,
@@ -35,20 +36,46 @@ export function MyActivitiesDashboardContent() {
     [activities]
   );
 
+  const activityIdFromQuery = useMemo(() => {
+    const rawValue = searchParams.get('activityId');
+    if (!rawValue) return null;
+
+    const parsedValue = Number(rawValue);
+    if (!Number.isInteger(parsedValue) || parsedValue <= 0) return null;
+
+    return parsedValue;
+  }, [searchParams]);
+
   const resolvedSelectedActivityId = useMemo(() => {
     if (!activities.length) {
       return null;
     }
 
     if (
-      selectedActivityId !== null &&
-      activities.some((activity) => activity.id === selectedActivityId)
+      activityIdFromQuery !== null &&
+      activities.some((activity) => activity.id === activityIdFromQuery)
     ) {
-      return selectedActivityId;
+      return activityIdFromQuery;
     }
 
     return activities[0].id;
-  }, [activities, selectedActivityId]);
+  }, [activities, activityIdFromQuery]);
+
+  useEffect(() => {
+    if (resolvedSelectedActivityId === null) return;
+    if (activityIdFromQuery === resolvedSelectedActivityId) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('activityId', String(resolvedSelectedActivityId));
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [
+    activityIdFromQuery,
+    pathname,
+    resolvedSelectedActivityId,
+    router,
+    searchParams,
+  ]);
 
   return (
     <>
@@ -67,7 +94,16 @@ export function MyActivitiesDashboardContent() {
         disabled={isLoading || !activityOptions.length}
         className="mt-6 2xl:mt-7.5"
         triggerClassName="shadow-custom"
-        onChange={(value) => setSelectedActivityId(Number(value))}
+        onChange={(value) => {
+          const nextActivityId = Number(value);
+          if (!Number.isInteger(nextActivityId) || nextActivityId <= 0) return;
+
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('activityId', String(nextActivityId));
+          params.delete('date');
+
+          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }}
       />
 
       <ReservationCalendarClient activityId={resolvedSelectedActivityId} />
