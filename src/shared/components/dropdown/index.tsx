@@ -136,7 +136,7 @@ export function Dropdown({
         aria-controls={isOpen ? listboxId : undefined}
         className={cn(
           // 공통 필수 속성 및 비활성화 상태
-          'typo-lg-medium flex cursor-pointer items-center transition-colors',
+          'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
           'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
           // 상수 파일의 디자인 및 커스텀 클래스
           TRIGGER_VARIANT_CLASS[variant],
@@ -173,7 +173,7 @@ export function Dropdown({
           role="listbox"
           className={cn(
             // 공통 필수 속성 및 비활성화 상태
-            'z-dropdown absolute top-full left-0 overflow-y-auto bg-white',
+            'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
             // 상수 파일의 디자인 및 커스텀 클래스
             MENU_VARIANT_CLASS[variant],
             menuClassName

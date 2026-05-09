@@ -6,9 +6,10 @@ export const INPUT_STYLE = cn(
   'focus:border-primary-500 focus:ring-primary-500 focus:ring-1'
 );
 
-export const INPUT_LABEL_STYLE = 'typo-lg-medium mb-2 text-gray-950';
+export const INPUT_LABEL_STYLE = cn('typo-lg-medium mb-2 text-gray-950');
 
-export const INPUT_ERROR_STYLE =
-  'border-red-500 focus:border-red-500 focus:ring-red-500';
+export const INPUT_ERROR_STYLE = cn(
+  'border-red-500 focus:border-red-500 focus:ring-red-500'
+);
 
-export const INPUT_ERROR_MESSAGE_STYLE = 'typo-sm-medium mt-2 text-red-500';
+export const INPUT_ERROR_MESSAGE_STYLE = cn('typo-sm-medium mt-2 text-red-500');
