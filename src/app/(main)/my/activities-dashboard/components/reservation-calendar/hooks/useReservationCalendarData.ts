@@ -7,6 +7,7 @@ import {
   ReservationDetailData,
   ReservationEventCounts,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
 interface UseReservationCalendarDataProps {
@@ -15,12 +16,6 @@ interface UseReservationCalendarDataProps {
   currentMonth: number;
   reservedScheduleDateKey: string | null;
 }
-
-const EMPTY_RESERVATION_COUNT = {
-  pending: 0,
-  confirmed: 0,
-  declined: 0,
-};
 
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
@@ -95,62 +90,11 @@ export const useReservationCalendarData = ({
   }, [reservationDashboard]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
-    const filteredActivitySchedules = reservedScheduleDateKey
-      ? activitySchedules.filter(
-          (schedule) => schedule.date === reservedScheduleDateKey
-        )
-      : [];
-    const reservedByScheduleId = new Map(
-      reservedSchedules.map(
-        (schedule) => [schedule.scheduleId, schedule] as const
-      )
-    );
-    const consumedReservedScheduleIds = new Set<number>();
-
-    const mergedTimeSlots = filteredActivitySchedules
-      .map((schedule) => {
-        const reservedSchedule =
-          schedule.scheduleId !== null
-            ? reservedByScheduleId.get(schedule.scheduleId)
-            : undefined;
-
-        if (reservedSchedule) {
-          consumedReservedScheduleIds.add(reservedSchedule.scheduleId);
-        }
-
-        const resolvedScheduleId =
-          schedule.scheduleId ?? reservedSchedule?.scheduleId ?? null;
-
-        return {
-          scheduleId: resolvedScheduleId,
-          label: `${schedule.startTime} - ${schedule.endTime}`,
-          value:
-            resolvedScheduleId !== null
-              ? String(resolvedScheduleId)
-              : `${schedule.startTime}-${schedule.endTime}`,
-          count: reservedSchedule?.count ?? EMPTY_RESERVATION_COUNT,
-          sortKey: schedule.startTime,
-        };
-      })
-      .concat(
-        reservedSchedules
-          .filter(
-            (schedule) => !consumedReservedScheduleIds.has(schedule.scheduleId)
-          )
-          .map((schedule) => ({
-            scheduleId: schedule.scheduleId,
-            label: `${schedule.startTime} - ${schedule.endTime}`,
-            value: String(schedule.scheduleId),
-            count: schedule.count,
-            sortKey: schedule.startTime,
-          }))
-      )
-      .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
-      .map(({ sortKey: _sortKey, ...timeSlot }) => timeSlot);
-
-    return {
-      timeSlots: mergedTimeSlots,
-    };
+    return buildReservationDetailData({
+      activitySchedules,
+      reservedSchedules,
+      reservedScheduleDateKey,
+    });
   }, [activitySchedules, reservedScheduleDateKey, reservedSchedules]);
 
   return {
