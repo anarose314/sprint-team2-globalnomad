@@ -47,7 +47,7 @@
 /* ===== 월(month) 날짜 그리드 ===== */
 .reservation-calendar .react-calendar__month-view__days {
   @apply grid grid-cols-7;
-  grid-auto-rows: minmax(104px, auto);
+  grid-auto-rows: minmax(calc(var(--spacing) * 26), auto);
 }
 
 .reservation-calendar
@@ -227,8 +227,7 @@
 
 .reservation-detail-sheet__request-scroll {
   /* 모바일/태블릿 기본: 예약 내역 영역만 독립 스크롤 */
-  @apply w-full overflow-y-auto pr-1;
-  max-height: 248px;
+  @apply max-h-62 w-full overflow-y-auto pr-1;
 }
 
 .reservation-detail-sheet__request-scroll--fixed {
@@ -293,7 +292,7 @@
 }
 
 /* ===== 데스크톱(md 이상) 반응형 보정 ===== */
-@media (min-width: 768px) {
+@media (min-width: theme(screens.md)) {
   /* 캘린더 컨테이너/그리드 데스크톱 스케일 */
   .reservation-calendar {
     @apply shadow-card min-h-194.25 px-5 pt-6 pb-5.75;
@@ -312,7 +311,7 @@
   }
 
   .reservation-calendar .react-calendar__month-view__days {
-    grid-auto-rows: minmax(124px, auto);
+    grid-auto-rows: minmax(calc(var(--spacing) * 31), auto);
   }
 
   .reservation-calendar__day-tile {
@@ -375,7 +374,7 @@
 
   .reservation-detail-sheet__request-scroll {
     /* 태블릿에서도 예약 내역 영역만 스크롤 컨테이너 유지 */
-    max-height: 248px;
+    @apply max-h-62;
   }
 
   .reservation-detail-sheet__select-wrap {
@@ -392,7 +391,7 @@
 }
 
 /* ===== 큰 데스크톱에서만 플로팅 상세 패널 ===== */
-@media (min-width: 1536px) {
+@media (min-width: theme(screens.2xl)) {
   .reservation-detail-sheet__backdrop {
     /* 대형 화면에서는 전체 오버레이 대신 달력 내부 레이어처럼 동작 */
     @apply absolute inset-0 items-start justify-start bg-transparent p-0;
@@ -400,7 +399,7 @@
 
   .reservation-detail-sheet {
     @apply absolute h-auto w-80 max-w-none rounded-3xl pb-5;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100vh - theme(spacing.10));
   }
 
   .reservation-detail-sheet__inner {
@@ -453,8 +452,7 @@
   }
 
   .reservation-detail-sheet__request-card {
-    @apply h-auto w-auto rounded-2xl px-3 py-3;
-    min-height: 96px;
+    @apply h-auto min-h-24 w-auto rounded-2xl px-3 py-3;
   }
 
   .reservation-detail-sheet__request-label {
@@ -471,7 +469,6 @@
 
   .reservation-detail-sheet__request-scroll--fixed {
     /* 2건 기준 뷰포트 + 하단 여백을 유지해 데스크톱 가독성 확보 */
-    max-height: 243px;
-    padding-bottom: 20px;
+    @apply max-h-60.75 pb-5;
   }
 }
