@@ -5,6 +5,7 @@ import { IcArrowDown } from '@/shared/assets/icons';
 import {
   DEFAULT_MAX_VISIBLE_OPTIONS,
   DEFAULT_OPTION_HEIGHT,
+  FIELD_INPUT_ERROR_FOCUS_CLASS,
   FIELD_INPUT_FOCUS_CLASS,
   MENU_VARIANT_CLASS,
   TRIGGER_VARIANT_CLASS,
@@ -144,7 +145,10 @@ export function Dropdown({
           // 추가 상태
           isOpen && isFieldVariant && 'rounded-b-none',
           isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS,
-          errorMessage && INPUT_ERROR_STYLE
+          errorMessage && INPUT_ERROR_STYLE,
+          errorMessage &&
+            variant === 'fieldInput' &&
+            FIELD_INPUT_ERROR_FOCUS_CLASS
         )}
         onClick={handleToggle}
       >
@@ -176,7 +180,11 @@ export function Dropdown({
             'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
             // 상수 파일의 디자인 및 커스텀 클래스
             MENU_VARIANT_CLASS[variant],
-            menuClassName
+            menuClassName,
+            // 추가 상태
+            errorMessage &&
+              variant === 'fieldInput' &&
+              FIELD_INPUT_ERROR_FOCUS_CLASS
           )}
           style={{ maxHeight: menuMaxHeight }}
         >
