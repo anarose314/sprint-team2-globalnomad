@@ -26,7 +26,7 @@ export const fetchActivityReservations = async ({
   cursorId = null,
 }: FetchActivityReservationsProps): Promise<MyActivityReservationsResponse> => {
   const response = await fetchInstanceClient<unknown>(
-    `/api/my-activities/${activityId}/reservations`,
+    `/api/proxy/my-activities/${activityId}/reservations`,
     {
       params: {
         scheduleId,
