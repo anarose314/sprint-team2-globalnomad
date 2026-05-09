@@ -10,7 +10,7 @@ import {
 export type AuthFooterMode = 'signin' | 'signup';
 
 export interface AuthFooterProps {
-  /** 페이지 모드 — 'login'이면 회원가입 안내, 'signup'이면 로그인 안내 */
+  /** 페이지 모드 — 'signin'이면 회원가입 안내, 'signup'이면 로그인 안내 */
   mode: AuthFooterMode;
 }
 

@@ -21,10 +21,7 @@ export type KakaoAuthButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
  * <KakaoAuthButton onClick={handleKakaoSignup}>카카오 회원가입</KakaoAuthButton>
  */
 
-export const KakaoAuthButton = ({
-  children,
-  ...props
-}: KakaoAuthButtonProps) => {
+export function KakaoAuthButton({ children, ...props }: KakaoAuthButtonProps) {
   return (
     <button
       type="button"
@@ -35,4 +32,4 @@ export const KakaoAuthButton = ({
       <span>{children}</span>
     </button>
   );
-};
+}

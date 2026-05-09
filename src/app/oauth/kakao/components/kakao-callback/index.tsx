@@ -25,7 +25,7 @@ import { useShowToast } from '@/shared/store/useToastStore';
  *
  * 모든 에러는 토스트로 안내 후 로그인 페이지로 redirect한다.
  */
-export const KakaoCallback = () => {
+export function KakaoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const showToast = useShowToast();
@@ -94,4 +94,4 @@ export const KakaoCallback = () => {
       <p className="text-lg text-gray-700">카카오 로그인 처리 중...</p>
     </main>
   );
-};
+}
