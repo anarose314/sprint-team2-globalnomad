@@ -110,19 +110,7 @@ export const useReservationDetailSheet = ({
   });
 
   const requests = useMemo<ReservationRequestItem[]>(
-    () =>
-      (data?.pages.flatMap((page) => page.reservations) ?? [])
-        .slice()
-        .sort((a, b) => {
-          const createdAtA = Date.parse(a.createdAt);
-          const createdAtB = Date.parse(b.createdAt);
-
-          if (Number.isNaN(createdAtA) || Number.isNaN(createdAtB)) {
-            return b.id - a.id;
-          }
-
-          return createdAtB - createdAtA;
-        }),
+    () => data?.pages.flatMap((page) => page.reservations) ?? [],
     [data]
   );
 
