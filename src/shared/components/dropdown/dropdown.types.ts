@@ -1,5 +1,4 @@
-export type DropdownVariant = 'field' | 'chip';
-
+export type DropdownVariant = 'field' | 'fieldInput' | 'chip';
 export interface DropdownOption {
   label: string;
   value: string;

@@ -5,6 +5,7 @@ import { IcArrowDown } from '@/shared/assets/icons';
 import {
   DEFAULT_MAX_VISIBLE_OPTIONS,
   DEFAULT_OPTION_HEIGHT,
+  FIELD_INPUT_FOCUS_CLASS,
   MENU_VARIANT_CLASS,
   TRIGGER_VARIANT_CLASS,
 } from '@/shared/components/dropdown/dropdown.constants';
@@ -19,6 +20,7 @@ import { cn } from '@/shared/utils/cn';
  * 공통 드롭다운 컴포넌트
  *
  * - `field`: 폼 입력처럼 사용하는 기본 드롭다운입니다.
+ * - `fieldInput`: Input 공통 컴포넌트와 Focus와 disabled를 공유하는 드롭다운입니다.
  * - `chip`: 가격 필터처럼 짧은 트리거 문구를 고정해서 사용하는 드롭다운입니다.
  * - 옵션 선택 시 `onChange`를 통해 선택한 값을 외부로 전달합니다.
  * - 옵션 데이터의 정렬, 필터링, API 연동은 사용하는 쪽에서 담당합니다.
@@ -55,6 +57,7 @@ export function Dropdown({
   const buttonId = `${dropdownId}-button`;
   const selectedOption = options.find((option) => option.value === value);
   const isDisabled = disabled || options.length === 0;
+  const isFieldVariant = variant === 'field' || variant === 'fieldInput';
 
   // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
@@ -62,7 +65,7 @@ export function Dropdown({
   const triggerLabel =
     variant === 'chip' ? placeholder : (selectedOption?.label ?? placeholder);
 
-  const isPlaceholder = !selectedOption && variant === 'field';
+  const isPlaceholder = !selectedOption && isFieldVariant;
 
   const handleToggle = () => {
     if (isDisabled) return;
@@ -111,7 +114,7 @@ export function Dropdown({
       ref={dropdownRef}
       className={cn(
         'relative',
-        variant === 'field' ? 'w-full' : 'inline-block',
+        isFieldVariant ? 'w-full' : 'inline-block',
         className
       )}
     >
@@ -129,13 +132,15 @@ export function Dropdown({
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
         className={cn(
-          'flex cursor-pointer items-center transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
-          variant === 'field'
-            ? 'justify-between gap-3'
-            : 'justify-center gap-1.5',
+          // 공통 필수 속성 및 비활성화 상태
+          'typo-lg-medium flex cursor-pointer items-center transition-colors',
+          'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+          // 상수 파일의 디자인 및 커스텀 클래스
           TRIGGER_VARIANT_CLASS[variant],
-          isOpen && variant === 'field' && 'rounded-b-none',
-          triggerClassName
+          triggerClassName,
+          // 추가 상태
+          isOpen && isFieldVariant && 'rounded-b-none',
+          isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS
         )}
         onClick={handleToggle}
       >
@@ -163,7 +168,9 @@ export function Dropdown({
           id={listboxId}
           role="listbox"
           className={cn(
+            // 공통 필수 속성 및 비활성화 상태
             'z-dropdown absolute top-full left-0 overflow-y-auto bg-white',
+            // 상수 파일의 디자인 및 커스텀 클래스
             MENU_VARIANT_CLASS[variant],
             menuClassName
           )}
