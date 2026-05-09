@@ -48,3 +48,9 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS = {
   ...SHARED_AUTH_COOKIE_OPTIONS,
   maxAge: 60 * 60 * 24 * 30,
 };
+
+/**
+ * 카카오 회원가입 흐름에서 닉네임 입력을 받는 페이지 경로.
+ * 콜백 페이지에서 이 경로로 redirect한다.
+ */
+export const KAKAO_SIGNUP_NICKNAME_PATH = '/signup/kakao';

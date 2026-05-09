@@ -47,3 +47,83 @@ export const buildKakaoAuthUrl = (intent: KakaoAuthIntent): string => {
 
   return `${KAKAO_AUTHORIZE_BASE_URL}?${params.toString()}`;
 };
+
+/**
+ * sessionStorage에 저장된 state 값을 꺼내고 즉시 삭제한다.
+ *
+ * state는 1회용이므로 꺼낸 직후 삭제하여 재사용을 방지한다.
+ *
+ */
+export const consumeKakaoOAuthState = (): string | null => {
+  const state = sessionStorage.getItem(KAKAO_OAUTH_STATE_KEY);
+  sessionStorage.removeItem(KAKAO_OAUTH_STATE_KEY);
+  return state;
+};
+
+/**
+ * state 문자열을 intent와 csrfToken으로 분리한다.
+ *
+ * intent와 csrfToken을 담은 객체, 형식이 잘못되면 null
+ *
+ * @example
+ * parseKakaoOAuthState('signup_a3f8d9e2');
+ */
+export const parseKakaoOAuthState = (
+  state: string
+): { intent: KakaoAuthIntent; csrfToken: string } | null => {
+  const [intent, ...rest] = state.split('_');
+  const csrfToken = rest.join('_');
+
+  if ((intent !== 'signin' && intent !== 'signup') || !csrfToken) {
+    return null;
+  }
+
+  return { intent, csrfToken };
+};
+
+/**
+ * 카카오 회원가입 흐름에서 닉네임 입력 페이지로 넘어갈 때
+ * 인가 코드와 redirectUri를 sessionStorage에 임시 저장하는 데 사용하는 키.
+ */
+export const KAKAO_OAUTH_PENDING_SIGNUP_KEY = 'kakao_oauth_pending_signup';
+
+/**
+ * 카카오 회원가입 흐름의 임시 저장 데이터.
+ * 콜백 페이지에서 닉네임 입력 페이지로 이동하는 동안 보존된다.
+ */
+export type KakaoPendingSignup = {
+  /** 카카오에서 받은 인가 코드 */
+  code: string;
+  /** 인가 코드 발급 시 사용한 redirectUri */
+  redirectUri: string;
+};
+
+/**
+ * 카카오 회원가입을 위한 임시 데이터를 sessionStorage에 저장한다.
+ *
+ * 콜백 페이지에서 인가 코드를 받은 직후, 닉네임 입력 페이지로 이동하기 전에 호출.
+ */
+export const setKakaoPendingSignup = (data: KakaoPendingSignup): void => {
+  sessionStorage.setItem(KAKAO_OAUTH_PENDING_SIGNUP_KEY, JSON.stringify(data));
+};
+
+/**
+ * sessionStorage에서 카카오 회원가입 임시 데이터를 꺼내고 즉시 삭제한다.
+ *
+ * 닉네임 입력 페이지에서 회원가입 API를 호출하기 직전에 호출.
+ *
+ */
+export const consumeKakaoPendingSignup = (): KakaoPendingSignup | null => {
+  const raw = sessionStorage.getItem(KAKAO_OAUTH_PENDING_SIGNUP_KEY);
+  sessionStorage.removeItem(KAKAO_OAUTH_PENDING_SIGNUP_KEY);
+
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as KakaoPendingSignup;
+    if (!parsed.code || !parsed.redirectUri) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
