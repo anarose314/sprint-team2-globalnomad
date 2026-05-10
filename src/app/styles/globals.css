@@ -17,6 +17,16 @@
 
   /* BreakPoint */
   --breakpoint-xs: 375px;
+
+  /* Focus ring */
+  --color-ring: var(--color-primary-500);
+}
+
+@layer base {
+  /* 키보드 포커스 outline 색상 */
+  :focus-visible {
+    outline-color: var(--color-primary-500);
+  }
 }
 
 /* Skeleton shimmer animation */

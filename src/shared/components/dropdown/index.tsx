@@ -5,6 +5,8 @@ import { IcArrowDown } from '@/shared/assets/icons';
 import {
   DEFAULT_MAX_VISIBLE_OPTIONS,
   DEFAULT_OPTION_HEIGHT,
+  FIELD_INPUT_ERROR_FOCUS_CLASS,
+  FIELD_INPUT_FOCUS_CLASS,
   MENU_VARIANT_CLASS,
   TRIGGER_VARIANT_CLASS,
 } from '@/shared/components/dropdown/dropdown.constants';
@@ -12,13 +14,18 @@ import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
-import { INPUT_LABEL_STYLE } from '@/shared/components/input/input.constants';
+import {
+  INPUT_ERROR_MESSAGE_STYLE,
+  INPUT_ERROR_STYLE,
+  INPUT_LABEL_STYLE,
+} from '@/shared/components/input/input.constants';
 import { cn } from '@/shared/utils/cn';
 
 /**
  * 공통 드롭다운 컴포넌트
  *
  * - `field`: 폼 입력처럼 사용하는 기본 드롭다운입니다.
+ * - `fieldInput`: Input 공통 컴포넌트와 Focus와 disabled를 공유하는 드롭다운입니다.
  * - `chip`: 가격 필터처럼 짧은 트리거 문구를 고정해서 사용하는 드롭다운입니다.
  * - 옵션 선택 시 `onChange`를 통해 선택한 값을 외부로 전달합니다.
  * - 옵션 데이터의 정렬, 필터링, API 연동은 사용하는 쪽에서 담당합니다.
@@ -34,7 +41,6 @@ import { cn } from '@/shared/utils/cn';
  */
 export function Dropdown({
   label,
-  name,
   options,
   value,
   placeholder = '선택해주세요',
@@ -45,6 +51,7 @@ export function Dropdown({
   className,
   triggerClassName,
   menuClassName,
+  errorMessage,
   onChange,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,6 +62,7 @@ export function Dropdown({
   const buttonId = `${dropdownId}-button`;
   const selectedOption = options.find((option) => option.value === value);
   const isDisabled = disabled || options.length === 0;
+  const isFieldVariant = variant === 'field' || variant === 'fieldInput';
 
   // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
@@ -62,7 +70,7 @@ export function Dropdown({
   const triggerLabel =
     variant === 'chip' ? placeholder : (selectedOption?.label ?? placeholder);
 
-  const isPlaceholder = !selectedOption && variant === 'field';
+  const isPlaceholder = !selectedOption && isFieldVariant;
 
   const handleToggle = () => {
     if (isDisabled) return;
@@ -107,95 +115,112 @@ export function Dropdown({
   }, [isOpen]);
 
   return (
-    <div
-      ref={dropdownRef}
-      className={cn(
-        'relative',
-        variant === 'field' ? 'w-full' : 'inline-block',
-        className
-      )}
-    >
-      <input type="hidden" name={name} value={value} />
-      {label && (
-        <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
-          {label}
-        </label>
-      )}
-      <button
-        id={buttonId}
-        type="button"
-        disabled={isDisabled}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-controls={isOpen ? listboxId : undefined}
+    <div>
+      <div
+        ref={dropdownRef}
         className={cn(
-          'flex cursor-pointer items-center transition-colors disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
-          variant === 'field'
-            ? 'justify-between gap-3'
-            : 'justify-center gap-1.5',
-          TRIGGER_VARIANT_CLASS[variant],
-          isOpen && variant === 'field' && 'rounded-b-none',
-          triggerClassName
+          'relative',
+          isFieldVariant ? 'w-full' : 'inline-block',
+          className
         )}
-        onClick={handleToggle}
       >
-        <span
+        {label && (
+          <label htmlFor={buttonId} className={cn(INPUT_LABEL_STYLE, 'block')}>
+            {label}
+          </label>
+        )}
+        <button
+          id={buttonId}
+          type="button"
+          disabled={isDisabled}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? listboxId : undefined}
           className={cn(
-            variant === 'chip' ? 'shrink-0 whitespace-nowrap' : 'truncate',
-            isPlaceholder && 'text-gray-400'
+            // 공통 필수 속성 및 비활성화 상태
+            'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
+            'disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+            // 상수 파일의 디자인 및 커스텀 클래스
+            TRIGGER_VARIANT_CLASS[variant],
+            triggerClassName,
+            // 추가 상태
+            isOpen && isFieldVariant && 'rounded-b-none',
+            isOpen && variant === 'fieldInput' && FIELD_INPUT_FOCUS_CLASS,
+            errorMessage && INPUT_ERROR_STYLE,
+            isOpen &&
+              errorMessage &&
+              variant === 'fieldInput' &&
+              FIELD_INPUT_ERROR_FOCUS_CLASS
           )}
+          onClick={handleToggle}
         >
-          {triggerLabel}
-        </span>
+          <span
+            className={cn(
+              variant === 'chip' ? 'shrink-0 whitespace-nowrap' : 'truncate',
+              isPlaceholder && 'text-gray-400'
+            )}
+          >
+            {triggerLabel}
+          </span>
 
-        <IcArrowDown
-          aria-hidden="true"
-          className={cn(
-            'shrink-0 transition-transform',
-            variant === 'chip' ? 'size-5' : 'size-6',
-            isOpen && 'rotate-180'
-          )}
-        />
-      </button>
+          <IcArrowDown
+            aria-hidden="true"
+            className={cn(
+              'shrink-0 transition-transform',
+              variant === 'chip' ? 'size-5' : 'size-6',
+              isOpen && 'rotate-180'
+            )}
+          />
+        </button>
 
-      {isOpen && (
-        <ul
-          id={listboxId}
-          role="listbox"
-          className={cn(
-            'z-dropdown absolute top-full left-0 overflow-y-auto bg-white',
-            MENU_VARIANT_CLASS[variant],
-            menuClassName
-          )}
-          style={{ maxHeight: menuMaxHeight }}
-        >
-          {options.map((option) => {
-            const isSelected = option.value === value;
-            const isOptionDisabled = option.disabled;
+        {isOpen && (
+          <ul
+            id={listboxId}
+            role="listbox"
+            className={cn(
+              // 공통 필수 속성 및 비활성화 상태
+              'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
+              // 상수 파일의 디자인 및 커스텀 클래스
+              MENU_VARIANT_CLASS[variant],
+              menuClassName,
+              // 추가 상태
+              errorMessage &&
+                variant === 'fieldInput' &&
+                FIELD_INPUT_ERROR_FOCUS_CLASS
+            )}
+            style={{ maxHeight: menuMaxHeight }}
+          >
+            {options.map((option) => {
+              const isSelected = option.value === value;
+              const isOptionDisabled = option.disabled;
 
-            return (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  role="option"
-                  disabled={isOptionDisabled}
-                  aria-selected={isSelected}
-                  className={cn(
-                    'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
-                    'hover:bg-primary-100 hover:text-primary-500',
-                    isSelected && 'bg-primary-100 text-primary-500',
-                    isOptionDisabled &&
-                      'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400'
-                  )}
-                  style={{ height: optionHeight }}
-                  onClick={() => handleOptionClick(option)}
-                >
-                  <span className="truncate">{option.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li key={option.value}>
+                  <button
+                    type="button"
+                    role="option"
+                    disabled={isOptionDisabled}
+                    aria-selected={isSelected}
+                    className={cn(
+                      'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
+                      'hover:bg-primary-100 hover:text-primary-500',
+                      isSelected && 'bg-primary-100 text-primary-500',
+                      isOptionDisabled &&
+                        'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400'
+                    )}
+                    style={{ height: optionHeight }}
+                    onClick={() => handleOptionClick(option)}
+                  >
+                    <span className="truncate">{option.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+      {errorMessage && (
+        <p className={INPUT_ERROR_MESSAGE_STYLE}>{errorMessage}</p>
       )}
     </div>
   );
