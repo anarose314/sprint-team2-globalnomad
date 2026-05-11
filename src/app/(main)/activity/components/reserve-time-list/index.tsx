@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { ReserveTime } from '@/app/(main)/activity/components/reserve-time';
 import { Schedule } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
+import { validateSchedule } from '@/app/(main)/activity/components/reserve-time-list/validateSchedule';
+import { useShowToast } from '@/shared/store/useToastStore';
 import { generateId } from '@/shared/utils/generateId';
 
 const INITIAL_SCHEDULE: Schedule = {
@@ -12,17 +14,32 @@ const INITIAL_SCHEDULE: Schedule = {
   endTime: '',
 };
 
+/**
+ * 예약 가능한 시간대 목록을 렌더링하고 추가, 수정, 삭제를 관리하는 컴포넌트
+ */
 export function ReserveTimeList() {
   const [inputSchedule, setInputSchedule] =
     useState<Schedule>(INITIAL_SCHEDULE);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
+  const showToast = useShowToast();
+
   const handleAdd = () => {
-    // TODO: 유효성 검사 추가 (실행 시 시간이 비어 있음 or 시작 시간이 종료 시간보다 느림)
+    const { isValid, errorMessage } = validateSchedule(
+      inputSchedule,
+      schedules
+    );
+
+    if (!isValid) {
+      showToast({ theme: 'error', message: errorMessage! });
+      return;
+    }
+
     const newSchedule = {
       ...inputSchedule,
       id: generateId(),
     };
+
     setSchedules((prev) => [...prev, newSchedule]);
     setInputSchedule(INITIAL_SCHEDULE);
   };
@@ -32,6 +49,17 @@ export function ReserveTimeList() {
   };
 
   const handleUpdate = (id: string, updatedSchedule: Schedule) => {
+    const { isValid, errorMessage } = validateSchedule(
+      updatedSchedule,
+      schedules,
+      id
+    );
+
+    if (!isValid) {
+      showToast({ theme: 'error', message: errorMessage! });
+      return;
+    }
+
     setSchedules((prev) =>
       prev.map((schedule) => (schedule.id === id ? updatedSchedule : schedule))
     );
