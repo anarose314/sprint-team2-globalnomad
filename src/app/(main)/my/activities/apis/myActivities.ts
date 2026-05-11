@@ -17,7 +17,8 @@ export const fetchMyActivities = async ({
     ...(pageParam !== null && { cursorId: pageParam }),
   };
 
-  return await fetchInstanceClient<MyActivitiesResponse>('/api/my-activities', {
-    params,
-  });
+  return await fetchInstanceClient<MyActivitiesResponse>(
+    '/api/proxy/my-activities',
+    { params }
+  );
 };

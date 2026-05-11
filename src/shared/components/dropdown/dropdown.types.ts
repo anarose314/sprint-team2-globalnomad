@@ -1,5 +1,4 @@
-export type DropdownVariant = 'field' | 'chip';
-
+export type DropdownVariant = 'field' | 'fieldInput' | 'chip';
 export interface DropdownOption {
   label: string;
   value: string;
@@ -19,5 +18,6 @@ export interface DropdownProps {
   menuClassName?: string;
   onChange: (value: string, option: DropdownOption) => void;
   label?: string;
-  name?: string;
+  errorMessage?: string;
+  onBlur?: () => void;
 }

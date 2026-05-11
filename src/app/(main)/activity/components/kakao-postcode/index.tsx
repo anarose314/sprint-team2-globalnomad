@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import type { Address } from 'react-daum-postcode';
 import { useKakaoPostcodePopup } from 'react-daum-postcode';
 import type { KakaoPostcodeProps } from '@/app/(main)/activity/components/kakao-postcode/kakaoPostcode.types';
@@ -8,7 +9,7 @@ import { Input } from '@/shared/components/input';
 /**
  * 카카오 우편번호 검색 팝업을 띄우고 결과를 반환하는 제어 컴포넌트
  *
- * * @example
+ * @example
  * ```tsx
  * const [address, setAddress] = useState('');
  *
@@ -21,8 +22,11 @@ import { Input } from '@/shared/components/input';
 export function KakaoPostcode({
   address,
   onAddressChange,
+  errorMessage,
+  onBlur,
 }: KakaoPostcodeProps) {
   const open = useKakaoPostcodePopup();
+  const isPopupOpen = useRef(false);
 
   const handleComplete = (data: Address) => {
     const { address: selectedAddress, addressType, bname, buildingName } = data;
@@ -34,10 +38,24 @@ export function KakaoPostcode({
     }
 
     onAddressChange(fullAddress);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    if (!isPopupOpen.current) return;
+    isPopupOpen.current = false;
+    if (onBlur) onBlur();
   };
 
   const handleClick = () => {
-    open({ onComplete: handleComplete });
+    if (isPopupOpen.current) return;
+    isPopupOpen.current = true;
+    open({ onComplete: handleComplete, onClose: handleClose });
+  };
+
+  const handleInputBlur = () => {
+    if (isPopupOpen.current) return;
+    if (onBlur) onBlur();
   };
 
   return (
@@ -54,9 +72,10 @@ export function KakaoPostcode({
         }
       }}
       className="cursor-pointer"
-      required
-      readOnly
       aria-haspopup="dialog"
+      errorMessage={errorMessage}
+      onBlur={handleInputBlur}
+      readOnly
     />
   );
 }
