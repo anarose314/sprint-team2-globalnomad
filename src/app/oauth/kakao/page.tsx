@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { KakaoCallback } from '@/app/oauth/kakao/components/kakao-callback';
+import { KakaoCallbackPending } from '@/app/oauth/kakao/components/kakao-callback-pending';
 
 /**
  * 카카오 OAuth 콜백 페이지.
@@ -9,14 +10,8 @@ import { KakaoCallback } from '@/app/oauth/kakao/components/kakao-callback';
  */
 export default function KakaoCallbackPage() {
   return (
-    <Suspense fallback={<KakaoCallbackFallback />}>
+    <Suspense fallback={<KakaoCallbackPending />}>
       <KakaoCallback />
     </Suspense>
   );
 }
-
-const KakaoCallbackFallback = () => (
-  <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-    <p className="text-lg text-gray-700">카카오 로그인 처리 중...</p>
-  </main>
-);
