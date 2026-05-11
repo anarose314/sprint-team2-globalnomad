@@ -38,14 +38,17 @@ export function KakaoPostcode({
     }
 
     onAddressChange(fullAddress);
+    handleClose();
   };
 
   const handleClose = () => {
+    if (!isPopupOpen.current) return;
     isPopupOpen.current = false;
     if (onBlur) onBlur();
   };
 
   const handleClick = () => {
+    if (isPopupOpen.current) return;
     isPopupOpen.current = true;
     open({ onComplete: handleComplete, onClose: handleClose });
   };
