@@ -53,8 +53,10 @@ export function Dropdown({
   menuClassName,
   errorMessage,
   onChange,
+  onBlur,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const hasOpened = useRef(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownId = useId();
@@ -84,6 +86,19 @@ export function Dropdown({
     onChange(option.value, option);
     setIsOpen(false);
   };
+
+  const handleButtonBlur = () => {
+    if (isOpen) return;
+    if (onBlur) onBlur();
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      hasOpened.current = true;
+    } else if (hasOpened.current && onBlur) {
+      onBlur();
+    }
+  }, [isOpen, onBlur]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -153,6 +168,7 @@ export function Dropdown({
               FIELD_INPUT_ERROR_FOCUS_CLASS
           )}
           onClick={handleToggle}
+          onBlur={handleButtonBlur}
         >
           <span
             className={cn(

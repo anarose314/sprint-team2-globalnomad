@@ -1,6 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  activityFormSchema,
+  ActivityFormValues,
+} from '@/app/(main)/activity/components/activity-form/activityForm.schema';
 import { ActivityFormProps } from '@/app/(main)/activity/components/activity-form/activityForm.types';
 import { FormImage } from '@/app/(main)/activity/components/form-image';
 import { FormTitle } from '@/app/(main)/activity/components/form-title';
@@ -11,42 +16,75 @@ import { Input } from '@/shared/components/input';
 import { Textarea } from '@/shared/components/textarea';
 import { CATEGORY_OPTIONS } from '@/shared/constants/category.constants';
 
-export function ActivityForm({ children, onSubmit }: ActivityFormProps) {
-  const [category, setCategory] = useState('');
-  const [address, setAddress] = useState('');
+export function ActivityForm({
+  children,
+  defaultValues,
+  onSubmit,
+}: ActivityFormProps) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ActivityFormValues>({
+    mode: 'onTouched',
+    resolver: zodResolver(activityFormSchema),
+    defaultValues,
+  });
 
   return (
-    <form className="mt-6 flex flex-col gap-7.5" onSubmit={onSubmit}>
+    <form
+      className="mt-6 flex flex-col gap-7.5"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <section className="flex flex-col gap-6">
         <Input
           label="제목"
-          name="title"
           placeholder="제목을 입력해 주세요"
-          required
+          errorMessage={errors.title?.message}
+          {...register('title')}
         />
-        <Dropdown
-          label="카테고리"
-          options={CATEGORY_OPTIONS}
-          value={category}
-          placeholder="카테고리를 선택해 주세요"
-          onChange={(value) => setCategory(value)}
-          triggerClassName="border-gray-100"
-          menuClassName="border-gray-100"
+        <Controller
+          name="category"
+          control={control}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <Dropdown
+              label="카테고리"
+              variant="fieldInput"
+              value={value || ''}
+              onChange={onChange}
+              onBlur={onBlur}
+              options={CATEGORY_OPTIONS}
+              placeholder="카테고리를 선택해 주세요"
+              errorMessage={errors.category?.message}
+            />
+          )}
         />
         <Textarea
           label="설명"
-          name="description"
           placeholder="체험에 대한 설명을 입력해 주세요"
-          required
+          errorMessage={errors.description?.message}
+          {...register('description')}
         />
         <Input
           label="가격"
           type="number"
-          name="price"
           placeholder="체험 금액을 입력해 주세요"
-          required
+          errorMessage={errors.price?.message}
+          {...register('price', { valueAsNumber: true })}
         />
-        <KakaoPostcode address={address} onAddressChange={setAddress} />
+        <Controller
+          name="address"
+          control={control}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <KakaoPostcode
+              address={value || ''}
+              onAddressChange={onChange}
+              onBlur={onBlur}
+              errorMessage={errors.address?.message}
+            />
+          )}
+        />
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>
