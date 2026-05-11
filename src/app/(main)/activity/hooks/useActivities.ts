@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchActivities } from '@/app/(main)/activity/apis/activities';
 import type { FetchActivitiesParams } from '@/app/(main)/activity/apis/activities.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -23,5 +23,8 @@ export const activitiesOptions = (params: FetchActivitiesParams) => ({
  * });
  */
 export const useActivities = (params: FetchActivitiesParams) => {
-  return useQuery(activitiesOptions(params));
+  return useQuery({
+    ...activitiesOptions(params),
+    placeholderData: keepPreviousData,
+  });
 };
