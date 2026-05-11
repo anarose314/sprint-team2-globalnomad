@@ -33,7 +33,7 @@ export function SideDrawer({
   const portalRoot =
     typeof document === 'undefined'
       ? null
-      : document.getElementById('modal-root');
+      : (document.getElementById('modal-root') ?? document.body);
 
   useEffect(() => {
     document.body.classList.add('overflow-hidden');
