@@ -1,15 +1,11 @@
 import z from 'zod';
 import { CATEGORY_VALUES } from '@/shared/constants/category.constants';
 
-const timeSchema = z.object({
-  id: z.union([z.string(), z.number()]).optional(),
-  startTime: z.string(),
-  endTime: z.string(),
-});
-
 const scheduleSchema = z.object({
-  date: z.string(),
-  times: z.array(timeSchema),
+  id: z.string().optional(),
+  date: z.iso.date({ error: '날짜를 선택해 주세요' }),
+  startTime: z.iso.time({ error: '시작 시간을 선택해 주세요' }),
+  endTime: z.iso.time({ error: '종료 시간을 선택해 주세요' }),
 });
 
 /**
