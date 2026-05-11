@@ -71,28 +71,28 @@ export function Header({
               />
             </button>
 
-            <div className="hidden h-5 w-px bg-gray-100 md:block" />
-
-            {onProfileClick ? (
-              <button
-                type="button"
-                onClick={onProfileClick}
-                aria-label={`${user.name}님의 마이페이지 메뉴 열기`}
-                aria-expanded={isProfileMenuOpen}
-                aria-controls={profileMenuId}
-                className="flex items-center gap-2 md:hidden"
-              >
-                <IcProfile className="h-8 w-8" aria-hidden="true" />
-              </button>
-            ) : (
-              <Link
-                href="/my/profile"
-                className="flex items-center gap-2 md:hidden"
-                aria-label={`${user.name}님의 마이페이지로 이동`}
-              >
-                <IcProfile className="h-8 w-8" aria-hidden="true" />
-              </Link>
-            )}
+            <div className="md:hidden">
+              {onProfileClick ? (
+                <button
+                  type="button"
+                  onClick={onProfileClick}
+                  aria-label={`${user.name}님의 마이페이지 메뉴 열기`}
+                  aria-expanded={isProfileMenuOpen}
+                  aria-controls={profileMenuId}
+                  className="flex items-center gap-2"
+                >
+                  <IcProfile className="h-8 w-8" aria-hidden="true" />
+                </button>
+              ) : (
+                <Link
+                  href="/my/profile"
+                  className="flex items-center gap-2"
+                  aria-label={`${user.name}님의 마이페이지로 이동`}
+                >
+                  <IcProfile className="h-8 w-8" aria-hidden="true" />
+                </Link>
+              )}
+            </div>
 
             <Link
               href="/my/profile"
@@ -100,7 +100,6 @@ export function Header({
               aria-label={`${user.name}님의 마이페이지로 이동`}
             >
               <IcProfile className="h-8 w-8" aria-hidden="true" />
-
               <span className="typo-md-medium text-gray-950">{user.name}</span>
             </Link>
           </div>
