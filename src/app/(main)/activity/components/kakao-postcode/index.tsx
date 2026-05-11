@@ -9,7 +9,7 @@ import { Input } from '@/shared/components/input';
 /**
  * 카카오 우편번호 검색 팝업을 띄우고 결과를 반환하는 제어 컴포넌트
  *
- * * @example
+ * @example
  * ```tsx
  * const [address, setAddress] = useState('');
  *
