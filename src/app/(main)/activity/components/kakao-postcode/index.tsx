@@ -21,6 +21,7 @@ import { Input } from '@/shared/components/input';
 export function KakaoPostcode({
   address,
   onAddressChange,
+  errorMessage,
 }: KakaoPostcodeProps) {
   const open = useKakaoPostcodePopup();
 
@@ -54,9 +55,9 @@ export function KakaoPostcode({
         }
       }}
       className="cursor-pointer"
-      required
-      readOnly
       aria-haspopup="dialog"
+      errorMessage={errorMessage}
+      readOnly
     />
   );
 }
