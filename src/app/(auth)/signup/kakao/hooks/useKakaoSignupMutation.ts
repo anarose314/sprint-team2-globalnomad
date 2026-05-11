@@ -8,7 +8,7 @@ import { useShowToast } from '@/shared/store/useToastStore';
 /**
  * 카카오 간편 회원가입 mutation hook.
  *
- * BFF (`/api/oauth/kakao/signup` Route Handler) 를 통해 카카오 회원가입을 진행한다.
+ * BFF (`/api/auth/kakao/signup` Route Handler) 를 통해 카카오 회원가입을 진행한다.
  * Route Handler 가 백엔드 카카오 회원가입을 수행하고
  * 토큰을 httpOnly 쿠키로 자동 저장하므로,
  * 클라이언트 코드는 토큰을 직접 다루지 않는다.

@@ -127,3 +127,24 @@ export const consumeKakaoPendingSignup = (): KakaoPendingSignup | null => {
     return null;
   }
 };
+
+/**
+ * sessionStorage에서 카카오 회원가입 임시 데이터를 꺼내본다 (삭제하지 않음).
+ *
+ * 닉네임 입력 폼에서 제출 시점에 호출. 재시도 가능성이 있어 즉시 삭제하지 않고
+ * 실제 가입이 성공한 시점(`onSuccess`)에서 `consumeKakaoPendingSignup`으로 삭제한다.
+ *
+ */
+export const peekKakaoPendingSignup = (): KakaoPendingSignup | null => {
+  const raw = sessionStorage.getItem(KAKAO_OAUTH_PENDING_SIGNUP_KEY);
+
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as KakaoPendingSignup;
+    if (!parsed.code || !parsed.redirectUri) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
