@@ -1,12 +1,13 @@
 'use client';
 
 import { ActivityForm } from '@/app/(main)/activity/components/activity-form';
+import { ActivityFormValues } from '@/app/(main)/activity/components/activity-form/activityForm.schema';
 import { Button } from '@/shared/components/buttons';
 
 export function ActivityAddForm() {
-  const handleAddSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleAddSubmit = (data: ActivityFormValues) => {
     // TODO: 등록 API 호출 로직
+    console.log('API로 보낼 데이터:', data);
   };
 
   return (

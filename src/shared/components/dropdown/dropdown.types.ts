@@ -19,4 +19,5 @@ export interface DropdownProps {
   onChange: (value: string, option: DropdownOption) => void;
   label?: string;
   errorMessage?: string;
+  onBlur?: () => void;
 }
