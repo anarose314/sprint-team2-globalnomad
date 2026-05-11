@@ -106,13 +106,15 @@ export function AllActivitySection() {
             ))}
           </ul>
 
-          <div className="mt-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          {totalPages > 1 && (
+            <div className="mt-10">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </>
       )}
     </section>
