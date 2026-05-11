@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import type { Address } from 'react-daum-postcode';
 import { useKakaoPostcodePopup } from 'react-daum-postcode';
 import type { KakaoPostcodeProps } from '@/app/(main)/activity/components/kakao-postcode/kakaoPostcode.types';
@@ -22,8 +23,10 @@ export function KakaoPostcode({
   address,
   onAddressChange,
   errorMessage,
+  onBlur,
 }: KakaoPostcodeProps) {
   const open = useKakaoPostcodePopup();
+  const isPopupOpen = useRef(false);
 
   const handleComplete = (data: Address) => {
     const { address: selectedAddress, addressType, bname, buildingName } = data;
@@ -37,8 +40,19 @@ export function KakaoPostcode({
     onAddressChange(fullAddress);
   };
 
+  const handleClose = () => {
+    isPopupOpen.current = false;
+    if (onBlur) onBlur();
+  };
+
   const handleClick = () => {
-    open({ onComplete: handleComplete });
+    isPopupOpen.current = true;
+    open({ onComplete: handleComplete, onClose: handleClose });
+  };
+
+  const handleInputBlur = () => {
+    if (isPopupOpen.current) return;
+    if (onBlur) onBlur();
   };
 
   return (
@@ -57,6 +71,7 @@ export function KakaoPostcode({
       className="cursor-pointer"
       aria-haspopup="dialog"
       errorMessage={errorMessage}
+      onBlur={handleInputBlur}
       readOnly
     />
   );

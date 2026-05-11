@@ -1,6 +1,8 @@
-import { ReactNode, SubmitEvent } from 'react';
+import { ReactNode } from 'react';
+import { ActivityFormValues } from '@/app/(main)/activity/components/activity-form/activityForm.schema';
 
 export interface ActivityFormProps {
   children: ReactNode;
-  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  defaultValues?: Partial<ActivityFormValues>;
+  onSubmit: (data: ActivityFormValues) => void;
 }
