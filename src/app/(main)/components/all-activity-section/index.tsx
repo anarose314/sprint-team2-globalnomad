@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useActivities } from '@/app/(main)/activity/hooks/useActivities';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
-  MAIN_ACTIVITIES,
   MAIN_CATEGORIES,
+  MAIN_PAGE_SIZE,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
 import { FilterButton } from '@/shared/components/buttons';
@@ -13,19 +14,28 @@ import { Heading } from '@/shared/components/heading';
 import { Pagination } from '@/shared/components/pagination';
 import { cn } from '@/shared/utils/cn';
 
-const TEMP_TOTAL_PAGES = 5;
-
 /**
  * 메인 페이지 모든 체험 섹션 컴포넌트
  *
- * - 모든 체험 영역의 제목, 정렬 드롭다운, 카테고리 필터 UI를 표시한다.
- * - 현재 UI 단계에서는 선택 상태와 필터링/정렬 로직을 포함하지 않는다.
+ * - 모든 체험 목록을 최신순 페이지네이션으로 조회한다.
+ * - PR1에서는 카테고리 필터와 가격 정렬 UI만 표시한다.
+ * - 검색, 카테고리, 가격 정렬 동작은 이후 작업에서 연결한다.
  *
  * @example
  * <AllActivitySection />
  */
 export function AllActivitySection() {
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, isPending, isError } = useActivities({
+    method: 'offset',
+    page: currentPage,
+    size: MAIN_PAGE_SIZE,
+    sort: 'latest',
+  });
+
+  const activities = data?.activities ?? [];
+  const totalPages = data ? Math.ceil(data.totalCount / MAIN_PAGE_SIZE) : 0;
 
   return (
     <section>
@@ -44,9 +54,10 @@ export function AllActivitySection() {
           placeholder="정렬"
           onChange={() => undefined}
           menuClassName="left-auto right-0"
-          // TODO: 추후 정렬 기능 연동 예정
+          // TODO: 가격 정렬 기능은 PR2에서 연결 예정
         />
       </div>
+
       <ul className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
         {MAIN_CATEGORIES.map((category) => (
           <li key={category.value} className="shrink-0">
@@ -54,37 +65,56 @@ export function AllActivitySection() {
               label={category.label}
               category={category.iconCategory}
               className="whitespace-nowrap"
+              // TODO: 카테고리 필터 기능은 PR2에서 연결 예정
             />
           </li>
         ))}
       </ul>
 
-      <ul
-        className={cn(
-          // 초소형 모바일
-          'grid w-full grid-cols-1 gap-4 gap-y-6',
-          // 일반 모바일
-          'xs:grid-cols-2',
-          // 태블릿
-          'md:grid-cols-3 md:gap-6',
-          // 데스크탑
-          '2xl:grid-cols-4'
-        )}
-      >
-        {MAIN_ACTIVITIES.map((activity) => (
-          <li key={activity.id}>
-            <ActivityCard activity={activity} />
-          </li>
-        ))}
-      </ul>
+      {isPending && (
+        <p className="typo-md-medium py-10 text-center text-gray-500">
+          체험을 불러오는 중입니다.
+        </p>
+      )}
 
-      <div className="mt-10">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={TEMP_TOTAL_PAGES}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+      {isError && (
+        <p className="typo-md-medium py-10 text-center text-red-500">
+          체험을 불러오지 못했습니다.
+        </p>
+      )}
+
+      {!isPending && !isError && activities.length === 0 && (
+        <p className="typo-md-medium py-10 text-center text-gray-500">
+          등록된 체험이 없습니다.
+        </p>
+      )}
+
+      {!isPending && !isError && activities.length > 0 && (
+        <>
+          <ul
+            className={cn(
+              'grid w-full grid-cols-1 gap-4 gap-y-6',
+              'xs:grid-cols-2',
+              'md:grid-cols-3 md:gap-6',
+              '2xl:grid-cols-4'
+            )}
+          >
+            {activities.map((activity) => (
+              <li key={activity.id}>
+                <ActivityCard activity={activity} />
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </>
+      )}
     </section>
   );
 }

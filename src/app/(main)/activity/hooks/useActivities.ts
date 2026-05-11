@@ -1,5 +1,3 @@
-'use client';
-
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivities } from '@/app/(main)/activity/apis/activities';
 import type { FetchActivitiesParams } from '@/app/(main)/activity/apis/activities.types';

@@ -1,5 +1,12 @@
-import type { MainActivity } from '@/app/(main)/main.types';
+export interface ActivityCardItem {
+  id: number;
+  title: string;
+  price: number;
+  rating: number;
+  reviewCount: number;
+  bannerImageUrl: string;
+}
 
 export interface ActivityCardProps {
-  activity: MainActivity;
+  activity: ActivityCardItem;
 }
