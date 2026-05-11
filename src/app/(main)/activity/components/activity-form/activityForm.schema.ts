@@ -25,16 +25,13 @@ export const activityFormSchema = z.object({
     .number({
       error: () => ({ message: '가격을 입력해 주세요' }),
     })
-    .min(1, '가격은 0원 이상이어야 합니다.'),
-  address: z
-    .string({
-      error: () => ({ message: '주소를 입력해 주세요' }),
-    })
-    .min(1, '주소를 입력해 주세요'),
+    .min(1, '가격은 1원 이상이어야 합니다.'),
+  address: z.string().min(1, '주소를 입력해 주세요'),
   schedules: z
     .array(scheduleSchema)
     .min(1, '예약 가능한 시간대는 최소 1개 이상 등록해주세요'),
   bannerImageUrl: z.string().min(1, '배너 이미지를 등록해 주세요'),
+  subImageUrls: z.array(z.string()).max(4).optional(),
 });
 
 /**
