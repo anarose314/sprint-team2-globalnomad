@@ -170,10 +170,12 @@
   @apply flex flex-col;
   /* 자식 스크롤 영역이 높이를 정상 계산하도록 축소 허용 */
   min-height: 0;
+  @apply overflow-visible;
 }
 
 .reservation-detail-sheet__section {
   @apply mb-7;
+  @apply overflow-visible;
 }
 
 .reservation-detail-sheet__section--requests {
@@ -188,14 +190,19 @@
 
 .reservation-detail-sheet__select-wrap {
   @apply relative;
+  @apply z-dropdown;
 }
 
 .reservation-detail-sheet__select {
-  @apply typo-md-medium h-13 w-full appearance-none rounded-2xl border border-gray-100 px-4 text-gray-950 outline-none;
+  @apply typo-md-medium h-13 w-full appearance-none border border-gray-100 px-4 text-gray-950 outline-none;
 }
 
 .reservation-detail-sheet__select-icon {
   @apply pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-900;
+}
+
+.reservation-detail-sheet__select-menu {
+  @apply mt-1 rounded-xl border border-gray-100 bg-white shadow-md;
 }
 
 .reservation-detail-sheet__request-list {
