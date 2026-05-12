@@ -29,7 +29,11 @@ export const activityFormSchema = z.object({
     .trim()
     .min(1, '주소를 입력해 주세요'),
   schedules: z
-    .array(scheduleSchema)
+    .array(scheduleSchema, {
+      error: () => ({
+        message: '예약 가능한 시간대는 최소 1개 이상 등록해주세요',
+      }),
+    })
     .min(1, '예약 가능한 시간대는 최소 1개 이상 등록해주세요'),
   bannerImageUrl: z.string().min(1, '배너 이미지를 등록해 주세요'),
   subImageUrls: z.array(z.string()).max(4).optional(),

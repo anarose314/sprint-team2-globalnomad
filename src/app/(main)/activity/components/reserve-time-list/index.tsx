@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { ReserveTime } from '@/app/(main)/activity/components/reserve-time';
 import { Schedule } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
 import { validateSchedule } from '@/app/(main)/activity/components/reserve-time-list/validateSchedule';
+import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
+import { cn } from '@/shared/utils/cn';
 import { generateId } from '@/shared/utils/generateId';
 
 const INITIAL_SCHEDULE: Schedule = {
@@ -14,13 +16,22 @@ const INITIAL_SCHEDULE: Schedule = {
   endTime: '',
 };
 
+export interface ReserveTimeListProps {
+  schedules: Schedule[];
+  onSchedulesChange: (schedules: Schedule[]) => void;
+  errorMessage?: string;
+}
+
 /**
  * 예약 가능한 시간대 목록을 렌더링하고 추가, 수정, 삭제를 관리하는 컴포넌트
  */
-export function ReserveTimeList() {
+export function ReserveTimeList({
+  schedules,
+  onSchedulesChange,
+  errorMessage,
+}: ReserveTimeListProps) {
   const [inputSchedule, setInputSchedule] =
     useState<Schedule>(INITIAL_SCHEDULE);
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   const showToast = useShowToast();
 
@@ -40,15 +51,17 @@ export function ReserveTimeList() {
       id: generateId(),
     };
 
-    setSchedules((prev) => [...prev, newSchedule]);
+    onSchedulesChange([...schedules, newSchedule]);
     setInputSchedule(INITIAL_SCHEDULE);
   };
 
-  const handleDelete = (id: string) => {
-    setSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
+  const handleDelete = (id?: string) => {
+    if (!id) return;
+    onSchedulesChange(schedules.filter((schedule) => schedule.id !== id));
   };
 
-  const handleUpdate = (id: string, updatedSchedule: Schedule) => {
+  const handleUpdate = (id: string | undefined, updatedSchedule: Schedule) => {
+    if (!id) return;
     const { isValid, errorMessage } = validateSchedule(
       updatedSchedule,
       schedules,
@@ -60,15 +73,15 @@ export function ReserveTimeList() {
       return;
     }
 
-    setSchedules((prev) =>
-      prev.map((schedule) => (schedule.id === id ? updatedSchedule : schedule))
+    onSchedulesChange(
+      schedules.map((schedule) =>
+        schedule.id === id ? updatedSchedule : schedule
+      )
     );
   };
 
   return (
     <div className="flex flex-col gap-5">
-      <input type="hidden" name="schedules" value={JSON.stringify(schedules)} />
-
       <ReserveTime
         value={inputSchedule}
         onChange={(newVal) => setInputSchedule(newVal)}
@@ -76,6 +89,7 @@ export function ReserveTimeList() {
         hasLabel
         isAddAction
         className="border-b border-gray-100 pb-5"
+        isError={Boolean(errorMessage)}
       />
       {schedules.map((item) => (
         <ReserveTime
@@ -85,6 +99,9 @@ export function ReserveTimeList() {
           onClick={() => handleDelete(item.id)}
         />
       ))}
+      {errorMessage && (
+        <p className={cn(INPUT_ERROR_MESSAGE_STYLE, 'mt-0')}>{errorMessage}</p>
+      )}
     </div>
   );
 }

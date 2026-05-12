@@ -29,7 +29,10 @@ export function ActivityForm({
   } = useForm<ActivityFormValues>({
     mode: 'onTouched',
     resolver: zodResolver(activityFormSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      schedules: defaultValues?.schedules || [],
+    },
   });
 
   return (
@@ -88,7 +91,17 @@ export function ActivityForm({
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>
-        <ReserveTimeList />
+        <Controller
+          name="schedules"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <ReserveTimeList
+              schedules={value || []}
+              onSchedulesChange={onChange}
+              errorMessage={errors.schedules?.message}
+            />
+          )}
+        />
       </section>
       <section>
         <FormTitle>배너 이미지 등록</FormTitle>
