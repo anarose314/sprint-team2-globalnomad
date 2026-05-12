@@ -45,6 +45,10 @@ const getDesktopPageSizeSnapshot = () => {
 
 const getServerDesktopPageSizeSnapshot = () => false;
 
+const isActivitySort = (value: string): value is ActivitySort => {
+  return MAIN_SORT_OPTIONS.some((option) => option.value === value);
+};
+
 /**
  * 메인 페이지 모든 체험 섹션 컴포넌트
  *
@@ -93,7 +97,11 @@ export function AllActivitySection({
   };
 
   const handleSortChange = (value: string) => {
-    setSelectedSort(value as ActivitySort);
+    if (!isActivitySort(value)) {
+      return;
+    }
+
+    setSelectedSort(value);
     onResetSearchInput();
     setCurrentPage(1);
   };
