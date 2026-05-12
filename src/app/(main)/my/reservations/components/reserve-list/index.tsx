@@ -39,16 +39,9 @@ export function ReserveList() {
         />
       ) : (
         <ul className="flex flex-col gap-5 wrap-anywhere">
-          {reserveList.map((reservation) => (
+          {reserveList.map((reservation, index) => (
             <li key={reservation.id}>
               <article className="flex flex-col gap-3 border-b border-b-gray-50 pb-7.5">
-                {/* 날짜 */}
-                <time
-                  dateTime={reservation.date}
-                  className="typo-lg-bold 2xl:typo-2lg-bold block"
-                >
-                  {reservation.date}
-                </time>
                 {/* 카드 */}
                 <ActivityCard href={`/activity/${reservation.activity.id}`}>
                   <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
@@ -60,15 +53,26 @@ export function ReserveList() {
                       >
                         {reservation.activity.title}
                       </Heading>
-                      <p className="typo-sm-medium 2xl:typo-lg-medium text-gray-500">
-                        <time dateTime={reservation.startTime}>
-                          {reservation.startTime}
-                        </time>{' '}
-                        -{' '}
-                        <time dateTime={reservation.endTime}>
-                          {reservation.endTime}
-                        </time>
-                      </p>
+                      <div className="typo-sm-medium 2xl:typo-lg-medium flex gap-2 text-gray-500">
+                        {/* 날짜 */}
+                        <p>
+                          <time dateTime={reservation.date}>
+                            {reservation.date}
+                          </time>
+                        </p>
+                        {/* divide */}
+                        <p>·</p>
+                        {/* 시간 */}
+                        <p>
+                          <time dateTime={reservation.startTime}>
+                            {reservation.startTime}
+                          </time>{' '}
+                          -{' '}
+                          <time dateTime={reservation.endTime}>
+                            {reservation.endTime}
+                          </time>
+                        </p>
+                      </div>
                     </div>
                     <p className="typo-lg-bold 2xl:typo-2lg-bold flex items-center gap-1 text-gray-950">
                       ₩{reservation.totalPrice.toLocaleString('ko-KR')}
@@ -82,6 +86,8 @@ export function ReserveList() {
                       fill
                       src={reservation.activity.bannerImageUrl}
                       alt={reservation.activity.title}
+                      priority={index === 0}
+                      sizes="(min-width: 768px) 25vw, 33vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </figure>
