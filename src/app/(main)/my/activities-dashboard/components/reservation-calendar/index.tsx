@@ -46,10 +46,6 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     () => (detailDate ? formatDateKey(detailDate) : null),
     [detailDate]
   );
-  const reservedScheduleDateKey = useMemo(
-    () => (detailDate ? formatDateKey(detailDate) : null),
-    [detailDate]
-  );
   const {
     desktopSheetPosition,
     setDesktopSheetPositionFromTile,
@@ -80,14 +76,14 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
       activityId,
-      reservedScheduleDateKey,
+      selectedDateKey,
     ],
     queryFn: () =>
       fetchReservedSchedule({
         activityId: activityId as number,
-        date: reservedScheduleDateKey as string,
+        date: selectedDateKey as string,
       }),
-    enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+    enabled: activityId !== null && Boolean(selectedDateKey),
   });
 
   const { data: activitySchedules = [] } = useQuery({
@@ -124,9 +120,9 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
   }, [reservationDashboard]);
 
   const detailData = useMemo(() => {
-    const filteredActivitySchedules = reservedScheduleDateKey
+    const filteredActivitySchedules = selectedDateKey
       ? activitySchedules.filter(
-          (schedule) => schedule.date === reservedScheduleDateKey
+          (schedule) => schedule.date === selectedDateKey
         )
       : [];
 
@@ -139,7 +135,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
       timeSlots: uniqueTimeSlots,
       requests: [],
     };
-  }, [activitySchedules, reservedScheduleDateKey, reservedSchedules]);
+  }, [activitySchedules, selectedDateKey, reservedSchedules]);
 
   if (activityId === null) {
     return (
