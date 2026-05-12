@@ -20,6 +20,7 @@ export interface ReserveTimeListProps {
   schedules: Schedule[];
   onSchedulesChange: (schedules: Schedule[]) => void;
   errorMessage?: string;
+  clearError?: () => void;
 }
 
 /**
@@ -29,11 +30,19 @@ export function ReserveTimeList({
   schedules,
   onSchedulesChange,
   errorMessage,
+  clearError,
 }: ReserveTimeListProps) {
   const [inputSchedule, setInputSchedule] =
     useState<Schedule>(INITIAL_SCHEDULE);
 
   const showToast = useShowToast();
+
+  const handleInputChange = (newVal: Schedule) => {
+    setInputSchedule(newVal);
+    if (errorMessage && clearError) {
+      clearError();
+    }
+  };
 
   const handleAdd = () => {
     const { isValid, errorMessage } = validateSchedule(
@@ -84,7 +93,7 @@ export function ReserveTimeList({
     <div className="flex flex-col gap-5">
       <ReserveTime
         value={inputSchedule}
-        onChange={(newVal) => setInputSchedule(newVal)}
+        onChange={handleInputChange}
         onClick={handleAdd}
         hasLabel
         isAddAction

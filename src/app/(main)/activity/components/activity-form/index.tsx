@@ -26,6 +26,7 @@ export function ActivityForm({
     handleSubmit,
     control,
     formState: { errors },
+    clearErrors,
   } = useForm<ActivityFormValues>({
     mode: 'onTouched',
     resolver: zodResolver(activityFormSchema),
@@ -99,6 +100,7 @@ export function ActivityForm({
               schedules={value || []}
               onSchedulesChange={onChange}
               errorMessage={errors.schedules?.message}
+              clearError={() => clearErrors('schedules')}
             />
           )}
         />
