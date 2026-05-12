@@ -4,6 +4,7 @@ import { MyReservationsResponse } from '@/shared/types/myReservation.types';
 
 interface FetchMyReservations {
   pageParam?: number | null;
+  status?: string | null;
 }
 
 /**
@@ -11,16 +12,16 @@ interface FetchMyReservations {
  */
 export const fetchMyReservations = async ({
   pageParam = null,
+  status = null,
 }: FetchMyReservations) => {
   const params = {
     size: MY_RESERVATIONS_SIZE,
     ...(pageParam !== null && { cursorId: pageParam }),
+    status,
   };
 
   return await fetchInstanceClient<MyReservationsResponse>(
     '/api/proxy/my-reservations',
-    {
-      params,
-    }
+    { params }
   );
 };

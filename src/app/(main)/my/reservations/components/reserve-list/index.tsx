@@ -2,6 +2,7 @@
 
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { ActivityCard } from '@/app/(main)/my/components/activity-card';
 import { MyPageEmpty } from '@/app/(main)/my/components/my-page-empty';
 import { ReserveButtons } from '@/app/(main)/my/reservations/components/reserve-buttons';
@@ -11,8 +12,11 @@ import { Spinner } from '@/shared/components/spinner';
 import { StatusBadge } from '@/shared/components/status-badge';
 
 export function ReserveList() {
+  const searchParams = useSearchParams();
+  const status = searchParams.get('status');
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMyReservations();
+    useMyReservations(status);
 
   const { ref } = useInView({
     onChange: (inView) => {
