@@ -1,9 +1,23 @@
+export type ActivityCategory =
+  | '문화 · 예술'
+  | '식음료'
+  | '스포츠'
+  | '투어'
+  | '관광'
+  | '웰빙';
+
+export type ActivitySort =
+  | 'latest'
+  | 'price_asc'
+  | 'price_desc'
+  | 'most_reviewed';
+
 export interface Activity {
   id: number;
   userId: number;
   title: string;
   description: string;
-  category: string;
+  category: ActivityCategory;
   price: number;
   address: string;
   bannerImageUrl?: string | null;
@@ -23,5 +37,7 @@ export interface FetchActivitiesParams {
   method: 'offset';
   page: number;
   size: number;
-  sort?: 'latest';
+  sort?: ActivitySort;
+  category?: ActivityCategory;
+  keyword?: string;
 }
