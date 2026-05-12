@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import { kakaoSignin } from '@/shared/apis/auth/kakao-signin';
+import { kakaoSignin } from '@/shared/apis/auth/kakaoSignin';
 import { useShowToast } from '@/shared/store/useToastStore';
 
 /**
