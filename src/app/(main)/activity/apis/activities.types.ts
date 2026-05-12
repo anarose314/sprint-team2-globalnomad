@@ -6,7 +6,7 @@ export interface Activity {
   category: string;
   price: number;
   address: string;
-  bannerImageUrl: string;
+  bannerImageUrl?: string | null;
   rating: number;
   reviewCount: number;
   createdAt: string;

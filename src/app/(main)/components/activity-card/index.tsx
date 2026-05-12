@@ -8,12 +8,15 @@ import { Heading } from '@/shared/components/heading';
  * 메인 페이지 체험 카드 컴포넌트
  *
  * - 체험 대표 이미지와 기본 정보를 표시한다.
+ * - 대표 이미지가 없는 경우 기본 배경 영역을 유지한다.
  * - 카드를 클릭하면 체험 상세 페이지로 이동한다.
  *
  * @example
  * <ActivityCard activity={activity} />
  */
 export function ActivityCard({ activity }: ActivityCardProps) {
+  const bannerImageUrl = activity.bannerImageUrl?.trim();
+
   return (
     <Link
       href={`/activity/${activity.id}`}
@@ -22,9 +25,9 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     >
       <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
         <div className="relative aspect-square w-full bg-gray-200">
-          {activity.bannerImageUrl && (
+          {bannerImageUrl && (
             <Image
-              src={activity.bannerImageUrl}
+              src={bannerImageUrl}
               alt={`${activity.title} 대표 이미지`}
               fill
               sizes="(min-width: 1536px) 262px, (min-width: 768px) 33vw, 50vw"

@@ -4,7 +4,7 @@ export interface ActivityCardItem {
   price: number;
   rating: number;
   reviewCount: number;
-  bannerImageUrl: string;
+  bannerImageUrl?: string | null;
 }
 
 export interface ActivityCardProps {
