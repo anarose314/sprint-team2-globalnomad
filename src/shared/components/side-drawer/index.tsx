@@ -76,7 +76,7 @@ export function SideDrawer({
       )}
       onMouseDown={handleOverlayMouseDown}
     >
-      <aside
+      <div
         id={id}
         role="dialog"
         aria-modal="true"
@@ -96,7 +96,7 @@ export function SideDrawer({
         </button>
 
         {children}
-      </aside>
+      </div>
     </div>,
     portalRoot
   );
