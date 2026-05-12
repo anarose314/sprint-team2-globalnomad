@@ -90,3 +90,33 @@ export type KakaoSignupBackendResponse = {
 export type KakaoSignupResponse = {
   user: User;
 };
+
+/**
+ * 카카오 간편 로그인 API 요청 바디.
+ *
+ * 회원가입과 달리 nickname이 없다 (이미 가입된 사용자의 인증만 처리).
+ *
+ * - token: 카카오에서 받은 인가 코드 (백엔드 가이드상 'token'이라는 명칭이지만 실제론 인가 코드)
+ * - redirectUri: 인가 코드 발급 시 사용한 redirect_uri
+ */
+export type KakaoSigninRequest = {
+  token: string;
+  redirectUri: string;
+};
+
+/**
+ * 백엔드의 카카오 로그인 응답 (BFF가 받는 형태).
+ */
+export type KakaoSigninBackendResponse = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+};
+
+/**
+ * 클라이언트가 BFF에서 받는 카카오 로그인 응답.
+ * 토큰은 httpOnly 쿠키로 처리되므로 바디에는 user 정보만 포함된다.
+ */
+export type KakaoSigninResponse = {
+  user: User;
+};
