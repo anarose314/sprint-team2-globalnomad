@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useActivities } from '@/app/(main)/activity/hooks/useActivities';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
 import {
   MAIN_CATEGORIES,
+  MAIN_DESKTOP_PAGE_SIZE,
+  MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
   MAIN_PAGE_SIZE,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
@@ -18,6 +20,7 @@ import { cn } from '@/shared/utils/cn';
  * 메인 페이지 모든 체험 섹션 컴포넌트
  *
  * - 모든 체험 목록을 최신순 페이지네이션으로 조회한다.
+ * - 모바일~태블릿에서는 한 페이지에 6개, 2xl 화면에서는 8개를 조회한다.
  * - PR1에서는 카테고리 필터와 가격 정렬 UI만 표시한다.
  * - 검색, 카테고리, 가격 정렬 동작은 이후 작업에서 연결한다.
  *
@@ -26,16 +29,38 @@ import { cn } from '@/shared/utils/cn';
  */
 export function AllActivitySection() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(MAIN_PAGE_SIZE);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
+
+    const updatePageSize = () => {
+      const nextPageSize = mediaQuery.matches
+        ? MAIN_DESKTOP_PAGE_SIZE
+        : MAIN_PAGE_SIZE;
+
+      setPageSize(nextPageSize);
+      setCurrentPage(1);
+    };
+
+    updatePageSize();
+
+    mediaQuery.addEventListener('change', updatePageSize);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updatePageSize);
+    };
+  }, []);
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
     page: currentPage,
-    size: MAIN_PAGE_SIZE,
+    size: pageSize,
     sort: 'latest',
   });
 
   const activities = data?.activities ?? [];
-  const totalPages = data ? Math.ceil(data.totalCount / MAIN_PAGE_SIZE) : 0;
+  const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
 
   return (
     <section>
