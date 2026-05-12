@@ -51,8 +51,39 @@ export function KakaoCallback() {
       router.replace('/login');
     };
 
+    /**
+     * 카카오 로그인 흐름 처리.
+     * 성공 시 메인으로 이동(훅의 onSuccess에서 처리), 실패 시 분기별 안내.
+     */
+    const handleSignin = (code: string, redirectUri: string) => {
+      signinMutate(
+        { token: code, redirectUri },
+        {
+          onError: (error) => {
+            // 404: 가입되지 않은 카카오 계정 — 회원가입 페이지로 안내
+            if (error instanceof ApiError && error.status === 404) {
+              showToast({
+                theme: 'info',
+                message: '가입된 계정이 없습니다. 회원가입을 진행해 주세요.',
+              });
+              router.replace('/signup');
+              return;
+            }
+
+            // 그 외: 일반 에러 처리
+            const message =
+              error instanceof Error
+                ? error.message
+                : '카카오 로그인에 실패했습니다.';
+            showToast({ theme: 'error', message });
+            router.replace('/login');
+          },
+        }
+      );
+    };
+
     try {
-      // URL에서 code, state 추출
+      // 1. URL에서 code, state 추출
       const code = searchParams.get('code');
       const stateFromUrl = searchParams.get('state');
 
@@ -61,7 +92,7 @@ export function KakaoCallback() {
         return;
       }
 
-      // CSRF 검증 — sessionStorage의 state와 비교 후 즉시 삭제
+      // 2. CSRF 검증 — sessionStorage의 state와 비교 후 즉시 삭제
       const stateFromStorage = consumeKakaoOAuthState();
 
       if (!stateFromStorage || stateFromStorage !== stateFromUrl) {
@@ -69,7 +100,7 @@ export function KakaoCallback() {
         return;
       }
 
-      // state에서 intent 추출
+      // 3. state에서 intent 추출
       const parsed = parseKakaoOAuthState(stateFromUrl);
 
       if (!parsed) {
@@ -77,7 +108,7 @@ export function KakaoCallback() {
         return;
       }
 
-      // redirectUri 확인 (signin/signup 모두 필요)
+      // 4. redirectUri 확인 (signin/signup 모두 필요)
       const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
 
       if (!redirectUri) {
@@ -87,33 +118,9 @@ export function KakaoCallback() {
         return;
       }
 
-      // intent별 분기
+      // 5. intent별 분기
       if (parsed.intent === 'signin') {
-        // 로그인 흐름 — mutation 호출, 성공 처리는 훅 안에서
-        signinMutate(
-          { token: code, redirectUri },
-          {
-            onError: (error) => {
-              // 404 — 가입되지 않은 카카오 계정. 회원가입 안내.
-              if (error instanceof ApiError && error.status === 404) {
-                showToast({
-                  theme: 'info',
-                  message: '가입된 계정이 없습니다. 회원가입을 진행해 주세요.',
-                });
-                router.replace('/signup');
-                return;
-              }
-
-              // 그 외 — 일반 에러 처리
-              const message =
-                error instanceof Error
-                  ? error.message
-                  : '카카오 로그인에 실패했습니다.';
-              showToast({ theme: 'error', message });
-              router.replace('/login');
-            },
-          }
-        );
+        handleSignin(code, redirectUri);
         return;
       }
 
