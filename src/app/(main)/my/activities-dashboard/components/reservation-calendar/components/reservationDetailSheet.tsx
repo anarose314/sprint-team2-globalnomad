@@ -6,7 +6,8 @@ import { ReservationDetailSheetRequestList } from '@/app/(main)/my/activities-da
 import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetTabs';
 import { useReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationDetailSheet';
 import { ReservationDetailMockData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { IcArrowDown, IcClose } from '@/shared/assets/icons';
+import { IcClose } from '@/shared/assets/icons';
+import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
@@ -59,6 +60,12 @@ export function ReservationDetailSheet({
     detailData,
     onClose,
   });
+  const timeSlotOptions = (
+    detailData?.timeSlots.length ? detailData.timeSlots : [EMPTY_TIME_SLOT]
+  ).map((timeSlot) => ({
+    label: timeSlot,
+    value: timeSlot,
+  }));
 
   if (!isOpen) return null;
 
@@ -103,24 +110,17 @@ export function ReservationDetailSheet({
               <p className="reservation-detail-sheet__section-title">
                 예약 시간
               </p>
-              <div className="reservation-detail-sheet__select-wrap">
-                <select
-                  className="reservation-detail-sheet__select"
-                  value={selectedTimeSlot}
-                  onChange={(event) => setSelectedTimeSlot(event.target.value)}
-                  disabled={!detailData?.timeSlots.length}
-                >
-                  {(detailData?.timeSlots.length
-                    ? detailData.timeSlots
-                    : [EMPTY_TIME_SLOT]
-                  ).map((timeSlot) => (
-                    <option key={timeSlot} value={timeSlot}>
-                      {timeSlot}
-                    </option>
-                  ))}
-                </select>
-                <IcArrowDown className="reservation-detail-sheet__select-icon" />
-              </div>
+              <Dropdown
+                options={timeSlotOptions}
+                value={selectedTimeSlot}
+                disabled={!detailData?.timeSlots.length}
+                optionHeight={44}
+                maxVisibleOptions={4}
+                className="reservation-detail-sheet__select-wrap"
+                triggerClassName="reservation-detail-sheet__select"
+                menuClassName="reservation-detail-sheet__select-menu"
+                onChange={(value) => setSelectedTimeSlot(value)}
+              />
             </div>
 
             <div className="reservation-detail-sheet__section reservation-detail-sheet__section--requests">
