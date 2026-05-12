@@ -6,14 +6,39 @@ import { User } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
-// TODO: 추후 API 연동 후 동적 메타데이터로 변경
-export const metadata: Metadata = {
-  title: '체험 이름',
-};
-
 interface ActivityDetailPageProps {
   params: Promise<{ id: string }>;
 }
+
+/**
+ * activityId로 체험 상세 정보 조회
+ */
+const getActivityDetail = async (activityId: number) => {
+  return fetchInstanceServer<ActivityDetailResponse>(
+    `/activities/${activityId}`
+  );
+};
+
+/**
+ * 체험 상세 페이지 메타데이터를 동적으로 생성
+ */
+export const generateMetadata = async ({
+  params,
+}: ActivityDetailPageProps): Promise<Metadata> => {
+  const { id } = await params;
+  const activityId = Number(id);
+
+  if (!Number.isFinite(activityId)) {
+    return { title: '체험 상세' };
+  }
+
+  try {
+    const activity = await getActivityDetail(activityId);
+    return { title: activity.title };
+  } catch {
+    return { title: '체험 상세' };
+  }
+};
 
 /**
  * 체험 상세 페이지 서버 엔트리 포인트
@@ -35,9 +60,7 @@ export default async function ActivityDetailPage({
   let activity: ActivityDetailResponse;
 
   try {
-    activity = await fetchInstanceServer<ActivityDetailResponse>(
-      `/activities/${activityId}`
-    );
+    activity = await getActivityDetail(activityId);
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       notFound();
