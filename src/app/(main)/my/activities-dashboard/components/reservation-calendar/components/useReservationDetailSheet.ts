@@ -131,6 +131,8 @@ export const useReservationDetailSheet = ({
 
     const observerTarget = requestListEndRef.current;
     if (!observerTarget) return;
+    const scrollTarget = requestScrollRef.current;
+    if (!scrollTarget) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -138,7 +140,7 @@ export const useReservationDetailSheet = ({
         fetchNextPage();
       },
       {
-        root: requestScrollRef.current,
+        root: scrollTarget,
         threshold: 0.2,
       }
     );
