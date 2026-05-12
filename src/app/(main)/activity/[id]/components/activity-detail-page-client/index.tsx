@@ -68,6 +68,12 @@ interface ActivityDetailPageClientProps {
   isOwner: boolean;
 }
 
+/**
+ * 체험 상세 페이지의 클라이언트 상호작용 영역 렌더링
+ *
+ * - 소유자 여부에 따라 케밥 메뉴와 예약 카드 노출 제어
+ * - 수정/삭제 액션과 삭제 성공 후 라우팅 처리
+ */
 export function ActivityDetailPageClient({
   activity,
   isOwner,

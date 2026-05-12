@@ -15,6 +15,13 @@ interface ActivityDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
+/**
+ * 체험 상세 페이지 서버 엔트리 포인트
+ *
+ * URL 파라미터를 기반으로 상세 데이터를 조회,
+ * 로그인 사용자와 작성자 id를 비교해 소유자 여부 계산 후
+ * 클라이언트 컴포넌트에 전달
+ */
 export default async function ActivityDetailPage({
   params,
 }: ActivityDetailPageProps) {
