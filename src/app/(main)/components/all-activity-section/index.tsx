@@ -1,8 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
+import type {
+  ActivityCategory,
+  ActivitySort,
+} from '@/app/(main)/activity/apis/activities.types';
 import { useActivities } from '@/app/(main)/activity/hooks/useActivities';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
+import type { AllActivitySectionProps } from '@/app/(main)/components/all-activity-section/allActivitySection.types';
 import {
   MAIN_CATEGORIES,
   MAIN_DESKTOP_PAGE_SIZE,
@@ -16,51 +21,82 @@ import { Heading } from '@/shared/components/heading';
 import { Pagination } from '@/shared/components/pagination';
 import { cn } from '@/shared/utils/cn';
 
+const subscribeDesktopPageSize = (onStoreChange: () => void) => {
+  if (typeof window === 'undefined') {
+    return () => undefined;
+  }
+
+  const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
+
+  mediaQuery.addEventListener('change', onStoreChange);
+
+  return () => {
+    mediaQuery.removeEventListener('change', onStoreChange);
+  };
+};
+
+const getDesktopPageSizeSnapshot = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY).matches;
+};
+
+const getServerDesktopPageSizeSnapshot = () => false;
+
 /**
  * 메인 페이지 모든 체험 섹션 컴포넌트
  *
- * - 모든 체험 목록을 최신순 페이지네이션으로 조회한다.
- * - 모바일~태블릿에서는 한 페이지에 6개, 2xl 화면에서는 8개를 조회한다.
- * - PR1에서는 카테고리 필터와 가격 정렬 UI만 표시한다.
- * - 검색, 카테고리, 가격 정렬 동작은 이후 작업에서 연결한다.
+ * - 검색어, 카테고리, 가격 정렬 조건으로 모든 체험 목록을 조회한다.
+ * - 검색 시 카테고리와 가격 정렬 조건은 초기화된다.
+ * - 카테고리와 가격 정렬은 함께 적용할 수 있다.
  *
  * @example
- * <AllActivitySection />
+ * <AllActivitySection
+ *   keyword={keyword}
+ *   onResetSearchInput={handleResetSearchInput}
+ * />
  */
-export function AllActivitySection() {
+export function AllActivitySection({
+  keyword,
+  onResetSearchInput,
+}: AllActivitySectionProps) {
+  const isDesktopPageSize = useSyncExternalStore(
+    subscribeDesktopPageSize,
+    getDesktopPageSizeSnapshot,
+    getServerDesktopPageSizeSnapshot
+  );
+
+  const pageSize = isDesktopPageSize ? MAIN_DESKTOP_PAGE_SIZE : MAIN_PAGE_SIZE;
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(MAIN_PAGE_SIZE);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
-
-    const updatePageSize = () => {
-      const nextPageSize = mediaQuery.matches
-        ? MAIN_DESKTOP_PAGE_SIZE
-        : MAIN_PAGE_SIZE;
-
-      setPageSize(nextPageSize);
-      setCurrentPage(1);
-    };
-
-    updatePageSize();
-
-    mediaQuery.addEventListener('change', updatePageSize);
-
-    return () => {
-      mediaQuery.removeEventListener('change', updatePageSize);
-    };
-  }, []);
+  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory>();
+  const [selectedSort, setSelectedSort] = useState<ActivitySort>('latest');
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
     page: currentPage,
     size: pageSize,
-    sort: 'latest',
+    sort: selectedSort,
+    category: selectedCategory,
+    keyword,
   });
 
   const activities = data?.activities ?? [];
   const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
+
+  const handleCategoryClick = (category: ActivityCategory) => {
+    setSelectedCategory((prev) => (prev === category ? undefined : category));
+    onResetSearchInput();
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSelectedSort(value as ActivitySort);
+    onResetSearchInput();
+    setCurrentPage(1);
+  };
 
   return (
     <section>
@@ -76,10 +112,10 @@ export function AllActivitySection() {
         <Dropdown
           variant="chip"
           options={MAIN_SORT_OPTIONS}
+          value={selectedSort === 'latest' ? undefined : selectedSort}
           placeholder="정렬"
-          onChange={() => undefined}
+          onChange={handleSortChange}
           menuClassName="left-auto right-0"
-          // TODO: 가격 정렬 기능은 PR2에서 연결 예정
         />
       </div>
 
@@ -89,8 +125,11 @@ export function AllActivitySection() {
             <FilterButton
               label={category.label}
               category={category.iconCategory}
+              state={
+                selectedCategory === category.apiValue ? 'active' : 'normal'
+              }
               className="whitespace-nowrap"
-              // TODO: 카테고리 필터 기능은 PR2에서 연결 예정
+              onClick={() => handleCategoryClick(category.apiValue)}
             />
           </li>
         ))}
@@ -110,7 +149,7 @@ export function AllActivitySection() {
 
       {!isPending && !isError && activities.length === 0 && (
         <p className="typo-md-medium py-10 text-center text-gray-500">
-          등록된 체험이 없습니다.
+          조건에 맞는 체험이 없습니다.
         </p>
       )}
 
