@@ -11,9 +11,14 @@ interface ReservationDetailSheetRequestListProps {
   activeTab: ReservationTab;
   isEmpty: boolean;
   isLoading: boolean;
+  isDateReservationEmpty: boolean;
   requests: ReservationRequestItem[];
+  isSelectedTimeSlotEnded: boolean;
+  isUpdatingStatus: boolean;
   hasMoreRequests: boolean;
   isFetchingNextPage: boolean;
+  onApprove: (reservationId: number) => void;
+  onReject: (reservationId: number) => void;
   sentinelRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -27,11 +32,23 @@ export function ReservationDetailSheetRequestList({
   activeTab,
   isEmpty,
   isLoading,
+  isDateReservationEmpty,
   requests,
+  isSelectedTimeSlotEnded,
+  isUpdatingStatus,
   hasMoreRequests,
   isFetchingNextPage,
+  onApprove,
+  onReject,
   sentinelRef,
 }: ReservationDetailSheetRequestListProps) {
+  const resolveBadgeStatus = (
+    requestStatus: ReservationRequestItem['status']
+  ) => {
+    if (requestStatus === 'pending') return 'pending';
+    return toReservationBadgeStatus(requestStatus);
+  };
+
   if (isLoading) {
     return (
       <p className="reservation-detail-sheet__empty">
@@ -43,7 +60,9 @@ export function ReservationDetailSheetRequestList({
   if (isEmpty) {
     return (
       <p className="reservation-detail-sheet__empty">
-        해당 날짜에 예약 내역이 없습니다.
+        {isDateReservationEmpty
+          ? '해당 날짜에 예약 내역이 없습니다.'
+          : '해당 시간대에 예약 내역이 없습니다.'}
       </p>
     );
   }
@@ -80,21 +99,27 @@ export function ReservationDetailSheetRequestList({
                   variant="secondary"
                   size="sm"
                   className="reservation-detail-sheet__action-button reservation-detail-sheet__action-button--approve"
-                  disabled={request.status !== 'pending'}
+                  onClick={() => onApprove(request.id)}
+                  disabled={request.status !== 'pending' || isUpdatingStatus}
                 >
                   승인하기
                 </Button>
                 <Button
                   size="sm"
                   className="reservation-detail-sheet__action-button reservation-detail-sheet__action-button--reject"
-                  disabled={request.status !== 'pending'}
+                  onClick={() => onReject(request.id)}
+                  disabled={request.status !== 'pending' || isUpdatingStatus}
                 >
                   거절하기
                 </Button>
               </div>
             ) : (
               <StatusBadge
-                status={toReservationBadgeStatus(activeTab)}
+                status={
+                  activeTab === 'confirmed' && isSelectedTimeSlotEnded
+                    ? 'completed'
+                    : resolveBadgeStatus(request.status)
+                }
                 className="reservation-detail-sheet__status-badge"
               />
             )}

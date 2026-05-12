@@ -51,6 +51,8 @@ export const buildReservationDetailData = ({
 
       return {
         scheduleId: resolvedScheduleId,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
         label: `${schedule.startTime} - ${schedule.endTime}`,
         value:
           resolvedScheduleId !== null
@@ -67,6 +69,8 @@ export const buildReservationDetailData = ({
         )
         .map((schedule) => ({
           scheduleId: schedule.scheduleId,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
           label: `${schedule.startTime} - ${schedule.endTime}`,
           value: String(schedule.scheduleId),
           count: schedule.count,

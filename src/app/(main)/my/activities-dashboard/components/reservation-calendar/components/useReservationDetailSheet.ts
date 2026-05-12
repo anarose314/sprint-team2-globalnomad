@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
+import {
+  fetchActivityReservations,
+  updateActivityReservationStatus,
+} from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import {
   EMPTY_TIME_SLOT,
   ReservationTab,
@@ -14,6 +21,7 @@ import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 interface UseReservationDetailSheetParams {
   activityId: number;
   isOpen: boolean;
+  selectedDate: Date;
   detailData?: ReservationDetailData;
   onClose: () => void;
 }
@@ -24,9 +32,11 @@ interface UseReservationDetailSheetParams {
 export const useReservationDetailSheet = ({
   activityId,
   isOpen,
+  selectedDate,
   detailData,
   onClose,
 }: UseReservationDetailSheetParams) => {
+  const queryClient = useQueryClient();
   const sheetRef = useRef<HTMLElement>(null);
   const requestScrollRef = useRef<HTMLDivElement>(null);
   const requestListEndRef = useRef<HTMLDivElement>(null);
@@ -34,6 +44,10 @@ export const useReservationDetailSheet = ({
   const [activeTab, setActiveTab] = useState<ReservationTab>('pending');
   const [manualSelectedTimeSlotValue, setManualSelectedTimeSlotValue] =
     useState<string | null>(null);
+  const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
+  const [feedbackModalMessage, setFeedbackModalMessage] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,6 +59,18 @@ export const useReservationDetailSheet = ({
     window.addEventListener('keydown', handleEscClose);
     return () => window.removeEventListener('keydown', handleEscClose);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const intervalId = window.setInterval(() => {
+      setNowTimestamp(Date.now());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -84,6 +110,20 @@ export const useReservationDetailSheet = ({
 
   const selectedScheduleId = selectedTimeSlot?.scheduleId ?? null;
 
+  const isSelectedTimeSlotEnded = (() => {
+    if (!selectedTimeSlot?.endTime) return false;
+
+    const [hourString, minuteString] = selectedTimeSlot.endTime.split(':');
+    const hour = Number(hourString);
+    const minute = Number(minuteString);
+    if (!Number.isFinite(hour) || !Number.isFinite(minute)) return false;
+
+    const endDateTime = new Date(selectedDate);
+    endDateTime.setHours(hour, minute, 0, 0);
+
+    return endDateTime.getTime() < nowTimestamp;
+  })();
+
   const {
     data,
     isLoading: isLoadingRequests,
@@ -107,23 +147,82 @@ export const useReservationDetailSheet = ({
     initialPageParam: null as number | null,
     getNextPageParam: (lastPage) => lastPage.cursorId ?? undefined,
     enabled: isOpen && selectedScheduleId !== null,
+    refetchInterval: isOpen ? 60_000 : false,
   });
 
-  const requests = useMemo<ReservationRequestItem[]>(
-    () => data?.pages.flatMap((page) => page.reservations) ?? [],
-    [data]
-  );
+  const requests = useMemo<ReservationRequestItem[]>(() => {
+    const baseRequests = data?.pages.flatMap((page) => page.reservations) ?? [];
+
+    if (activeTab !== 'confirmed' || !isSelectedTimeSlotEnded) {
+      return baseRequests;
+    }
+
+    return baseRequests.map((request) => ({
+      ...request,
+      status: 'completed',
+    }));
+  }, [activeTab, data, isSelectedTimeSlotEnded]);
 
   const hasMoreRequests = Boolean(hasNextPage);
+
+  const { mutate: mutateReservationStatus, isPending: isUpdatingStatus } =
+    useMutation({
+      mutationFn: ({
+        reservationId,
+        status,
+      }: {
+        reservationId: number;
+        status: 'confirmed' | 'declined';
+      }) =>
+        updateActivityReservationStatus({
+          activityId,
+          reservationId,
+          status,
+        }),
+      onSuccess: async (_, variables) => {
+        setFeedbackModalMessage(
+          variables.status === 'confirmed'
+            ? '승인이 완료되었습니다.'
+            : '해당 예약신청을 거절했습니다.'
+        );
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS, activityId],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE, activityId],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [
+              ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
+              activityId,
+            ],
+          }),
+        ]);
+      },
+    });
 
   const tabCount = useMemo(() => {
     return selectedTimeSlot?.count ?? { pending: 0, confirmed: 0, declined: 0 };
   }, [selectedTimeSlot]);
 
-  const shouldUseFixedRequestViewport = useMemo(
-    () => Object.values(tabCount).some((count) => count >= 2),
-    [tabCount]
-  );
+  const isDateReservationEmpty = useMemo(() => {
+    const timeSlots = detailData?.timeSlots ?? [];
+    if (timeSlots.length === 0) return true;
+
+    return timeSlots.every((timeSlot) =>
+      Object.values(timeSlot.count).every((count) => count === 0)
+    );
+  }, [detailData]);
+
+  const shouldUseFixedRequestViewport = useMemo(() => {
+    const timeSlots = detailData?.timeSlots ?? [];
+
+    return timeSlots.some((timeSlot) =>
+      Object.values(timeSlot.count).some((count) => count >= 2)
+    );
+  }, [detailData]);
 
   useEffect(() => {
     if (!hasMoreRequests) return;
@@ -153,6 +252,24 @@ export const useReservationDetailSheet = ({
     setManualSelectedTimeSlotValue(nextValue);
   };
 
+  const handleApproveReservation = (reservationId: number) => {
+    mutateReservationStatus({
+      reservationId,
+      status: 'confirmed',
+    });
+  };
+
+  const handleRejectReservation = (reservationId: number) => {
+    mutateReservationStatus({
+      reservationId,
+      status: 'declined',
+    });
+  };
+
+  const closeFeedbackModal = () => {
+    setFeedbackModalMessage(null);
+  };
+
   return {
     activeTab,
     requests,
@@ -162,7 +279,14 @@ export const useReservationDetailSheet = ({
     requestListEndRef,
     requestScrollRef,
     selectedTimeSlotValue,
+    isSelectedTimeSlotEnded,
+    isUpdatingStatus,
+    feedbackModalMessage,
+    isDateReservationEmpty,
     handleTimeSlotChange,
+    handleApproveReservation,
+    handleRejectReservation,
+    closeFeedbackModal,
     setActiveTab,
     sheetRef,
     shouldUseFixedRequestViewport,

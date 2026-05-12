@@ -10,6 +10,12 @@ interface FetchActivityReservationsProps {
   cursorId?: number | null;
 }
 
+interface UpdateActivityReservationStatusProps {
+  activityId: number;
+  reservationId: number;
+  status: 'confirmed' | 'declined';
+}
+
 interface ActivityReservationsResponseLike {
   cursorId?: unknown;
   totalCount?: unknown;
@@ -67,7 +73,8 @@ export const fetchActivityReservations = async ({
         const isStatusValid =
           reservation.status === 'pending' ||
           reservation.status === 'confirmed' ||
-          reservation.status === 'declined';
+          reservation.status === 'declined' ||
+          reservation.status === 'completed';
 
         if (
           typeof reservation.id !== 'number' ||
@@ -96,4 +103,21 @@ export const fetchActivityReservations = async ({
           item !== null
       ),
   };
+};
+
+/**
+ * 내 체험 예약 상태를 승인/거절로 변경한다.
+ */
+export const updateActivityReservationStatus = async ({
+  activityId,
+  reservationId,
+  status,
+}: UpdateActivityReservationStatusProps): Promise<void> => {
+  await fetchInstanceClient(
+    `/api/proxy/my-activities/${activityId}/reservations/${reservationId}`,
+    {
+      method: 'PATCH',
+      body: { status },
+    }
+  );
 };

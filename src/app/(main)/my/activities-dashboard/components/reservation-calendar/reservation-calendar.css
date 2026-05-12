@@ -120,8 +120,12 @@
   @apply top-14;
 }
 
-.reservation-calendar__event-badge--completed {
+.reservation-calendar__event-badge--declined {
   @apply top-20;
+}
+
+.reservation-calendar__event-badge--completed {
+  @apply top-26;
 }
 
 /* ===== 예약 상세 레이어(모바일: 바텀시트) ===== */
@@ -326,8 +330,12 @@
     @apply top-17.75;
   }
 
+  .reservation-calendar__event-badge--declined {
+    @apply top-23.5;
+  }
+
   .reservation-calendar__event-badge--completed {
-    @apply top-24;
+    @apply top-29.25;
   }
 
   /* 상세 레이어: 태블릿도 바텀시트 유지 */

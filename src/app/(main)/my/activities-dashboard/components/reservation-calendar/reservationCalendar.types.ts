@@ -2,7 +2,7 @@ import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export type ReservationEventStatus = Extract<
   ReservationStatus,
-  'pending' | 'confirmed' | 'completed'
+  'pending' | 'confirmed' | 'declined' | 'completed'
 >;
 
 export type ReservationEventCounts = Partial<
@@ -14,16 +14,22 @@ export type ReservationRequestStatus = Extract<
   'pending' | 'confirmed' | 'declined'
 >;
 
+export type ReservationRequestDisplayStatus =
+  | ReservationRequestStatus
+  | 'completed';
+
 export interface ReservationRequestItem {
   id: number;
   nickname: string;
   headCount: number;
-  status: ReservationRequestStatus;
+  status: ReservationRequestDisplayStatus;
   createdAt: string;
 }
 
 export interface ReservationTimeSlotOption {
   scheduleId: number | null;
+  startTime: string;
+  endTime: string;
   label: string;
   value: string;
   count: {
