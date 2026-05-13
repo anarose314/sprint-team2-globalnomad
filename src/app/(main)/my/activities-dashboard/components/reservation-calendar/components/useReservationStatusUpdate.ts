@@ -126,11 +126,7 @@ export const useReservationStatusUpdate = ({
               ? '승인이 완료되었습니다.'
               : '해당 예약신청을 거절했습니다.',
         });
-        setFeedbackModalMessage(
-          variables.status === 'confirmed'
-            ? '승인이 완료되었습니다.'
-            : '해당 예약신청을 거절했습니다.'
-        );
+        setFeedbackModalMessage(null);
 
         await Promise.all([
           queryClient.invalidateQueries({

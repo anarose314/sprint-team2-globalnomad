@@ -96,6 +96,57 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     enabled: activityId !== null,
   });
 
+  const missingDeclinedDateKeys = useMemo(
+    () =>
+      reservationDashboard
+        .filter(
+          (item) =>
+            !Number.isFinite(item.reservations.declined as unknown as number)
+        )
+        .map((item) => item.date)
+        .filter(Boolean),
+    [reservationDashboard]
+  );
+
+  const { data: declinedFallbackByDate = {} } = useQuery({
+    queryKey: [
+      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+      activityId,
+      currentYear,
+      currentMonth,
+      missingDeclinedDateKeys.join(','),
+    ],
+    queryFn: async () => {
+      if (activityId === null || missingDeclinedDateKeys.length === 0) {
+        return {} as Record<string, number>;
+      }
+
+      const results = await Promise.all(
+        missingDeclinedDateKeys.map(async (dateKey) => {
+          const schedules = await fetchReservedSchedule({
+            activityId,
+            date: dateKey,
+          });
+
+          const declined = schedules.reduce(
+            (accumulator, schedule) =>
+              accumulator + Math.max(schedule.count.declined, 0),
+            0
+          );
+
+          return [dateKey, declined] as const;
+        })
+      );
+
+      return results.reduce<Record<string, number>>((accumulator, entry) => {
+        const [dateKey, declined] = entry;
+        accumulator[dateKey] = declined;
+        return accumulator;
+      }, {});
+    },
+    enabled: activityId !== null && missingDeclinedDateKeys.length > 0,
+  });
+
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
@@ -104,7 +155,10 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     >((accumulator, item) => {
       const completed = Math.max(item.reservations.completed, 0);
       const confirmed = Math.max(item.reservations.confirmed, 0);
-      const declined = Math.max(item.reservations.declined, 0);
+      const declinedRaw = item.reservations.declined as unknown as number;
+      const declined = Number.isFinite(declinedRaw)
+        ? Math.max(declinedRaw, 0)
+        : Math.max(declinedFallbackByDate[item.date] ?? 0, 0);
       const pending = Math.max(item.reservations.pending, 0);
 
       const eventCounts: ReservationEventCounts = {};
@@ -152,7 +206,12 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     }
 
     return eventCounts;
-  }, [reservationDashboard, reservedSchedules, selectedDateKey]);
+  }, [
+    declinedFallbackByDate,
+    reservationDashboard,
+    reservedSchedules,
+    selectedDateKey,
+  ]);
 
   const detailData = useMemo(() => {
     return buildReservationDetailData({
