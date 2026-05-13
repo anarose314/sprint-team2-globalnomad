@@ -1,13 +1,19 @@
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 
-interface ActivityScheduleItem {
+export interface ActivityScheduleItem {
+  scheduleId: number | null;
   date: string;
   startTime: string;
   endTime: string;
 }
 
 interface ActivityDetailWithSchedules {
-  schedules: ActivityScheduleItem[];
+  schedules: Array<{
+    id?: number;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
 }
 
 interface FetchActivitySchedulesProps {
@@ -24,5 +30,10 @@ export const fetchActivitySchedules = async ({
     `/api/proxy/activities/${activityId}`
   );
 
-  return response.schedules;
+  return response.schedules.map((schedule) => ({
+    scheduleId: schedule.id ?? null,
+    date: schedule.date,
+    startTime: schedule.startTime,
+    endTime: schedule.endTime,
+  }));
 };
