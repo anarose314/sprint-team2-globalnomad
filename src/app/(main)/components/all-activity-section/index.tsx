@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import type {
   ActivityCategory,
   ActivitySort,
@@ -20,20 +20,6 @@ import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
 import { Pagination } from '@/shared/components/pagination';
 import { cn } from '@/shared/utils/cn';
-
-const subscribeDesktopPageSize = (onStoreChange: () => void) => {
-  if (typeof window === 'undefined') {
-    return () => undefined;
-  }
-
-  const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
-
-  mediaQuery.addEventListener('change', onStoreChange);
-
-  return () => {
-    mediaQuery.removeEventListener('change', onStoreChange);
-  };
-};
 
 const getDesktopPageSizeSnapshot = () => {
   if (typeof window === 'undefined') {
@@ -66,6 +52,29 @@ export function AllActivitySection({
   keyword,
   onResetSearchInput,
 }: AllActivitySectionProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory>();
+  const [selectedSort, setSelectedSort] = useState<ActivitySort>('latest');
+
+  const subscribeDesktopPageSize = useCallback((onStoreChange: () => void) => {
+    if (typeof window === 'undefined') {
+      return () => undefined;
+    }
+
+    const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
+
+    const handleMediaQueryChange = () => {
+      setCurrentPage(1);
+      onStoreChange();
+    };
+
+    mediaQuery.addEventListener('change', handleMediaQueryChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaQueryChange);
+    };
+  }, []);
+
   const isDesktopPageSize = useSyncExternalStore(
     subscribeDesktopPageSize,
     getDesktopPageSizeSnapshot,
@@ -73,10 +82,6 @@ export function AllActivitySection({
   );
 
   const pageSize = isDesktopPageSize ? MAIN_DESKTOP_PAGE_SIZE : MAIN_PAGE_SIZE;
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory>();
-  const [selectedSort, setSelectedSort] = useState<ActivitySort>('latest');
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
