@@ -19,6 +19,7 @@ export function FormImagePreview({
           src={imageUrl}
           fill
           className="object-cover"
+          sizes="(max-width: 768px) 33vw, 20vw"
           alt="업로드 된 이미지 미리보기"
         />
       </figure>

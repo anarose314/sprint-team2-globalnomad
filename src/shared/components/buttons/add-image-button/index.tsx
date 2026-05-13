@@ -1,6 +1,7 @@
 'use client';
 
 import { IcPlus } from '@/shared/assets/icons';
+import { INPUT_ERROR_STYLE } from '@/shared/components/input/input.constants';
 import { cn } from '@/shared/utils/cn';
 
 export interface AddImageButtonProps {
@@ -46,6 +47,8 @@ export function AddImageButton({
         disabled
           ? 'cursor-not-allowed opacity-50'
           : 'cursor-pointer hover:border-gray-300 hover:text-gray-600',
+        errorMessage && INPUT_ERROR_STYLE,
+        errorMessage && 'hover:border-red-500',
         className
       )}
     >

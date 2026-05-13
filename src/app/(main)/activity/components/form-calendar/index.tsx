@@ -8,7 +8,9 @@ import {
 } from '@/app/(main)/activity/components/form-calendar/formCalendar.types';
 import { IcArrowLeft, IcArrowRight, IcCalendar } from '@/shared/assets/icons';
 import { Input } from '@/shared/components/input';
+import { INPUT_ERROR_STYLE } from '@/shared/components/input/input.constants';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
+import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/activity/components/form-calendar/form-calendar.css';
 
@@ -18,7 +20,12 @@ const getToday = () => {
   return today;
 };
 
-export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
+export function FormCalendar({
+  onChange,
+  hasLabel,
+  date,
+  isError,
+}: FormCalendarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [today, setToday] = useState(getToday);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,7 +86,7 @@ export function FormCalendar({ onChange, hasLabel, date }: FormCalendarProps) {
         }}
         rightIcon={<IcCalendar className="text-black" />}
         rightIconClassName="pointer-events-none"
-        className="cursor-pointer"
+        className={cn('cursor-pointer', isError && INPUT_ERROR_STYLE)}
         required
         readOnly
         aria-haspopup="grid"

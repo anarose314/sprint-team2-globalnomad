@@ -14,6 +14,7 @@ export function ReserveTime({
   hasLabel = false,
   isAddAction = false,
   className,
+  isError = false,
 }: ReserveTimeProps) {
   const handleChange = (key: keyof typeof value, val: string) => {
     onChange({ ...value, [key]: val });
@@ -31,6 +32,7 @@ export function ReserveTime({
         onChange={handleChange}
         hasLabel={hasLabel}
         date={value.date}
+        isError={isError}
       />
       {/* 시간 */}
       <div className="flex flex-1 flex-wrap items-end gap-2.25 md:flex-3 md:flex-nowrap">
@@ -39,6 +41,7 @@ export function ReserveTime({
             label={hasLabel ? '시작 시간' : undefined}
             value={value.startTime}
             onChange={(val) => handleChange('startTime', val)}
+            isError={isError}
           />
         </div>
         <span className="relative bottom-3.5 shrink-0">-</span>
@@ -47,6 +50,7 @@ export function ReserveTime({
             label={hasLabel ? '종료 시간' : undefined}
             value={value.endTime}
             onChange={(val) => handleChange('endTime', val)}
+            isError={isError}
           />
         </div>
         {/* 버튼 */}

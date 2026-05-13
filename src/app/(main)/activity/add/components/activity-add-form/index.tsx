@@ -6,8 +6,12 @@ import { Button } from '@/shared/components/buttons';
 
 export function ActivityAddForm() {
   const handleAddSubmit = (data: ActivityFormValues) => {
+    const payload = {
+      ...data,
+      schedules: data.schedules.map(({ id: _id, ...rest }) => rest),
+    };
     // TODO: 등록 API 호출 로직
-    console.log('API로 보낼 데이터:', data);
+    console.log('API로 보낼 데이터:', payload);
   };
 
   return (

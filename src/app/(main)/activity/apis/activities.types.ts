@@ -41,3 +41,7 @@ export interface FetchActivitiesParams {
   category?: ActivityCategory;
   keyword?: string;
 }
+
+export interface ActivityImageResponse {
+  activityImageUrl: string;
+}
