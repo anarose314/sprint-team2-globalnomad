@@ -20,6 +20,8 @@ export function MainInteractiveContent() {
   const [keyword, setKeyword] = useState('');
   const [searchVersion, setSearchVersion] = useState(0);
 
+  const isSearchMode = keyword.trim().length > 0;
+
   const handleSearch = (nextKeyword: string) => {
     setKeyword(nextKeyword);
     setSearchVersion((prev) => prev + 1);
@@ -38,11 +40,14 @@ export function MainInteractiveContent() {
         onSearch={handleSearch}
       />
 
-      <PopularActivitySection activities={POPULAR_ACTIVITIES} />
+      {!isSearchMode && (
+        <PopularActivitySection activities={POPULAR_ACTIVITIES} />
+      )}
 
       <AllActivitySection
         key={searchVersion}
         keyword={keyword}
+        isSearchMode={isSearchMode}
         onResetSearchInput={handleResetSearchInput}
       />
     </>

@@ -19,6 +19,7 @@ import { FilterButton } from '@/shared/components/buttons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
 import { Pagination } from '@/shared/components/pagination';
+import { useDragScroll } from '@/shared/hooks/useDragScroll';
 import { cn } from '@/shared/utils/cn';
 
 const getDesktopPageSizeSnapshot = () => {
@@ -50,11 +51,14 @@ const isActivitySort = (value: string): value is ActivitySort => {
  */
 export function AllActivitySection({
   keyword,
+  isSearchMode = false,
   onResetSearchInput,
 }: AllActivitySectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<ActivityCategory>();
   const [selectedSort, setSelectedSort] = useState<ActivitySort>('latest');
+
+  const { scrollRef, events } = useDragScroll<HTMLUListElement>();
 
   const subscribeDesktopPageSize = useCallback((onStoreChange: () => void) => {
     if (typeof window === 'undefined') {
@@ -88,11 +92,12 @@ export function AllActivitySection({
     page: currentPage,
     size: pageSize,
     sort: selectedSort,
-    category: selectedCategory,
+    category: isSearchMode ? undefined : selectedCategory,
     keyword,
   });
 
   const activities = data?.activities ?? [];
+  const totalCount = data?.totalCount ?? 0;
   const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
 
   const handleCategoryClick = (category: ActivityCategory) => {
@@ -107,20 +112,46 @@ export function AllActivitySection({
     }
 
     setSelectedSort(value);
-    onResetSearchInput();
+
+    if (!isSearchMode) {
+      onResetSearchInput();
+    }
+
     setCurrentPage(1);
   };
 
   return (
     <section>
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <Heading
-          as="h2"
-          textStyle="typo-2lg-bold"
-          className="2xl:typo-3xl-bold md:typo-2xl-bold text-gray-950"
-        >
-          모든 체험
-        </Heading>
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <Heading
+            as="h2"
+            textStyle={isSearchMode ? 'typo-2lg-medium' : 'typo-2lg-bold'}
+            className={cn(
+              'text-gray-950',
+              isSearchMode
+                ? 'md:typo-xl-medium 2xl:typo-xl-medium'
+                : 'md:typo-2xl-bold 2xl:typo-3xl-bold'
+            )}
+          >
+            {isSearchMode ? (
+              <>
+                <span className="typo-2lg-bold md:typo-xl-bold 2xl:typo-xl-bold">
+                  {keyword}
+                </span>
+                으로 검색한 결과입니다.
+              </>
+            ) : (
+              '모든 체험'
+            )}
+          </Heading>
+
+          {isSearchMode && !isPending && !isError && (
+            <p className="typo-2lg-medium text-gray-700">
+              총 {totalCount.toLocaleString()}개의 결과
+            </p>
+          )}
+        </div>
 
         <Dropdown
           variant="chip"
@@ -132,21 +163,27 @@ export function AllActivitySection({
         />
       </div>
 
-      <ul className="scrollbar-hide mb-5 flex gap-3 overflow-x-auto">
-        {MAIN_CATEGORIES.map((category) => (
-          <li key={category.value} className="shrink-0">
-            <FilterButton
-              label={category.label}
-              category={category.iconCategory}
-              state={
-                selectedCategory === category.apiValue ? 'active' : 'normal'
-              }
-              className="whitespace-nowrap"
-              onClick={() => handleCategoryClick(category.apiValue)}
-            />
-          </li>
-        ))}
-      </ul>
+      {!isSearchMode && (
+        <ul
+          ref={scrollRef}
+          {...events}
+          className="scrollbar-hide mb-5 flex cursor-grab gap-3 overflow-x-auto select-none active:cursor-grabbing"
+        >
+          {MAIN_CATEGORIES.map((category) => (
+            <li key={category.value} className="shrink-0">
+              <FilterButton
+                label={category.label}
+                category={category.iconCategory}
+                state={
+                  selectedCategory === category.apiValue ? 'active' : 'normal'
+                }
+                className="whitespace-nowrap"
+                onClick={() => handleCategoryClick(category.apiValue)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {isPending && (
         <p className="typo-md-medium py-10 text-center text-gray-500">
@@ -162,7 +199,9 @@ export function AllActivitySection({
 
       {!isPending && !isError && activities.length === 0 && (
         <p className="typo-md-medium py-10 text-center text-gray-500">
-          조건에 맞는 체험이 없습니다.
+          {isSearchMode
+            ? '검색 결과가 없습니다.'
+            : '조건에 맞는 체험이 없습니다.'}
         </p>
       )}
 
