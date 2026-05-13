@@ -1,3 +1,3 @@
 export interface MyReservationsPageProps {
-  searchParams: { status?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }

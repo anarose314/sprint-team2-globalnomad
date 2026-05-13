@@ -16,7 +16,7 @@ export function ReserveListSkeleton() {
                   {/* 제목 */}
                   <Skeleton className="mb-2 w-3/4" height={24} />
                   {/* 날짜 · 시간 상세 정보 (한 줄로 통합) */}
-                  <Skeleton className="w-[60%]" height={20} />
+                  <Skeleton className="w-3/5" height={20} />
                 </div>
 
                 {/* 가격 및 인원 */}

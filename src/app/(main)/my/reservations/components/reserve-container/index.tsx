@@ -15,7 +15,8 @@ export async function ReserveContainer({
   searchParams,
 }: ReserveContainerProps) {
   const queryClient = new QueryClient();
-  const status = searchParams?.status || null;
+  const status =
+    typeof searchParams?.status === 'string' ? searchParams.status : null;
 
   const params = new URLSearchParams({ size: String(MY_RESERVATIONS_SIZE) });
   if (status) {

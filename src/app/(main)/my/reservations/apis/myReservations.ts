@@ -17,7 +17,7 @@ export const fetchMyReservations = async ({
   const params = {
     size: MY_RESERVATIONS_SIZE,
     ...(pageParam !== null && { cursorId: pageParam }),
-    status,
+    ...(status && { status }),
   };
 
   return await fetchInstanceClient<MyReservationsResponse>(
