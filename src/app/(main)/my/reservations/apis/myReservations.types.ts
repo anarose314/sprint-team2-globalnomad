@@ -21,3 +21,7 @@ export interface ReviewResponse {
   teamId: string;
   id: number;
 }
+
+export interface PatchMyReservation {
+  reservationId: number;
+}

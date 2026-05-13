@@ -1,5 +1,6 @@
 import {
   FetchMyReservations,
+  PatchMyReservation,
   PostReviews,
   ReviewResponse,
 } from '@/app/(main)/my/reservations/apis/myReservations.types';
@@ -35,6 +36,23 @@ export const postReviews = ({ reservationId, body }: PostReviews) => {
     {
       method: 'POST',
       body,
+    }
+  );
+};
+
+/**
+ * 예약을 취소하는 API 호출 함수 (BFF 경유)
+ */
+export const patchMyReservation = async ({
+  reservationId,
+}: PatchMyReservation) => {
+  return await fetchInstanceClient(
+    `/api/proxy/my-reservations/${reservationId}`,
+    {
+      method: 'PATCH',
+      body: {
+        status: 'canceled',
+      },
     }
   );
 };
