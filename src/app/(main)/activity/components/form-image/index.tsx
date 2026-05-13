@@ -39,6 +39,7 @@ export function FormImage({
     let filesToAdd = files;
     const remaining = MAX_IMAGE_COUNT - imageFiles.length;
 
+    // [다중 업로드] 남은 슬롯이 없는 경우 업로드 차단
     if (isMultiple && remaining <= 0) {
       showToast({
         theme: 'error',
@@ -48,6 +49,7 @@ export function FormImage({
       return;
     }
 
+    // [다중 업로드] 남은 슬롯보다 많은 파일을 올린 경우 넘치는 파일 차단
     if (isMultiple && files.length > remaining) {
       showToast({
         theme: 'error',
@@ -55,15 +57,43 @@ export function FormImage({
       });
       filesToAdd = files.slice(0, remaining);
     }
+
     try {
-      const uploadedUrls = await Promise.all(
-        filesToAdd.map(async (file) => {
-          const response = await postActivityImage(file);
-          return response.activityImageUrl;
-        })
+      // S3 업로드 병렬 요청
+      const results = await Promise.allSettled(
+        filesToAdd.map((file) => postActivityImage(file))
       );
 
-      const newImageFiles = uploadedUrls.map((url) => ({
+      const successfulUrls: string[] = [];
+      const failedFileNames: string[] = [];
+
+      // 성공한 URL과 실패한 파일명 분류
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          successfulUrls.push(result.value.activityImageUrl);
+        } else {
+          failedFileNames.push(filesToAdd[index].name);
+        }
+      });
+
+      // 실패한 파일이 있을 경우 에러 토스트 표시
+      if (failedFileNames.length > 0) {
+        const message =
+          failedFileNames.length === 1
+            ? `${failedFileNames[0]} 업로드에 실패했습니다.`
+            : `${failedFileNames[0]} 외 ${failedFileNames.length - 1}장 업로드에 실패했습니다.`;
+
+        showToast({
+          theme: 'error',
+          message,
+        });
+      }
+
+      // 성공한 이미지가 하나도 없다면 상태 업데이트 없이 종료
+      if (successfulUrls.length === 0) return;
+
+      // 성공한 이미지들을 객체 형태로 변환 및 로컬 상태 업데이트
+      const newImageFiles = successfulUrls.map((url) => ({
         id: generateId(),
         url,
       }));
@@ -74,12 +104,16 @@ export function FormImage({
 
       setImageFiles(updatedFiles);
 
+      // react-hook-form 상태 동기화
       onChange?.(
         isMultiple ? updatedFiles.map((item) => item.url) : updatedFiles[0].url
       );
     } catch (error) {
-      console.error(error);
-      showToast({ theme: 'error', message: '이미지 업로드에 실패했습니다.' });
+      console.error('이미지 처리 중 치명적 오류:', error);
+      showToast({
+        theme: 'error',
+        message: '이미지 처리 중 예기치 못한 오류가 발생했습니다.',
+      });
     } finally {
       if (inputRef.current) inputRef.current.value = '';
     }
