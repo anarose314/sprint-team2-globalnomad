@@ -21,7 +21,7 @@ interface FetchActivitySchedulesProps {
 }
 
 /**
- * 체험 상세 스케줄 전체를 조회한다.
+ * 체험 상세 스케줄 전체 조회
  */
 export const fetchActivitySchedules = async ({
   activityId,

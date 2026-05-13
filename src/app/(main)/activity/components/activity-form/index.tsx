@@ -26,10 +26,17 @@ export function ActivityForm({
     handleSubmit,
     control,
     formState: { errors },
+    clearErrors,
   } = useForm<ActivityFormValues>({
     mode: 'onTouched',
     resolver: zodResolver(activityFormSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      address: defaultValues?.address || '',
+      schedules: defaultValues?.schedules || [],
+      bannerImageUrl: defaultValues?.bannerImageUrl || '',
+      subImageUrls: defaultValues?.subImageUrls || [],
+    },
   });
 
   return (
@@ -88,15 +95,45 @@ export function ActivityForm({
       </section>
       <section>
         <FormTitle>예약 가능한 시간대</FormTitle>
-        <ReserveTimeList />
+        <Controller
+          name="schedules"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <ReserveTimeList
+              schedules={value || []}
+              onSchedulesChange={onChange}
+              errorMessage={errors.schedules?.message}
+              clearError={() => clearErrors('schedules')}
+            />
+          )}
+        />
       </section>
       <section>
         <FormTitle>배너 이미지 등록</FormTitle>
-        <FormImage name="bannerImageUrl" />
+        <Controller
+          name="bannerImageUrl"
+          control={control}
+          render={({ field: { onChange } }) => (
+            <FormImage
+              onChange={onChange}
+              errorMessage={errors.bannerImageUrl?.message}
+            />
+          )}
+        />
       </section>
       <section>
         <FormTitle>소개 이미지 등록</FormTitle>
-        <FormImage name="subImageUrls" isMultiple />
+        <Controller
+          name="subImageUrls"
+          control={control}
+          render={({ field: { onChange } }) => (
+            <FormImage
+              onChange={onChange}
+              errorMessage={errors.subImageUrls?.message}
+              isMultiple
+            />
+          )}
+        />
       </section>
       {children}
     </form>

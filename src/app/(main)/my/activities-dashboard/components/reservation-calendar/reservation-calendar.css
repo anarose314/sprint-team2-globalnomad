@@ -120,8 +120,12 @@
   @apply top-14;
 }
 
-.reservation-calendar__event-badge--completed {
+.reservation-calendar__event-badge--declined {
   @apply top-20;
+}
+
+.reservation-calendar__event-badge--completed {
+  @apply top-26;
 }
 
 /* ===== 예약 상세 레이어(모바일: 바텀시트) ===== */
@@ -275,6 +279,18 @@
   @apply typo-sm-medium mt-2 text-center text-gray-500;
 }
 
+.reservation-detail-sheet__confirm-modal {
+  @apply w-full max-w-lg;
+}
+
+.reservation-detail-sheet__confirm-modal .max-w-100 {
+  @apply max-w-3xl;
+}
+
+.reservation-detail-sheet__confirm-modal p {
+  @apply break-keep whitespace-pre-line;
+}
+
 /* ===== 데스크톱(md 이상) 반응형 보정 ===== */
 @media (min-width: theme(screens.md)) {
   /* 캘린더 컨테이너/그리드 데스크톱 스케일 */
@@ -326,8 +342,12 @@
     @apply top-17.75;
   }
 
+  .reservation-calendar__event-badge--declined {
+    @apply top-23.5;
+  }
+
   .reservation-calendar__event-badge--completed {
-    @apply top-24;
+    @apply top-29.25;
   }
 
   /* 상세 레이어: 태블릿도 바텀시트 유지 */

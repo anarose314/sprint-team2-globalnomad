@@ -1,15 +1,11 @@
 import z from 'zod';
 import { CATEGORY_VALUES } from '@/shared/constants/category.constants';
 
-const timeSchema = z.object({
-  id: z.union([z.string(), z.number()]).optional(),
-  startTime: z.string(),
-  endTime: z.string(),
-});
-
 const scheduleSchema = z.object({
-  date: z.string(),
-  times: z.array(timeSchema),
+  id: z.string().optional(),
+  date: z.iso.date({ error: '날짜를 선택해 주세요' }),
+  startTime: z.iso.time({ error: '시작 시간을 선택해 주세요' }),
+  endTime: z.iso.time({ error: '종료 시간을 선택해 주세요' }),
 });
 
 /**
@@ -33,7 +29,11 @@ export const activityFormSchema = z.object({
     .trim()
     .min(1, '주소를 입력해 주세요'),
   schedules: z
-    .array(scheduleSchema)
+    .array(scheduleSchema, {
+      error: () => ({
+        message: '예약 가능한 시간대는 최소 1개 이상 등록해주세요',
+      }),
+    })
     .min(1, '예약 가능한 시간대는 최소 1개 이상 등록해주세요'),
   bannerImageUrl: z.string().min(1, '배너 이미지를 등록해 주세요'),
   subImageUrls: z.array(z.string()).max(4).optional(),

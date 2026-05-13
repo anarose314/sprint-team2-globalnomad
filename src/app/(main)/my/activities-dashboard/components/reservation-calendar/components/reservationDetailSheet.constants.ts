@@ -1,4 +1,7 @@
-import { ReservationRequestStatus } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import {
+  ReservationRequestDisplayStatus,
+  ReservationRequestStatus,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export type ReservationTab = ReservationRequestStatus;
@@ -31,8 +34,9 @@ export const formatDetailDate = (date: Date) => {
  * @returns `StatusBadge` 컴포넌트에서 사용하는 상태값
  */
 export const toReservationBadgeStatus = (
-  status: Exclude<ReservationRequestStatus, 'pending'>
+  status: Exclude<ReservationRequestDisplayStatus, 'pending'>
 ): ReservationStatus => {
   if (status === 'confirmed') return 'confirmed';
+  if (status === 'completed') return 'completed';
   return 'declined';
 };

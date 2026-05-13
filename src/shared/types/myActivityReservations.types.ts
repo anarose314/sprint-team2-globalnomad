@@ -2,7 +2,7 @@ import { ReservationStatus } from '@/shared/constants/status.constants';
 
 type MyActivityReservationStatus = Extract<
   ReservationStatus,
-  'pending' | 'confirmed' | 'declined'
+  'pending' | 'confirmed' | 'declined' | 'completed'
 >;
 
 export interface MyActivityReservationItem {

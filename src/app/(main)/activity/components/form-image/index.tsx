@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
-import { FormImageProps } from '@/app/(main)/activity/components/form-image/FormImage.types';
+import { useId, useRef, useState } from 'react';
+import { postActivityImage } from '@/app/(main)/activity/apis/activities';
+import { FormImageProps } from '@/app/(main)/activity/components/form-image/formImage.types';
 import { FormImagePreview } from '@/app/(main)/activity/components/form-image-preview';
 import { AddImageButton } from '@/shared/components/buttons';
 import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
+import { cn } from '@/shared/utils/cn';
 import { generateId } from '@/shared/utils/generateId';
 
 const MAX_IMAGE_COUNT = 4;
@@ -18,11 +20,10 @@ export function FormImage({
   ...props
 }: FormImageProps) {
   const [imageFiles, setImageFiles] = useState<
-    Array<{ id: string; url: string; file: File }>
+    Array<{ id: string; url: string }>
   >([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const objectUrls = useRef<string[]>([]);
 
   const showToast = useShowToast();
 
@@ -31,20 +32,14 @@ export function FormImage({
   const errorId = `${inputId}-error`;
   const isMaxReached = isMultiple && imageFiles.length >= MAX_IMAGE_COUNT;
 
-  const syncInputFiles = (files: File[]) => {
-    if (!inputRef.current) return;
-    const dataTransfer = new DataTransfer();
-    files.forEach((file) => dataTransfer.items.add(file));
-    inputRef.current.files = dataTransfer.files;
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : null;
     if (!files || files.length === 0) return;
 
     let filesToAdd = files;
     const remaining = MAX_IMAGE_COUNT - imageFiles.length;
 
+    // [다중 업로드] 남은 슬롯이 없는 경우 업로드 차단
     if (isMultiple && remaining <= 0) {
       showToast({
         theme: 'error',
@@ -54,6 +49,7 @@ export function FormImage({
       return;
     }
 
+    // [다중 업로드] 남은 슬롯보다 많은 파일을 올린 경우 넘치는 파일 차단
     if (isMultiple && files.length > remaining) {
       showToast({
         theme: 'error',
@@ -62,71 +58,80 @@ export function FormImage({
       filesToAdd = files.slice(0, remaining);
     }
 
-    const newImageFiles = filesToAdd.map((file) => {
-      const url = URL.createObjectURL(file);
-      objectUrls.current.push(url);
-      return {
+    try {
+      // S3 업로드 병렬 요청
+      const results = await Promise.allSettled(
+        filesToAdd.map((file) => postActivityImage(file))
+      );
+
+      const successfulUrls: string[] = [];
+      const failedFileNames: string[] = [];
+
+      // 성공한 URL과 실패한 파일명 분류
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          successfulUrls.push(result.value.activityImageUrl);
+        } else {
+          failedFileNames.push(filesToAdd[index].name);
+        }
+      });
+
+      // 실패한 파일이 있을 경우 에러 토스트 표시
+      if (failedFileNames.length > 0) {
+        const message =
+          failedFileNames.length === 1
+            ? `${failedFileNames[0]} 업로드에 실패했습니다.`
+            : `${failedFileNames[0]} 외 ${failedFileNames.length - 1}장 업로드에 실패했습니다.`;
+
+        showToast({
+          theme: 'error',
+          message,
+        });
+      }
+
+      // 성공한 이미지가 하나도 없다면 상태 업데이트 없이 종료
+      if (successfulUrls.length === 0) return;
+
+      // 성공한 이미지들을 객체 형태로 변환 및 로컬 상태 업데이트
+      const newImageFiles = successfulUrls.map((url) => ({
         id: generateId(),
         url,
-        file,
-      };
-    });
+      }));
 
-    if (!isMultiple && imageFiles.length > 0) {
-      URL.revokeObjectURL(imageFiles[0].url);
-      objectUrls.current = objectUrls.current.filter(
-        (prevUrl) => prevUrl !== imageFiles[0].url
+      const updatedFiles = isMultiple
+        ? [...imageFiles, ...newImageFiles]
+        : newImageFiles;
+
+      setImageFiles(updatedFiles);
+
+      // react-hook-form 상태 동기화
+      onChange?.(
+        isMultiple ? updatedFiles.map((item) => item.url) : updatedFiles[0].url
       );
+    } catch (error) {
+      console.error('이미지 처리 중 치명적 오류:', error);
+      showToast({
+        theme: 'error',
+        message: '이미지 처리 중 예기치 못한 오류가 발생했습니다.',
+      });
+    } finally {
+      if (inputRef.current) inputRef.current.value = '';
     }
-
-    const updatedFiles = isMultiple
-      ? [...imageFiles, ...newImageFiles]
-      : newImageFiles;
-
-    setImageFiles(updatedFiles);
-    syncInputFiles(updatedFiles.map((item) => item.file));
-
-    onChange?.(
-      isMultiple ? updatedFiles.map((item) => item.file) : updatedFiles[0].file
-    );
-
-    if (inputRef.current) inputRef.current.value = '';
   };
 
   const handleImageDelete = (deleteImageId: string) => {
-    const deletedImage = imageFiles.find((image) => image.id === deleteImageId);
     const filteredFiles = imageFiles.filter(
       (image) => image.id !== deleteImageId
     );
 
-    if (deletedImage) {
-      URL.revokeObjectURL(deletedImage.url);
-      objectUrls.current = objectUrls.current.filter(
-        (prevUrl) => prevUrl !== deletedImage.url
-      );
-    }
-
     setImageFiles(filteredFiles);
-    syncInputFiles(filteredFiles.map((item) => item.file));
 
     onChange?.(
       isMultiple
-        ? filteredFiles.map((item) => item.file)
-        : filteredFiles[0]?.file || null
+        ? filteredFiles.map((item) => item.url)
+        : filteredFiles[0]?.url || ''
     );
-
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
   };
-
-  useEffect(() => {
-    return () => {
-      objectUrls.current.forEach((url) => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, []);
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -165,7 +170,7 @@ export function FormImage({
       </div>
 
       {errorMessage && (
-        <p id={errorId} className={INPUT_ERROR_MESSAGE_STYLE}>
+        <p id={errorId} className={cn(INPUT_ERROR_MESSAGE_STYLE, 'mt-0')}>
           {errorMessage}
         </p>
       )}

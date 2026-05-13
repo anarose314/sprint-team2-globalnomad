@@ -1,5 +1,5 @@
 export interface Schedule {
-  id: string;
+  id?: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -12,4 +12,5 @@ export interface ReserveTimeProps {
   hasLabel?: boolean;
   isAddAction?: boolean;
   className?: string;
+  isError?: boolean;
 }
