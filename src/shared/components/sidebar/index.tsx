@@ -5,11 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMyInfo } from '@/app/(main)/my/profile/hooks/useMyInfo';
-import { IcEdit, IcProfile } from '@/shared/assets/icons';
+import { IcClose, IcEdit, IcProfile } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 import type { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
 import { IMAGE_INPUT_ACCEPT } from '@/shared/constants/image.constants';
+import { useRemoveProfileImageMutation } from '@/shared/hooks/useRemoveProfileImageMutation';
 import { useUpdateProfileImageMutation } from '@/shared/hooks/useUpdateProfileImageMutation';
 import { useShowToast } from '@/shared/store/useToastStore';
 import { cn } from '@/shared/utils/cn';
@@ -19,8 +20,8 @@ import { validateImageFile } from '@/shared/utils/validateImageFile';
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
  *
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
- * - 프로필 이미지, 프로필 이미지 수정, 로그아웃 등 사이드바 내부의 상태와 동작을 모두 자체적으로 관리한다.
  * - 프로필 이미지는 사용자 선택 즉시 업로드 + user 반영까지 자동 처리한다.
+ * - 사용자가 업로드한 이미지가 있을 때만 close 버튼이 노출되며, 클릭 시 즉시 기본 이미지로 복원한다.
  * - variant에 따라 데스크탑 사이드바와 모바일 드로어 내부 메뉴로 재사용한다.
  */
 export function Sidebar({
@@ -31,11 +32,15 @@ export function Sidebar({
   const pathname = usePathname();
   const { data: user } = useMyInfo();
   const showToast = useShowToast();
-  const { mutate: updateProfileImage, isPending } =
+  const { mutate: updateProfileImage, isPending: isUploading } =
     useUpdateProfileImageMutation();
+  const { mutate: removeProfileImage, isPending: isRemoving } =
+    useRemoveProfileImageMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileImageUrl = user?.profileImageUrl ?? '';
+  const hasProfileImage = Boolean(profileImageUrl);
+  const isProfileImageMutating = isUploading || isRemoving;
   const isDrawer = variant === 'drawer';
 
   const handleProfileEdit = () => {
@@ -44,7 +49,6 @@ export function Sidebar({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    // input 값을 항상 리셋해 같은 파일을 다시 선택해도 change가 발생하게 함
     event.target.value = '';
 
     if (!file) return;
@@ -56,6 +60,10 @@ export function Sidebar({
     }
 
     updateProfileImage(file);
+  };
+
+  const handleProfileImageRemove = () => {
+    removeProfileImage();
   };
 
   const handleLogout = () => {
@@ -86,7 +94,7 @@ export function Sidebar({
             isDrawer ? 'w-24' : 'w-17.5 2xl:w-28'
           )}
         >
-          {profileImageUrl ? (
+          {hasProfileImage ? (
             <Image
               src={profileImageUrl}
               alt="프로필 이미지"
@@ -101,10 +109,11 @@ export function Sidebar({
           )}
         </div>
 
+        {/* 연필 버튼 — 항상 노출, 클릭 시 파일 선택 */}
         <button
           type="button"
           onClick={handleProfileEdit}
-          disabled={isPending}
+          disabled={isProfileImageMutating}
           aria-label="프로필 이미지 수정"
           className={cn(
             'absolute right-1 bottom-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
@@ -113,6 +122,22 @@ export function Sidebar({
         >
           <IcEdit className="h-full w-full" aria-hidden="true" />
         </button>
+
+        {/* close 버튼 — 사용자 업로드 이미지가 있을 때만 노출 */}
+        {hasProfileImage && (
+          <button
+            type="button"
+            onClick={handleProfileImageRemove}
+            disabled={isProfileImageMutating}
+            aria-label="프로필 이미지 삭제"
+            className={cn(
+              'absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1 text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
+              isDrawer ? 'h-6 w-6' : 'h-5 w-5 2xl:h-6 2xl:w-6'
+            )}
+          >
+            <IcClose className="h-full w-full" aria-hidden="true" />
+          </button>
+        )}
 
         <input
           ref={fileInputRef}
