@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  approveReservationWithAutoDecline,
   fetchActivityReservations,
   updateActivityReservationStatus,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
@@ -43,13 +44,37 @@ export const useReservationStatusUpdate = ({
         status: ReservationUpdateStatus;
         scheduleId: number | null;
       }) => {
+        if (status !== 'confirmed') {
+          await updateActivityReservationStatus({
+            activityId,
+            reservationId,
+            status,
+          });
+          return;
+        }
+
+        if (scheduleId === null) {
+          await updateActivityReservationStatus({
+            activityId,
+            reservationId,
+            status,
+          });
+          return;
+        }
+
+        const backendHandled = await approveReservationWithAutoDecline({
+          activityId,
+          reservationId,
+          scheduleId,
+        });
+
+        if (backendHandled) return;
+
         await updateActivityReservationStatus({
           activityId,
           reservationId,
           status,
         });
-
-        if (status !== 'confirmed' || scheduleId === null) return;
 
         const autoDeclineTargets: number[] = [];
         const visitedCursorIds = new Set<number>();

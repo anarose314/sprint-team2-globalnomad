@@ -1,3 +1,4 @@
+import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { MyActivityReservationsResponse } from '@/shared/types/myActivityReservations.types';
 
@@ -14,6 +15,12 @@ interface UpdateActivityReservationStatusProps {
   activityId: number;
   reservationId: number;
   status: 'confirmed' | 'declined';
+}
+
+interface ApproveReservationWithAutoDeclineProps {
+  activityId: number;
+  reservationId: number;
+  scheduleId: number;
 }
 
 interface ActivityReservationsResponseLike {
@@ -120,4 +127,33 @@ export const updateActivityReservationStatus = async ({
       body: { status },
     }
   );
+};
+
+/**
+ * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도한다.
+ * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백을 수행한다.
+ */
+export const approveReservationWithAutoDecline = async ({
+  activityId,
+  reservationId,
+  scheduleId,
+}: ApproveReservationWithAutoDeclineProps): Promise<boolean> => {
+  try {
+    await fetchInstanceClient(
+      `/api/proxy/my-activities/${activityId}/reservations/${reservationId}/approve`,
+      {
+        method: 'PATCH',
+        body: { scheduleId },
+      }
+    );
+    return true;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const unsupportedStatuses = [404, 405, 501];
+      if (unsupportedStatuses.includes(error.status)) {
+        return false;
+      }
+    }
+    throw error;
+  }
 };
