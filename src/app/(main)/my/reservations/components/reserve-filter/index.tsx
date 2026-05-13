@@ -33,17 +33,20 @@ export function ReserveFilter() {
     return () => window.removeEventListener('resize', handleScroll);
   }, [handleScroll]);
 
-  const handleFilterClick = (status: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const handleFilterClick = useCallback(
+    (status: string) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    if (currentStatus === status) {
-      params.delete('status');
-    } else {
-      params.set('status', status);
-    }
+      if (currentStatus === status) {
+        params.delete('status');
+      } else {
+        params.set('status', status);
+      }
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
+      router.replace(pathname + '?' + params.toString(), { scroll: false });
+    },
+    [currentStatus, pathname, router, searchParams]
+  );
 
   return (
     <div className="relative -mx-6 mt-3.5">
