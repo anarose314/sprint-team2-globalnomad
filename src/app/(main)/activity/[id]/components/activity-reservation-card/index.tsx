@@ -263,9 +263,15 @@ export function ActivityReservationCard({
    */
   const handleDateChange = (value: CalendarValue) => {
     if (value instanceof Date) {
-      const dateKey = formatDateKey(value);
-      setSelectedDateKey(dateKey);
+      const newDateKey = formatDateKey(value);
+
+      if (newDateKey === selectedDateKey) {
+        return;
+      }
+
+      setSelectedDateKey(newDateKey);
       setCurrentDate(new Date(value.getFullYear(), value.getMonth(), 1));
+      setSelectedTimeSlot(null);
     }
   };
 
