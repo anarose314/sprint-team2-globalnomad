@@ -4,6 +4,8 @@ import { DesktopReservationCard } from '@/app/(main)/activity/[id]/components/ac
 import { MobileReservationBottomBar } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/mobileReservationBottomBar';
 import { MobileReservationSheet } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/mobileReservationSheet';
 import { useActivityReservationCardState } from '@/app/(main)/activity/[id]/components/activity-reservation-card/hooks/useActivityReservationCardState';
+import { OneButtonModal } from '@/shared/components/modal';
+import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import '@/app/(main)/activity/[id]/components/activity-reservation-card/reservation-calendar.css';
 
@@ -26,8 +28,11 @@ export function ActivityReservationCard({
 }: ActivityReservationCardProps) {
   const {
     isDateSheetOpen,
+    isSuccessModalOpen,
     mobileSheetStep,
     hasSelectableDate,
+    isReservationAvailable,
+    isReservationSubmitting,
     selectedDate,
     displayCurrentDate,
     monthTitle,
@@ -38,6 +43,7 @@ export function ActivityReservationCard({
     totalPrice,
     handleOpenDateSheet,
     handleCloseDateSheet,
+    handleCloseSuccessModal,
     handleMoveToHeadCountStep,
     handleMoveToDateTimeStep,
     handleDateChange,
@@ -45,6 +51,7 @@ export function ActivityReservationCard({
     handleSelectTimeSlot,
     handleDecreaseHeadCount,
     handleIncreaseHeadCount,
+    handleSubmitReservation,
     tileDisabled,
   } = useActivityReservationCardState({
     activityId,
@@ -70,6 +77,8 @@ export function ActivityReservationCard({
         availableTimeSlots={availableTimeSlots}
         headCount={headCount}
         totalPrice={totalPrice}
+        isReservationAvailable={isReservationAvailable}
+        isReservationSubmitting={isReservationSubmitting}
         onClose={handleCloseDateSheet}
         onMoveToHeadCountStep={handleMoveToHeadCountStep}
         onMoveToDateTimeStep={handleMoveToDateTimeStep}
@@ -78,6 +87,7 @@ export function ActivityReservationCard({
         onSelectTimeSlot={handleSelectTimeSlot}
         onDecreaseHeadCount={handleDecreaseHeadCount}
         onIncreaseHeadCount={handleIncreaseHeadCount}
+        onSubmitReservation={handleSubmitReservation}
         tileDisabled={tileDisabled}
       />
 
@@ -91,13 +101,25 @@ export function ActivityReservationCard({
         selectedTimeSlot={activeSelectedTimeSlot}
         availableTimeSlots={availableTimeSlots}
         hasSelectableDate={hasSelectableDate}
+        isReservationAvailable={isReservationAvailable}
+        isReservationSubmitting={isReservationSubmitting}
         onDateChange={handleDateChange}
         onMonthChange={handleMonthChange}
         onDecreaseHeadCount={handleDecreaseHeadCount}
         onIncreaseHeadCount={handleIncreaseHeadCount}
         onSelectTimeSlot={handleSelectTimeSlot}
+        onSubmitReservation={handleSubmitReservation}
         tileDisabled={tileDisabled}
       />
+
+      {isSuccessModalOpen ? (
+        <ModalOverlay onClose={handleCloseSuccessModal}>
+          <OneButtonModal
+            message="예약이 완료되었습니다."
+            onConfirm={handleCloseSuccessModal}
+          />
+        </ModalOverlay>
+      ) : null}
     </>
   );
 }

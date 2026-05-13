@@ -21,6 +21,8 @@ interface MobileReservationSheetProps {
   availableTimeSlots: TimeSlot[];
   headCount: number;
   totalPrice: number;
+  isReservationAvailable: boolean;
+  isReservationSubmitting: boolean;
   onClose: () => void;
   onMoveToHeadCountStep: () => void;
   onMoveToDateTimeStep: () => void;
@@ -29,6 +31,7 @@ interface MobileReservationSheetProps {
   onSelectTimeSlot: (slot: TimeSlot) => () => void;
   onDecreaseHeadCount: () => void;
   onIncreaseHeadCount: () => void;
+  onSubmitReservation: () => void;
   tileDisabled: (props: { date: Date; view: string }) => boolean;
 }
 
@@ -47,6 +50,8 @@ export function MobileReservationSheet({
   availableTimeSlots,
   headCount,
   totalPrice,
+  isReservationAvailable,
+  isReservationSubmitting,
   onClose,
   onMoveToHeadCountStep,
   onMoveToDateTimeStep,
@@ -55,6 +60,7 @@ export function MobileReservationSheet({
   onSelectTimeSlot,
   onDecreaseHeadCount,
   onIncreaseHeadCount,
+  onSubmitReservation,
   tileDisabled,
 }: MobileReservationSheetProps) {
   if (!isOpen) return null;
@@ -172,7 +178,12 @@ export function MobileReservationSheet({
                   </div>
                 </div>
 
-                <Button size="lg" className="w-full">
+                <Button
+                  size="lg"
+                  className="w-full"
+                  disabled={!isReservationAvailable || isReservationSubmitting}
+                  onClick={onSubmitReservation}
+                >
                   {new Intl.NumberFormat('ko-KR').format(totalPrice)}원 예약하기
                 </Button>
               </>
@@ -243,7 +254,12 @@ export function MobileReservationSheet({
               </div>
             </div>
 
-            <Button size="lg" className="mt-6 w-full">
+            <Button
+              size="lg"
+              className="mt-6 w-full"
+              disabled={!isReservationAvailable || isReservationSubmitting}
+              onClick={onSubmitReservation}
+            >
               {new Intl.NumberFormat('ko-KR').format(totalPrice)}원 예약하기
             </Button>
           </div>

@@ -17,11 +17,14 @@ interface DesktopReservationCardProps {
   selectedTimeSlot: TimeSlot | null;
   availableTimeSlots: TimeSlot[];
   hasSelectableDate: boolean;
+  isReservationAvailable: boolean;
+  isReservationSubmitting: boolean;
   onDateChange: (value: CalendarValue) => void;
   onMonthChange: (activeStartDate?: Date | null) => void;
   onDecreaseHeadCount: () => void;
   onIncreaseHeadCount: () => void;
   onSelectTimeSlot: (slot: TimeSlot) => () => void;
+  onSubmitReservation: () => void;
   tileDisabled: (props: { date: Date; view: string }) => boolean;
 }
 
@@ -38,11 +41,14 @@ export function DesktopReservationCard({
   selectedTimeSlot,
   availableTimeSlots,
   hasSelectableDate,
+  isReservationAvailable,
+  isReservationSubmitting,
   onDateChange,
   onMonthChange,
   onDecreaseHeadCount,
   onIncreaseHeadCount,
   onSelectTimeSlot,
+  onSubmitReservation,
   tileDisabled,
 }: DesktopReservationCardProps) {
   return (
@@ -126,7 +132,8 @@ export function DesktopReservationCard({
               <Button
                 size="sm"
                 className="w-30"
-                disabled={!selectedTimeSlot || !hasSelectableDate}
+                disabled={!isReservationAvailable || isReservationSubmitting}
+                onClick={onSubmitReservation}
               >
                 예약하기
               </Button>
