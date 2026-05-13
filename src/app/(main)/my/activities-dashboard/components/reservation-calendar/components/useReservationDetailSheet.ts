@@ -123,10 +123,12 @@ export const useReservationDetailSheet = ({
       document.removeEventListener('pointerdown', handlePointerDownOutside);
   }, [isOpen, onClose]);
 
-  const isSelectedTimeSlotEnded = (() => {
-    if (!selectedTimeSlot?.endTime) return false;
+  const selectedTimeSlotEndTime = selectedTimeSlot?.endTime;
 
-    const [hourString, minuteString] = selectedTimeSlot.endTime.split(':');
+  const isSelectedTimeSlotEnded = useMemo(() => {
+    if (!selectedTimeSlotEndTime) return false;
+
+    const [hourString, minuteString] = selectedTimeSlotEndTime.split(':');
     const hour = Number(hourString);
     const minute = Number(minuteString);
     if (!Number.isFinite(hour) || !Number.isFinite(minute)) return false;
@@ -135,7 +137,7 @@ export const useReservationDetailSheet = ({
     endDateTime.setHours(hour, minute, 0, 0);
 
     return endDateTime.getTime() < nowTimestamp;
-  })();
+  }, [nowTimestamp, selectedDate, selectedTimeSlotEndTime]);
 
   const {
     data,
