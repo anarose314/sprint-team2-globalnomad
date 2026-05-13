@@ -42,28 +42,31 @@ export function ReserveList() {
           {reserveList.map((reservation, index) => (
             <li key={reservation.id}>
               <article className="flex flex-col gap-3 border-b border-b-gray-50 pb-7.5">
-                {/* 카드 */}
+                {/* 카드 영역 */}
                 <ActivityCard href={`/activity/${reservation.activity.id}`}>
                   <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
+                    {/* 뱃지 */}
                     <StatusBadge status={reservation.status} />
                     <div>
+                      {/* 제목 */}
                       <Heading
                         as="h3"
                         className="typo-md-bold 2xl:typo-2lg-bold"
                       >
                         {reservation.activity.title}
                       </Heading>
+                      {/* 날짜 · 시간 */}
                       <div className="typo-sm-medium 2xl:typo-lg-medium flex gap-2 text-gray-500">
                         {/* 날짜 */}
-                        <p>
+                        <span>
                           <time dateTime={reservation.date}>
                             {reservation.date}
                           </time>
-                        </p>
-                        {/* divide */}
-                        <p>·</p>
+                        </span>
+                        {/* 구분자 */}
+                        <span aria-hidden="true">·</span>
                         {/* 시간 */}
-                        <p>
+                        <span>
                           <time dateTime={reservation.startTime}>
                             {reservation.startTime}
                           </time>{' '}
@@ -71,9 +74,10 @@ export function ReserveList() {
                           <time dateTime={reservation.endTime}>
                             {reservation.endTime}
                           </time>
-                        </p>
+                        </span>
                       </div>
                     </div>
+                    {/* 가격 및 인원 */}
                     <p className="typo-lg-bold 2xl:typo-2lg-bold flex items-center gap-1 text-gray-950">
                       ₩{reservation.totalPrice.toLocaleString('ko-KR')}
                       <span className="typo-md-medium 2xl:typo-lg-medium text-gray-400">
@@ -81,6 +85,7 @@ export function ReserveList() {
                       </span>
                     </p>
                   </div>
+                  {/* 이미지 영역 */}
                   <figure className="relative w-1/3 shrink-0 overflow-hidden md:w-1/4">
                     <Image
                       fill
@@ -92,7 +97,7 @@ export function ReserveList() {
                     />
                   </figure>
                 </ActivityCard>
-                {/* 버튼 */}
+                {/* 하단 버튼 영역 */}
                 <ReserveButtons status={reservation.status} />
               </article>
             </li>

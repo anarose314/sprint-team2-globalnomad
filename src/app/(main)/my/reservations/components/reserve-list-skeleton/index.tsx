@@ -11,24 +11,20 @@ export function ReserveListSkeleton() {
               <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
                 {/* 뱃지 */}
                 <Skeleton width={60} height={24} rounded="md" />
-
                 <div>
                   {/* 제목 */}
                   <Skeleton className="mb-2 w-3/4" height={24} />
-                  {/* 날짜 · 시간 상세 정보 (한 줄로 통합) */}
+                  {/* 날짜 · 시간 */}
                   <Skeleton className="w-3/5" height={20} />
                 </div>
-
                 {/* 가격 및 인원 */}
                 <Skeleton width={120} height={28} />
               </div>
-
               {/* 이미지 영역 */}
-              <div className="relative w-1/3 shrink-0 md:w-1/4">
+              <figure className="relative w-1/3 shrink-0 overflow-hidden md:w-1/4">
                 <Skeleton fullWidth height="100%" rounded="none" />
-              </div>
+              </figure>
             </div>
-
             {/* 하단 버튼 영역 */}
             <Skeleton fullWidth height={48} rounded="lg" />
           </article>
