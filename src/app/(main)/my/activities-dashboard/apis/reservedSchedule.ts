@@ -7,7 +7,7 @@ interface FetchReservedScheduleProps {
 }
 
 /**
- * 선택한 날짜에 예약 관련 데이터가 있는 스케줄 목록을 조회한다.
+ * 선택한 날짜에 예약 관련 데이터가 있는 스케줄 목록 조회
  */
 export const fetchReservedSchedule = async ({
   activityId,

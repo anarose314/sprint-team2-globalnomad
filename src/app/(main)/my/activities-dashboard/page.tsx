@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { MyActivitiesDashboardContent } from '@/app/(main)/my/activities-dashboard/components/myActivitiesDashboardContent';
 import { Heading } from '@/shared/components/heading';
@@ -13,7 +14,16 @@ export default function MyActivitiesDashboardPage() {
       <p className="typo-md-medium mt-2.5 text-gray-500 md:mt-2">
         내 체험에 예약된 내역들을 한 눈에 확인할 수 있습니다.
       </p>
-      <MyActivitiesDashboardContent />
+      <Suspense
+        fallback={
+          <div
+            aria-hidden="true"
+            className="shadow-card bg-gray-25 mt-7 h-192 w-full animate-pulse rounded-3xl md:mt-6"
+          />
+        }
+      >
+        <MyActivitiesDashboardContent />
+      </Suspense>
     </section>
   );
 }
