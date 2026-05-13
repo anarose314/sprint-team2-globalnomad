@@ -19,7 +19,7 @@ export interface ActivityDetailResponse {
   price: number;
   address: string;
   bannerImageUrl: string;
-  subImages: ActivitySubImage[];
+  subImages: ActivitySubImage[] | null;
   schedules: ActivitySchedule[];
   reviewCount: number;
   rating: number;
