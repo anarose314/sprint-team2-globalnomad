@@ -96,50 +96,6 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     enabled: activityId !== null,
   });
 
-  const reservationDashboardDateKeys = useMemo(
-    () => reservationDashboard.map((item) => item.date).filter(Boolean),
-    [reservationDashboard]
-  );
-
-  const { data: declinedByDate = {} } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      currentYear,
-      currentMonth,
-      reservationDashboardDateKeys.join(','),
-    ],
-    queryFn: async () => {
-      if (activityId === null || reservationDashboardDateKeys.length === 0) {
-        return {} as Record<string, number>;
-      }
-
-      const results = await Promise.all(
-        reservationDashboardDateKeys.map(async (dateKey) => {
-          const schedules = await fetchReservedSchedule({
-            activityId,
-            date: dateKey,
-          });
-
-          const declined = schedules.reduce(
-            (accumulator, schedule) =>
-              accumulator + Math.max(schedule.count.declined, 0),
-            0
-          );
-
-          return [dateKey, declined] as const;
-        })
-      );
-
-      return results.reduce<Record<string, number>>((accumulator, entry) => {
-        const [dateKey, declined] = entry;
-        accumulator[dateKey] = declined;
-        return accumulator;
-      }, {});
-    },
-    enabled: activityId !== null && reservationDashboardDateKeys.length > 0,
-  });
-
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
@@ -148,10 +104,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     >((accumulator, item) => {
       const completed = Math.max(item.reservations.completed, 0);
       const confirmed = Math.max(item.reservations.confirmed, 0);
-      const declined = Math.max(
-        item.reservations.declined ?? declinedByDate[item.date] ?? 0,
-        0
-      );
+      const declined = Math.max(item.reservations.declined, 0);
       const pending = Math.max(item.reservations.pending, 0);
 
       const eventCounts: ReservationEventCounts = {};
@@ -167,7 +120,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
       return accumulator;
     }, {});
 
-    // 월간 대시보드가 declined를 정확히 내려주지 않는 케이스 보정
+    // 현재 선택 날짜는 reserved-schedule 집계값으로 보정
     if (selectedDateKey) {
       const normalized = reservedSchedules.reduce(
         (accumulator, schedule) => {
@@ -199,12 +152,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     }
 
     return eventCounts;
-  }, [
-    declinedByDate,
-    reservationDashboard,
-    reservedSchedules,
-    selectedDateKey,
-  ]);
+  }, [reservationDashboard, reservedSchedules, selectedDateKey]);
 
   const detailData = useMemo(() => {
     return buildReservationDetailData({
