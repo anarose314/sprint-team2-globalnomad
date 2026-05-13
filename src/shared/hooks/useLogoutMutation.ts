@@ -37,7 +37,7 @@ export const useLogoutMutation = () => {
       // 토스트 인지 시간 확보 후 full reload
       setTimeout(() => {
         window.location.href = '/';
-      }, 100);
+      }, 500);
     },
     onError: (error) => {
       showToast({

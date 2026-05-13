@@ -48,14 +48,14 @@ export function ProfileForm() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && !isDirty) {
       reset({
         nickname: user.nickname,
         newPassword: '',
         newPasswordConfirm: '',
       });
     }
-  }, [user, reset]);
+  }, [user, reset, isDirty]);
 
   if (!user) {
     return null;
