@@ -30,3 +30,29 @@ export const updateMyInfo = async (body: UpdateMyInfoBody) => {
     body,
   });
 };
+
+/**
+ * 프로필 이미지 업로드 API 응답.
+ */
+export type UploadProfileImageResponse = {
+  profileImageUrl: string;
+};
+
+/**
+ * 프로필 이미지 파일을 업로드하고 URL을 받는다 (BFF 경유).
+ *
+ * 이 API는 URL만 생성하며, user 엔티티의 profileImageUrl을 직접 수정하지 않는다.
+ * user에 반영하려면 응답받은 URL로 updateMyInfo를 추가로 호출해야 한다.
+ */
+export const uploadProfileImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  return await fetchInstanceClient<UploadProfileImageResponse>(
+    '/api/proxy/users/me/image',
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+};

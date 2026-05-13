@@ -1,22 +1,26 @@
 'use client';
 
+import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMyInfo } from '@/app/(main)/my/profile/hooks/useMyInfo';
 import { IcEdit, IcProfile } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 import type { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
+import { IMAGE_INPUT_ACCEPT } from '@/shared/constants/image.constants';
+import { useUpdateProfileImageMutation } from '@/shared/hooks/useUpdateProfileImageMutation';
+import { useShowToast } from '@/shared/store/useToastStore';
 import { cn } from '@/shared/utils/cn';
-
-// TODO: 내 정보 API 연동 후 실제 프로필 이미지 URL로 교체
-const MOCK_PROFILE_IMAGE_URL = '';
+import { validateImageFile } from '@/shared/utils/validateImageFile';
 
 /**
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
  *
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
  * - 프로필 이미지, 프로필 이미지 수정, 로그아웃 등 사이드바 내부의 상태와 동작을 모두 자체적으로 관리한다.
+ * - 프로필 이미지는 사용자 선택 즉시 업로드 + user 반영까지 자동 처리한다.
  * - variant에 따라 데스크탑 사이드바와 모바일 드로어 내부 메뉴로 재사용한다.
  */
 export function Sidebar({
@@ -25,18 +29,38 @@ export function Sidebar({
   onLogout,
 }: SidebarProps) {
   const pathname = usePathname();
-  const profileImageUrl = MOCK_PROFILE_IMAGE_URL;
+  const { data: user } = useMyInfo();
+  const showToast = useShowToast();
+  const { mutate: updateProfileImage, isPending } =
+    useUpdateProfileImageMutation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const profileImageUrl = user?.profileImageUrl ?? '';
   const isDrawer = variant === 'drawer';
 
   const handleProfileEdit = () => {
-    // TODO: 프로필 수정 버튼 이벤트 연동 후 콘솔 로그 지우기
-    console.warn('프로필 수정 클릭');
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    // input 값을 항상 리셋해 같은 파일을 다시 선택해도 change가 발생하게 함
+    event.target.value = '';
+
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      showToast({ theme: 'error', message: validation.message });
+      return;
+    }
+
+    updateProfileImage(file);
   };
 
   const handleLogout = () => {
     // TODO: 로그아웃 버튼 이벤트 연동 후 콘솔 로그 지우기
     console.warn('로그아웃 클릭');
-
     onLogout?.();
   };
 
@@ -68,6 +92,7 @@ export function Sidebar({
               alt="프로필 이미지"
               fill
               className="object-cover"
+              sizes="(min-width: 1536px) 112px, 70px"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-blue-200">
@@ -79,14 +104,24 @@ export function Sidebar({
         <button
           type="button"
           onClick={handleProfileEdit}
+          disabled={isPending}
           aria-label="프로필 이미지 수정"
           className={cn(
-            'absolute right-1 bottom-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500',
+            'absolute right-1 bottom-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
             isDrawer ? 'h-7.5 w-7.5' : 'h-6 w-6 2xl:h-7.5 2xl:w-7.5'
           )}
         >
           <IcEdit className="h-full w-full" aria-hidden="true" />
         </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={IMAGE_INPUT_ACCEPT}
+          onChange={handleFileChange}
+          className="hidden"
+          aria-hidden="true"
+        />
       </div>
 
       {/* 메뉴 영역 */}
