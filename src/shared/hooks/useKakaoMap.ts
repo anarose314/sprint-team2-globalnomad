@@ -100,7 +100,7 @@ const loadKakaoMapSdk = (appKey: string) => {
 };
 
 /**
- * 주소 문자열을 기준으로 카카오 지도와 마커를 렌더링한다.
+ * 주소 문자열 기준으로 카카오 지도, 마커 렌더링
  */
 export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
