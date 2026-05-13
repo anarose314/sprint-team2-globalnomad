@@ -9,10 +9,8 @@ import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
 import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
-import {
-  ReservationEventCounts,
-  ReservationTimeSlotOption,
-} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -98,67 +96,122 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     enabled: activityId !== null,
   });
 
+  const reservationDashboardDateKeys = useMemo(
+    () => reservationDashboard.map((item) => item.date).filter(Boolean),
+    [reservationDashboard]
+  );
+
+  const { data: declinedByDate = {} } = useQuery({
+    queryKey: [
+      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+      activityId,
+      currentYear,
+      currentMonth,
+      reservationDashboardDateKeys.join(','),
+    ],
+    queryFn: async () => {
+      if (activityId === null || reservationDashboardDateKeys.length === 0) {
+        return {} as Record<string, number>;
+      }
+
+      const results = await Promise.all(
+        reservationDashboardDateKeys.map(async (dateKey) => {
+          const schedules = await fetchReservedSchedule({
+            activityId,
+            date: dateKey,
+          });
+
+          const declined = schedules.reduce(
+            (accumulator, schedule) =>
+              accumulator + Math.max(schedule.count.declined, 0),
+            0
+          );
+
+          return [dateKey, declined] as const;
+        })
+      );
+
+      return results.reduce<Record<string, number>>((accumulator, entry) => {
+        const [dateKey, declined] = entry;
+        accumulator[dateKey] = declined;
+        return accumulator;
+      }, {});
+    },
+    enabled: activityId !== null && reservationDashboardDateKeys.length > 0,
+  });
+
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
-    return reservationDashboard.reduce<Record<string, ReservationEventCounts>>(
-      (accumulator, item) => {
-        const completed = Math.max(item.reservations.completed, 0);
-        const confirmed = Math.max(item.reservations.confirmed, 0);
-        const pending = Math.max(item.reservations.pending, 0);
+    const eventCounts = reservationDashboard.reduce<
+      Record<string, ReservationEventCounts>
+    >((accumulator, item) => {
+      const completed = Math.max(item.reservations.completed, 0);
+      const confirmed = Math.max(item.reservations.confirmed, 0);
+      const declined = Math.max(
+        item.reservations.declined ?? declinedByDate[item.date] ?? 0,
+        0
+      );
+      const pending = Math.max(item.reservations.pending, 0);
 
-        const eventCounts: ReservationEventCounts = {};
-        if (pending > 0) eventCounts.pending = pending;
-        if (confirmed > 0) eventCounts.confirmed = confirmed;
-        if (completed > 0) eventCounts.completed = completed;
+      const eventCounts: ReservationEventCounts = {};
+      if (pending > 0) eventCounts.pending = pending;
+      if (confirmed > 0) eventCounts.confirmed = confirmed;
+      if (declined > 0) eventCounts.declined = declined;
+      if (completed > 0) eventCounts.completed = completed;
 
-        if (Object.keys(eventCounts).length > 0) {
-          accumulator[item.date] = eventCounts;
-        }
-
-        return accumulator;
-      },
-      {}
-    );
-  }, [reservationDashboard]);
-
-  const detailData = useMemo(() => {
-    const filteredActivitySchedules = selectedDateKey
-      ? activitySchedules.filter(
-          (schedule) => schedule.date === selectedDateKey
-        )
-      : [];
-
-    const uniqueTimeSlots = [
-      ...reservedSchedules,
-      ...filteredActivitySchedules,
-    ].reduce<ReservationTimeSlotOption[]>((accumulator, schedule) => {
-      const timeSlotLabel = `${schedule.startTime} - ${schedule.endTime}`;
-      if (!timeSlotLabel) return accumulator;
-
-      if (accumulator.some((timeSlot) => timeSlot.value === timeSlotLabel)) {
-        return accumulator;
+      if (Object.keys(eventCounts).length > 0) {
+        accumulator[item.date] = eventCounts;
       }
 
-      const counts =
-        'count' in schedule
-          ? schedule.count
-          : { pending: 0, confirmed: 0, declined: 0 };
-
-      accumulator.push({
-        scheduleId: schedule.scheduleId ?? null,
-        label: timeSlotLabel,
-        value: timeSlotLabel,
-        count: counts,
-      });
-
       return accumulator;
-    }, []);
+    }, {});
 
-    return {
-      timeSlots: uniqueTimeSlots,
-      requests: [],
-    };
+    // 월간 대시보드가 declined를 정확히 내려주지 않는 케이스 보정
+    if (selectedDateKey) {
+      const normalized = reservedSchedules.reduce(
+        (accumulator, schedule) => {
+          accumulator.pending += Math.max(schedule.count.pending, 0);
+          accumulator.confirmed += Math.max(schedule.count.confirmed, 0);
+          accumulator.declined += Math.max(schedule.count.declined, 0);
+          return accumulator;
+        },
+        { pending: 0, confirmed: 0, declined: 0 }
+      );
+
+      const completed = Math.max(
+        eventCounts[selectedDateKey]?.completed ?? 0,
+        0
+      );
+
+      const mergedDailyCounts: ReservationEventCounts = {};
+      if (normalized.pending > 0)
+        mergedDailyCounts.pending = normalized.pending;
+      if (normalized.confirmed > 0)
+        mergedDailyCounts.confirmed = normalized.confirmed;
+      if (normalized.declined > 0)
+        mergedDailyCounts.declined = normalized.declined;
+      if (completed > 0) mergedDailyCounts.completed = completed;
+
+      if (Object.keys(mergedDailyCounts).length > 0) {
+        eventCounts[selectedDateKey] = mergedDailyCounts;
+      }
+    }
+
+    return eventCounts;
+  }, [
+    declinedByDate,
+    reservationDashboard,
+    reservedSchedules,
+    selectedDateKey,
+  ]);
+
+  const detailData = useMemo(() => {
+    return buildReservationDetailData({
+      activitySchedules,
+      reservedSchedules,
+      reservedScheduleDateKey: selectedDateKey,
+    });
   }, [activitySchedules, selectedDateKey, reservedSchedules]);
 
   if (activityId === null) {

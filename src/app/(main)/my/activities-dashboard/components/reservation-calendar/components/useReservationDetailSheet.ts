@@ -38,6 +38,35 @@ export const useReservationDetailSheet = ({
   const [manualSelectedTimeSlotValue, setManualSelectedTimeSlotValue] =
     useState<string | null>(null);
   const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
+
+  const selectedTimeSlotValue = useMemo(() => {
+    const timeSlots = detailData?.timeSlots ?? [];
+    if (!timeSlots.length) return EMPTY_TIME_SLOT;
+
+    const defaultTimeSlot =
+      timeSlots.find((timeSlot) => timeSlot.scheduleId !== null) ??
+      timeSlots[0];
+
+    const hasManualSelected =
+      manualSelectedTimeSlotValue !== null &&
+      timeSlots.some(
+        (timeSlot) => timeSlot.value === manualSelectedTimeSlotValue
+      );
+
+    return hasManualSelected
+      ? manualSelectedTimeSlotValue
+      : defaultTimeSlot.value;
+  }, [detailData, manualSelectedTimeSlotValue]);
+
+  const selectedTimeSlot = useMemo(
+    () =>
+      detailData?.timeSlots.find(
+        (timeSlot) => timeSlot.value === selectedTimeSlotValue
+      ) ?? null,
+    [detailData, selectedTimeSlotValue]
+  );
+
+  const selectedScheduleId = selectedTimeSlot?.scheduleId ?? null;
   const {
     isUpdatingStatus,
     confirmationModalMessage,
@@ -47,7 +76,10 @@ export const useReservationDetailSheet = ({
     cancelStatusUpdateConfirmation,
     confirmStatusUpdate,
     closeFeedbackModal,
-  } = useReservationStatusUpdate({ activityId });
+  } = useReservationStatusUpdate({
+    activityId,
+    selectedScheduleId,
+  });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -76,9 +108,13 @@ export const useReservationDetailSheet = ({
     if (!isOpen) return;
 
     const handlePointerDownOutside = (event: PointerEvent) => {
+      const eventTarget = event.target as Node;
+      const modalRoot = document.getElementById('modal-root');
+      if (modalRoot?.contains(eventTarget)) return;
+
       const sheetElement = sheetRef.current;
       if (!sheetElement) return;
-      if (sheetElement.contains(event.target as Node)) return;
+      if (sheetElement.contains(eventTarget)) return;
       onClose();
     };
 
@@ -86,29 +122,6 @@ export const useReservationDetailSheet = ({
     return () =>
       document.removeEventListener('pointerdown', handlePointerDownOutside);
   }, [isOpen, onClose]);
-
-  const selectedTimeSlotValue = useMemo(() => {
-    const timeSlots = detailData?.timeSlots ?? [];
-    if (!timeSlots.length) return EMPTY_TIME_SLOT;
-
-    const hasManualSelected =
-      manualSelectedTimeSlotValue !== null &&
-      timeSlots.some(
-        (timeSlot) => timeSlot.value === manualSelectedTimeSlotValue
-      );
-
-    return hasManualSelected ? manualSelectedTimeSlotValue : timeSlots[0].value;
-  }, [detailData, manualSelectedTimeSlotValue]);
-
-  const selectedTimeSlot = useMemo(
-    () =>
-      detailData?.timeSlots.find(
-        (timeSlot) => timeSlot.value === selectedTimeSlotValue
-      ) ?? null,
-    [detailData, selectedTimeSlotValue]
-  );
-
-  const selectedScheduleId = selectedTimeSlot?.scheduleId ?? null;
 
   const isSelectedTimeSlotEnded = (() => {
     if (!selectedTimeSlot?.endTime) return false;

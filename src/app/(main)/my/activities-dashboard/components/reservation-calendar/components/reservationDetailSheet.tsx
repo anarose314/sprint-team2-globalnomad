@@ -181,13 +181,15 @@ export function ReservationDetailSheet({
 
       {confirmationModalMessage ? (
         <ModalOverlay onClose={cancelStatusUpdateConfirmation}>
-          <TwoButtonModal
-            message={confirmationModalMessage}
-            cancelText="취소"
-            confirmText="확인"
-            onCancel={cancelStatusUpdateConfirmation}
-            onConfirm={confirmStatusUpdate}
-          />
+          <div className="reservation-detail-sheet__confirm-modal">
+            <TwoButtonModal
+              message={confirmationModalMessage}
+              cancelText="취소"
+              confirmText="확인"
+              onCancel={cancelStatusUpdateConfirmation}
+              onConfirm={confirmStatusUpdate}
+            />
+          </div>
         </ModalOverlay>
       ) : null}
     </div>
