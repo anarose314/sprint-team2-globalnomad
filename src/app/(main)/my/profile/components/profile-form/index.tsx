@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { UpdateMyInfoBody } from '@/app/(main)/my/profile/apis/myInfo';
@@ -41,11 +41,21 @@ export function ProfileForm() {
     mode: 'onTouched',
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      nickname: user?.nickname ?? '',
+      nickname: '',
       newPassword: '',
       newPasswordConfirm: '',
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        nickname: user.nickname,
+        newPassword: '',
+        newPasswordConfirm: '',
+      });
+    }
+  }, [user, reset]);
 
   if (!user) {
     return null;

@@ -10,6 +10,7 @@ import { Button } from '@/shared/components/buttons';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 import type { SidebarProps } from '@/shared/components/sidebar/sidebar.types';
 import { IMAGE_INPUT_ACCEPT } from '@/shared/constants/image.constants';
+import { useLogoutMutation } from '@/shared/hooks/useLogoutMutation';
 import { useRemoveProfileImageMutation } from '@/shared/hooks/useRemoveProfileImageMutation';
 import { useUpdateProfileImageMutation } from '@/shared/hooks/useUpdateProfileImageMutation';
 import { useShowToast } from '@/shared/store/useToastStore';
@@ -20,8 +21,8 @@ import { validateImageFile } from '@/shared/utils/validateImageFile';
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
  *
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
- * - 프로필 이미지는 사용자 선택 즉시 업로드 + user 반영까지 자동 처리한다.
- * - 사용자가 업로드한 이미지가 있을 때만 close 버튼이 노출되며, 클릭 시 즉시 기본 이미지로 복원한다.
+ * - 프로필 이미지 변경/제거를 자체적으로 처리한다.
+ * - 로그아웃 시 인증 쿠키 삭제, 캐시 클리어, 메인 페이지로 이동을 모두 처리한다.
  * - variant에 따라 데스크탑 사이드바와 모바일 드로어 내부 메뉴로 재사용한다.
  */
 export function Sidebar({
@@ -36,6 +37,7 @@ export function Sidebar({
     useUpdateProfileImageMutation();
   const { mutate: removeProfileImage, isPending: isRemoving } =
     useRemoveProfileImageMutation();
+  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileImageUrl = user?.profileImageUrl ?? '';
@@ -67,8 +69,8 @@ export function Sidebar({
   };
 
   const handleLogout = () => {
-    // TODO: 로그아웃 버튼 이벤트 연동 후 콘솔 로그 지우기
-    console.warn('로그아웃 클릭');
+    onNavigate?.(); // 드로어 모드일 경우 드로어 먼저 닫기
+    logout();
     onLogout?.();
   };
 
@@ -109,7 +111,6 @@ export function Sidebar({
           )}
         </div>
 
-        {/* 연필 버튼 — 항상 노출, 클릭 시 파일 선택 */}
         <button
           type="button"
           onClick={handleProfileEdit}
@@ -123,7 +124,6 @@ export function Sidebar({
           <IcEdit className="h-full w-full" aria-hidden="true" />
         </button>
 
-        {/* close 버튼 — 사용자 업로드 이미지가 있을 때만 노출 */}
         {hasProfileImage && (
           <button
             type="button"
@@ -177,11 +177,12 @@ export function Sidebar({
       <Button
         type="button"
         onClick={handleLogout}
+        disabled={isLoggingOut}
         className={cn('mt-3.5 h-12 w-full 2xl:h-13.5', isDrawer && 'mt-auto')}
         size="lg"
         variant="secondary"
       >
-        로그아웃
+        {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
       </Button>
     </aside>
   );
