@@ -9,7 +9,10 @@ import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
 import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
-import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import {
+  ReservationEventCounts,
+  ReservationTimeSlotOption,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -126,10 +129,31 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
         )
       : [];
 
-    const timeSlots = [...reservedSchedules, ...filteredActivitySchedules]
-      .map((schedule) => `${schedule.startTime} - ${schedule.endTime}`)
-      .filter((timeSlot): timeSlot is string => Boolean(timeSlot));
-    const uniqueTimeSlots = [...new Set(timeSlots)];
+    const uniqueTimeSlots = [
+      ...reservedSchedules,
+      ...filteredActivitySchedules,
+    ].reduce<ReservationTimeSlotOption[]>((accumulator, schedule) => {
+      const timeSlotLabel = `${schedule.startTime} - ${schedule.endTime}`;
+      if (!timeSlotLabel) return accumulator;
+
+      if (accumulator.some((timeSlot) => timeSlot.value === timeSlotLabel)) {
+        return accumulator;
+      }
+
+      const counts =
+        'count' in schedule
+          ? schedule.count
+          : { pending: 0, confirmed: 0, declined: 0 };
+
+      accumulator.push({
+        scheduleId: schedule.scheduleId ?? null,
+        label: timeSlotLabel,
+        value: timeSlotLabel,
+        count: counts,
+      });
+
+      return accumulator;
+    }, []);
 
     return {
       timeSlots: uniqueTimeSlots,
@@ -215,6 +239,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
       {detailDate && selectedDateKey ? (
         <ReservationDetailSheet
           key={selectedDateKey}
+          activityId={activityId}
           isOpen
           selectedDate={detailDate}
           detailData={detailData}
