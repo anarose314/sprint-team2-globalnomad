@@ -1,7 +1,9 @@
 import type {
   ActivitiesResponse,
+  ActivityImageResponse,
   FetchActivitiesParams,
 } from '@/app/(main)/activity/apis/activities.types';
+import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
 
 /**
@@ -29,4 +31,20 @@ export const fetchActivities = async ({
     },
     cache: 'no-store',
   });
+};
+
+/**
+ * 체험 이미지를 서버(S3)에 업로드하고 URL을 반환받는 API (BFF 경유)
+ */
+export const postActivityImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  return await fetchInstanceClient<ActivityImageResponse>(
+    '/api/proxy/activities/image',
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
 };

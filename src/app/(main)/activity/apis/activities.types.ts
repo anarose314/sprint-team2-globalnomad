@@ -25,3 +25,7 @@ export interface FetchActivitiesParams {
   size: number;
   sort?: 'latest';
 }
+
+export interface ActivityImageResponse {
+  activityImageUrl: string;
+}
