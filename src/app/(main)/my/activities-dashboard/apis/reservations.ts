@@ -1,3 +1,4 @@
+import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { MyActivityReservationsResponse } from '@/shared/types/myActivityReservations.types';
 
@@ -10,6 +11,18 @@ interface FetchActivityReservationsProps {
   cursorId?: number | null;
 }
 
+interface UpdateActivityReservationStatusProps {
+  activityId: number;
+  reservationId: number;
+  status: 'confirmed' | 'declined';
+}
+
+interface ApproveReservationWithAutoDeclineProps {
+  activityId: number;
+  reservationId: number;
+  scheduleId: number;
+}
+
 interface ActivityReservationsResponseLike {
   cursorId?: unknown;
   totalCount?: unknown;
@@ -17,7 +30,7 @@ interface ActivityReservationsResponseLike {
 }
 
 /**
- * 특정 체험/스케줄/상태 기준 예약 내역 목록을 커서 페이징으로 조회한다.
+ * 특정 체험/스케줄/상태 기준 예약 내역 목록을 커서 페이징으로 조회
  */
 export const fetchActivityReservations = async ({
   activityId,
@@ -67,7 +80,8 @@ export const fetchActivityReservations = async ({
         const isStatusValid =
           reservation.status === 'pending' ||
           reservation.status === 'confirmed' ||
-          reservation.status === 'declined';
+          reservation.status === 'declined' ||
+          reservation.status === 'completed';
 
         if (
           typeof reservation.id !== 'number' ||
@@ -96,4 +110,50 @@ export const fetchActivityReservations = async ({
           item !== null
       ),
   };
+};
+
+/**
+ * 내 체험 예약 상태를 승인/거절로 변경한다.
+ */
+export const updateActivityReservationStatus = async ({
+  activityId,
+  reservationId,
+  status,
+}: UpdateActivityReservationStatusProps): Promise<void> => {
+  await fetchInstanceClient(
+    `/api/proxy/my-activities/${activityId}/reservations/${reservationId}`,
+    {
+      method: 'PATCH',
+      body: { status },
+    }
+  );
+};
+
+/**
+ * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도한다.
+ * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백을 수행한다.
+ */
+export const approveReservationWithAutoDecline = async ({
+  activityId,
+  reservationId,
+  scheduleId,
+}: ApproveReservationWithAutoDeclineProps): Promise<boolean> => {
+  try {
+    await fetchInstanceClient(
+      `/api/proxy/my-activities/${activityId}/reservations/${reservationId}/approve`,
+      {
+        method: 'PATCH',
+        body: { scheduleId },
+      }
+    );
+    return true;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const unsupportedStatuses = [404, 405, 501];
+      if (unsupportedStatuses.includes(error.status)) {
+        return false;
+      }
+    }
+    throw error;
+  }
 };

@@ -3,6 +3,7 @@ export interface ReservationDashboardDailyItem {
   reservations: {
     completed: number;
     confirmed: number;
+    declined: number;
     pending: number;
   };
 }

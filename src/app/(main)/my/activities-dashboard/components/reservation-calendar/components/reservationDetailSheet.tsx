@@ -9,6 +9,8 @@ import { ReservationDetailData } from '@/app/(main)/my/activities-dashboard/comp
 import { IcClose } from '@/shared/assets/icons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
+import { OneButtonModal, TwoButtonModal } from '@/shared/components/modal';
+import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
 import { cn } from '@/shared/utils/cn';
 
 interface ReservationDetailSheetProps {
@@ -52,14 +54,25 @@ export function ReservationDetailSheet({
     requestListEndRef,
     requestScrollRef,
     selectedTimeSlotValue,
+    isSelectedTimeSlotEnded,
+    isUpdatingStatus,
+    confirmationModalMessage,
+    feedbackModalMessage,
+    isDateReservationEmpty,
     setActiveTab,
     handleTimeSlotChange,
+    handleApproveReservation,
+    handleRejectReservation,
+    cancelStatusUpdateConfirmation,
+    confirmStatusUpdate,
+    closeFeedbackModal,
     sheetRef,
     shouldUseFixedRequestViewport,
     tabCount,
   } = useReservationDetailSheet({
     activityId,
     isOpen,
+    selectedDate,
     detailData,
     onClose,
   });
@@ -141,9 +154,14 @@ export function ReservationDetailSheet({
                   activeTab={activeTab}
                   isEmpty={!isLoadingRequests && !requests.length}
                   isLoading={isLoadingRequests}
+                  isDateReservationEmpty={isDateReservationEmpty}
                   requests={requests}
+                  isSelectedTimeSlotEnded={isSelectedTimeSlotEnded}
+                  isUpdatingStatus={isUpdatingStatus}
                   hasMoreRequests={hasMoreRequests}
                   isFetchingNextPage={isFetchingNextPage}
+                  onApprove={handleApproveReservation}
+                  onReject={handleRejectReservation}
                   sentinelRef={requestListEndRef}
                 />
               </div>
@@ -151,6 +169,29 @@ export function ReservationDetailSheet({
           </div>
         </div>
       </section>
+
+      {feedbackModalMessage ? (
+        <ModalOverlay onClose={closeFeedbackModal}>
+          <OneButtonModal
+            message={feedbackModalMessage}
+            onConfirm={closeFeedbackModal}
+          />
+        </ModalOverlay>
+      ) : null}
+
+      {confirmationModalMessage ? (
+        <ModalOverlay onClose={cancelStatusUpdateConfirmation}>
+          <div className="reservation-detail-sheet__confirm-modal">
+            <TwoButtonModal
+              message={confirmationModalMessage}
+              cancelText="취소"
+              confirmText="확인"
+              onCancel={cancelStatusUpdateConfirmation}
+              onConfirm={confirmStatusUpdate}
+            />
+          </div>
+        </ModalOverlay>
+      ) : null}
     </div>
   );
 }
