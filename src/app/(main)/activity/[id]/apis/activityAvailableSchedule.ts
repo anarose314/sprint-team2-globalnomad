@@ -1,3 +1,4 @@
+import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { ActivityAvailableScheduleItem } from '@/shared/types/activityDetail.types';
 
@@ -13,7 +14,14 @@ export const fetchActivityAvailableSchedule = async ({
 }: FetchActivityAvailableScheduleProps): Promise<
   ActivityAvailableScheduleItem[]
 > => {
-  return fetchInstanceClient<ActivityAvailableScheduleItem[]>(
-    `/api/proxy/activities/${activityId}/available-schedule`
-  );
+  try {
+    return await fetchInstanceClient<ActivityAvailableScheduleItem[]>(
+      `/api/proxy/activities/${activityId}/available-schedule`
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 400) {
+      return [];
+    }
+    throw error;
+  }
 };
