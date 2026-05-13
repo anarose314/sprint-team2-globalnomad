@@ -22,9 +22,10 @@ export function ReserveButtons({ reservationInfo }: ReserveButtonsProps) {
           예약 취소
         </Button>
       )}
-      {reservationInfo.status === 'completed' && (
-        <ReserveReview reservationInfo={reservationInfo} />
-      )}
+      {reservationInfo.status === 'completed' &&
+        !reservationInfo.reviewSubmitted && (
+          <ReserveReview reservationInfo={reservationInfo} />
+        )}
     </>
   );
 }

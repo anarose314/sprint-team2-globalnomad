@@ -49,6 +49,7 @@ export function ReserveList() {
               date,
               startTime,
               endTime,
+              reviewSubmitted,
             } = reservation;
 
             const reservationInfo = {
@@ -56,6 +57,7 @@ export function ReserveList() {
               status,
               title: activity.title,
               description: `${date} / ${startTime} - ${endTime} (${headCount}명)`,
+              reviewSubmitted,
             };
 
             return (

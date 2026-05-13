@@ -12,6 +12,7 @@ interface ReviewModalProps {
   onReviewTextChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
+  isPending: boolean;
 }
 
 const SECTION_TITLE = '소중한 경험을 들려주세요';
@@ -46,6 +47,7 @@ export function ReviewModal({
   onReviewTextChange,
   onClose,
   onSubmit,
+  isPending,
 }: ReviewModalProps) {
   return (
     <ModalBase
@@ -115,8 +117,9 @@ export function ReviewModal({
             size="lg"
             onClick={onSubmit}
             className="w-full"
+            disabled={isPending}
           >
-            작성하기
+            {isPending ? '리뷰 작성 중...' : '작성하기'}
           </Button>
         </div>
       </div>

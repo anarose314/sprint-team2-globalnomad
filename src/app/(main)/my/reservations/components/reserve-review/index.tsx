@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ReserveReviewProps } from '@/app/(main)/my/reservations/components/reserve-review/reserveReview.types';
+import { useReviewMutation } from '@/app/(main)/my/reservations/hooks/useReviewMutation';
 import { Button } from '@/shared/components/buttons';
 import { ReviewModal } from '@/shared/components/modal';
 import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
@@ -10,6 +11,8 @@ export function ReserveReview({ reservationInfo }: ReserveReviewProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
+
+  const { mutate: submitReview, isPending } = useReviewMutation(closeModal);
 
   const showToast = useShowToast();
   const { title, description } = reservationInfo;
@@ -30,8 +33,19 @@ export function ReserveReview({ reservationInfo }: ReserveReviewProps) {
       });
       return;
     }
-    // TODO: API 동작 추가
-    console.log('리뷰 작성 전송');
+
+    if (reservationInfo.reviewSubmitted) {
+      showToast({ theme: 'error', message: '이미 리뷰를 작성하셨습니다.' });
+      return;
+    }
+
+    submitReview({
+      reservationId: reservationInfo.id,
+      body: {
+        rating,
+        content: reviewText,
+      },
+    });
   };
 
   return (
@@ -50,6 +64,7 @@ export function ReserveReview({ reservationInfo }: ReserveReviewProps) {
             onReviewTextChange={(value) => setReviewText(value)}
             onClose={closeModal}
             onSubmit={handleReview}
+            isPending={isPending}
           />
         </ModalOverlay>
       )}

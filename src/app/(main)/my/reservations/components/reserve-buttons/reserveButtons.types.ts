@@ -5,6 +5,7 @@ export interface ReservationInfo {
   status: ReservationStatus;
   title: string;
   description: string;
+  reviewSubmitted: boolean;
 }
 
 export interface ReserveButtonsProps {
