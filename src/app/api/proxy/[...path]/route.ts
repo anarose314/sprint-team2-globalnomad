@@ -21,9 +21,9 @@ const buildEndpoint = async (
 };
 
 /**
- * 공통 프록시 요청 처리
+ * 공통 프록시 요청 처리 (Body 없음)
  *
- * GET/DELETE 같은 body 없는 메서드를 주입받아 서버 fetch 래퍼를 호출하고,
+ * GET/DELETE 같은 Body 없는 메서드를 주입받아 서버 fetch 래퍼를 호출하고,
  * API 에러를 클라이언트 응답 형태로 변환
  */
 const handleProxyRequest = async (
@@ -58,44 +58,37 @@ const handleProxyRequest = async (
 };
 
 /**
- * GET 요청을 외부 API로 프록시
+ * 공통 프록시 요청 처리 (Body 포함)
+ *
+ * 요청의 Content-Type에 따라 일반 JSON 또는 multipart/form-data를 안전하게 파싱하여 백엔드로 전달합니다.
+ * JSON 파싱 실패 시 undefined로 처리하여 Body가 비어있는 요청도 유연하게 허용합니다.
+ *
+ * @example
+ * export const POST = async (req, ctx) => handleProxyRequestWithBody(req, ctx, 'POST');
  */
-export const GET = async (
+const handleProxyRequestWithBody = async (
   request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) => {
-  return handleProxyRequest(request, context, 'GET');
-};
-
-/**
- * DELETE 요청을 외부 API로 프록시
- */
-export const DELETE = async (
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) => {
-  return handleProxyRequest(request, context, 'DELETE');
-};
-
-/**
- * PATCH 프록시 처리
- * - request.json() 파싱 실패 시 undefined로 처리해
- *   body 없는 PATCH도 백엔드로 전달
- */
-export const PATCH = async (
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
+  context: { params: Promise<{ path: string[] }> },
+  method: 'POST' | 'PATCH' | 'PUT'
 ) => {
   try {
     const endpoint = await buildEndpoint(request, context);
-    const jsonBody = await request.json().catch(() => undefined);
-    const requestBody =
-      jsonBody && typeof jsonBody === 'object'
-        ? (jsonBody as Record<string, unknown>)
-        : undefined;
+    const contentType = request.headers.get('content-type') ?? '';
 
-    const data = await fetchInstanceServer(endpoint, {
-      method: 'PATCH',
+    let requestBody: Record<string, unknown> | FormData | undefined = undefined;
+
+    if (contentType.includes('multipart/form-data')) {
+      requestBody = await request.formData();
+    } else if (contentType.includes('application/json')) {
+      const jsonBody = await request.json().catch(() => undefined);
+      requestBody =
+        jsonBody && typeof jsonBody === 'object'
+          ? (jsonBody as Record<string, unknown>)
+          : undefined;
+    }
+
+    const data = await fetchInstanceServer<unknown>(endpoint, {
+      method,
       body: requestBody,
     });
 
@@ -117,3 +110,31 @@ export const PATCH = async (
     );
   }
 };
+
+/**
+ * 라우트 핸들러 export
+ */
+export const GET = async (
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) => handleProxyRequest(request, context, 'GET');
+
+export const DELETE = async (
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) => handleProxyRequest(request, context, 'DELETE');
+
+export const POST = async (
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) => handleProxyRequestWithBody(request, context, 'POST');
+
+export const PATCH = async (
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) => handleProxyRequestWithBody(request, context, 'PATCH');
+
+export const PUT = async (
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) => handleProxyRequestWithBody(request, context, 'PUT');
