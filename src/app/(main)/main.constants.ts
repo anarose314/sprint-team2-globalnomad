@@ -63,6 +63,8 @@ export const MAIN_DESKTOP_PAGE_SIZE = 8;
 
 export const MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY = '(min-width: 1536px)';
 
+export const POPULAR_ACTIVITY_PAGE_SIZE = 4;
+
 // TODO: 인기 체험 API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
   {

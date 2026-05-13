@@ -28,7 +28,7 @@ export interface Activity {
 }
 
 export interface ActivitiesResponse {
-  cursorId: number;
+  cursorId: number | null;
   totalCount: number;
   activities: Activity[];
 }
@@ -44,4 +44,8 @@ export interface FetchActivitiesParams {
 
 export interface ActivityImageResponse {
   activityImageUrl: string;
+}
+
+export interface FetchPopularActivitiesParams {
+  pageParam?: number | null;
 }
