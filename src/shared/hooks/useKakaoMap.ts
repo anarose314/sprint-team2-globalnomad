@@ -51,47 +51,7 @@ const loadKakaoMapSdk = (appKey: string) => {
 
   kakaoMapScriptPromise = new Promise<KakaoMapNamespace>((resolve, reject) => {
     const windowWithKakao = window as Window & { kakao?: KakaoMapNamespace };
-
-    if (windowWithKakao.kakao?.maps) {
-      windowWithKakao.kakao.maps.load(() => {
-        if (!windowWithKakao.kakao) {
-          reject(new Error('카카오 지도 SDK 초기화에 실패했습니다.'));
-          return;
-        }
-        resolve(windowWithKakao.kakao);
-      });
-      return;
-    }
-
-    const existingScript = document.getElementById(
-      KAKAO_MAP_SCRIPT_ID
-    ) as HTMLScriptElement | null;
-
-    if (existingScript) {
-      existingScript.addEventListener('load', () => {
-        if (!windowWithKakao.kakao?.maps) {
-          reject(new Error('카카오 지도 SDK 로드에 실패했습니다.'));
-          return;
-        }
-        windowWithKakao.kakao.maps.load(() => {
-          if (!windowWithKakao.kakao) {
-            reject(new Error('카카오 지도 SDK 초기화에 실패했습니다.'));
-            return;
-          }
-          resolve(windowWithKakao.kakao);
-        });
-      });
-      existingScript.addEventListener('error', () => {
-        reject(new Error('카카오 지도 SDK 스크립트 로드에 실패했습니다.'));
-      });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = KAKAO_MAP_SCRIPT_ID;
-    script.async = true;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false&libraries=services`;
-    script.onload = () => {
+    const initializeKakao = () => {
       if (!windowWithKakao.kakao?.maps) {
         reject(new Error('카카오 지도 SDK 로드에 실패했습니다.'));
         return;
@@ -104,9 +64,31 @@ const loadKakaoMapSdk = (appKey: string) => {
         resolve(windowWithKakao.kakao);
       });
     };
-    script.onerror = () => {
+    const onScriptError = () => {
       reject(new Error('카카오 지도 SDK 스크립트 로드에 실패했습니다.'));
     };
+
+    if (windowWithKakao.kakao?.maps) {
+      initializeKakao();
+      return;
+    }
+
+    const existingScript = document.getElementById(
+      KAKAO_MAP_SCRIPT_ID
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      existingScript.addEventListener('load', initializeKakao);
+      existingScript.addEventListener('error', onScriptError);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = KAKAO_MAP_SCRIPT_ID;
+    script.async = true;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false&libraries=services`;
+    script.onload = initializeKakao;
+    script.onerror = onScriptError;
 
     document.head.appendChild(script);
   }).catch((error) => {
