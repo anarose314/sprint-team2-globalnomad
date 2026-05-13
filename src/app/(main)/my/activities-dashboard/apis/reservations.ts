@@ -23,7 +23,7 @@ interface ActivityReservationsResponseLike {
 }
 
 /**
- * 특정 체험/스케줄/상태 기준 예약 내역 목록을 커서 페이징으로 조회한다.
+ * 특정 체험/스케줄/상태 기준 예약 내역 목록을 커서 페이징으로 조회
  */
 export const fetchActivityReservations = async ({
   activityId,

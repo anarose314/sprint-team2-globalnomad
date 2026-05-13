@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import {
-  fetchActivityReservations,
-  updateActivityReservationStatus,
-} from '@/app/(main)/my/activities-dashboard/apis/reservations';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import {
   EMPTY_TIME_SLOT,
   ReservationTab,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
+import { useReservationStatusUpdate } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationStatusUpdate';
 import {
   ReservationDetailData,
   ReservationRequestItem,
@@ -36,7 +30,6 @@ export const useReservationDetailSheet = ({
   detailData,
   onClose,
 }: UseReservationDetailSheetParams) => {
-  const queryClient = useQueryClient();
   const sheetRef = useRef<HTMLElement>(null);
   const requestScrollRef = useRef<HTMLDivElement>(null);
   const requestListEndRef = useRef<HTMLDivElement>(null);
@@ -45,9 +38,16 @@ export const useReservationDetailSheet = ({
   const [manualSelectedTimeSlotValue, setManualSelectedTimeSlotValue] =
     useState<string | null>(null);
   const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
-  const [feedbackModalMessage, setFeedbackModalMessage] = useState<
-    string | null
-  >(null);
+  const {
+    isUpdatingStatus,
+    confirmationModalMessage,
+    feedbackModalMessage,
+    handleApproveReservation,
+    handleRejectReservation,
+    cancelStatusUpdateConfirmation,
+    confirmStatusUpdate,
+    closeFeedbackModal,
+  } = useReservationStatusUpdate({ activityId });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -165,44 +165,6 @@ export const useReservationDetailSheet = ({
 
   const hasMoreRequests = Boolean(hasNextPage);
 
-  const { mutate: mutateReservationStatus, isPending: isUpdatingStatus } =
-    useMutation({
-      mutationFn: ({
-        reservationId,
-        status,
-      }: {
-        reservationId: number;
-        status: 'confirmed' | 'declined';
-      }) =>
-        updateActivityReservationStatus({
-          activityId,
-          reservationId,
-          status,
-        }),
-      onSuccess: async (_, variables) => {
-        setFeedbackModalMessage(
-          variables.status === 'confirmed'
-            ? '승인이 완료되었습니다.'
-            : '해당 예약신청을 거절했습니다.'
-        );
-
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS, activityId],
-          }),
-          queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE, activityId],
-          }),
-          queryClient.invalidateQueries({
-            queryKey: [
-              ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-              activityId,
-            ],
-          }),
-        ]);
-      },
-    });
-
   const tabCount = useMemo(() => {
     return selectedTimeSlot?.count ?? { pending: 0, confirmed: 0, declined: 0 };
   }, [selectedTimeSlot]);
@@ -252,24 +214,6 @@ export const useReservationDetailSheet = ({
     setManualSelectedTimeSlotValue(nextValue);
   };
 
-  const handleApproveReservation = (reservationId: number) => {
-    mutateReservationStatus({
-      reservationId,
-      status: 'confirmed',
-    });
-  };
-
-  const handleRejectReservation = (reservationId: number) => {
-    mutateReservationStatus({
-      reservationId,
-      status: 'declined',
-    });
-  };
-
-  const closeFeedbackModal = () => {
-    setFeedbackModalMessage(null);
-  };
-
   return {
     activeTab,
     requests,
@@ -281,11 +225,14 @@ export const useReservationDetailSheet = ({
     selectedTimeSlotValue,
     isSelectedTimeSlotEnded,
     isUpdatingStatus,
+    confirmationModalMessage,
     feedbackModalMessage,
     isDateReservationEmpty,
     handleTimeSlotChange,
     handleApproveReservation,
     handleRejectReservation,
+    cancelStatusUpdateConfirmation,
+    confirmStatusUpdate,
     closeFeedbackModal,
     setActiveTab,
     sheetRef,

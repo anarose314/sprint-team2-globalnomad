@@ -15,7 +15,7 @@ interface BuildReservationDetailDataProps {
 }
 
 /**
- * 체험 스케줄/예약 스케줄을 병합해 상세 패널 시간 슬롯 데이터를 생성한다.
+ * 체험 스케줄/예약 스케줄을 병합해 상세 패널 시간 슬롯 데이터 생성
  */
 export const buildReservationDetailData = ({
   activitySchedules,
@@ -33,14 +33,21 @@ export const buildReservationDetailData = ({
       (schedule) => [schedule.scheduleId, schedule] as const
     )
   );
+  const reservedByTimeRange = new Map(
+    reservedSchedules.map((schedule) => [
+      `${schedule.startTime}-${schedule.endTime}`,
+      schedule,
+    ])
+  );
   const consumedReservedScheduleIds = new Set<number>();
 
   const mergedTimeSlots = filteredActivitySchedules
     .map((schedule) => {
+      const timeRangeKey = `${schedule.startTime}-${schedule.endTime}`;
       const reservedSchedule =
-        schedule.scheduleId !== null
+        (schedule.scheduleId !== null
           ? reservedByScheduleId.get(schedule.scheduleId)
-          : undefined;
+          : undefined) ?? reservedByTimeRange.get(timeRangeKey);
 
       if (reservedSchedule) {
         consumedReservedScheduleIds.add(reservedSchedule.scheduleId);

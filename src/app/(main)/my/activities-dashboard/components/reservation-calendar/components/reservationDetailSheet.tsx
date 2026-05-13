@@ -9,7 +9,7 @@ import { ReservationDetailData } from '@/app/(main)/my/activities-dashboard/comp
 import { IcClose } from '@/shared/assets/icons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
-import { OneButtonModal } from '@/shared/components/modal';
+import { OneButtonModal, TwoButtonModal } from '@/shared/components/modal';
 import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
 import { cn } from '@/shared/utils/cn';
 
@@ -56,12 +56,15 @@ export function ReservationDetailSheet({
     selectedTimeSlotValue,
     isSelectedTimeSlotEnded,
     isUpdatingStatus,
+    confirmationModalMessage,
     feedbackModalMessage,
     isDateReservationEmpty,
     setActiveTab,
     handleTimeSlotChange,
     handleApproveReservation,
     handleRejectReservation,
+    cancelStatusUpdateConfirmation,
+    confirmStatusUpdate,
     closeFeedbackModal,
     sheetRef,
     shouldUseFixedRequestViewport,
@@ -172,6 +175,18 @@ export function ReservationDetailSheet({
           <OneButtonModal
             message={feedbackModalMessage}
             onConfirm={closeFeedbackModal}
+          />
+        </ModalOverlay>
+      ) : null}
+
+      {confirmationModalMessage ? (
+        <ModalOverlay onClose={cancelStatusUpdateConfirmation}>
+          <TwoButtonModal
+            message={confirmationModalMessage}
+            cancelText="취소"
+            confirmText="확인"
+            onCancel={cancelStatusUpdateConfirmation}
+            onConfirm={confirmStatusUpdate}
           />
         </ModalOverlay>
       ) : null}
