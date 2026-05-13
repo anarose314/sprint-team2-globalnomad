@@ -32,6 +32,7 @@ export function ActivityForm({
     resolver: zodResolver(activityFormSchema),
     defaultValues: {
       ...defaultValues,
+      address: defaultValues?.address || '',
       schedules: defaultValues?.schedules || [],
       bannerImageUrl: defaultValues?.bannerImageUrl || '',
       subImageUrls: defaultValues?.subImageUrls || [],

@@ -6,11 +6,11 @@ import { Button } from '@/shared/components/buttons';
 
 export function ActivityEditForm() {
   const handleEditSubmit = (data: ActivityFormValues) => {
-    // TODO: 수정 API 호출 로직
     const payload = {
       ...data,
       schedules: data.schedules.map(({ id: _id, ...rest }) => rest),
     };
+    // TODO: 수정 API 호출 로직
     console.log('API로 보낼 데이터:', payload);
   };
 
