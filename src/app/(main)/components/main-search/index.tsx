@@ -1,6 +1,7 @@
 'use client';
 
-import { SubmitEvent } from 'react';
+import type { SubmitEventHandler } from 'react';
+import type { MainSearchProps } from '@/app/(main)/components/main-search/mainSearch.types';
 import { IcSearch } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
@@ -8,15 +9,16 @@ import { Heading } from '@/shared/components/heading';
 /**
  * 메인 페이지 검색 영역 컴포넌트
  *
- * - 사용자가 원하는 체험을 검색할 수 있는 입력 UI를 표시한다.
- * - 현재 UI 단계에서는 제출 시 기본 새로고침만 방지한다.
+ * - 사용자가 입력한 검색어를 제출한다.
+ * - 검색 입력값과 검색 실행 상태는 상위 컴포넌트에서 관리한다.
  *
  * @example
- * <MainSearch />
+ * <MainSearch value={keyword} onChange={setKeyword} onSearch={handleSearch} />
  */
-export function MainSearch() {
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+export function MainSearch({ value, onChange, onSearch }: MainSearchProps) {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    onSearch(value.trim());
   };
 
   return (
@@ -37,6 +39,8 @@ export function MainSearch() {
 
         <input
           type="search"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
           placeholder="내가 원하는 체험은"
           className="typo-lg-medium min-w-0 flex-1 bg-transparent text-gray-950 outline-none placeholder:text-gray-400"
         />
