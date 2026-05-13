@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-query';
 import type { ActivitiesResponse } from '@/app/(main)/activity/apis/activities.types';
 import { activitiesOptions } from '@/app/(main)/activity/hooks/useActivities';
+import { popularActivitiesOptions } from '@/app/(main)/activity/hooks/usePopularActivitiesInfinite';
 import { MainContent } from '@/app/(main)/components/main-content';
 import { MAIN_PAGE_SIZE } from '@/app/(main)/main.constants';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
@@ -25,13 +26,16 @@ export default async function HomePage() {
     sort: 'latest' as const,
   };
 
-  await queryClient.prefetchQuery({
-    ...activitiesOptions(activitiesParams),
-    queryFn: () =>
-      fetchInstanceServer<ActivitiesResponse>('/activities', {
-        params: activitiesParams,
-      }),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      ...activitiesOptions(activitiesParams),
+      queryFn: () =>
+        fetchInstanceServer<ActivitiesResponse>('/activities', {
+          params: activitiesParams,
+        }),
+    }),
+    queryClient.prefetchInfiniteQuery(popularActivitiesOptions()),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
