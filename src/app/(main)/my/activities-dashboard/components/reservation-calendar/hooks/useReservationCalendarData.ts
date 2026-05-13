@@ -40,6 +40,7 @@ export const useReservationCalendarData = ({
         month: currentMonth,
       }),
     enabled: activityId !== null,
+    refetchInterval: activityId !== null ? 60_000 : false,
   });
 
   const { data: reservedSchedules = [] } = useQuery({
@@ -54,6 +55,8 @@ export const useReservationCalendarData = ({
         date: reservedScheduleDateKey as string,
       }),
     enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+    refetchInterval:
+      activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
   const { data: activitySchedules = [] } = useQuery({
@@ -65,29 +68,122 @@ export const useReservationCalendarData = ({
     enabled: activityId !== null,
   });
 
+  const missingDeclinedDateKeys = useMemo(
+    () =>
+      reservationDashboard
+        .filter(
+          (item) =>
+            !Number.isFinite(item.reservations.declined as unknown as number)
+        )
+        .map((item) => item.date)
+        .filter(Boolean),
+    [reservationDashboard]
+  );
+
+  const { data: declinedFallbackByDate = {} } = useQuery({
+    queryKey: [
+      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+      activityId,
+      currentYear,
+      currentMonth,
+      missingDeclinedDateKeys.join(','),
+    ],
+    queryFn: async () => {
+      if (activityId === null || missingDeclinedDateKeys.length === 0) {
+        return {} as Record<string, number>;
+      }
+
+      const results = await Promise.all(
+        missingDeclinedDateKeys.map(async (dateKey) => {
+          const schedules = await fetchReservedSchedule({
+            activityId,
+            date: dateKey,
+          });
+
+          const declined = schedules.reduce(
+            (accumulator, schedule) =>
+              accumulator + Math.max(schedule.count.declined, 0),
+            0
+          );
+
+          return [dateKey, declined] as const;
+        })
+      );
+
+      return results.reduce<Record<string, number>>((accumulator, entry) => {
+        const [dateKey, declined] = entry;
+        accumulator[dateKey] = declined;
+        return accumulator;
+      }, {});
+    },
+    enabled: activityId !== null && missingDeclinedDateKeys.length > 0,
+  });
+
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
-    return reservationDashboard.reduce<Record<string, ReservationEventCounts>>(
-      (accumulator, item) => {
-        const completed = Math.max(item.reservations.completed, 0);
-        const confirmed = Math.max(item.reservations.confirmed, 0);
-        const pending = Math.max(item.reservations.pending, 0);
+    const eventCounts = reservationDashboard.reduce<
+      Record<string, ReservationEventCounts>
+    >((accumulator, item) => {
+      const completed = Math.max(item.reservations.completed, 0);
+      const confirmed = Math.max(item.reservations.confirmed, 0);
+      const declinedRaw = item.reservations.declined as unknown as number;
+      const declined = Number.isFinite(declinedRaw)
+        ? Math.max(declinedRaw, 0)
+        : Math.max(declinedFallbackByDate[item.date] ?? 0, 0);
+      const pending = Math.max(item.reservations.pending, 0);
 
-        const eventCounts: ReservationEventCounts = {};
-        if (pending > 0) eventCounts.pending = pending;
-        if (confirmed > 0) eventCounts.confirmed = confirmed;
-        if (completed > 0) eventCounts.completed = completed;
+      const dailyEventCounts: ReservationEventCounts = {};
+      if (pending > 0) dailyEventCounts.pending = pending;
+      if (confirmed > 0) dailyEventCounts.confirmed = confirmed;
+      if (declined > 0) dailyEventCounts.declined = declined;
+      if (completed > 0) dailyEventCounts.completed = completed;
 
-        if (Object.keys(eventCounts).length > 0) {
-          accumulator[item.date] = eventCounts;
-        }
+      if (Object.keys(dailyEventCounts).length > 0) {
+        accumulator[item.date] = dailyEventCounts;
+      }
 
-        return accumulator;
-      },
-      {}
-    );
-  }, [reservationDashboard]);
+      return accumulator;
+    }, {});
+
+    // 현재 선택 날짜는 reserved-schedule 집계값으로 보정한다.
+    if (reservedScheduleDateKey) {
+      const normalized = reservedSchedules.reduce(
+        (accumulator, schedule) => {
+          accumulator.pending += Math.max(schedule.count.pending, 0);
+          accumulator.confirmed += Math.max(schedule.count.confirmed, 0);
+          accumulator.declined += Math.max(schedule.count.declined, 0);
+          return accumulator;
+        },
+        { pending: 0, confirmed: 0, declined: 0 }
+      );
+
+      const completed = Math.max(
+        eventCounts[reservedScheduleDateKey]?.completed ?? 0,
+        0
+      );
+
+      const mergedDailyCounts: ReservationEventCounts = {};
+      if (normalized.pending > 0)
+        mergedDailyCounts.pending = normalized.pending;
+      if (normalized.confirmed > 0)
+        mergedDailyCounts.confirmed = normalized.confirmed;
+      if (normalized.declined > 0)
+        mergedDailyCounts.declined = normalized.declined;
+      if (completed > 0) mergedDailyCounts.completed = completed;
+
+      if (Object.keys(mergedDailyCounts).length > 0) {
+        eventCounts[reservedScheduleDateKey] = mergedDailyCounts;
+      }
+    }
+
+    return eventCounts;
+  }, [
+    declinedFallbackByDate,
+    reservationDashboard,
+    reservedScheduleDateKey,
+    reservedSchedules,
+  ]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
     return buildReservationDetailData({
