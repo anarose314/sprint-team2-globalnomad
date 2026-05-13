@@ -8,6 +8,8 @@ import { ActivityInfoHeader } from '@/app/(main)/activity/[id]/components/activi
 import { ActivityReservationCard } from '@/app/(main)/activity/[id]/components/activity-reservation-card';
 import { ActivityReviewsSection } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviewsSection';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
+import { TwoButtonModal } from '@/shared/components/modal';
+import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
 import { useShowToast } from '@/shared/store/useToastStore';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
@@ -81,22 +83,31 @@ export function ActivityDetailPageClient({
   const router = useRouter();
   const showToast = useShowToast();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleEdit = () => {
     router.push(`/activity/${activity.id}/edit`);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (isDeleting) {
       return;
     }
 
-    const isConfirmed = window.confirm('정말 이 체험을 삭제하시겠습니까?');
-    if (!isConfirmed) {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (isDeleting) {
       return;
     }
 
     try {
+      setIsDeleteModalOpen(false);
       setIsDeleting(true);
       await fetchInstanceClient<unknown>(
         `/api/proxy/my-activities/${activity.id}`,
@@ -182,6 +193,17 @@ export function ActivityDetailPageClient({
           </div>
         </div>
       </div>
+      {isDeleteModalOpen ? (
+        <ModalOverlay onClose={handleCloseDeleteModal}>
+          <TwoButtonModal
+            message="정말 이 체험을 삭제하시겠습니까?"
+            cancelText="취소"
+            confirmText="삭제"
+            onCancel={handleCloseDeleteModal}
+            onConfirm={handleDeleteConfirm}
+          />
+        </ModalOverlay>
+      ) : null}
     </div>
   );
 }
