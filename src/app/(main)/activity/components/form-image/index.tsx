@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { postActivityImage } from '@/app/(main)/activity/apis/activities';
-import { FormImageProps } from '@/app/(main)/activity/components/form-image/FormImage.types';
+import { FormImageProps } from '@/app/(main)/activity/components/form-image/formImage.types';
 import { FormImagePreview } from '@/app/(main)/activity/components/form-image-preview';
 import { AddImageButton } from '@/shared/components/buttons';
 import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
