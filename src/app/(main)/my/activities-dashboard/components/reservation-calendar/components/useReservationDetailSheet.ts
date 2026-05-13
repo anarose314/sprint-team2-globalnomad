@@ -1,16 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
-import {
-  EMPTY_TIME_SLOT,
-  ReservationTab,
-} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
+import { useMemo, useRef, useState } from 'react';
+import { ReservationTab } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
+import { useCurrentTimestamp } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useCurrentTimestamp';
+import { useDetailModal } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useDetailModal';
+import { useReservationRequests } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationRequests';
 import { useReservationStatusUpdate } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationStatusUpdate';
-import {
-  ReservationDetailData,
-  ReservationRequestItem,
-} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { useSelectedTimeSlot } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useSelectedTimeSlot';
+import { ReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 
 interface UseReservationDetailSheetParams {
   activityId: number;
@@ -31,42 +26,15 @@ export const useReservationDetailSheet = ({
   onClose,
 }: UseReservationDetailSheetParams) => {
   const sheetRef = useRef<HTMLElement>(null);
-  const requestScrollRef = useRef<HTMLDivElement>(null);
-  const requestListEndRef = useRef<HTMLDivElement>(null);
-
   const [activeTab, setActiveTab] = useState<ReservationTab>('pending');
-  const [manualSelectedTimeSlotValue, setManualSelectedTimeSlotValue] =
-    useState<string | null>(null);
-  const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
+  const nowTimestamp = useCurrentTimestamp(isOpen);
+  const {
+    selectedTimeSlotValue,
+    selectedTimeSlot,
+    selectedScheduleId,
+    handleTimeSlotChange,
+  } = useSelectedTimeSlot({ detailData });
 
-  const selectedTimeSlotValue = useMemo(() => {
-    const timeSlots = detailData?.timeSlots ?? [];
-    if (!timeSlots.length) return EMPTY_TIME_SLOT;
-
-    const defaultTimeSlot =
-      timeSlots.find((timeSlot) => timeSlot.scheduleId !== null) ??
-      timeSlots[0];
-
-    const hasManualSelected =
-      manualSelectedTimeSlotValue !== null &&
-      timeSlots.some(
-        (timeSlot) => timeSlot.value === manualSelectedTimeSlotValue
-      );
-
-    return hasManualSelected
-      ? manualSelectedTimeSlotValue
-      : defaultTimeSlot.value;
-  }, [detailData, manualSelectedTimeSlotValue]);
-
-  const selectedTimeSlot = useMemo(
-    () =>
-      detailData?.timeSlots.find(
-        (timeSlot) => timeSlot.value === selectedTimeSlotValue
-      ) ?? null,
-    [detailData, selectedTimeSlotValue]
-  );
-
-  const selectedScheduleId = selectedTimeSlot?.scheduleId ?? null;
   const {
     isUpdatingStatus,
     confirmationModalMessage,
@@ -81,47 +49,7 @@ export const useReservationDetailSheet = ({
     selectedScheduleId,
   });
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscClose = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', handleEscClose);
-    return () => window.removeEventListener('keydown', handleEscClose);
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const intervalId = window.setInterval(() => {
-      setNowTimestamp(Date.now());
-    }, 60_000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handlePointerDownOutside = (event: PointerEvent) => {
-      const eventTarget = event.target as Node;
-      const modalRoot = document.getElementById('modal-root');
-      if (modalRoot?.contains(eventTarget)) return;
-
-      const sheetElement = sheetRef.current;
-      if (!sheetElement) return;
-      if (sheetElement.contains(eventTarget)) return;
-      onClose();
-    };
-
-    document.addEventListener('pointerdown', handlePointerDownOutside);
-    return () =>
-      document.removeEventListener('pointerdown', handlePointerDownOutside);
-  }, [isOpen, onClose]);
+  useDetailModal({ isOpen, onClose, sheetRef });
 
   const selectedTimeSlotEndTime = selectedTimeSlot?.endTime;
 
@@ -140,45 +68,19 @@ export const useReservationDetailSheet = ({
   }, [nowTimestamp, selectedDate, selectedTimeSlotEndTime]);
 
   const {
-    data,
-    isLoading: isLoadingRequests,
+    requests,
+    isLoadingRequests,
     isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
-      activityId,
-      selectedScheduleId,
-      activeTab,
-    ],
-    queryFn: ({ pageParam }) =>
-      fetchActivityReservations({
-        activityId,
-        scheduleId: selectedScheduleId as number,
-        status: activeTab,
-        cursorId: pageParam as number | null,
-      }),
-    initialPageParam: null as number | null,
-    getNextPageParam: (lastPage) => lastPage.cursorId ?? undefined,
-    enabled: isOpen && selectedScheduleId !== null,
-    refetchInterval: isOpen ? 60_000 : false,
+    hasMoreRequests,
+    requestScrollRef,
+    requestListEndRef,
+  } = useReservationRequests({
+    activityId,
+    selectedScheduleId,
+    activeTab,
+    isOpen,
+    isSelectedTimeSlotEnded,
   });
-
-  const requests = useMemo<ReservationRequestItem[]>(() => {
-    const baseRequests = data?.pages.flatMap((page) => page.reservations) ?? [];
-
-    if (activeTab !== 'confirmed' || !isSelectedTimeSlotEnded) {
-      return baseRequests;
-    }
-
-    return baseRequests.map((request) => ({
-      ...request,
-      status: 'completed',
-    }));
-  }, [activeTab, data, isSelectedTimeSlotEnded]);
-
-  const hasMoreRequests = Boolean(hasNextPage);
 
   const tabCount = useMemo(() => {
     return selectedTimeSlot?.count ?? { pending: 0, confirmed: 0, declined: 0 };
@@ -200,34 +102,6 @@ export const useReservationDetailSheet = ({
       Object.values(timeSlot.count).some((count) => count >= 2)
     );
   }, [detailData]);
-
-  useEffect(() => {
-    if (!hasMoreRequests) return;
-    if (isFetchingNextPage) return;
-
-    const observerTarget = requestListEndRef.current;
-    if (!observerTarget) return;
-    const scrollTarget = requestScrollRef.current;
-    if (!scrollTarget) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        fetchNextPage();
-      },
-      {
-        root: scrollTarget,
-        threshold: 0.2,
-      }
-    );
-
-    observer.observe(observerTarget);
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasMoreRequests, isFetchingNextPage]);
-
-  const handleTimeSlotChange = (nextValue: string) => {
-    setManualSelectedTimeSlotValue(nextValue);
-  };
 
   return {
     activeTab,
