@@ -34,3 +34,32 @@ export const GET = async (
     );
   }
 };
+
+export const PATCH = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) => {
+  try {
+    const resolvedParams = await params;
+    const joinedPath = resolvedParams.path.join('/');
+    const body = await request.json();
+
+    const data = await fetchInstanceServer(`/${joinedPath}`, {
+      method: 'PATCH',
+      body,
+    });
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return NextResponse.json(
+        { message: error.message },
+        { status: error.status }
+      );
+    }
+    return NextResponse.json(
+      { message: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+};
