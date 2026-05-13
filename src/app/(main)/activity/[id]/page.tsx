@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ActivityDetailPageClient } from '@/app/(main)/activity/[id]/components/activity-detail-page-client';
@@ -13,11 +14,11 @@ interface ActivityDetailPageProps {
 /**
  * activityId로 체험 상세 정보 조회
  */
-const getActivityDetail = async (activityId: number) => {
+const getActivityDetail = cache(async (activityId: number) => {
   return fetchInstanceServer<ActivityDetailResponse>(
     `/activities/${activityId}`
   );
-};
+});
 
 /**
  * 체험 상세 페이지 메타데이터를 동적으로 생성
