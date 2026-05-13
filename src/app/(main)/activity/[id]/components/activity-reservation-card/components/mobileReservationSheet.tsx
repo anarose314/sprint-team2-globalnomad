@@ -1,4 +1,3 @@
-import { MOCK_TIME_SLOTS } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
 import type {
   CalendarValue,
   MobileSheetStep,
@@ -13,11 +12,13 @@ import { Heading } from '@/shared/components/heading';
 interface MobileReservationSheetProps {
   isOpen: boolean;
   mobileSheetStep: MobileSheetStep;
+  hasSelectableDate: boolean;
   selectedDate: Date;
   currentDate: Date;
   monthTitle: string;
   selectedDateText: string;
-  selectedTimeSlot: TimeSlot;
+  selectedTimeSlot: TimeSlot | null;
+  availableTimeSlots: TimeSlot[];
   headCount: number;
   totalPrice: number;
   onClose: () => void;
@@ -28,6 +29,7 @@ interface MobileReservationSheetProps {
   onSelectTimeSlot: (slot: TimeSlot) => () => void;
   onDecreaseHeadCount: () => void;
   onIncreaseHeadCount: () => void;
+  tileDisabled: (props: { date: Date; view: string }) => boolean;
 }
 
 /**
@@ -36,11 +38,13 @@ interface MobileReservationSheetProps {
 export function MobileReservationSheet({
   isOpen,
   mobileSheetStep,
+  hasSelectableDate,
   selectedDate,
   currentDate,
   monthTitle,
   selectedDateText,
   selectedTimeSlot,
+  availableTimeSlots,
   headCount,
   totalPrice,
   onClose,
@@ -51,6 +55,7 @@ export function MobileReservationSheet({
   onSelectTimeSlot,
   onDecreaseHeadCount,
   onIncreaseHeadCount,
+  tileDisabled,
 }: MobileReservationSheetProps) {
   if (!isOpen) return null;
 
@@ -73,23 +78,32 @@ export function MobileReservationSheet({
                   monthTitle={monthTitle}
                   onDateChange={onDateChange}
                   onMonthChange={onMonthChange}
+                  tileDisabled={tileDisabled}
                   className="activity-booking-calendar activity-booking-sheet-calendar"
                 />
 
                 <div className="mt-6">
                   <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
                   <div className="mt-3 flex flex-col gap-3">
-                    {MOCK_TIME_SLOTS.map((slot) => (
-                      <TimeSlotButton
-                        key={slot}
-                        size="tb"
-                        isActive={selectedTimeSlot === slot}
-                        onClick={onSelectTimeSlot(slot)}
-                        className="w-full"
-                      >
-                        {slot}
-                      </TimeSlotButton>
-                    ))}
+                    {availableTimeSlots.length > 0 ? (
+                      availableTimeSlots.map((slot) => (
+                        <TimeSlotButton
+                          key={slot.id}
+                          size="tb"
+                          isActive={selectedTimeSlot?.id === slot.id}
+                          onClick={onSelectTimeSlot(slot)}
+                          className="w-full"
+                        >
+                          {slot.startTime} ~ {slot.endTime}
+                        </TimeSlotButton>
+                      ))
+                    ) : (
+                      <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
+                        {hasSelectableDate
+                          ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
+                          : '예약 가능한 날짜가 없습니다.'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -127,7 +141,9 @@ export function MobileReservationSheet({
                     {selectedDateText}
                   </span>
                   <span className="typo-xs-medium text-gray-400">
-                    {selectedTimeSlot}
+                    {selectedTimeSlot
+                      ? `${selectedTimeSlot.startTime} ~ ${selectedTimeSlot.endTime}`
+                      : '-'}
                   </span>
                 </div>
 
@@ -172,6 +188,7 @@ export function MobileReservationSheet({
                   monthTitle={monthTitle}
                   onDateChange={onDateChange}
                   onMonthChange={onMonthChange}
+                  tileDisabled={tileDisabled}
                   className="activity-booking-calendar activity-booking-sheet-calendar"
                 />
               </div>
@@ -179,17 +196,25 @@ export function MobileReservationSheet({
               <div className="shadow-review-card h-102 w-75 overflow-y-auto overscroll-contain rounded-3xl bg-white p-5">
                 <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
                 <div className="mt-3 flex flex-col gap-3">
-                  {MOCK_TIME_SLOTS.map((slot) => (
-                    <TimeSlotButton
-                      key={slot}
-                      size="tb"
-                      isActive={selectedTimeSlot === slot}
-                      onClick={onSelectTimeSlot(slot)}
-                      className="w-full"
-                    >
-                      {slot}
-                    </TimeSlotButton>
-                  ))}
+                  {availableTimeSlots.length > 0 ? (
+                    availableTimeSlots.map((slot) => (
+                      <TimeSlotButton
+                        key={slot.id}
+                        size="tb"
+                        isActive={selectedTimeSlot?.id === slot.id}
+                        onClick={onSelectTimeSlot(slot)}
+                        className="w-full"
+                      >
+                        {slot.startTime} ~ {slot.endTime}
+                      </TimeSlotButton>
+                    ))
+                  ) : (
+                    <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
+                      {hasSelectableDate
+                        ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
+                        : '예약 가능한 날짜가 없습니다.'}
+                    </p>
+                  )}
                 </div>
                 <div className="mt-7">
                   <p className="typo-lg-bold text-gray-950">참여 인원 수</p>

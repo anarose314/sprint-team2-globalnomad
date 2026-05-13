@@ -1,5 +1,6 @@
 export const QUERY_KEYS = {
   ACTIVITIES: ['activities'],
+  ACTIVITY_AVAILABLE_SCHEDULE: ['activityAvailableSchedule'],
   MY_ACTIVITIES: ['myActivities'],
   MY_RESERVATIONS: ['myReservations'],
   MY_ACTIVITIES_DASHBOARD: ['myActivitiesDashboard'],

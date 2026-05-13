@@ -1,4 +1,4 @@
-import Calendar from 'react-calendar';
+import Calendar, { type CalendarProps } from 'react-calendar';
 import type { CalendarValue } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
@@ -10,6 +10,7 @@ interface ReservationCalendarViewProps {
   className: string;
   onDateChange: (value: CalendarValue) => void;
   onMonthChange: (activeStartDate?: Date | null) => void;
+  tileDisabled?: NonNullable<CalendarProps['tileDisabled']>;
 }
 
 /**
@@ -22,6 +23,7 @@ export function ReservationCalendarView({
   className,
   onDateChange,
   onMonthChange,
+  tileDisabled,
 }: ReservationCalendarViewProps) {
   return (
     <Calendar
@@ -50,6 +52,7 @@ export function ReservationCalendarView({
       formatMonthYear={() => monthTitle}
       formatShortWeekday={(_, date) => WEEKDAY[date.getDay()]}
       formatDay={(_, date) => String(date.getDate())}
+      tileDisabled={tileDisabled}
       className={className}
     />
   );
