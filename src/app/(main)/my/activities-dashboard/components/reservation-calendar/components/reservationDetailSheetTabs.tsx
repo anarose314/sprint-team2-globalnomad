@@ -1,6 +1,5 @@
 import {
   DETAIL_TABS,
-  REQUESTS_PAGE_SIZE,
   ReservationTab,
   TAB_LABEL,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
@@ -10,7 +9,6 @@ interface ReservationDetailSheetTabsProps {
   activeTab: ReservationTab;
   tabCount: Record<ReservationTab, number>;
   onChangeTab: (nextTab: ReservationTab) => void;
-  onResetVisibleRequestCount: (count: number) => void;
 }
 
 /**
@@ -20,7 +18,6 @@ export function ReservationDetailSheetTabs({
   activeTab,
   tabCount,
   onChangeTab,
-  onResetVisibleRequestCount,
 }: ReservationDetailSheetTabsProps) {
   return (
     <nav className="reservation-detail-sheet__tabs">
@@ -28,10 +25,7 @@ export function ReservationDetailSheetTabs({
         <button
           key={tabKey}
           type="button"
-          onClick={() => {
-            onChangeTab(tabKey);
-            onResetVisibleRequestCount(REQUESTS_PAGE_SIZE);
-          }}
+          onClick={() => onChangeTab(tabKey)}
           className={cn(
             'reservation-detail-sheet__tab',
             activeTab === tabKey && 'reservation-detail-sheet__tab--active'

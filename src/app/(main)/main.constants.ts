@@ -26,7 +26,13 @@ export const MAIN_SORT_OPTIONS: MainSortOption[] = [
   { label: '높은 가격 순', value: 'price_desc' },
 ];
 
-// TODO: API 연동 시 더미 체험 목록 제거
+export const MAIN_PAGE_SIZE = 6;
+
+export const MAIN_DESKTOP_PAGE_SIZE = 8;
+
+export const MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY = '(min-width: 1536px)';
+
+// TODO: 인기 체험 API 연동 시 더미 체험 목록 제거
 export const MAIN_ACTIVITIES: MainActivity[] = [
   {
     id: 1,
@@ -34,7 +40,7 @@ export const MAIN_ACTIVITIES: MainActivity[] = [
     price: 38000,
     rating: 4.9,
     reviewCount: 703,
-    bannerImageUrl: DUMMY_IMAGE_URL, // TODO: API 연동 시 실제 이미지 URL로 교체
+    bannerImageUrl: DUMMY_IMAGE_URL,
     category: 'art',
   },
   {
@@ -85,13 +91,3 @@ export const MAIN_ACTIVITIES: MainActivity[] = [
 ];
 
 export const POPULAR_ACTIVITIES = MAIN_ACTIVITIES.slice(0, 4);
-
-// TODO: API 연동 시 모든 체험 목록은 별도 응답 데이터로 교체
-export const ALL_ACTIVITIES = MAIN_ACTIVITIES.filter(
-  (activity) =>
-    !POPULAR_ACTIVITIES.some(
-      (popularActivity) => popularActivity.id === activity.id
-    )
-);
-
-export const MAIN_PAGE_SIZE = 6;

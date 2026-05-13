@@ -19,9 +19,20 @@ export interface ReservationRequestItem {
   nickname: string;
   headCount: number;
   status: ReservationRequestStatus;
+  createdAt: string;
 }
 
-export interface ReservationDetailMockData {
-  timeSlots: string[];
-  requests: ReservationRequestItem[];
+export interface ReservationTimeSlotOption {
+  scheduleId: number | null;
+  label: string;
+  value: string;
+  count: {
+    pending: number;
+    confirmed: number;
+    declined: number;
+  };
+}
+
+export interface ReservationDetailData {
+  timeSlots: ReservationTimeSlotOption[];
 }

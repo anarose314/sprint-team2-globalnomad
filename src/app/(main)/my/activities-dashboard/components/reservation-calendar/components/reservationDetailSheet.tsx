@@ -5,18 +5,20 @@ import {
 import { ReservationDetailSheetRequestList } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetRequestList';
 import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetTabs';
 import { useReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationDetailSheet';
-import { ReservationDetailMockData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { IcArrowDown, IcClose } from '@/shared/assets/icons';
+import { ReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import { IcClose } from '@/shared/assets/icons';
+import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
 interface ReservationDetailSheetProps {
+  activityId: number;
   /** 상세 바텀시트/플로팅 패널 노출 여부 */
   isOpen: boolean;
   /** 헤더에 표시할 선택 날짜 */
   selectedDate: Date;
   /** 날짜별 예약 상세 데이터(시간 슬롯 + 요청 목록) */
-  detailData?: ReservationDetailMockData;
+  detailData?: ReservationDetailData;
   /** 2xl 이상에서 달력 타일 기준으로 계산된 패널 절대 위치 */
   desktopPosition?: {
     top: number;
@@ -34,6 +36,7 @@ interface ReservationDetailSheetProps {
  * - 예약 내역 영역만 독립 스크롤 및 무한스크롤 뼈대 적용
  */
 export function ReservationDetailSheet({
+  activityId,
   isOpen,
   selectedDate,
   detailData,
@@ -42,23 +45,30 @@ export function ReservationDetailSheet({
 }: ReservationDetailSheetProps) {
   const {
     activeTab,
-    filteredRequests,
+    requests,
+    isLoadingRequests,
+    isFetchingNextPage,
     hasMoreRequests,
     requestListEndRef,
     requestScrollRef,
-    selectedTimeSlot,
+    selectedTimeSlotValue,
     setActiveTab,
-    setSelectedTimeSlot,
-    setVisibleRequestCount,
+    handleTimeSlotChange,
     sheetRef,
     shouldUseFixedRequestViewport,
     tabCount,
-    visibleRequests,
   } = useReservationDetailSheet({
+    activityId,
     isOpen,
     detailData,
     onClose,
   });
+  const timeSlotOptions = detailData?.timeSlots.length
+    ? detailData.timeSlots.map((timeSlot) => ({
+        label: timeSlot.label,
+        value: timeSlot.value,
+      }))
+    : [{ label: EMPTY_TIME_SLOT, value: EMPTY_TIME_SLOT }];
 
   if (!isOpen) return null;
 
@@ -95,7 +105,6 @@ export function ReservationDetailSheet({
             activeTab={activeTab}
             tabCount={tabCount}
             onChangeTab={setActiveTab}
-            onResetVisibleRequestCount={setVisibleRequestCount}
           />
 
           <div className="reservation-detail-sheet__content">
@@ -103,24 +112,17 @@ export function ReservationDetailSheet({
               <p className="reservation-detail-sheet__section-title">
                 예약 시간
               </p>
-              <div className="reservation-detail-sheet__select-wrap">
-                <select
-                  className="reservation-detail-sheet__select"
-                  value={selectedTimeSlot}
-                  onChange={(event) => setSelectedTimeSlot(event.target.value)}
-                  disabled={!detailData?.timeSlots.length}
-                >
-                  {(detailData?.timeSlots.length
-                    ? detailData.timeSlots
-                    : [EMPTY_TIME_SLOT]
-                  ).map((timeSlot) => (
-                    <option key={timeSlot} value={timeSlot}>
-                      {timeSlot}
-                    </option>
-                  ))}
-                </select>
-                <IcArrowDown className="reservation-detail-sheet__select-icon" />
-              </div>
+              <Dropdown
+                options={timeSlotOptions}
+                value={selectedTimeSlotValue}
+                disabled={!detailData?.timeSlots.length}
+                optionHeight={44}
+                maxVisibleOptions={4}
+                className="reservation-detail-sheet__select-wrap"
+                triggerClassName="reservation-detail-sheet__select"
+                menuClassName="reservation-detail-sheet__select-menu"
+                onChange={handleTimeSlotChange}
+              />
             </div>
 
             <div className="reservation-detail-sheet__section reservation-detail-sheet__section--requests">
@@ -137,9 +139,11 @@ export function ReservationDetailSheet({
               >
                 <ReservationDetailSheetRequestList
                   activeTab={activeTab}
-                  isEmpty={!filteredRequests.length}
-                  visibleRequests={visibleRequests}
+                  isEmpty={!isLoadingRequests && !requests.length}
+                  isLoading={isLoadingRequests}
+                  requests={requests}
                   hasMoreRequests={hasMoreRequests}
+                  isFetchingNextPage={isFetchingNextPage}
                   sentinelRef={requestListEndRef}
                 />
               </div>
