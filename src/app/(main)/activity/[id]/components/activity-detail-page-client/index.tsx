@@ -84,6 +84,9 @@ export function ActivityDetailPageClient({
   const showToast = useShowToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const subImageUrls = Array.isArray(activity.subImages)
+    ? activity.subImages.map((image) => image.imageUrl)
+    : [];
 
   const handleEdit = () => {
     router.push(`/activity/${activity.id}/edit`);
@@ -142,7 +145,7 @@ export function ActivityDetailPageClient({
           <div className="2xl:col-span-3">
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
-              subImageUrls={activity.subImages.map((image) => image.imageUrl)}
+              subImageUrls={subImageUrls}
               title={activity.title}
               className="mb-5 md:mb-6 2xl:mb-10"
             />
