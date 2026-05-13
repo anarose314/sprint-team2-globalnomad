@@ -6,5 +6,5 @@ export interface FormImageProps extends Omit<
 > {
   errorMessage?: string;
   isMultiple?: boolean;
-  onChange?: (file: File[] | File | null) => void;
+  onChange?: (value: string | string[]) => void;
 }

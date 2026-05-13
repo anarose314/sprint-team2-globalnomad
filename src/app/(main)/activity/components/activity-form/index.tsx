@@ -33,6 +33,8 @@ export function ActivityForm({
     defaultValues: {
       ...defaultValues,
       schedules: defaultValues?.schedules || [],
+      bannerImageUrl: defaultValues?.bannerImageUrl || '',
+      subImageUrls: defaultValues?.subImageUrls || [],
     },
   });
 
@@ -107,11 +109,30 @@ export function ActivityForm({
       </section>
       <section>
         <FormTitle>배너 이미지 등록</FormTitle>
-        <FormImage name="bannerImageUrl" />
+        <Controller
+          name="bannerImageUrl"
+          control={control}
+          render={({ field: { onChange } }) => (
+            <FormImage
+              onChange={onChange}
+              errorMessage={errors.bannerImageUrl?.message}
+            />
+          )}
+        />
       </section>
       <section>
         <FormTitle>소개 이미지 등록</FormTitle>
-        <FormImage name="subImageUrls" isMultiple />
+        <Controller
+          name="subImageUrls"
+          control={control}
+          render={({ field: { onChange } }) => (
+            <FormImage
+              onChange={onChange}
+              errorMessage={errors.subImageUrls?.message}
+              isMultiple
+            />
+          )}
+        />
       </section>
       {children}
     </form>

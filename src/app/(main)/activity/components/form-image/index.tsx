@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
+import { postActivityImage } from '@/app/(main)/activity/apis/activities';
 import { FormImageProps } from '@/app/(main)/activity/components/form-image/FormImage.types';
 import { FormImagePreview } from '@/app/(main)/activity/components/form-image-preview';
 import { AddImageButton } from '@/shared/components/buttons';
 import { INPUT_ERROR_MESSAGE_STYLE } from '@/shared/components/input/input.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
+import { cn } from '@/shared/utils/cn';
 import { generateId } from '@/shared/utils/generateId';
 
 const MAX_IMAGE_COUNT = 4;
@@ -18,11 +20,10 @@ export function FormImage({
   ...props
 }: FormImageProps) {
   const [imageFiles, setImageFiles] = useState<
-    Array<{ id: string; url: string; file: File }>
+    Array<{ id: string; url: string }>
   >([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const objectUrls = useRef<string[]>([]);
 
   const showToast = useShowToast();
 
@@ -31,14 +32,7 @@ export function FormImage({
   const errorId = `${inputId}-error`;
   const isMaxReached = isMultiple && imageFiles.length >= MAX_IMAGE_COUNT;
 
-  const syncInputFiles = (files: File[]) => {
-    if (!inputRef.current) return;
-    const dataTransfer = new DataTransfer();
-    files.forEach((file) => dataTransfer.items.add(file));
-    inputRef.current.files = dataTransfer.files;
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : null;
     if (!files || files.length === 0) return;
 
@@ -61,72 +55,49 @@ export function FormImage({
       });
       filesToAdd = files.slice(0, remaining);
     }
+    try {
+      const uploadedUrls = await Promise.all(
+        filesToAdd.map(async (file) => {
+          const response = await postActivityImage(file);
+          return response.activityImageUrl;
+        })
+      );
 
-    const newImageFiles = filesToAdd.map((file) => {
-      const url = URL.createObjectURL(file);
-      objectUrls.current.push(url);
-      return {
+      const newImageFiles = uploadedUrls.map((url) => ({
         id: generateId(),
         url,
-        file,
-      };
-    });
+      }));
 
-    if (!isMultiple && imageFiles.length > 0) {
-      URL.revokeObjectURL(imageFiles[0].url);
-      objectUrls.current = objectUrls.current.filter(
-        (prevUrl) => prevUrl !== imageFiles[0].url
+      const updatedFiles = isMultiple
+        ? [...imageFiles, ...newImageFiles]
+        : newImageFiles;
+
+      setImageFiles(updatedFiles);
+
+      onChange?.(
+        isMultiple ? updatedFiles.map((item) => item.url) : updatedFiles[0].url
       );
+    } catch (error) {
+      console.error(error);
+      showToast({ theme: 'error', message: '이미지 업로드에 실패했습니다.' });
+    } finally {
+      if (inputRef.current) inputRef.current.value = '';
     }
-
-    const updatedFiles = isMultiple
-      ? [...imageFiles, ...newImageFiles]
-      : newImageFiles;
-
-    setImageFiles(updatedFiles);
-    syncInputFiles(updatedFiles.map((item) => item.file));
-
-    onChange?.(
-      isMultiple ? updatedFiles.map((item) => item.file) : updatedFiles[0].file
-    );
-
-    if (inputRef.current) inputRef.current.value = '';
   };
 
   const handleImageDelete = (deleteImageId: string) => {
-    const deletedImage = imageFiles.find((image) => image.id === deleteImageId);
     const filteredFiles = imageFiles.filter(
       (image) => image.id !== deleteImageId
     );
 
-    if (deletedImage) {
-      URL.revokeObjectURL(deletedImage.url);
-      objectUrls.current = objectUrls.current.filter(
-        (prevUrl) => prevUrl !== deletedImage.url
-      );
-    }
-
     setImageFiles(filteredFiles);
-    syncInputFiles(filteredFiles.map((item) => item.file));
 
     onChange?.(
       isMultiple
-        ? filteredFiles.map((item) => item.file)
-        : filteredFiles[0]?.file || null
+        ? filteredFiles.map((item) => item.url)
+        : filteredFiles[0]?.url || ''
     );
-
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
   };
-
-  useEffect(() => {
-    return () => {
-      objectUrls.current.forEach((url) => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, []);
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -165,7 +136,7 @@ export function FormImage({
       </div>
 
       {errorMessage && (
-        <p id={errorId} className={INPUT_ERROR_MESSAGE_STYLE}>
+        <p id={errorId} className={cn(INPUT_ERROR_MESSAGE_STYLE, 'mt-0')}>
           {errorMessage}
         </p>
       )}
