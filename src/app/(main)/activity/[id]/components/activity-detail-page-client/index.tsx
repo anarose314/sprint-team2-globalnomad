@@ -133,7 +133,11 @@ export function ActivityDetailPageClient({
             </div>
             {!isOwner && (
               <div className="2xl:sticky 2xl:top-24">
-                <ActivityReservationCard />
+                <ActivityReservationCard
+                  activityId={activity.id}
+                  pricePerPerson={activity.price}
+                  schedules={activity.schedules}
+                />
               </div>
             )}
           </div>

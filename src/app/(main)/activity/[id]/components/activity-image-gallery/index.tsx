@@ -19,7 +19,15 @@ function ImageSlot({
 }) {
   return (
     <div className={cn('relative overflow-hidden bg-gray-100', className)}>
-      {src ? <Image src={src} alt={alt} fill className="object-cover" /> : null}
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover"
+        />
+      ) : null}
     </div>
   );
 }

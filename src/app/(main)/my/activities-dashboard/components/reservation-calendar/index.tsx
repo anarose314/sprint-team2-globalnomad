@@ -132,7 +132,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
         formatDay={() => ''}
         locale="ko-KR"
         calendarType="gregory"
-        className="reservation-calendar"
+        className="reservation-status-calendar"
         tileContent={({ date, view, activeStartDate }) => {
           if (view !== 'month') return null;
 
@@ -156,8 +156,9 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           const isDetailTarget =
             Boolean(selectedDateKey) && formatDateKey(date) === selectedDateKey;
           return cn(
-            'reservation-calendar__day-tile',
-            isDetailTarget && 'reservation-calendar__day-tile--detail-target'
+            'reservation-status-calendar__day-tile',
+            isDetailTarget &&
+              'reservation-status-calendar__day-tile--detail-target'
           );
         }}
       />

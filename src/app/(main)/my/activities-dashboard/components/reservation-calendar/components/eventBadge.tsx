@@ -17,7 +17,7 @@ export function EventBadge({ status, count }: EventBadgeProps) {
   return (
     <span
       className={cn(
-        'reservation-calendar__event-badge',
+        'reservation-status-calendar__event-badge',
         STATUS_POSITION_CLASS[status],
         STATUS_META[status].className
       )}
