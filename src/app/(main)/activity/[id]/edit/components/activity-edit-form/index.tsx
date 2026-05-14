@@ -83,7 +83,7 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
 
   const defaultValues: Partial<ActivityFormValues> = {
     title: activityData.title,
-    category: activityData.category as ActivityFormValues['category'],
+    category: activityData.category,
     description: activityData.description,
     price: activityData.price,
     address: activityData.address,

@@ -68,7 +68,7 @@ export interface ActivityMutationResponse {
   userId: number;
   title: string;
   description: string;
-  category: string;
+  category: ActivityCategory;
   price: number;
   address: string;
   bannerImageUrl: string;
@@ -76,18 +76,14 @@ export interface ActivityMutationResponse {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
-  subImages: [
-    {
-      imageUrl: string;
-      id: number;
-    },
-  ];
-  schedules: [
-    {
-      times: [{ endTime: string; startTime: string; id: number }];
-      date: string;
-    },
-  ];
+  subImages: {
+    imageUrl: string;
+    id: number;
+  }[];
+  schedules: {
+    times: { endTime: string; startTime: string; id: number }[];
+    date: string;
+  }[];
 }
 
 export type PatchActivities = {
