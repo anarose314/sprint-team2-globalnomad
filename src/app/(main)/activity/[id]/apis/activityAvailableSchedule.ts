@@ -17,10 +17,15 @@ export const fetchActivityAvailableSchedule = async ({
 }: FetchActivityAvailableScheduleProps): Promise<
   ActivityAvailableScheduleItem[]
 > => {
+  const params = {
+    year,
+    month: String(month).padStart(2, '0'),
+  };
+
   return fetchInstanceClient<ActivityAvailableScheduleItem[]>(
     `/api/proxy/activities/${activityId}/available-schedule`,
     {
-      params: { year, month },
+      params,
     }
   );
 };
