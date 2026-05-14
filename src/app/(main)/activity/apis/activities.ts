@@ -1,12 +1,16 @@
 import type {
   ActivitiesResponse,
   ActivityImageResponse,
+  ActivityMutationResponse,
   FetchActivitiesParams,
   FetchPopularActivitiesParams,
+  PatchActivities,
+  PostActivities,
 } from '@/app/(main)/activity/apis/activities.types';
 import { POPULAR_ACTIVITY_PAGE_SIZE } from '@/app/(main)/main.constants';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
+import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
 /**
  * 체험 목록을 조회하는 API 함수
@@ -85,6 +89,48 @@ export const postActivityImage = async (file: File) => {
     {
       method: 'POST',
       body: formData,
+    }
+  );
+};
+
+/**
+ * 체험 등록을 하는 API 호출 함수 (BFF 경유)
+ */
+export const postActivities = async (body: PostActivities) => {
+  return await fetchInstanceClient<ActivityMutationResponse>(
+    `/api/proxy/activities`,
+    {
+      method: 'POST',
+      body,
+    }
+  );
+};
+
+/**
+ * 체험 수정을 하는 API 호출 함수 (BFF 경유)
+ */
+export const patchActivities = async ({
+  activityId,
+  body,
+}: PatchActivities) => {
+  return await fetchInstanceClient<ActivityMutationResponse>(
+    `/api/proxy/my-activities/${activityId}`,
+    {
+      method: 'PATCH',
+      body,
+    }
+  );
+};
+
+/**
+ * 특정 체험 1개의 상세 정보를 조회하는 API 함수
+ */
+export const fetchActivityDetail = async (activityId: number) => {
+  return await fetchInstance<ActivityDetailResponse>(
+    `/activities/${activityId}`,
+    {
+      method: 'GET',
+      cache: 'no-store',
     }
   );
 };

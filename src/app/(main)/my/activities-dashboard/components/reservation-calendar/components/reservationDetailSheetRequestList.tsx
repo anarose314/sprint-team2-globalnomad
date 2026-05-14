@@ -3,7 +3,10 @@ import {
   ReservationTab,
   toReservationBadgeStatus,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
-import { ReservationRequestItem } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import {
+  ReservationRequestItem,
+  ReservationTimeSlotOption,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { Button } from '@/shared/components/buttons/button';
 import { StatusBadge } from '@/shared/components/status-badge';
 
@@ -13,6 +16,7 @@ interface ReservationDetailSheetRequestListProps {
   isLoading: boolean;
   isDateReservationEmpty: boolean;
   requests: ReservationRequestItem[];
+  selectedTimeSlotCount: ReservationTimeSlotOption['count'];
   isSelectedTimeSlotEnded: boolean;
   isUpdatingStatus: boolean;
   hasMoreRequests: boolean;
@@ -34,6 +38,7 @@ export function ReservationDetailSheetRequestList({
   isLoading,
   isDateReservationEmpty,
   requests,
+  selectedTimeSlotCount,
   isSelectedTimeSlotEnded,
   isUpdatingStatus,
   hasMoreRequests,
@@ -49,6 +54,16 @@ export function ReservationDetailSheetRequestList({
     return toReservationBadgeStatus(requestStatus);
   };
 
+  const getEmptyMessage = () => {
+    const hasConfirmed = selectedTimeSlotCount.confirmed > 0;
+    if (activeTab === 'pending' && hasConfirmed)
+      return '승인된 예약이 있습니다.';
+    if (activeTab === 'declined' && hasConfirmed)
+      return '거절된 예약이 없습니다.';
+    if (isDateReservationEmpty) return '해당 날짜에 예약 내역이 없습니다.';
+    return '해당 시간대에 예약 내역이 없습니다.';
+  };
+
   if (isLoading) {
     return (
       <p className="reservation-detail-sheet__empty">
@@ -59,11 +74,7 @@ export function ReservationDetailSheetRequestList({
 
   if (isEmpty) {
     return (
-      <p className="reservation-detail-sheet__empty">
-        {isDateReservationEmpty
-          ? '해당 날짜에 예약 내역이 없습니다.'
-          : '해당 시간대에 예약 내역이 없습니다.'}
-      </p>
+      <p className="reservation-detail-sheet__empty">{getEmptyMessage()}</p>
     );
   }
 

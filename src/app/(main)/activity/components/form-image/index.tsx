@@ -17,11 +17,23 @@ export function FormImage({
   errorMessage,
   isMultiple = false,
   onChange,
+  value,
   ...props
 }: FormImageProps) {
   const [imageFiles, setImageFiles] = useState<
     Array<{ id: string; url: string }>
-  >([]);
+  >(() => {
+    if (!value) return [];
+
+    const initialUrls = Array.isArray(value) ? value : [value];
+
+    return initialUrls
+      .filter((url) => typeof url === 'string' && url.trim() !== '')
+      .map((url) => ({
+        id: generateId(),
+        url,
+      }));
+  });
 
   const inputRef = useRef<HTMLInputElement>(null);
 

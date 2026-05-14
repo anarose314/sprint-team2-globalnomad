@@ -14,6 +14,12 @@ export interface ActivityReview {
   updatedAt: string;
 }
 
+export interface ActivityReviewsResponse {
+  averageRating: number;
+  totalCount: number;
+  reviews: ActivityReview[];
+}
+
 export interface ActivityReviewsProps {
   averageRating: number;
   totalCount: number;
@@ -21,13 +27,12 @@ export interface ActivityReviewsProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
+  isLoading?: boolean;
+  errorMessage?: string | null;
   className?: string;
 }
 
 export interface ActivityReviewsSectionProps {
-  averageRating: number;
-  totalCount: number;
-  reviews: ActivityReview[];
-  totalPages: number;
+  activityId: number;
   className?: string;
 }

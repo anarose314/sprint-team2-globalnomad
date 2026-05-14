@@ -7,4 +7,5 @@ export interface FormImageProps extends Omit<
   errorMessage?: string;
   isMultiple?: boolean;
   onChange?: (value: string | string[]) => void;
+  value?: string | string[];
 }

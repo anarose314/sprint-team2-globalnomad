@@ -1,93 +1,36 @@
-import { ActivityScheduleItem } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
 import { ReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 
-const EMPTY_RESERVATION_COUNT = {
-  pending: 0,
-  confirmed: 0,
-  declined: 0,
-};
-
 interface BuildReservationDetailDataProps {
-  activitySchedules: ActivityScheduleItem[];
   reservedSchedules: ReservedScheduleItem[];
-  reservedScheduleDateKey: string | null;
 }
 
 /**
- * 체험 스케줄/예약 스케줄을 병합해 상세 패널 시간 슬롯 데이터 생성
+ * 예약이 존재하는 스케줄만 상세 패널 시간 슬롯으로 변환
  */
 export const buildReservationDetailData = ({
-  activitySchedules,
   reservedSchedules,
-  reservedScheduleDateKey,
 }: BuildReservationDetailDataProps): ReservationDetailData => {
-  const filteredActivitySchedules = reservedScheduleDateKey
-    ? activitySchedules.filter(
-        (schedule) => schedule.date === reservedScheduleDateKey
-      )
-    : [];
-
-  const reservedByScheduleId = new Map(
-    reservedSchedules.map(
-      (schedule) => [schedule.scheduleId, schedule] as const
-    )
-  );
-  const reservedByTimeRange = new Map(
-    reservedSchedules.map((schedule) => [
-      `${schedule.startTime}-${schedule.endTime}`,
-      schedule,
-    ])
-  );
-  const consumedReservedScheduleIds = new Set<number>();
-
-  const mergedTimeSlots = filteredActivitySchedules
-    .map((schedule) => {
-      const timeRangeKey = `${schedule.startTime}-${schedule.endTime}`;
-      const reservedSchedule =
-        (schedule.scheduleId !== null
-          ? reservedByScheduleId.get(schedule.scheduleId)
-          : undefined) ?? reservedByTimeRange.get(timeRangeKey);
-
-      if (reservedSchedule) {
-        consumedReservedScheduleIds.add(reservedSchedule.scheduleId);
-      }
-
-      const resolvedScheduleId =
-        schedule.scheduleId ?? reservedSchedule?.scheduleId ?? null;
-
-      return {
-        scheduleId: resolvedScheduleId,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        label: `${schedule.startTime} - ${schedule.endTime}`,
-        value:
-          resolvedScheduleId !== null
-            ? String(resolvedScheduleId)
-            : `${schedule.startTime}-${schedule.endTime}`,
-        count: reservedSchedule?.count ?? EMPTY_RESERVATION_COUNT,
-        sortKey: schedule.startTime,
-      };
+  const reservationTimeSlots = reservedSchedules
+    .filter((schedule) => {
+      const pending = Math.max(schedule.count.pending, 0);
+      const confirmed = Math.max(schedule.count.confirmed, 0);
+      const declined = Math.max(schedule.count.declined, 0);
+      return pending + confirmed + declined > 0;
     })
-    .concat(
-      reservedSchedules
-        .filter(
-          (schedule) => !consumedReservedScheduleIds.has(schedule.scheduleId)
-        )
-        .map((schedule) => ({
-          scheduleId: schedule.scheduleId,
-          startTime: schedule.startTime,
-          endTime: schedule.endTime,
-          label: `${schedule.startTime} - ${schedule.endTime}`,
-          value: String(schedule.scheduleId),
-          count: schedule.count,
-          sortKey: schedule.startTime,
-        }))
-    )
+    .map((schedule) => ({
+      scheduleId: schedule.scheduleId,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      label: `${schedule.startTime} - ${schedule.endTime}`,
+      value: String(schedule.scheduleId),
+      count: schedule.count,
+      sortKey: schedule.startTime,
+    }))
     .sort((a, b) => a.sortKey.localeCompare(b.sortKey))
     .map(({ sortKey: _sortKey, ...timeSlot }) => timeSlot);
 
   return {
-    timeSlots: mergedTimeSlots,
+    timeSlots: reservationTimeSlots,
   };
 };

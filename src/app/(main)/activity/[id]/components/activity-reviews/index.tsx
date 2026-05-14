@@ -35,6 +35,8 @@ export function ActivityReviews({
   totalPages,
   currentPage,
   onPageChange,
+  isLoading,
+  errorMessage,
   className,
 }: ActivityReviewsProps) {
   const safeAverageRating = formatRating(averageRating);
@@ -70,7 +72,15 @@ export function ActivityReviews({
         </div>
       </div>
 
-      {reviews.length > 0 ? (
+      {isLoading && reviews.length === 0 ? (
+        <p className="typo-md-medium md:typo-lg-medium bg-gray-25 mt-6 rounded-3xl p-8 text-center leading-6 tracking-tight text-gray-600 md:mt-8 md:leading-7">
+          후기를 불러오는 중입니다.
+        </p>
+      ) : errorMessage && reviews.length === 0 ? (
+        <p className="typo-md-medium md:typo-lg-medium bg-gray-25 mt-6 rounded-3xl p-8 text-center leading-6 tracking-tight text-gray-600 md:mt-8 md:leading-7">
+          {errorMessage}
+        </p>
+      ) : reviews.length > 0 ? (
         <div className="mt-6 flex flex-col gap-10 md:mt-8 md:gap-5">
           {reviews.map((review) => (
             <article

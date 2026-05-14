@@ -2,18 +2,18 @@
 
 import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
-import { useQuery } from '@tanstack/react-query';
-import { fetchActivitySchedules } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
-import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
-import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
 import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
+import { useReservationCalendarData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useReservationCalendarData';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
+import {
+  parseDateQueryKey,
+  toDateFromDateKey,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/dateQuery';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
@@ -30,12 +30,20 @@ interface ReservationCalendarProps {
 }
 
 export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
-  const [detailDate, setDetailDate] = useState<Date | null>(null);
+  const [fallbackSelectedDate, setFallbackSelectedDate] = useState<Date>(
+    () => new Date()
+  );
   const calendarRootRef = useRef<HTMLDivElement>(null);
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
+  const dateKeyFromQuery = useMemo(
+    () => parseDateQueryKey(searchParams.get('date')),
+    [searchParams]
+  );
 
   const currentMonthTitle = useMemo(
     () =>
@@ -43,10 +51,21 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     [currentDate]
   );
 
-  const selectedDateKey = useMemo(
-    () => (detailDate ? formatDateKey(detailDate) : null),
-    [detailDate]
+  const selectedDateKey = useMemo(() => dateKeyFromQuery, [dateKeyFromQuery]);
+  const detailDate = useMemo(
+    () => (dateKeyFromQuery ? toDateFromDateKey(dateKeyFromQuery) : null),
+    [dateKeyFromQuery]
   );
+  const selectedDate = detailDate ?? fallbackSelectedDate;
+  const activeStartDate = detailDate
+    ? new Date(detailDate.getFullYear(), detailDate.getMonth(), 1)
+    : currentDate;
+  const { detailData, eventCountsByDate } = useReservationCalendarData({
+    activityId,
+    currentYear,
+    currentMonth,
+    reservedScheduleDateKey: selectedDateKey,
+  });
   const {
     desktopSheetPosition,
     setDesktopSheetPositionFromTile,
@@ -57,169 +76,17 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     detailDate,
   });
 
-  const { data: reservationDashboard = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-      activityId,
-      currentYear,
-      currentMonth,
-    ],
-    queryFn: () =>
-      fetchReservationDashboard({
-        activityId: activityId as number,
-        year: currentYear,
-        month: currentMonth,
-      }),
-    enabled: activityId !== null,
-  });
+  const updateDateQuery = (nextDateKey: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-  const { data: reservedSchedules = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      selectedDateKey,
-    ],
-    queryFn: () =>
-      fetchReservedSchedule({
-        activityId: activityId as number,
-        date: selectedDateKey as string,
-      }),
-    enabled: activityId !== null && Boolean(selectedDateKey),
-  });
-
-  const { data: activitySchedules = [] } = useQuery({
-    queryKey: [...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES, activityId],
-    queryFn: () =>
-      fetchActivitySchedules({
-        activityId: activityId as number,
-      }),
-    enabled: activityId !== null,
-  });
-
-  const missingDeclinedDateKeys = useMemo(
-    () =>
-      reservationDashboard
-        .filter(
-          (item) =>
-            !Number.isFinite(item.reservations.declined as unknown as number)
-        )
-        .map((item) => item.date)
-        .filter(Boolean),
-    [reservationDashboard]
-  );
-
-  const { data: declinedFallbackByDate = {} } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      currentYear,
-      currentMonth,
-      missingDeclinedDateKeys.join(','),
-    ],
-    queryFn: async () => {
-      if (activityId === null || missingDeclinedDateKeys.length === 0) {
-        return {} as Record<string, number>;
-      }
-
-      const results = await Promise.all(
-        missingDeclinedDateKeys.map(async (dateKey) => {
-          const schedules = await fetchReservedSchedule({
-            activityId,
-            date: dateKey,
-          });
-
-          const declined = schedules.reduce(
-            (accumulator, schedule) =>
-              accumulator + Math.max(schedule.count.declined, 0),
-            0
-          );
-
-          return [dateKey, declined] as const;
-        })
-      );
-
-      return results.reduce<Record<string, number>>((accumulator, entry) => {
-        const [dateKey, declined] = entry;
-        accumulator[dateKey] = declined;
-        return accumulator;
-      }, {});
-    },
-    enabled: activityId !== null && missingDeclinedDateKeys.length > 0,
-  });
-
-  const eventCountsByDate = useMemo<
-    Record<string, ReservationEventCounts>
-  >(() => {
-    const eventCounts = reservationDashboard.reduce<
-      Record<string, ReservationEventCounts>
-    >((accumulator, item) => {
-      const completed = Math.max(item.reservations.completed, 0);
-      const confirmed = Math.max(item.reservations.confirmed, 0);
-      const declinedRaw = item.reservations.declined as unknown as number;
-      const declined = Number.isFinite(declinedRaw)
-        ? Math.max(declinedRaw, 0)
-        : Math.max(declinedFallbackByDate[item.date] ?? 0, 0);
-      const pending = Math.max(item.reservations.pending, 0);
-
-      const eventCounts: ReservationEventCounts = {};
-      if (pending > 0) eventCounts.pending = pending;
-      if (confirmed > 0) eventCounts.confirmed = confirmed;
-      if (declined > 0) eventCounts.declined = declined;
-      if (completed > 0) eventCounts.completed = completed;
-
-      if (Object.keys(eventCounts).length > 0) {
-        accumulator[item.date] = eventCounts;
-      }
-
-      return accumulator;
-    }, {});
-
-    // 현재 선택 날짜는 reserved-schedule 집계값으로 보정
-    if (selectedDateKey) {
-      const normalized = reservedSchedules.reduce(
-        (accumulator, schedule) => {
-          accumulator.pending += Math.max(schedule.count.pending, 0);
-          accumulator.confirmed += Math.max(schedule.count.confirmed, 0);
-          accumulator.declined += Math.max(schedule.count.declined, 0);
-          return accumulator;
-        },
-        { pending: 0, confirmed: 0, declined: 0 }
-      );
-
-      const completed = Math.max(
-        eventCounts[selectedDateKey]?.completed ?? 0,
-        0
-      );
-
-      const mergedDailyCounts: ReservationEventCounts = {};
-      if (normalized.pending > 0)
-        mergedDailyCounts.pending = normalized.pending;
-      if (normalized.confirmed > 0)
-        mergedDailyCounts.confirmed = normalized.confirmed;
-      if (normalized.declined > 0)
-        mergedDailyCounts.declined = normalized.declined;
-      if (completed > 0) mergedDailyCounts.completed = completed;
-
-      if (Object.keys(mergedDailyCounts).length > 0) {
-        eventCounts[selectedDateKey] = mergedDailyCounts;
-      }
+    if (nextDateKey) {
+      params.set('date', nextDateKey);
+    } else {
+      params.delete('date');
     }
 
-    return eventCounts;
-  }, [
-    declinedFallbackByDate,
-    reservationDashboard,
-    reservedSchedules,
-    selectedDateKey,
-  ]);
-
-  const detailData = useMemo(() => {
-    return buildReservationDetailData({
-      activitySchedules,
-      reservedSchedules,
-      reservedScheduleDateKey: selectedDateKey,
-    });
-  }, [activitySchedules, selectedDateKey, reservedSchedules]);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   if (activityId === null) {
     return (
@@ -235,17 +102,18 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     <div ref={calendarRootRef} className="mt-7 w-full md:relative md:mt-6">
       <Calendar
         value={selectedDate}
-        onChange={(value) => setSelectedDate(value as Date)}
+        onChange={(value) => setFallbackSelectedDate(value as Date)}
         onClickDay={(value, event) => {
           const nextDate = value as Date;
-          setSelectedDate(nextDate);
-          setDetailDate(nextDate);
+          const nextDateKey = formatDateKey(nextDate);
+          setFallbackSelectedDate(nextDate);
+          updateDateQuery(nextDateKey);
 
           if (event.currentTarget instanceof HTMLElement) {
             setDesktopSheetPositionFromTile(event.currentTarget);
           }
         }}
-        activeStartDate={currentDate}
+        activeStartDate={activeStartDate}
         onActiveStartDateChange={({ activeStartDate }) => {
           if (activeStartDate) setCurrentDate(activeStartDate);
         }}
@@ -305,7 +173,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           detailData={detailData}
           desktopPosition={desktopSheetPosition}
           onClose={() => {
-            setDetailDate(null);
+            updateDateQuery(null);
             clearDesktopSheetPosition();
           }}
         />

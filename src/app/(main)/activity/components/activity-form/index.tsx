@@ -113,8 +113,9 @@ export function ActivityForm({
         <Controller
           name="bannerImageUrl"
           control={control}
-          render={({ field: { onChange } }) => (
+          render={({ field: { value, onChange } }) => (
             <FormImage
+              value={value}
               onChange={onChange}
               errorMessage={errors.bannerImageUrl?.message}
             />
@@ -126,8 +127,9 @@ export function ActivityForm({
         <Controller
           name="subImageUrls"
           control={control}
-          render={({ field: { onChange } }) => (
+          render={({ field: { value, onChange } }) => (
             <FormImage
+              value={value}
               onChange={onChange}
               errorMessage={errors.subImageUrls?.message}
               isMultiple
