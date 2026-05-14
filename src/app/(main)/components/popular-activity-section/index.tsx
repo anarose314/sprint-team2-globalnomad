@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  type MouseEvent,
+  type PointerEvent,
   type UIEvent,
   useCallback,
   useRef,
@@ -14,6 +16,7 @@ import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
 const SCROLL_LOAD_THRESHOLD = 80;
+const DRAG_SCROLL_CLICK_THRESHOLD = 5;
 
 const subscribeDesktopLayout = (onStoreChange: () => void) => {
   if (typeof window === 'undefined') {
@@ -44,6 +47,7 @@ const getServerDesktopLayoutSnapshot = () => false;
  *
  * - 댓글 수가 많은 순으로 인기 체험 목록을 조회한다.
  * - 모바일/태블릿에서는 가로 스크롤 끝에 도달하면 다음 목록을 불러온다.
+ * - 모바일/태블릿에서는 마우스 드래그로도 가로 스크롤할 수 있다.
  * - 데스크탑에서는 화살표 버튼 클릭 시 인기 체험 묶음을 이동한다.
  * - 마지막 응답이 빈 배열인 경우 마지막으로 데이터가 있던 목록을 유지한다.
  *
@@ -53,6 +57,10 @@ const getServerDesktopLayoutSnapshot = () => false;
 export function PopularActivitySection() {
   const [desktopPageIndex, setDesktopPageIndex] = useState(0);
   const isLoadNextPageLockedRef = useRef(false);
+  const isDragScrollingRef = useRef(false);
+  const hasDraggedScrollRef = useRef(false);
+  const dragStartClientXRef = useRef(0);
+  const dragStartScrollLeftRef = useRef(0);
 
   const {
     data,
@@ -145,6 +153,74 @@ export function PopularActivitySection() {
     }
   };
 
+  const handleHorizontalScrollPointerDown = (
+    event: PointerEvent<HTMLUListElement>
+  ) => {
+    if (
+      isDesktopLayout ||
+      event.pointerType !== 'mouse' ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    isDragScrollingRef.current = true;
+    hasDraggedScrollRef.current = false;
+    dragStartClientXRef.current = event.clientX;
+    dragStartScrollLeftRef.current = event.currentTarget.scrollLeft;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleHorizontalScrollPointerMove = (
+    event: PointerEvent<HTMLUListElement>
+  ) => {
+    if (!isDragScrollingRef.current || isDesktopLayout) {
+      return;
+    }
+
+    const dragDistance = event.clientX - dragStartClientXRef.current;
+
+    if (Math.abs(dragDistance) > DRAG_SCROLL_CLICK_THRESHOLD) {
+      hasDraggedScrollRef.current = true;
+      event.preventDefault();
+    }
+
+    event.currentTarget.scrollLeft =
+      dragStartScrollLeftRef.current - dragDistance;
+  };
+
+  const handleHorizontalScrollPointerEnd = (
+    event: PointerEvent<HTMLUListElement>
+  ) => {
+    if (!isDragScrollingRef.current) {
+      return;
+    }
+
+    isDragScrollingRef.current = false;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (hasDraggedScrollRef.current) {
+      window.setTimeout(() => {
+        hasDraggedScrollRef.current = false;
+      }, 0);
+    }
+  };
+
+  const handleHorizontalScrollClickCapture = (
+    event: MouseEvent<HTMLUListElement>
+  ) => {
+    if (!hasDraggedScrollRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   return (
     <section>
       <Heading
@@ -177,12 +253,18 @@ export function PopularActivitySection() {
         <div className="relative">
           <ul
             onScroll={handleHorizontalScroll}
+            onPointerDown={handleHorizontalScrollPointerDown}
+            onPointerMove={handleHorizontalScrollPointerMove}
+            onPointerUp={handleHorizontalScrollPointerEnd}
+            onPointerCancel={handleHorizontalScrollPointerEnd}
+            onClickCapture={handleHorizontalScrollClickCapture}
             className={cn(
-              'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4',
+              'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
+              'cursor-grab active:cursor-grabbing 2xl:cursor-auto 2xl:active:cursor-auto',
               '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
               'xs:auto-cols-[calc((100%-1rem)/2.1)]',
-              'md:mx-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:px-0',
-              '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible'
+              'md:-mr-7.5 md:ml-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:pr-7.5 md:pl-0',
+              '2xl:mx-0 2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible 2xl:px-0'
             )}
           >
             {activities.map((activity) => (
