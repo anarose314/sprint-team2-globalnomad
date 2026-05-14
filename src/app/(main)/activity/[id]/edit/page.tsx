@@ -1,11 +1,27 @@
 import { Metadata } from 'next';
 import { ActivityEditForm } from '@/app/(main)/activity/[id]/edit/components/activity-edit-form';
+import { ActivityEditPageProps } from '@/app/(main)/activity/[id]/edit/edit.types';
+import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { Heading } from '@/shared/components/heading';
+import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
-// TODO: 추후 API 연동 후 동적 이름으로 변경
-export const metadata: Metadata = {
-  title: '체험 이름 - 수정',
-};
+/**
+ * 동적 메타데이터 생성
+ */
+export async function generateMetadata({
+  params,
+}: ActivityEditPageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const activity = await fetchInstanceServer<ActivityDetailResponse>(
+      `/activities/${id}`
+    );
+    return { title: `${activity.title} - 수정` };
+  } catch {
+    return { title: '체험 수정' };
+  }
+}
 
 export default function ActivityEditPage() {
   return (
