@@ -1,5 +1,8 @@
+'use client';
+
 import { IcMap } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+import { useKakaoMap } from '@/shared/hooks/useKakaoMap';
 import { cn } from '@/shared/utils/cn';
 
 interface ActivityDetailContentProps {
@@ -13,6 +16,12 @@ export function ActivityDetailContent({
   address,
   className,
 }: ActivityDetailContentProps) {
+  const appKey = (process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY ?? '').trim();
+  const { mapContainerRef, isMapLoading, mapErrorMessage } = useKakaoMap({
+    address,
+    appKey,
+  });
+
   return (
     <section className={cn('w-full', className)}>
       <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-10 2xl:pb-10">
@@ -29,8 +38,20 @@ export function ActivityDetailContent({
           <p className="typo-md-semibold text-gray-950">{address}</p>
         </div>
 
-        <div className="mt-4 h-60 w-full rounded-2xl bg-gray-100 md:h-80 md:rounded-3xl 2xl:h-96">
-          {/* TODO: 카카오 지도 API 연동 시 이 컨테이너에 마운트 */}
+        <div
+          ref={mapContainerRef}
+          className="relative mt-4 h-60 w-full overflow-hidden rounded-2xl bg-gray-100 md:h-80 md:rounded-3xl 2xl:h-96"
+        >
+          {isMapLoading && !mapErrorMessage && (
+            <p className="typo-md-medium absolute inset-0 flex items-center justify-center text-gray-600">
+              지도 정보를 불러오는 중입니다.
+            </p>
+          )}
+          {mapErrorMessage && (
+            <p className="typo-md-medium absolute inset-0 flex items-center justify-center text-gray-600">
+              {mapErrorMessage}
+            </p>
+          )}
         </div>
       </div>
     </section>

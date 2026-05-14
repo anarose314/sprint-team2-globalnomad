@@ -1,13 +1,28 @@
 import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
-import { MyActivityReservationsResponse } from '@/shared/types/myActivityReservations.types';
 
 const RESERVATION_PAGE_SIZE = 10;
+type ReservationRequestStatus = 'pending' | 'confirmed' | 'declined';
+
+interface ReservationRequestItem {
+  id: number;
+  nickname: string;
+  headCount: number;
+  scheduleId: number;
+  status: ReservationRequestStatus;
+  createdAt: string;
+}
+
+interface ReservationRequestsResponse {
+  cursorId: number | null;
+  totalCount: number;
+  reservations: ReservationRequestItem[];
+}
 
 interface FetchActivityReservationsProps {
   activityId: number;
   scheduleId: number;
-  status: 'pending' | 'confirmed' | 'declined';
+  status: ReservationRequestStatus;
   cursorId?: number | null;
 }
 
@@ -37,7 +52,7 @@ export const fetchActivityReservations = async ({
   scheduleId,
   status,
   cursorId = null,
-}: FetchActivityReservationsProps): Promise<MyActivityReservationsResponse> => {
+}: FetchActivityReservationsProps): Promise<ReservationRequestsResponse> => {
   const response = await fetchInstanceClient<unknown>(
     `/api/proxy/my-activities/${activityId}/reservations`,
     {
@@ -104,9 +119,7 @@ export const fetchActivityReservations = async ({
         };
       })
       .filter(
-        (
-          item
-        ): item is MyActivityReservationsResponse['reservations'][number] =>
+        (item): item is ReservationRequestsResponse['reservations'][number] =>
           item !== null
       ),
   };

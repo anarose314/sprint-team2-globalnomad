@@ -8,7 +8,7 @@ import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
  * - dynamic path segment를 `/a/b/c` 형태로 합치고
  * - query string이 있으면 그대로 보존
  */
-const buildEndpoint = async (
+const resolveEndpoint = async (
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> }
 ) => {
@@ -32,7 +32,7 @@ const handleProxyRequest = async (
   method: 'GET' | 'DELETE'
 ) => {
   try {
-    const endpoint = await buildEndpoint(request, context);
+    const endpoint = await resolveEndpoint(request, context);
 
     const data = await fetchInstanceServer<unknown>(endpoint, {
       method,
@@ -72,7 +72,7 @@ const handleProxyRequestWithBody = async (
   method: 'POST' | 'PATCH' | 'PUT'
 ) => {
   try {
-    const endpoint = await buildEndpoint(request, context);
+    const endpoint = await resolveEndpoint(request, context);
     const contentType = request.headers.get('content-type') ?? '';
 
     let requestBody: Record<string, unknown> | FormData | undefined = undefined;
