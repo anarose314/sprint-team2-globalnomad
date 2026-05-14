@@ -177,6 +177,18 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     });
   }, [reservedSchedules]);
 
+  const updateDateQuery = (nextDateKey: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextDateKey) {
+      params.set('date', nextDateKey);
+    } else {
+      params.delete('date');
+    }
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   if (activityId === null) {
     return (
       <div className="shadow-card bg-gray-25 mt-7 flex h-192 w-full items-center justify-center rounded-3xl md:mt-6">
@@ -196,10 +208,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           const nextDate = value as Date;
           const nextDateKey = formatDateKey(nextDate);
           setFallbackSelectedDate(nextDate);
-
-          const params = new URLSearchParams(searchParams.toString());
-          params.set('date', nextDateKey);
-          router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+          updateDateQuery(nextDateKey);
 
           if (event.currentTarget instanceof HTMLElement) {
             setDesktopSheetPositionFromTile(event.currentTarget);
@@ -265,11 +274,7 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           detailData={detailData}
           desktopPosition={desktopSheetPosition}
           onClose={() => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete('date');
-            router.replace(`${pathname}?${params.toString()}`, {
-              scroll: false,
-            });
+            updateDateQuery(null);
             clearDesktopSheetPosition();
           }}
         />
