@@ -14,7 +14,7 @@ import { ActivityCardStatus } from '@/app/(main)/my/components/activity-card/act
  * @example
  * <ActivityCard>
  *   <ActivityCard.Info
- *     index={0}
+ *     priority={true}
  *     title="체험 제목"
  *     activityId={123}
  *     bannerImageUrl="/image.png"
