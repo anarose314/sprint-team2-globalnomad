@@ -26,8 +26,16 @@ interface KakaoMapNamespace {
     Map: new (
       container: HTMLElement,
       options: { center: unknown; level: number }
-    ) => unknown;
-    Marker: new (options: { position: unknown; map: unknown }) => unknown;
+    ) => {
+      setCenter: (position: unknown) => void;
+    };
+    Marker: new (options: {
+      position: unknown;
+      map: { setCenter: (position: unknown) => void };
+    }) => {
+      setPosition: (position: unknown) => void;
+      setMap: (map: { setCenter: (position: unknown) => void } | null) => void;
+    };
     services: KakaoMapServices;
   };
 }
@@ -104,6 +112,13 @@ const loadKakaoMapSdk = (appKey: string) => {
  */
 export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<{
+    setCenter: (position: unknown) => void;
+  } | null>(null);
+  const markerRef = useRef<{
+    setPosition: (position: unknown) => void;
+    setMap: (map: { setCenter: (position: unknown) => void } | null) => void;
+  } | null>(null);
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [mapErrorMessage, setMapErrorMessage] = useState<string | null>(null);
 
@@ -143,15 +158,21 @@ export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
 
           const { x, y } = result[0];
           const center = new kakao.maps.LatLng(Number(y), Number(x));
-          const map = new kakao.maps.Map(mapContainerRef.current, {
-            center,
-            level: 3,
-          });
 
-          new kakao.maps.Marker({
-            map,
-            position: center,
-          });
+          if (!mapRef.current) {
+            mapRef.current = new kakao.maps.Map(mapContainerRef.current, {
+              center,
+              level: 3,
+            });
+
+            markerRef.current = new kakao.maps.Marker({
+              map: mapRef.current,
+              position: center,
+            });
+          } else {
+            mapRef.current.setCenter(center);
+            markerRef.current?.setPosition(center);
+          }
 
           setMapErrorMessage(null);
           setIsMapLoading(false);
@@ -169,6 +190,9 @@ export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
 
     return () => {
       isCancelled = true;
+      markerRef.current?.setMap(null);
+      markerRef.current = null;
+      mapRef.current = null;
     };
   }, [address, appKey]);
 
