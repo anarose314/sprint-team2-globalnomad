@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ActivityEditForm } from '@/app/(main)/activity/[id]/edit/components/activity-edit-form';
 import { ActivityEditPageProps } from '@/app/(main)/activity/[id]/edit/edit.types';
 import { ActivityFormSkeleton } from '@/app/(main)/activity/components/activity-form-skeleton';
@@ -30,6 +31,10 @@ export default async function ActivityEditPage({
 }: ActivityEditPageProps) {
   const { id } = await params;
   const activityId = Number(id);
+
+  if (!Number.isFinite(activityId)) {
+    notFound();
+  }
 
   return (
     <div className="mx-auto mt-7.5 mb-9 w-full max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
