@@ -2,6 +2,8 @@ import type {
   ActivitiesResponse,
   ActivityImageResponse,
   FetchActivitiesParams,
+  PostActivities,
+  PostActivitiesResponse,
 } from '@/app/(main)/activity/apis/activities.types';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
@@ -56,6 +58,19 @@ export const postActivityImage = async (file: File) => {
     {
       method: 'POST',
       body: formData,
+    }
+  );
+};
+
+/**
+ * 체험 등록을 하는 API 호출 함수 (BFF 경유)
+ */
+export const postActivities = async (body: PostActivities) => {
+  return await fetchInstanceClient<PostActivitiesResponse>(
+    `/api/proxy/activities`,
+    {
+      method: 'POST',
+      body,
     }
   );
 };
