@@ -31,6 +31,61 @@ const normalizeDateKey = (rawDate: string) => {
   return formatDateKey(parsed);
 };
 
+const parseTimeToHourMinute = (time: string) => {
+  const [hourText, minuteText] = time.split(':');
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+
+  if (
+    !Number.isInteger(hour) ||
+    !Number.isInteger(minute) ||
+    hour < 0 ||
+    hour > 23 ||
+    minute < 0 ||
+    minute > 59
+  ) {
+    return null;
+  }
+
+  return { hour, minute };
+};
+
+const isUpcomingTimeSlot = (dateKey: string, startTime: string, now: Date) => {
+  const [yearText, monthText, dayText] = dateKey.split('-');
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const parsedTime = parseTimeToHourMinute(startTime);
+
+  if (!parsedTime) {
+    return true;
+  }
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return true;
+  }
+
+  const startDateTime = new Date(
+    year,
+    month - 1,
+    day,
+    parsedTime.hour,
+    parsedTime.minute,
+    0,
+    0
+  );
+
+  if (Number.isNaN(startDateTime.getTime())) {
+    return true;
+  }
+
+  return startDateTime.getTime() > now.getTime();
+};
+
 export const useActivityReservationAvailability = ({
   activityId,
   schedules,
@@ -66,6 +121,8 @@ export const useActivityReservationAvailability = ({
   }, [myReservedScheduleIds, reservedScheduleIds]);
 
   const fallbackScheduleByDate = useMemo(() => {
+    const now = new Date();
+
     return schedules.reduce<Record<string, TimeSlot[]>>(
       (accumulator, schedule) => {
         if (blockedScheduleIds.includes(schedule.id)) {
@@ -73,6 +130,10 @@ export const useActivityReservationAvailability = ({
         }
 
         const dateKey = normalizeDateKey(schedule.date);
+        if (!isUpcomingTimeSlot(dateKey, schedule.startTime, now)) {
+          return accumulator;
+        }
+
         const nextSlot: TimeSlot = {
           id: schedule.id,
           startTime: schedule.startTime,
@@ -92,12 +153,16 @@ export const useActivityReservationAvailability = ({
   }, [blockedScheduleIds, schedules]);
 
   const availableScheduleByDate = useMemo(() => {
+    const now = new Date();
+
     const fromAvailableApi = availableSchedules.reduce<
       Record<string, (typeof availableSchedules)[number]['times']>
     >((accumulator, item) => {
       const dateKey = normalizeDateKey(item.date);
       const filteredTimes = item.times.filter(
-        (time) => !blockedScheduleIds.includes(time.id)
+        (time) =>
+          !blockedScheduleIds.includes(time.id) &&
+          isUpcomingTimeSlot(dateKey, time.startTime, now)
       );
 
       if (filteredTimes.length > 0) {
