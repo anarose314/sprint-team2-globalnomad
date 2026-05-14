@@ -1,4 +1,4 @@
-import { ActivityCardSkeleton } from '@/app/(main)/my/components/activity-card-skeleton';
+import { MyActivityCardSkeleton } from '@/app/(main)/my/components/my-activity-card-skeleton';
 import { ReserveFilterSkeleton } from '@/app/(main)/my/reservations/components/reserve-filter-skeleton';
 
 export function ReserveContainerSkeleton() {
@@ -9,7 +9,7 @@ export function ReserveContainerSkeleton() {
 
       {/* 2. 리스트 스켈레톤 */}
       <section className="mt-7.5">
-        <ActivityCardSkeleton />
+        <MyActivityCardSkeleton />
       </section>
     </>
   );

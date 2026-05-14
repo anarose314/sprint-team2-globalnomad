@@ -1,10 +1,10 @@
 import { StatusBadge } from '@/shared/components/status-badge';
 import { ReservationStatus } from '@/shared/constants/status.constants';
 
-interface ActivityCardStatusProps {
+interface MyActivityCardStatusProps {
   status: ReservationStatus;
 }
 
-export function ActivityCardStatus({ status }: ActivityCardStatusProps) {
+export function MyActivityCardStatus({ status }: MyActivityCardStatusProps) {
   return <StatusBadge status={status} />;
 }

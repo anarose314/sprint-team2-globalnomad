@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface ActivityCardInfoProps {
+interface MyActivityCardInfoProps {
   priority?: boolean;
   title: string;
   activityId: number;
@@ -10,13 +10,13 @@ interface ActivityCardInfoProps {
   children: ReactNode;
 }
 
-export function ActivityCardInfo({
+export function MyActivityCardInfo({
   priority,
   title,
   activityId,
   bannerImageUrl,
   children,
-}: ActivityCardInfoProps) {
+}: MyActivityCardInfoProps) {
   return (
     <Link
       href={`/activity/${activityId}`}

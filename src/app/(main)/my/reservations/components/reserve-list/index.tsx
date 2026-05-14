@@ -2,7 +2,7 @@
 
 import { useInView } from 'react-intersection-observer';
 import { useSearchParams } from 'next/navigation';
-import { ActivityCard } from '@/app/(main)/my/components/activity-card';
+import { MyActivityCard } from '@/app/(main)/my/components/my-activity-card';
 import { MyPageEmpty } from '@/app/(main)/my/components/my-page-empty';
 import { ReserveButtons } from '@/app/(main)/my/reservations/components/reserve-buttons';
 import { useMyReservations } from '@/app/(main)/my/reservations/hooks/useMyReservations';
@@ -58,29 +58,29 @@ export function ReserveList() {
             };
 
             return (
-              <ActivityCard key={id}>
-                <ActivityCard.Info
+              <MyActivityCard key={id}>
+                <MyActivityCard.Info
                   priority={index === 0}
                   title={activity.title}
                   activityId={activity.id}
                   bannerImageUrl={activity.bannerImageUrl}
                 >
-                  <ActivityCard.Status status={status} />
-                  <ActivityCard.Heading title={activity.title} />
-                  <ActivityCard.DateTime
+                  <MyActivityCard.Status status={status} />
+                  <MyActivityCard.Heading title={activity.title} />
+                  <MyActivityCard.DateTime
                     date={date}
                     startTime={startTime}
                     endTime={endTime}
                   />
-                  <ActivityCard.Price
+                  <MyActivityCard.Price
                     price={totalPrice}
                     headCount={headCount}
                   />
-                </ActivityCard.Info>
-                <ActivityCard.Buttons>
+                </MyActivityCard.Info>
+                <MyActivityCard.Buttons>
                   <ReserveButtons reservationInfo={reservationInfo} />
-                </ActivityCard.Buttons>
-              </ActivityCard>
+                </MyActivityCard.Buttons>
+              </MyActivityCard>
             );
           })}
         </ul>

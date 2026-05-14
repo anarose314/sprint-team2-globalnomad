@@ -1,10 +1,10 @@
 import { Heading } from '@/shared/components/heading';
 
-interface ActivityCardHeadingProps {
+interface MyActivityCardHeadingProps {
   title: string;
 }
 
-export function ActivityCardHeading({ title }: ActivityCardHeadingProps) {
+export function MyActivityCardHeading({ title }: MyActivityCardHeadingProps) {
   return (
     <Heading as="h3" className="typo-md-bold 2xl:typo-2lg-bold">
       {title}

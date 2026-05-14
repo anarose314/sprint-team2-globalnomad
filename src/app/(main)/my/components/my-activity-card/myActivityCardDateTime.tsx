@@ -1,14 +1,14 @@
-interface ActivityCardDateTimeProps {
+interface MyActivityCardDateTimeProps {
   date: string;
   startTime: string;
   endTime: string;
 }
 
-export function ActivityCardDateTime({
+export function MyActivityCardDateTime({
   date,
   startTime,
   endTime,
-}: ActivityCardDateTimeProps) {
+}: MyActivityCardDateTimeProps) {
   return (
     <time
       dateTime={`${date}T${startTime}`}

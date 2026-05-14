@@ -2,7 +2,7 @@
 
 import { useInView } from 'react-intersection-observer';
 import { useMyActivitiesInfinite } from '@/app/(main)/my/activities/hooks/useMyActivitiesInfinite';
-import { ActivityCard } from '@/app/(main)/my/components/activity-card';
+import { MyActivityCard } from '@/app/(main)/my/components/my-activity-card';
 import { MyPageEmpty } from '@/app/(main)/my/components/my-page-empty';
 import { Button } from '@/shared/components/buttons';
 import { Spinner } from '@/shared/components/spinner';
@@ -37,21 +37,21 @@ export function MyActivitiesList() {
               activity;
 
             return (
-              <ActivityCard key={id}>
-                <ActivityCard.Info
+              <MyActivityCard key={id}>
+                <MyActivityCard.Info
                   priority={index === 0}
                   title={title}
                   activityId={id}
                   bannerImageUrl={bannerImageUrl}
                 >
-                  <ActivityCard.Heading title={title} />
-                  <ActivityCard.Rating
+                  <MyActivityCard.Heading title={title} />
+                  <MyActivityCard.Rating
                     rating={rating}
                     reviewCount={reviewCount}
                   />
-                  <ActivityCard.Price price={price} />
-                </ActivityCard.Info>
-                <ActivityCard.Buttons>
+                  <MyActivityCard.Price price={price} />
+                </MyActivityCard.Info>
+                <MyActivityCard.Buttons>
                   <ul className="flex gap-3 *:flex-1">
                     <li>
                       <Button variant="secondary" size="md" className="w-full">
@@ -68,8 +68,8 @@ export function MyActivitiesList() {
                       </Button>
                     </li>
                   </ul>
-                </ActivityCard.Buttons>
-              </ActivityCard>
+                </MyActivityCard.Buttons>
+              </MyActivityCard>
             );
           })}
         </ul>

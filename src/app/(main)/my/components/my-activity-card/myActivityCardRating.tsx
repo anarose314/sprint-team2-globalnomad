@@ -1,14 +1,14 @@
 import { IcStar } from '@/shared/assets/icons';
 
-interface ActivityCardRatingProps {
+interface MyActivityCardRatingProps {
   rating: number;
   reviewCount: number;
 }
 
-export function ActivityCardRating({
+export function MyActivityCardRating({
   rating,
   reviewCount,
-}: ActivityCardRatingProps) {
+}: MyActivityCardRatingProps) {
   return (
     <div className="flex items-center gap-0.5">
       <IcStar className="w-3.5 text-yellow-500" />

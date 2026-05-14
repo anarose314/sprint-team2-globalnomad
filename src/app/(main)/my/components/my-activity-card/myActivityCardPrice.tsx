@@ -1,12 +1,12 @@
-interface ActivityCardPriceProps {
+interface MyActivityCardPriceProps {
   price: number;
   headCount?: number;
 }
 
-export function ActivityCardPrice({
+export function MyActivityCardPrice({
   price,
   headCount,
-}: ActivityCardPriceProps) {
+}: MyActivityCardPriceProps) {
   return (
     <p className="typo-lg-bold 2xl:typo-2lg-bold mt-1 flex items-center gap-1 text-gray-950">
       ₩{price.toLocaleString('ko-KR')}
