@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
 import type {
   CalendarValue,
@@ -34,6 +34,11 @@ const normalizeDateKey = (rawDate: string) => {
   return formatDateKey(parsed);
 };
 
+const parseYearMonthFromDateKey = (dateKey: string) => {
+  const [year, month] = dateKey.split('-').map(Number);
+  return { year, month };
+};
+
 export const useActivityReservationCardState = ({
   activityId,
   pricePerPerson,
@@ -52,24 +57,65 @@ export const useActivityReservationCardState = ({
   const activeYear = activeMonthDate.getFullYear();
   const activeMonth = activeMonthDate.getMonth() + 1;
 
-  const {
-    data: availableSchedules = [],
-    isLoading: isAvailableSchedulesLoading,
-    isError: isAvailableSchedulesError,
-  } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
-      activityId,
-      activeYear,
-      activeMonth,
+  const selectedYearMonth = useMemo(
+    () =>
+      selectedDateKey ? parseYearMonthFromDateKey(selectedDateKey) : undefined,
+    [selectedDateKey]
+  );
+
+  const shouldFetchSelectedMonth =
+    selectedYearMonth &&
+    (selectedYearMonth.year !== activeYear ||
+      selectedYearMonth.month !== activeMonth);
+
+  const scheduleQueries = useQueries({
+    queries: [
+      {
+        queryKey: [
+          ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
+          activityId,
+          activeYear,
+          activeMonth,
+        ],
+        queryFn: () =>
+          fetchActivityAvailableSchedule({
+            activityId,
+            year: activeYear,
+            month: activeMonth,
+          }),
+      },
+      ...(shouldFetchSelectedMonth
+        ? [
+            {
+              queryKey: [
+                ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
+                activityId,
+                selectedYearMonth.year,
+                selectedYearMonth.month,
+              ],
+              queryFn: () =>
+                fetchActivityAvailableSchedule({
+                  activityId,
+                  year: selectedYearMonth.year,
+                  month: selectedYearMonth.month,
+                }),
+            },
+          ]
+        : []),
     ],
-    queryFn: () =>
-      fetchActivityAvailableSchedule({
-        activityId,
-        year: activeYear,
-        month: activeMonth,
-      }),
   });
+
+  const availableSchedules = useMemo(
+    () => scheduleQueries.flatMap((query) => query.data ?? []),
+    [scheduleQueries]
+  );
+
+  const isAvailableSchedulesLoading = scheduleQueries.some(
+    (query) => query.isLoading
+  );
+  const isAvailableSchedulesError = scheduleQueries.some(
+    (query) => query.isError
+  );
 
   const fallbackScheduleByDate = useMemo(() => {
     return schedules.reduce<Record<string, TimeSlot[]>>(
