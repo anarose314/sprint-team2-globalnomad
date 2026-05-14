@@ -9,7 +9,7 @@ import { Button } from '@/shared/components/buttons/button';
 
 interface DesktopReservationCardProps {
   pricePerPerson: number;
-  selectedDate: Date;
+  selectedDate: Date | null;
   currentDate: Date;
   monthTitle: string;
   headCount: number;
@@ -106,13 +106,13 @@ export function DesktopReservationCard({
                       {slot.startTime} ~ {slot.endTime}
                     </TimeSlotButton>
                   ))
-                ) : (
+                ) : selectedDate ? (
                   <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
                     {hasSelectableDate
                       ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                       : '예약 가능한 날짜가 없습니다.'}
                   </p>
-                )}
+                ) : null}
               </div>
             </div>
 

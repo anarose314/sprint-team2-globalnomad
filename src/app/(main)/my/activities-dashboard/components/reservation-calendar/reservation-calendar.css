@@ -96,6 +96,19 @@
   @apply text-gray-300;
 }
 
+/* 타일 상호작용 시 날짜 숫자 색상 우선순위 */
+.reservation-calendar
+  .react-calendar__tile:enabled:hover
+  .reservation-calendar__day-number,
+.reservation-calendar
+  .react-calendar__tile:enabled:focus
+  .reservation-calendar__day-number,
+.reservation-calendar
+  .react-calendar__tile--active
+  .reservation-calendar__day-number {
+  @apply text-white;
+}
+
 .reservation-calendar__meta--muted {
   @apply opacity-50;
 }

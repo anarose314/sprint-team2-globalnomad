@@ -131,6 +131,18 @@
   @apply typo-lg-bold bg-primary-500 text-white;
 }
 
+/* 주말 타일은 기본 색보다 active 색(흰색)을 우선 적용 */
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--active:nth-child(7n + 1)
+  > abbr,
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--active:nth-child(7n)
+  > abbr {
+  @apply text-white;
+}
+
 /**
  * @description
  * 오늘 날짜와 선택 날짜가 겹치면 선택 스타일을 우선 적용

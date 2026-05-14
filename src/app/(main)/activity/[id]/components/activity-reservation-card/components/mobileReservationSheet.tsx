@@ -13,7 +13,7 @@ interface MobileReservationSheetProps {
   isOpen: boolean;
   mobileSheetStep: MobileSheetStep;
   hasSelectableDate: boolean;
-  selectedDate: Date;
+  selectedDate: Date | null;
   currentDate: Date;
   monthTitle: string;
   selectedDateText: string;
@@ -97,13 +97,13 @@ export function MobileReservationSheet({
                           {slot.startTime} ~ {slot.endTime}
                         </TimeSlotButton>
                       ))
-                    ) : (
+                    ) : selectedDate ? (
                       <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
                         {hasSelectableDate
                           ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                           : '예약 가능한 날짜가 없습니다.'}
                       </p>
-                    )}
+                    ) : null}
                   </div>
                 </div>
 
@@ -208,13 +208,13 @@ export function MobileReservationSheet({
                         {slot.startTime} ~ {slot.endTime}
                       </TimeSlotButton>
                     ))
-                  ) : (
+                  ) : selectedDate ? (
                     <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
                       {hasSelectableDate
                         ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                         : '예약 가능한 날짜가 없습니다.'}
                     </p>
-                  )}
+                  ) : null}
                 </div>
                 <div className="mt-7">
                   <p className="typo-lg-bold text-gray-950">참여 인원 수</p>

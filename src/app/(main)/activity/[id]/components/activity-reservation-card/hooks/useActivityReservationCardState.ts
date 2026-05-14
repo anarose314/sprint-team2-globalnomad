@@ -134,8 +134,18 @@ export const useActivityReservationCardState = ({
   );
 
   const hasSelectableDate = availableDateKeys.length > 0;
-  const effectiveSelectedDateKey =
-    selectedDateKey ?? availableDateKeys[0] ?? null;
+  const initialSelectedDateKey = useMemo(() => {
+    const firstAvailableDateKey = availableDateKeys[0];
+    if (!firstAvailableDateKey) {
+      return null;
+    }
+
+    const todayDateKey = formatDateKey(new Date());
+    return firstAvailableDateKey === todayDateKey
+      ? firstAvailableDateKey
+      : null;
+  }, [availableDateKeys]);
+  const effectiveSelectedDateKey = selectedDateKey ?? initialSelectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
     if (!effectiveSelectedDateKey) {
@@ -146,12 +156,7 @@ export const useActivityReservationCardState = ({
     return new Date(year, month - 1, day);
   }, [effectiveSelectedDateKey]);
 
-  const selectedDate = useMemo(() => {
-    if (parsedSelectedDate) {
-      return parsedSelectedDate;
-    }
-    return new Date();
-  }, [parsedSelectedDate]);
+  const selectedDate = parsedSelectedDate;
 
   const availableTimeSlots = useMemo<TimeSlot[]>(() => {
     if (!effectiveSelectedDateKey) {
@@ -176,7 +181,7 @@ export const useActivityReservationCardState = ({
     );
   }, [availableTimeSlots, selectedTimeSlot]);
 
-  const displayCurrentDate = currentDate ?? selectedDate;
+  const displayCurrentDate = currentDate ?? selectedDate ?? new Date();
   const monthTitle = useMemo(
     () =>
       `${displayCurrentDate.getFullYear()}년 ${displayCurrentDate.getMonth() + 1}월`,
@@ -189,6 +194,10 @@ export const useActivityReservationCardState = ({
   );
 
   const selectedDateText = useMemo(() => {
+    if (!selectedDate) {
+      return '-';
+    }
+
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');

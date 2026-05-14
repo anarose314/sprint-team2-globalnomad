@@ -4,7 +4,7 @@ import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
 
 interface ReservationCalendarViewProps {
-  value: Date;
+  value: Date | null;
   activeStartDate: Date;
   monthTitle: string;
   className: string;
