@@ -204,7 +204,7 @@ export function PopularActivitySection() {
                 isDesktopLayout ? !canMoveNextDesktopPage : !canLoadNextPage
               }
               aria-label="인기 체험 더 불러오기"
-              className="shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white disabled:cursor-not-allowed disabled:opacity-50 md:flex"
+              className="shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white disabled:cursor-not-allowed disabled:opacity-50 2xl:flex"
             >
               <span
                 aria-hidden="true"
