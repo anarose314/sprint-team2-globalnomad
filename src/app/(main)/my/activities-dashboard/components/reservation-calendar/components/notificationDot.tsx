@@ -13,8 +13,8 @@ export function NotificationDot({ isMuted }: NotificationDotProps) {
       <span
         aria-hidden="true"
         className={cn(
-          'reservation-calendar__notification-dot',
-          isMuted && 'reservation-calendar__meta--muted'
+          'reservation-status-calendar__notification-dot',
+          isMuted && 'reservation-status-calendar__meta--muted'
         )}
       />
       <span className="sr-only">예약 있음</span>
