@@ -33,7 +33,12 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
     const originalSchedules = activityData.schedules || [];
     const finalSchedules = data.schedules;
 
-    // 최종 목록에 없는 기존 스케쥴 삭제
+    // 최적화를 위한 Map 생성
+    const originalSchedulesMap = new Map(
+      originalSchedules.map((s) => [String(s.id), s])
+    );
+
+    // 최종 목록에 없는 기존 스케쥴 삭제 대상 추출
     const scheduleIdsToRemove = originalSchedules
       .filter(
         (orig) =>
@@ -41,33 +46,28 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
       )
       .map((orig) => orig.id);
 
-    // id는 있지만 내용이 달라진 스케쥴 감지
+    // 내용이 변경된 스케쥴 감지
     const modifiedSchedules = finalSchedules.filter((final) => {
-      const original = originalSchedules.find(
-        (orig) => String(orig.id) === String(final.id)
-      );
-      if (!original) return false;
+      const original = originalSchedulesMap.get(String(final.id));
       return (
-        original.date !== final.date ||
-        original.startTime !== final.startTime ||
-        original.endTime !== final.endTime
+        original &&
+        (original.date !== final.date ||
+          original.startTime !== final.startTime ||
+          original.endTime !== final.endTime)
       );
     });
 
-    const modifiedIds = modifiedSchedules.map((s) => Number(s.id));
-    const finalScheduleIdsToRemove = [...scheduleIdsToRemove, ...modifiedIds];
+    const finalScheduleIdsToRemove = [
+      ...scheduleIdsToRemove,
+      ...modifiedSchedules.map((s) => Number(s.id)),
+    ];
 
     const schedulesToAdd = [
-      ...finalSchedules
-        .filter(
-          (final) =>
-            !originalSchedules.some(
-              (orig) => String(orig.id) === String(final.id)
-            )
-        )
-        .map(({ id: _id, ...rest }) => rest),
-      ...modifiedSchedules.map(({ id: _id, ...rest }) => rest),
-    ];
+      ...finalSchedules.filter(
+        (final) => !originalSchedulesMap.has(String(final.id))
+      ),
+      ...modifiedSchedules,
+    ].map(({ id: _id, ...rest }) => rest);
 
     // [3] 최종 Payload 조립 및 API 호출
     const payload = {
