@@ -125,7 +125,7 @@
 }
 
 .reservation-calendar__event-badge--completed {
-  @apply top-26;
+  @apply top-20;
 }
 
 /* ===== 예약 상세 레이어(모바일: 바텀시트) ===== */
@@ -343,11 +343,11 @@
   }
 
   .reservation-calendar__event-badge--declined {
-    @apply top-23.5;
+    @apply top-24;
   }
 
   .reservation-calendar__event-badge--completed {
-    @apply top-29.25;
+    @apply top-24;
   }
 
   /* 상세 레이어: 태블릿도 바텀시트 유지 */
