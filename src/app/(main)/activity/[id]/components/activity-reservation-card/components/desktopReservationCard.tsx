@@ -1,4 +1,3 @@
-import { MOCK_TIME_SLOTS } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.constants';
 import type {
   CalendarValue,
   TimeSlot,
@@ -9,34 +8,42 @@ import { IcMinus, IcPlus } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
 
 interface DesktopReservationCardProps {
-  selectedDate: Date;
+  pricePerPerson: number;
+  selectedDate: Date | null;
   currentDate: Date;
   monthTitle: string;
   headCount: number;
   totalPrice: number;
-  selectedTimeSlot: TimeSlot;
+  selectedTimeSlot: TimeSlot | null;
+  availableTimeSlots: TimeSlot[];
+  hasSelectableDate: boolean;
   onDateChange: (value: CalendarValue) => void;
   onMonthChange: (activeStartDate?: Date | null) => void;
   onDecreaseHeadCount: () => void;
   onIncreaseHeadCount: () => void;
   onSelectTimeSlot: (slot: TimeSlot) => () => void;
+  tileDisabled: (props: { date: Date; view: string }) => boolean;
 }
 
 /**
  * @description PC(2xl+) 전용 예약 카드
  */
 export function DesktopReservationCard({
+  pricePerPerson,
   selectedDate,
   currentDate,
   monthTitle,
   headCount,
   totalPrice,
   selectedTimeSlot,
+  availableTimeSlots,
+  hasSelectableDate,
   onDateChange,
   onMonthChange,
   onDecreaseHeadCount,
   onIncreaseHeadCount,
   onSelectTimeSlot,
+  tileDisabled,
 }: DesktopReservationCardProps) {
   return (
     <aside className="hidden w-full 2xl:block">
@@ -44,7 +51,9 @@ export function DesktopReservationCard({
         <div className="max-h-[calc(100dvh-(--spacing(24))-(--spacing(10)))] overflow-x-hidden overflow-y-auto overscroll-contain p-8">
           <div className="mx-auto w-88">
             <div className="flex items-end">
-              <span className="typo-2xl-bold text-gray-950">₩1,000</span>
+              <span className="typo-2xl-bold text-gray-950">
+                ₩{new Intl.NumberFormat('ko-KR').format(pricePerPerson)}
+              </span>
               <span className="typo-xl-medium ml-1 text-gray-600">/ 인</span>
             </div>
 
@@ -55,6 +64,7 @@ export function DesktopReservationCard({
                 monthTitle={monthTitle}
                 onDateChange={onDateChange}
                 onMonthChange={onMonthChange}
+                tileDisabled={tileDisabled}
                 className="activity-booking-calendar"
               />
             </div>
@@ -85,16 +95,24 @@ export function DesktopReservationCard({
             <div className="mt-6">
               <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
               <div className="mt-3.5 mb-6 flex flex-col gap-3">
-                {MOCK_TIME_SLOTS.map((slot) => (
-                  <TimeSlotButton
-                    key={slot}
-                    size="pc"
-                    isActive={selectedTimeSlot === slot}
-                    onClick={onSelectTimeSlot(slot)}
-                  >
-                    {slot}
-                  </TimeSlotButton>
-                ))}
+                {availableTimeSlots.length > 0 ? (
+                  availableTimeSlots.map((slot) => (
+                    <TimeSlotButton
+                      key={slot.id}
+                      size="pc"
+                      isActive={selectedTimeSlot?.id === slot.id}
+                      onClick={onSelectTimeSlot(slot)}
+                    >
+                      {slot.startTime} ~ {slot.endTime}
+                    </TimeSlotButton>
+                  ))
+                ) : selectedDate ? (
+                  <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
+                    {hasSelectableDate
+                      ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
+                      : '예약 가능한 날짜가 없습니다.'}
+                  </p>
+                ) : null}
               </div>
             </div>
 
@@ -105,7 +123,11 @@ export function DesktopReservationCard({
                   {new Intl.NumberFormat('ko-KR').format(totalPrice)}원
                 </span>
               </div>
-              <Button size="sm" className="w-30">
+              <Button
+                size="sm"
+                className="w-30"
+                disabled={!selectedTimeSlot || !hasSelectableDate}
+              >
                 예약하기
               </Button>
             </div>

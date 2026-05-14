@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { patchActivities } from '@/app/(main)/activity/apis/activities';
+import { ApiError } from '@/shared/apis/apiError';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { useShowToast } from '@/shared/store/useToastStore';
 
@@ -25,10 +26,13 @@ export const usePatchActivities = () => {
     },
     onError: (error) => {
       console.error('체험 수정 실패:', error);
-      showToast({
-        theme: 'error',
-        message: '체험 수정에 실패했습니다. 다시 시도해 주세요.',
-      });
+
+      const message =
+        error instanceof ApiError && error.status === 400
+          ? error.message
+          : '체험 수정에 실패했습니다. 다시 시도해 주세요.';
+
+      showToast({ theme: 'error', message });
     },
   });
 };

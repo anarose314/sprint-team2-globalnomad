@@ -1,6 +1,9 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ActivityEditForm } from '@/app/(main)/activity/[id]/edit/components/activity-edit-form';
 import { ActivityEditPageProps } from '@/app/(main)/activity/[id]/edit/edit.types';
+import { ActivityFormSkeleton } from '@/app/(main)/activity/components/activity-form-skeleton';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { Heading } from '@/shared/components/heading';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
@@ -29,10 +32,16 @@ export default async function ActivityEditPage({
   const { id } = await params;
   const activityId = Number(id);
 
+  if (!Number.isFinite(activityId)) {
+    notFound();
+  }
+
   return (
     <div className="mx-auto mt-7.5 mb-9 w-full max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
       <Heading>내 체험 수정</Heading>
-      <ActivityEditForm activityId={activityId} />
+      <Suspense fallback={<ActivityFormSkeleton />}>
+        <ActivityEditForm activityId={activityId} />
+      </Suspense>
     </div>
   );
 }

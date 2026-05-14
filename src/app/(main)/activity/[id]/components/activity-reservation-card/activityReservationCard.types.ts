@@ -12,7 +12,8 @@ export type CalendarValue = Parameters<
   NonNullable<CalendarProps['onChange']>
 >[0];
 
-/**
- * @description 목업 예약 시간 슬롯 타입
- */
-export type TimeSlot = '14:00-15:00' | '15:00-16:00' | '16:00-17:00';
+export interface TimeSlot {
+  id: number;
+  startTime: string;
+  endTime: string;
+}

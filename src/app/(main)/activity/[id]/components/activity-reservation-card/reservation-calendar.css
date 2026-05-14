@@ -121,11 +121,35 @@
  * - 선택(`--active`)
  * - hover/focus
  */
-.activity-booking-calendar .react-calendar__tile--now > abbr {
-  @apply typo-lg-bold bg-primary-100 text-primary-500;
+.activity-booking-calendar
+  .react-calendar__tile--now:not(.react-calendar__tile--active)
+  > abbr {
+  @apply typo-lg-bold bg-gray-300 text-white;
 }
 
 .activity-booking-calendar .react-calendar__tile--active > abbr {
+  @apply typo-lg-bold bg-primary-500 text-white;
+}
+
+/* 주말 타일은 기본 색보다 active 색(흰색)을 우선 적용 */
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--active:nth-child(7n + 1)
+  > abbr,
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--active:nth-child(7n)
+  > abbr {
+  @apply text-white;
+}
+
+/**
+ * @description
+ * 오늘 날짜와 선택 날짜가 겹치면 선택 스타일을 우선 적용
+ */
+.activity-booking-calendar
+  .react-calendar__tile--now.react-calendar__tile--active
+  > abbr {
   @apply typo-lg-bold bg-primary-500 text-white;
 }
 
@@ -137,6 +161,35 @@
 .activity-booking-calendar .react-calendar__tile--active:enabled:hover > abbr,
 .activity-booking-calendar .react-calendar__tile--active:enabled:focus > abbr {
   @apply bg-primary-500 text-white;
+}
+
+.activity-booking-calendar
+  .react-calendar__tile--now:not(.react-calendar__tile--active):enabled:hover
+  > abbr,
+.activity-booking-calendar
+  .react-calendar__tile--now:not(.react-calendar__tile--active):enabled:focus
+  > abbr {
+  @apply bg-gray-300 text-white;
+}
+
+/**
+ * @description
+ * 예약 불가 날짜(비활성 타일) 스타일
+ * - 날짜 숫자를 흐리게 표시
+ * - 오늘/선택 상태보다 우선 적용
+ */
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button:disabled:not(.react-calendar__tile--now)
+  > abbr,
+.activity-booking-calendar
+  .react-calendar__tile--active:disabled:not(.react-calendar__tile--now)
+  > abbr {
+  @apply bg-transparent text-gray-300;
+}
+
+.activity-booking-calendar .react-calendar__month-view__days button:disabled {
+  @apply cursor-not-allowed;
 }
 
 /**

@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchActivityReviews } from '@/app/(main)/activity/[id]/apis/activityReviews';
 import { ActivityReviews } from '@/app/(main)/activity/[id]/components/activity-reviews';
 import {
   ActivityReviewsResponse,
   ActivityReviewsSectionProps,
 } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviews.types';
-import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
+import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 
 const REVIEW_PAGE_SIZE = 3;
 const INITIAL_REVIEWS_RESPONSE: ActivityReviewsResponse = {
@@ -19,76 +21,49 @@ export function ActivityReviewsSection({
   activityId,
   className,
 }: ActivityReviewsSectionProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [reviewData, setReviewData] = useState<ActivityReviewsResponse>(
-    INITIAL_REVIEWS_RESPONSE
+  return (
+    <ActivityReviewsSectionInner
+      key={activityId}
+      activityId={activityId}
+      className={className}
+    />
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+}
+
+function ActivityReviewsSectionInner({
+  activityId,
+  className,
+}: ActivityReviewsSectionProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const {
+    data: reviewData = INITIAL_REVIEWS_RESPONSE,
+    isLoading,
+    error,
+  } = useQuery<ActivityReviewsResponse>({
+    queryKey: [
+      ...QUERY_KEYS.ACTIVITY_REVIEWS,
+      activityId,
+      currentPage,
+      REVIEW_PAGE_SIZE,
+    ],
+    queryFn: () =>
+      fetchActivityReviews({
+        activityId,
+        page: currentPage,
+        size: REVIEW_PAGE_SIZE,
+      }),
+    placeholderData: (previousData) => previousData,
+  });
 
   const totalPages = useMemo(() => {
     return Math.ceil(reviewData.totalCount / REVIEW_PAGE_SIZE);
   }, [reviewData.totalCount]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    setReviewData(INITIAL_REVIEWS_RESPONSE);
-  }, [activityId]);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchReviews = async () => {
-      try {
-        setIsLoading(true);
-        setErrorMessage(null);
-
-        const response = await fetchInstanceClient<ActivityReviewsResponse>(
-          `/api/proxy/activities/${activityId}/reviews`,
-          {
-            params: {
-              page: currentPage,
-              size: REVIEW_PAGE_SIZE,
-            },
-          }
-        );
-
-        if (isCancelled) {
-          return;
-        }
-
-        setReviewData({
-          averageRating: response.averageRating ?? 0,
-          totalCount: response.totalCount ?? 0,
-          reviews: response.reviews ?? [],
-        });
-      } catch {
-        if (isCancelled) {
-          return;
-        }
-        setErrorMessage('후기를 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchReviews();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [activityId, currentPage]);
-
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
+  const normalizedCurrentPage =
+    totalPages > 0 ? Math.min(currentPage, totalPages) : currentPage;
 
   const handlePageChange = (page: number) => {
-    if (isLoading || page === currentPage) {
+    if (isLoading || page === normalizedCurrentPage) {
       return;
     }
     setCurrentPage(page);
@@ -100,10 +75,10 @@ export function ActivityReviewsSection({
       totalCount={reviewData.totalCount}
       reviews={reviewData.reviews}
       totalPages={totalPages}
-      currentPage={currentPage}
+      currentPage={normalizedCurrentPage}
       onPageChange={handlePageChange}
       isLoading={isLoading}
-      errorMessage={errorMessage}
+      errorMessage={error ? '후기를 불러오는 중 오류가 발생했습니다.' : null}
       className={className}
     />
   );
