@@ -119,9 +119,6 @@ export const GET = async (
   context: { params: Promise<{ path: string[] }> }
 ) => handleProxyRequest(request, context, 'GET');
 
-/**
- * DELETE 요청을 외부 API로 프록시
- */
 export const DELETE = async (
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> }
