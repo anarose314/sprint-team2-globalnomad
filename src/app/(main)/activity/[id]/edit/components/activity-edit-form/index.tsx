@@ -33,6 +33,7 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
     const originalSchedules = activityData.schedules || [];
     const finalSchedules = data.schedules;
 
+    // 최종 목록에 없는 기존 스케쥴 삭제
     const scheduleIdsToRemove = originalSchedules
       .filter(
         (orig) =>
@@ -40,14 +41,33 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
       )
       .map((orig) => orig.id);
 
-    const schedulesToAdd = finalSchedules
-      .filter(
-        (final) =>
-          !originalSchedules.some(
-            (orig) => String(orig.id) === String(final.id)
-          )
-      )
-      .map(({ id: _id, ...rest }) => rest);
+    // id는 있지만 내용이 달라진 스케쥴 감지
+    const modifiedSchedules = finalSchedules.filter((final) => {
+      const original = originalSchedules.find(
+        (orig) => String(orig.id) === String(final.id)
+      );
+      if (!original) return false;
+      return (
+        original.date !== final.date ||
+        original.startTime !== final.startTime ||
+        original.endTime !== final.endTime
+      );
+    });
+
+    const modifiedIds = modifiedSchedules.map((s) => Number(s.id));
+    const finalScheduleIdsToRemove = [...scheduleIdsToRemove, ...modifiedIds];
+
+    const schedulesToAdd = [
+      ...finalSchedules
+        .filter(
+          (final) =>
+            !originalSchedules.some(
+              (orig) => String(orig.id) === String(final.id)
+            )
+        )
+        .map(({ id: _id, ...rest }) => rest),
+      ...modifiedSchedules.map(({ id: _id, ...rest }) => rest),
+    ];
 
     // [3] 최종 Payload 조립 및 API 호출
     const payload = {
@@ -61,7 +81,7 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
         bannerImageUrl: data.bannerImageUrl,
         subImageIdsToRemove,
         subImageUrlsToAdd,
-        scheduleIdsToRemove,
+        scheduleIdsToRemove: finalScheduleIdsToRemove,
         schedulesToAdd,
       },
     };
