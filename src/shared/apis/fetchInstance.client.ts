@@ -113,7 +113,14 @@ export const fetchInstanceClient = async <T>(
     }
 
     // 갱신 성공 — 원래 요청을 한 번만 재시도
-    // 재시도가 또 401이면 무한 루프 방지 위해 그대로 throw
-    return fetchInstance<T>(endpoint, requestOptions);
+    // 재시도도 401이면 세션이 회복 불가능한 상태로 간주 → 세션 만료 처리
+    try {
+      return await fetchInstance<T>(endpoint, requestOptions);
+    } catch (retryError) {
+      if (retryError instanceof ApiError && retryError.status === 401) {
+        handleSessionExpired();
+      }
+      throw retryError;
+    }
   }
 };

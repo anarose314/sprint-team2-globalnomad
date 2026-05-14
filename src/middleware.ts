@@ -30,5 +30,5 @@ export const middleware = (request: NextRequest) => {
  * 추후 인증 필요한 다른 경로가 추가되면 matcher에 패턴 추가.
  */
 export const config = {
-  matcher: ['/my/:path*'],
+  matcher: ['/my', '/my/:path*'],
 };
