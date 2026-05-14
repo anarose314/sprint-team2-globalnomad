@@ -5,13 +5,14 @@ import { ModalBase } from '@/shared/components/modal/ModalBase';
 
 interface ReviewModalProps {
   title: string;
-  dateText: string;
+  description: string;
   reviewText: string;
   selectedRating: number;
   onRatingChange: (rating: number) => void;
   onReviewTextChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
+  isPending: boolean;
 }
 
 const SECTION_TITLE = '소중한 경험을 들려주세요';
@@ -28,7 +29,7 @@ const MAX_LENGTH = 100;
  * @example *
  * <ReviewModal *
  *   title="함께 배우면 즐거운 스트릿 댄스"
- *   dateText="2023.02.14 / 11:00 - 12:30"
+ *   description="2023.02.14 / 11:00 - 12:30"
  *   reviewText={reviewText}
  *   selectedRating={rating}
  *   onRatingChange={setRating}
@@ -39,36 +40,39 @@ const MAX_LENGTH = 100;
  */
 export function ReviewModal({
   title,
-  dateText,
+  description,
   reviewText,
   selectedRating,
   onRatingChange,
   onReviewTextChange,
   onClose,
   onSubmit,
+  isPending,
 }: ReviewModalProps) {
   return (
     <ModalBase
-      className="h-130.75 max-w-96.25"
+      className="max-h-9/10 max-w-96.25 overflow-y-auto"
       bodyClassName="px-7.5 pt-6 pb-7.5"
       onClose={onClose}
     >
-      <div className="relative flex h-full flex-col">
-        <div className="mt-8.5 flex flex-col items-center">
+      <div className="mt-2 flex h-full flex-col">
+        {/* 타이틀 & 날짜 */}
+        <div className="flex w-full flex-col items-center gap-1.5">
           <Heading
             as="h2"
             textStyle="typo-lg-bold"
-            className="text-center text-gray-950"
+            className="w-full truncate text-center text-gray-950"
           >
             {title}
           </Heading>
-
-          <p className="typo-md-medium mt-1.5 text-center leading-normal text-gray-500">
-            {dateText}
+          <p className="typo-md-medium text-center leading-normal text-gray-500">
+            {description}
           </p>
         </div>
 
-        <div className="mt-5 flex items-center justify-center gap-2">
+        {/* 별점 */}
+        <div className="mx-auto mt-3.5 grid w-full max-w-60 grid-cols-5 gap-2 sm:mt-2.5 sm:gap-3">
+          {' '}
           {Array.from({ length: 5 }).map((_, index) => {
             const rating = index + 1;
             const isFilled = rating <= selectedRating;
@@ -80,16 +84,18 @@ export function ReviewModal({
                 aria-label={`${rating}점`}
                 aria-pressed={isFilled}
                 onClick={() => onRatingChange(rating)}
+                className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
               >
                 <IcStar
-                  className={`h-10 w-10 ${isFilled ? 'text-yellow-400' : 'text-gray-200'}`}
+                  className={`h-auto w-full ${isFilled ? 'text-yellow-500' : 'text-gray-200'}`}
                 />
               </button>
             );
           })}
         </div>
 
-        <div className="mt-7.5 flex flex-col gap-4">
+        {/* 입력 */}
+        <div className="mt-7.5 flex flex-col">
           <p className="typo-2lg-bold text-gray-950">{SECTION_TITLE}</p>
 
           <textarea
@@ -97,22 +103,23 @@ export function ReviewModal({
             onChange={(e) => onReviewTextChange(e.target.value)}
             maxLength={MAX_LENGTH}
             placeholder={PLACEHOLDER}
-            className="typo-lg-medium h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 leading-normal text-gray-950 outline-none placeholder:text-gray-400"
+            className="typo-lg-medium mt-4 h-42 w-full resize-none rounded-2xl border border-gray-100 bg-white px-5 py-5 leading-normal text-gray-950 outline-none placeholder:text-gray-400"
           />
-        </div>
-
-        <div className="mt-auto flex flex-col gap-4">
-          <p className="typo-md-medium mt-1 text-right leading-none text-gray-500">
+          <p className="typo-md-medium mt-2 text-right leading-none text-gray-500">
             {reviewText.length}/{MAX_LENGTH}
           </p>
+        </div>
 
+        {/* 버튼 */}
+        <div className="mt-4.5">
           <Button
             variant="primary"
             size="lg"
             onClick={onSubmit}
             className="w-full"
+            disabled={isPending}
           >
-            작성하기
+            {isPending ? '리뷰 작성 중...' : '작성하기'}
           </Button>
         </div>
       </div>
