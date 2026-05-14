@@ -24,7 +24,6 @@ function ImageSlot({
           src={src}
           alt={alt}
           fill
-          unoptimized
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover"
         />
