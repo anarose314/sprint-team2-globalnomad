@@ -11,9 +11,9 @@ export const usePatchActivities = () => {
 
   return useMutation({
     mutationFn: patchActivities,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ACTIVITIES],
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ACTIVITIES,
       });
 
       showToast({

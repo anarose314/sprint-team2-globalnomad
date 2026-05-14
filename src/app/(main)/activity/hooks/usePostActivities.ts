@@ -15,9 +15,9 @@ export const usePostActivities = () => {
 
   return useMutation({
     mutationFn: postActivities,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ACTIVITIES],
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ACTIVITIES,
       });
 
       showToast({
