@@ -54,6 +54,16 @@ export function ReservationDetailSheetRequestList({
     return toReservationBadgeStatus(requestStatus);
   };
 
+  const getEmptyMessage = () => {
+    const hasConfirmed = selectedTimeSlotCount.confirmed > 0;
+    if (activeTab === 'pending' && hasConfirmed)
+      return '승인된 예약이 있습니다.';
+    if (activeTab === 'declined' && hasConfirmed)
+      return '거절된 예약이 없습니다.';
+    if (isDateReservationEmpty) return '해당 날짜에 예약 내역이 없습니다.';
+    return '해당 시간대에 예약 내역이 없습니다.';
+  };
+
   if (isLoading) {
     return (
       <p className="reservation-detail-sheet__empty">
@@ -63,17 +73,9 @@ export function ReservationDetailSheetRequestList({
   }
 
   if (isEmpty) {
-    const hasConfirmedReservations = selectedTimeSlotCount.confirmed > 0;
-    const emptyMessage =
-      activeTab === 'pending' && hasConfirmedReservations
-        ? '승인된 예약이 있습니다.'
-        : activeTab === 'declined' && hasConfirmedReservations
-          ? '거절된 예약이 없습니다.'
-          : isDateReservationEmpty
-            ? '해당 날짜에 예약 내역이 없습니다.'
-            : '해당 시간대에 예약 내역이 없습니다.';
-
-    return <p className="reservation-detail-sheet__empty">{emptyMessage}</p>;
+    return (
+      <p className="reservation-detail-sheet__empty">{getEmptyMessage()}</p>
+    );
   }
 
   return (
