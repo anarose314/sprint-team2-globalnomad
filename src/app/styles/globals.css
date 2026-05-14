@@ -10,6 +10,7 @@
   /* Z-Index */
   --z-index-base: 10; /* Base Content */
   --z-index-header: 100; /* Navigation & Layout */
+  --z-index-not-found: 200; /* Not Found */
   --z-index-dropdown: 500; /* Floating UI */
   --z-index-modal-backdrop: 900; /* Full-screen Overlays */
   --z-index-modal: 1000; /* Full-screen Overlays */

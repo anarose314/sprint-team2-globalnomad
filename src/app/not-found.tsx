@@ -7,7 +7,7 @@ import { Heading } from '@/shared/components/heading';
 
 export default function NotFound() {
   return (
-    <div className="bg-gray-25 flex min-h-screen flex-col items-center justify-center px-6 pb-26">
+    <div className="bg-gray-25 z-not-found fixed inset-0 flex min-h-screen flex-col items-center justify-center px-6 pb-26">
       <Link href="/" className="mb-7" aria-label="홈으로 이동">
         <LogoIcon width={120} height={120} />
       </Link>
