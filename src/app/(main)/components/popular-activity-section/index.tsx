@@ -3,6 +3,7 @@
 import {
   type UIEvent,
   useCallback,
+  useRef,
   useState,
   useSyncExternalStore,
 } from 'react';
@@ -51,6 +52,7 @@ const getServerDesktopLayoutSnapshot = () => false;
  */
 export function PopularActivitySection() {
   const [desktopPageIndex, setDesktopPageIndex] = useState(0);
+  const isLoadNextPageLockedRef = useRef(false);
 
   const {
     data,
@@ -82,16 +84,27 @@ export function PopularActivitySection() {
   const activities = isDesktopLayout ? desktopActivities : allActivities;
 
   const canLoadNextPage = Boolean(hasNextPage) && !isFetchingNextPage;
+
   const canMovePreviousDesktopPage =
     isDesktopLayout && safeDesktopPageIndex > 0;
+
   const canMoveNextDesktopPage =
     isDesktopLayout &&
-    (safeDesktopPageIndex < desktopPages.length - 1 || canLoadNextPage);
+    (safeDesktopPageIndex < desktopPages.length - 1 || Boolean(hasNextPage));
 
-  const loadNextPage = useCallback(() => {
-    if (!canLoadNextPage) return;
+  const shouldShowPreviousButton = canMovePreviousDesktopPage;
+  const shouldShowNextButton = canMoveNextDesktopPage;
 
-    void fetchNextPage();
+  const loadNextPage = useCallback(async () => {
+    if (!canLoadNextPage || isLoadNextPageLockedRef.current) return null;
+
+    isLoadNextPageLockedRef.current = true;
+
+    try {
+      return await fetchNextPage();
+    } finally {
+      isLoadNextPageLockedRef.current = false;
+    }
   }, [canLoadNextPage, fetchNextPage]);
 
   const handlePreviousButtonClick = () => {
@@ -100,7 +113,7 @@ export function PopularActivitySection() {
 
   const handleNextButtonClick = async () => {
     if (!isDesktopLayout) {
-      loadNextPage();
+      await loadNextPage();
       return;
     }
 
@@ -111,11 +124,9 @@ export function PopularActivitySection() {
       return;
     }
 
-    if (!canLoadNextPage) return;
-
-    const result = await fetchNextPage();
+    const result = await loadNextPage();
     const nextDesktopPages =
-      result.data?.pages.filter((page) => page.activities.length > 0) ?? [];
+      result?.data?.pages.filter((page) => page.activities.length > 0) ?? [];
 
     if (nextDesktopPages[nextPageIndex]) {
       setDesktopPageIndex(nextPageIndex);
@@ -130,7 +141,7 @@ export function PopularActivitySection() {
       scrollLeft + clientWidth >= scrollWidth - SCROLL_LOAD_THRESHOLD;
 
     if (isNearEnd) {
-      loadNextPage();
+      void loadNextPage();
     }
   };
 
@@ -163,62 +174,52 @@ export function PopularActivitySection() {
       )}
 
       {!isPending && !isError && activities.length > 0 && (
-        <>
-          <div className="relative">
-            <ul
-              onScroll={handleHorizontalScroll}
-              className={cn(
-                'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4',
-                '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
-                'xs:auto-cols-[calc((100%-1rem)/2.1)]',
-                'md:mx-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:px-0',
-                '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible'
-              )}
-            >
-              {activities.map((activity) => (
-                <li key={activity.id} className="w-full">
-                  <ActivityCard activity={activity} />
-                </li>
-              ))}
-            </ul>
-
-            {isDesktopLayout && (
-              <button
-                type="button"
-                onClick={handlePreviousButtonClick}
-                disabled={!canMovePreviousDesktopPage}
-                aria-label="이전 인기 체험 보기"
-                className="shadow-card absolute top-1/2 left-0 hidden h-13.5 w-13.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white disabled:cursor-not-allowed disabled:opacity-50 2xl:flex"
-              >
-                <span
-                  aria-hidden="true"
-                  className="h-3 w-3 rotate-45 border-b-2 border-l-2 border-gray-950"
-                />
-              </button>
+        <div className="relative">
+          <ul
+            onScroll={handleHorizontalScroll}
+            className={cn(
+              'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4',
+              '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
+              'xs:auto-cols-[calc((100%-1rem)/2.1)]',
+              'md:mx-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:px-0',
+              '2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible'
             )}
+          >
+            {activities.map((activity) => (
+              <li key={activity.id} className="w-full">
+                <ActivityCard activity={activity} />
+              </li>
+            ))}
+          </ul>
 
+          {shouldShowPreviousButton && (
+            <button
+              type="button"
+              onClick={handlePreviousButtonClick}
+              aria-label="이전 인기 체험 보기"
+              className="shadow-card absolute top-1/2 left-0 hidden h-13.5 w-13.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white 2xl:flex"
+            >
+              <span
+                aria-hidden="true"
+                className="h-3 w-3 rotate-45 border-b-2 border-l-2 border-gray-950"
+              />
+            </button>
+          )}
+
+          {shouldShowNextButton && (
             <button
               type="button"
               onClick={handleNextButtonClick}
-              disabled={
-                isDesktopLayout ? !canMoveNextDesktopPage : !canLoadNextPage
-              }
               aria-label="인기 체험 더 불러오기"
-              className="shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white disabled:cursor-not-allowed disabled:opacity-50 2xl:flex"
+              className="shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white 2xl:flex"
             >
               <span
                 aria-hidden="true"
                 className="h-3 w-3 rotate-45 border-t-2 border-r-2 border-gray-950"
               />
             </button>
-          </div>
-
-          {isFetchingNextPage && (
-            <p className="typo-sm-medium mt-3 text-center text-gray-500">
-              인기 체험을 더 불러오는 중입니다.
-            </p>
           )}
-        </>
+        </div>
       )}
     </section>
   );
