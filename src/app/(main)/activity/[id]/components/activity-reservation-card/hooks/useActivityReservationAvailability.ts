@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
 import { fetchMyReservedSchedules } from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
 import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
@@ -29,6 +29,11 @@ const normalizeDateKey = (rawDate: string) => {
   }
 
   return formatDateKey(parsed);
+};
+
+const parseYearMonthFromDateKey = (dateKey: string) => {
+  const [year, month] = dateKey.split('-').map(Number);
+  return { year, month };
 };
 
 const parseTimeToHourMinute = (time: string) => {
@@ -91,17 +96,50 @@ export const useActivityReservationAvailability = ({
   schedules,
   reservedScheduleIds,
 }: UseActivityReservationAvailabilityProps) => {
-  const {
-    data: availableSchedules = [],
-    isLoading: isAvailableSchedulesLoading,
-    isError: isAvailableSchedulesError,
-  } = useQuery({
-    queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
-    queryFn: () =>
-      fetchActivityAvailableSchedule({
+  const queryTargetMonths = useMemo(() => {
+    const uniqueYearMonth = new Set<string>();
+
+    schedules.forEach((schedule) => {
+      const dateKey = normalizeDateKey(schedule.date);
+      const { year, month } = parseYearMonthFromDateKey(dateKey);
+      if (Number.isInteger(year) && Number.isInteger(month)) {
+        uniqueYearMonth.add(`${year}-${String(month).padStart(2, '0')}`);
+      }
+    });
+
+    return Array.from(uniqueYearMonth).map((yearMonth) => {
+      const [year, month] = yearMonth.split('-').map(Number);
+      return { year, month };
+    });
+  }, [schedules]);
+
+  const availableScheduleQueries = useQueries({
+    queries: queryTargetMonths.map(({ year, month }) => ({
+      queryKey: [
+        ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
         activityId,
-      }),
+        year,
+        month,
+      ],
+      queryFn: () =>
+        fetchActivityAvailableSchedule({
+          activityId,
+          year,
+          month,
+        }),
+    })),
   });
+
+  const availableSchedules = useMemo(
+    () => availableScheduleQueries.flatMap((query) => query.data ?? []),
+    [availableScheduleQueries]
+  );
+  const isAvailableSchedulesLoading = availableScheduleQueries.some(
+    (query) => query.isLoading
+  );
+  const isAvailableSchedulesError = availableScheduleQueries.some(
+    (query) => query.isError
+  );
 
   const { data: myReservedSchedules = [] } = useQuery({
     queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
