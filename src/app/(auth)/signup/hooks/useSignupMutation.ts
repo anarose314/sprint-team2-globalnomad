@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { signup } from '@/shared/apis/auth/signup';
+import { useShowToast } from '@/shared/store/useToastStore';
 
 /**
  * 회원가입 mutation hook.
@@ -19,6 +20,7 @@ import { signup } from '@/shared/apis/auth/signup';
  * 에러 케이스별 처리는 호출부에서 mutate 의 onError 옵션으로.
  */
 export const useSignupMutation = () => {
+  const showToast = useShowToast();
   const router = useRouter();
 
   return useMutation({
@@ -26,7 +28,10 @@ export const useSignupMutation = () => {
     onSuccess: (data) => {
       // 부분 실패 — 회원가입은 성공했지만 자동 로그인 실패
       if (!data.user && data.message) {
-        alert(data.message);
+        showToast({
+          theme: 'warning',
+          message: data.message,
+        });
         router.push('/login');
         return;
       }

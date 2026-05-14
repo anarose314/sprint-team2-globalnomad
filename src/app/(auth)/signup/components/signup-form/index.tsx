@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthFooter } from '@/app/(auth)/components/auth-footer';
@@ -11,10 +10,10 @@ import {
 import { useSignupMutation } from '@/app/(auth)/signup/hooks/useSignupMutation';
 import { ApiError } from '@/shared/apis/apiError';
 import type { SignupRequest } from '@/shared/apis/auth/auth.types';
-import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { LogoIcon, LogoVertical } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
+import { useShowToast } from '@/shared/store/useToastStore';
 
 /**
  * 회원가입 폼 컴포넌트.
@@ -26,10 +25,7 @@ import { Input } from '@/shared/components/input';
  * API 연동은 별도 단계에서 진행한다.
  */
 export function SignupForm() {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] =
-    useState(false);
-
+  const showToast = useShowToast();
   const {
     register,
     handleSubmit,
@@ -56,18 +52,18 @@ export function SignupForm() {
 
     mutate(signupData, {
       onError: (error) => {
-        // 409 Conflict — 이메일 중복
-        // (백엔드는 이메일만 unique 제약, 닉네임은 중복 OK)
+        // 409 Conflict — 이메일 중복 (input 에러로 표시)
         if (error instanceof ApiError && error.status === 409) {
           setError('email', { message: error.message });
           return;
         }
 
-        // 그 외 에러는 alert (fallback)
-        console.error('회원가입 실패:', error);
-        alert(
-          error instanceof Error ? error.message : '회원가입에 실패했습니다.'
-        );
+        // 그 외 에러는 토스트 (fallback)
+        showToast({
+          theme: 'error',
+          message:
+            error instanceof Error ? error.message : '회원가입에 실패했습니다.',
+        });
       },
     });
   };
@@ -104,58 +100,22 @@ export function SignupForm() {
           errorMessage={errors.nickname?.message}
           {...register('nickname')}
         />
-        {/*
-         * TODO: 공통 Input(shared/components/input)에 비밀번호 토글 기능이 추가되면
-         *       아래 rightIcon 인라인 토글을 제거하고 <Input type="password" /> 한 줄로 단순화.
-         */}
         <Input
           label="비밀번호"
-          type={isPasswordVisible ? 'text' : 'password'}
+          type="password"
           placeholder="8자 이상 입력해 주세요"
           autoComplete="new-password"
           errorMessage={errors.password?.message}
           {...register('password')}
-          rightIcon={
-            <button
-              type="button"
-              onClick={() => setIsPasswordVisible((prev) => !prev)}
-              aria-label={
-                isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'
-              }
-              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-            >
-              {isPasswordVisible ? (
-                <IcEyeOn className="h-5 w-5" />
-              ) : (
-                <IcEyeOff className="h-5 w-5" />
-              )}
-            </button>
-          }
         />
 
         <Input
           label="비밀번호 확인"
-          type={isPasswordConfirmVisible ? 'text' : 'password'}
+          type="password"
           placeholder="비밀번호를 한 번 더 입력해 주세요"
           autoComplete="new-password"
           errorMessage={errors.passwordConfirm?.message}
           {...register('passwordConfirm')}
-          rightIcon={
-            <button
-              type="button"
-              onClick={() => setIsPasswordConfirmVisible((prev) => !prev)}
-              aria-label={
-                isPasswordConfirmVisible ? '비밀번호 숨기기' : '비밀번호 보기'
-              }
-              className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-            >
-              {isPasswordConfirmVisible ? (
-                <IcEyeOn className="h-5 w-5" />
-              ) : (
-                <IcEyeOff className="h-5 w-5" />
-              )}
-            </button>
-          }
         />
 
         <Button type="submit" size="lg" disabled={!isValid || isPending}>
