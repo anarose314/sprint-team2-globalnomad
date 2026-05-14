@@ -1,5 +1,6 @@
 export interface HeaderUser {
-  name: string;
+  nickname: string;
+  profileImageUrl: string | null;
 }
 
 export interface HeaderProps {
