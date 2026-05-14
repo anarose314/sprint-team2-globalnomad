@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchActivitySchedules } from '@/app/(main)/my/activities-dashboard/apis/activitySchedules';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import {
@@ -9,6 +8,17 @@ import {
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { formatDateKey } from '@/shared/utils/formatDate';
+
+const normalizeTimeWithSeconds = (time: string) => {
+  const [hour = '00', minute = '00', second = '00'] = time.split(':');
+  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
+};
+
+const isScheduleEnded = (dateKey: string, endTime: string, now: Date) => {
+  const endAt = new Date(`${dateKey}T${normalizeTimeWithSeconds(endTime)}`);
+  return !Number.isNaN(endAt.getTime()) && endAt.getTime() <= now.getTime();
+};
 
 interface UseReservationCalendarDataProps {
   activityId: number | null;
@@ -59,85 +69,24 @@ export const useReservationCalendarData = ({
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
-  const { data: activitySchedules = [] } = useQuery({
-    queryKey: [...QUERY_KEYS.MY_ACTIVITY_DATE_SCHEDULES, activityId],
-    queryFn: () =>
-      fetchActivitySchedules({
-        activityId: activityId as number,
-      }),
-    enabled: activityId !== null,
-  });
-
-  const missingDeclinedDateKeys = useMemo(
-    () =>
-      reservationDashboard
-        .filter(
-          (item) =>
-            !Number.isFinite(item.reservations.declined as unknown as number)
-        )
-        .map((item) => item.date)
-        .filter(Boolean),
-    [reservationDashboard]
-  );
-
-  const { data: declinedFallbackByDate = {} } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      currentYear,
-      currentMonth,
-      missingDeclinedDateKeys.join(','),
-    ],
-    queryFn: async () => {
-      if (activityId === null || missingDeclinedDateKeys.length === 0) {
-        return {} as Record<string, number>;
-      }
-
-      const results = await Promise.all(
-        missingDeclinedDateKeys.map(async (dateKey) => {
-          const schedules = await fetchReservedSchedule({
-            activityId,
-            date: dateKey,
-          });
-
-          const declined = schedules.reduce(
-            (accumulator, schedule) =>
-              accumulator + Math.max(schedule.count.declined, 0),
-            0
-          );
-
-          return [dateKey, declined] as const;
-        })
-      );
-
-      return results.reduce<Record<string, number>>((accumulator, entry) => {
-        const [dateKey, declined] = entry;
-        accumulator[dateKey] = declined;
-        return accumulator;
-      }, {});
-    },
-    enabled: activityId !== null && missingDeclinedDateKeys.length > 0,
-  });
-
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
+    const todayDateKey = formatDateKey(new Date());
     const eventCounts = reservationDashboard.reduce<
       Record<string, ReservationEventCounts>
     >((accumulator, item) => {
       const completed = Math.max(item.reservations.completed, 0);
       const confirmed = Math.max(item.reservations.confirmed, 0);
-      const declinedRaw = item.reservations.declined as unknown as number;
-      const declined = Number.isFinite(declinedRaw)
-        ? Math.max(declinedRaw, 0)
-        : Math.max(declinedFallbackByDate[item.date] ?? 0, 0);
       const pending = Math.max(item.reservations.pending, 0);
+      const isPastDate = item.date < todayDateKey;
+      const shiftedCompleted = isPastDate ? completed + confirmed : completed;
+      const shiftedConfirmed = isPastDate ? 0 : confirmed;
 
       const dailyEventCounts: ReservationEventCounts = {};
       if (pending > 0) dailyEventCounts.pending = pending;
-      if (confirmed > 0) dailyEventCounts.confirmed = confirmed;
-      if (declined > 0) dailyEventCounts.declined = declined;
-      if (completed > 0) dailyEventCounts.completed = completed;
+      if (shiftedConfirmed > 0) dailyEventCounts.confirmed = shiftedConfirmed;
+      if (shiftedCompleted > 0) dailyEventCounts.completed = shiftedCompleted;
 
       if (Object.keys(dailyEventCounts).length > 0) {
         accumulator[item.date] = dailyEventCounts;
@@ -148,29 +97,37 @@ export const useReservationCalendarData = ({
 
     // 현재 선택 날짜는 reserved-schedule 집계값으로 보정한다.
     if (reservedScheduleDateKey) {
+      const now = new Date();
       const normalized = reservedSchedules.reduce(
         (accumulator, schedule) => {
           accumulator.pending += Math.max(schedule.count.pending, 0);
-          accumulator.confirmed += Math.max(schedule.count.confirmed, 0);
-          accumulator.declined += Math.max(schedule.count.declined, 0);
+          const confirmedCount = Math.max(schedule.count.confirmed, 0);
+          if (confirmedCount > 0) {
+            if (
+              isScheduleEnded(reservedScheduleDateKey, schedule.endTime, now)
+            ) {
+              accumulator.completed += confirmedCount;
+            } else {
+              accumulator.confirmed += confirmedCount;
+            }
+          }
           return accumulator;
         },
-        { pending: 0, confirmed: 0, declined: 0 }
+        { pending: 0, confirmed: 0, completed: 0 }
       );
 
       const completed = Math.max(
         eventCounts[reservedScheduleDateKey]?.completed ?? 0,
         0
       );
+      const mergedCompleted = Math.max(completed, normalized.completed);
 
       const mergedDailyCounts: ReservationEventCounts = {};
       if (normalized.pending > 0)
         mergedDailyCounts.pending = normalized.pending;
       if (normalized.confirmed > 0)
         mergedDailyCounts.confirmed = normalized.confirmed;
-      if (normalized.declined > 0)
-        mergedDailyCounts.declined = normalized.declined;
-      if (completed > 0) mergedDailyCounts.completed = completed;
+      if (mergedCompleted > 0) mergedDailyCounts.completed = mergedCompleted;
 
       if (Object.keys(mergedDailyCounts).length > 0) {
         eventCounts[reservedScheduleDateKey] = mergedDailyCounts;
@@ -178,20 +135,13 @@ export const useReservationCalendarData = ({
     }
 
     return eventCounts;
-  }, [
-    declinedFallbackByDate,
-    reservationDashboard,
-    reservedScheduleDateKey,
-    reservedSchedules,
-  ]);
+  }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
     return buildReservationDetailData({
-      activitySchedules,
       reservedSchedules,
-      reservedScheduleDateKey,
     });
-  }, [activitySchedules, reservedScheduleDateKey, reservedSchedules]);
+  }, [reservedSchedules]);
 
   return {
     detailData,

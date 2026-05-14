@@ -3,7 +3,10 @@ import {
   ReservationTab,
   toReservationBadgeStatus,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
-import { ReservationRequestItem } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
+import {
+  ReservationRequestItem,
+  ReservationTimeSlotOption,
+} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { Button } from '@/shared/components/buttons/button';
 import { StatusBadge } from '@/shared/components/status-badge';
 
@@ -13,6 +16,7 @@ interface ReservationDetailSheetRequestListProps {
   isLoading: boolean;
   isDateReservationEmpty: boolean;
   requests: ReservationRequestItem[];
+  selectedTimeSlotCount: ReservationTimeSlotOption['count'];
   isSelectedTimeSlotEnded: boolean;
   isUpdatingStatus: boolean;
   hasMoreRequests: boolean;
@@ -34,6 +38,7 @@ export function ReservationDetailSheetRequestList({
   isLoading,
   isDateReservationEmpty,
   requests,
+  selectedTimeSlotCount,
   isSelectedTimeSlotEnded,
   isUpdatingStatus,
   hasMoreRequests,
@@ -58,13 +63,17 @@ export function ReservationDetailSheetRequestList({
   }
 
   if (isEmpty) {
-    return (
-      <p className="reservation-detail-sheet__empty">
-        {isDateReservationEmpty
-          ? '해당 날짜에 예약 내역이 없습니다.'
-          : '해당 시간대에 예약 내역이 없습니다.'}
-      </p>
-    );
+    const hasConfirmedReservations = selectedTimeSlotCount.confirmed > 0;
+    const emptyMessage =
+      activeTab === 'pending' && hasConfirmedReservations
+        ? '승인 내역이 존재합니다.'
+        : activeTab === 'declined' && hasConfirmedReservations
+          ? '거절된 예약이 없습니다.'
+          : isDateReservationEmpty
+            ? '해당 날짜에 예약 내역이 없습니다.'
+            : '해당 시간대에 예약 내역이 없습니다.';
+
+    return <p className="reservation-detail-sheet__empty">{emptyMessage}</p>;
   }
 
   return (

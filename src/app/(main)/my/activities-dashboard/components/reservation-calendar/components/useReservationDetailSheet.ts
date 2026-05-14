@@ -106,6 +106,7 @@ export const useReservationDetailSheet = ({
   return {
     activeTab,
     requests,
+    selectedTimeSlotCount: tabCount,
     isLoadingRequests,
     isFetchingNextPage,
     hasMoreRequests,

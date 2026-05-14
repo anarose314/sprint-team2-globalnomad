@@ -1,7 +1,4 @@
-import {
-  EMPTY_TIME_SLOT,
-  formatDetailDate,
-} from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
+import { formatDetailDate } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
 import { ReservationDetailSheetRequestList } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetRequestList';
 import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetTabs';
 import { useReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useReservationDetailSheet';
@@ -59,6 +56,7 @@ export function ReservationDetailSheet({
     confirmationModalMessage,
     feedbackModalMessage,
     isDateReservationEmpty,
+    selectedTimeSlotCount,
     setActiveTab,
     handleTimeSlotChange,
     handleApproveReservation,
@@ -81,7 +79,7 @@ export function ReservationDetailSheet({
         label: timeSlot.label,
         value: timeSlot.value,
       }))
-    : [{ label: EMPTY_TIME_SLOT, value: EMPTY_TIME_SLOT }];
+    : [];
 
   if (!isOpen) return null;
 
@@ -121,22 +119,23 @@ export function ReservationDetailSheet({
           />
 
           <div className="reservation-detail-sheet__content">
-            <div className="reservation-detail-sheet__section">
-              <p className="reservation-detail-sheet__section-title">
-                예약 시간
-              </p>
-              <Dropdown
-                options={timeSlotOptions}
-                value={selectedTimeSlotValue}
-                disabled={!detailData?.timeSlots.length}
-                optionHeight={44}
-                maxVisibleOptions={4}
-                className="reservation-detail-sheet__select-wrap"
-                triggerClassName="reservation-detail-sheet__select"
-                menuClassName="reservation-detail-sheet__select-menu"
-                onChange={handleTimeSlotChange}
-              />
-            </div>
+            {timeSlotOptions.length > 0 ? (
+              <div className="reservation-detail-sheet__section">
+                <p className="reservation-detail-sheet__section-title">
+                  예약 시간
+                </p>
+                <Dropdown
+                  options={timeSlotOptions}
+                  value={selectedTimeSlotValue}
+                  optionHeight={44}
+                  maxVisibleOptions={4}
+                  className="reservation-detail-sheet__select-wrap"
+                  triggerClassName="reservation-detail-sheet__select"
+                  menuClassName="reservation-detail-sheet__select-menu"
+                  onChange={handleTimeSlotChange}
+                />
+              </div>
+            ) : null}
 
             <div className="reservation-detail-sheet__section reservation-detail-sheet__section--requests">
               <p className="reservation-detail-sheet__section-title">
@@ -156,6 +155,7 @@ export function ReservationDetailSheet({
                   isLoading={isLoadingRequests}
                   isDateReservationEmpty={isDateReservationEmpty}
                   requests={requests}
+                  selectedTimeSlotCount={selectedTimeSlotCount}
                   isSelectedTimeSlotEnded={isSelectedTimeSlotEnded}
                   isUpdatingStatus={isUpdatingStatus}
                   hasMoreRequests={hasMoreRequests}

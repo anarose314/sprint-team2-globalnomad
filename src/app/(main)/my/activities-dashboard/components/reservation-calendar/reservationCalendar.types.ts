@@ -2,7 +2,7 @@ import { ReservationStatus } from '@/shared/constants/status.constants';
 
 export type ReservationEventStatus = Extract<
   ReservationStatus,
-  'pending' | 'confirmed' | 'declined' | 'completed'
+  'pending' | 'confirmed' | 'completed'
 >;
 
 export type ReservationEventCounts = Partial<

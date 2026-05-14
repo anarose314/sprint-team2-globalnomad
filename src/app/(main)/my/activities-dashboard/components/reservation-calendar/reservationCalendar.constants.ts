@@ -13,10 +13,6 @@ export const STATUS_META: Record<
     label: '승인',
     className: 'bg-orange-100 text-orange-700',
   },
-  declined: {
-    label: '거절',
-    className: 'bg-red-100 text-red-500',
-  },
   completed: {
     label: '완료',
     className: 'bg-gray-50 text-gray-500',
@@ -27,6 +23,5 @@ export const STATUS_META: Record<
 export const STATUS_POSITION_CLASS: Record<ReservationEventStatus, string> = {
   pending: 'reservation-calendar__event-badge--pending',
   confirmed: 'reservation-calendar__event-badge--confirmed',
-  declined: 'reservation-calendar__event-badge--declined',
-  completed: 'reservation-calendar__event-badge--completed',
+  completed: 'reservation-calendar__event-badge--declined',
 };
