@@ -63,7 +63,7 @@ export type PostActivities = {
   subImageUrls?: string[];
 };
 
-export interface PostActivitiesResponse {
+export interface ActivityMutationResponse {
   id: number;
   userId: number;
   title: string;
@@ -89,3 +89,19 @@ export interface PostActivitiesResponse {
     },
   ];
 }
+
+export type PatchActivities = {
+  activityId: number;
+  body: {
+    title: string;
+    category: string;
+    description: string;
+    price: number;
+    address: string;
+    bannerImageUrl: string;
+    subImageIdsToRemove: number[];
+    subImageUrlsToAdd: string[];
+    scheduleIdsToRemove: number[];
+    schedulesToAdd: CreateSchedule[];
+  };
+};

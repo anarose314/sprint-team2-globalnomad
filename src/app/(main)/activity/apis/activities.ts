@@ -1,9 +1,10 @@
 import type {
   ActivitiesResponse,
   ActivityImageResponse,
+  ActivityMutationResponse,
   FetchActivitiesParams,
+  PatchActivities,
   PostActivities,
-  PostActivitiesResponse,
 } from '@/app/(main)/activity/apis/activities.types';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
@@ -66,10 +67,26 @@ export const postActivityImage = async (file: File) => {
  * 체험 등록을 하는 API 호출 함수 (BFF 경유)
  */
 export const postActivities = async (body: PostActivities) => {
-  return await fetchInstanceClient<PostActivitiesResponse>(
+  return await fetchInstanceClient<ActivityMutationResponse>(
     `/api/proxy/activities`,
     {
       method: 'POST',
+      body,
+    }
+  );
+};
+
+/**
+ * 체험 수정을 하는 API 호출 함수 (BFF 경유)
+ */
+export const patchActivities = async ({
+  activityId,
+  body,
+}: PatchActivities) => {
+  return await fetchInstanceClient<ActivityMutationResponse>(
+    `/api/proxy/my-activities/${activityId}`,
+    {
+      method: 'PATCH',
       body,
     }
   );
