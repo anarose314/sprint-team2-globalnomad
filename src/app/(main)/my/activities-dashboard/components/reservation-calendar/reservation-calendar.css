@@ -98,18 +98,7 @@
   @apply text-gray-300;
 }
 
-/* 타일 상호작용 시 날짜 숫자 색상 우선순위 */
-.reservation-status-calendar
-  .react-calendar__tile:enabled:hover
-  .reservation-status-calendar__day-number,
-.reservation-status-calendar
-  .react-calendar__tile:enabled:focus
-  .reservation-status-calendar__day-number,
-.reservation-status-calendar
-  .react-calendar__tile--active
-  .reservation-status-calendar__day-number {
-  @apply text-white;
-}
+/* 날짜 숫자 색상은 기본(평일/주말/이웃월) 스타일을 그대로 사용 */
 
 .reservation-status-calendar__meta--muted {
   @apply opacity-50;
