@@ -11,11 +11,11 @@ import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
  * const payload = getActivityUpdatePayload(activityId, formData, originalData);
  * updateActivity(payload);
  */
-export function getActivityUpdatePayload(
+export const getActivityUpdatePayload = (
   activityId: number,
   data: ActivityFormValues,
   activityData: ActivityDetailResponse
-) {
+) => {
   // [1] 서브 이미지 비교
   const originalImages = activityData.subImages || [];
   const finalImageUrls = data.subImageUrls || [];
@@ -83,4 +83,4 @@ export function getActivityUpdatePayload(
       schedulesToAdd,
     },
   };
-}
+};
