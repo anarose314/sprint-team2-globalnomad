@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { EMPTY_TIME_SLOT } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
 import type {
   ReservationDetailData,
   ReservationTimeSlotOption,
@@ -20,7 +19,7 @@ export const useSelectedTimeSlot = ({
 
   const selectedTimeSlotValue = useMemo(() => {
     const timeSlots = detailData?.timeSlots ?? [];
-    if (!timeSlots.length) return EMPTY_TIME_SLOT;
+    if (!timeSlots.length) return '';
 
     const defaultTimeSlot =
       timeSlots.find((timeSlot) => timeSlot.scheduleId !== null) ??

@@ -14,7 +14,10 @@ import {
  */
 export function Footer() {
   return (
-    <footer className="h-16 shrink-0 border-t border-gray-50 bg-white md:h-20">
+    <footer
+      data-main-footer
+      className="h-16 shrink-0 border-t border-gray-50 bg-white md:h-20"
+    >
       <div className="mx-auto flex h-full w-full max-w-380 min-w-0 items-center justify-between gap-4 px-4 md:px-10 2xl:px-0">
         <p className="typo-md-medium truncate text-gray-500">
           {FOOTER_COPYRIGHT_TEXT}
