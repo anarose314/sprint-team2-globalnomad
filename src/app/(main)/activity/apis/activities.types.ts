@@ -45,3 +45,59 @@ export interface FetchActivitiesParams {
 export interface ActivityImageResponse {
   activityImageUrl: string;
 }
+
+export type CreateSchedule = {
+  date: string;
+  startTime: string;
+  endTime: string;
+};
+
+export type PostActivities = {
+  title: string;
+  category: string;
+  description: string;
+  price: number;
+  address: string;
+  schedules: CreateSchedule[];
+  bannerImageUrl: string;
+  subImageUrls?: string[];
+};
+
+export interface ActivityMutationResponse {
+  id: number;
+  userId: number;
+  title: string;
+  description: string;
+  category: ActivityCategory;
+  price: number;
+  address: string;
+  bannerImageUrl: string;
+  rating: number;
+  reviewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  subImages: {
+    imageUrl: string;
+    id: number;
+  }[];
+  schedules: {
+    times: { endTime: string; startTime: string; id: number }[];
+    date: string;
+  }[];
+}
+
+export type PatchActivities = {
+  activityId: number;
+  body: {
+    title: string;
+    category: string;
+    description: string;
+    price: number;
+    address: string;
+    bannerImageUrl: string;
+    subImageIdsToRemove: number[];
+    subImageUrlsToAdd: string[];
+    scheduleIdsToRemove: number[];
+    schedulesToAdd: CreateSchedule[];
+  };
+};
