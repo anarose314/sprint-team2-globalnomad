@@ -1,13 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQueries } from '@tanstack/react-query';
-import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   CalendarValue,
   MobileSheetStep,
   TimeSlot,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
+import { useActivityReservationAvailability } from '@/app/(main)/activity/[id]/components/activity-reservation-card/hooks/useActivityReservationAvailability';
+import { ApiError } from '@/shared/apis/apiError';
+import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
@@ -18,161 +20,29 @@ interface UseActivityReservationCardStateProps {
   schedules: ActivitySchedule[];
 }
 
-const normalizeDateKey = (rawDate: string) => {
-  const trimmed = rawDate.trim();
-  const shortDate = trimmed.slice(0, 10);
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
-    return shortDate;
-  }
-
-  const parsed = new Date(trimmed);
-  if (Number.isNaN(parsed.getTime())) {
-    return trimmed;
-  }
-
-  return formatDateKey(parsed);
-};
-
-const parseYearMonthFromDateKey = (dateKey: string) => {
-  const [year, month] = dateKey.split('-').map(Number);
-  return { year, month };
-};
-
 export const useActivityReservationCardState = ({
   activityId,
   pricePerPerson,
   schedules,
 }: UseActivityReservationCardStateProps) => {
+  const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [headCount, setHeadCount] = useState(1);
+  const [reservedScheduleIds, setReservedScheduleIds] = useState<number[]>([]);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(
     null
   );
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [mobileSheetStep, setMobileSheetStep] =
     useState<MobileSheetStep>('dateTime');
-  const activeMonthDate = currentDate ?? new Date();
-  const activeYear = activeMonthDate.getFullYear();
-  const activeMonth = activeMonthDate.getMonth() + 1;
 
-  const selectedYearMonth = useMemo(
-    () =>
-      selectedDateKey ? parseYearMonthFromDateKey(selectedDateKey) : undefined,
-    [selectedDateKey]
-  );
-
-  const shouldFetchSelectedMonth =
-    selectedYearMonth &&
-    (selectedYearMonth.year !== activeYear ||
-      selectedYearMonth.month !== activeMonth);
-
-  const scheduleQueries = useQueries({
-    queries: [
-      {
-        queryKey: [
-          ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
-          activityId,
-          activeYear,
-          activeMonth,
-        ],
-        queryFn: () =>
-          fetchActivityAvailableSchedule({
-            activityId,
-            year: activeYear,
-            month: activeMonth,
-          }),
-      },
-      ...(shouldFetchSelectedMonth
-        ? [
-            {
-              queryKey: [
-                ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
-                activityId,
-                selectedYearMonth.year,
-                selectedYearMonth.month,
-              ],
-              queryFn: () =>
-                fetchActivityAvailableSchedule({
-                  activityId,
-                  year: selectedYearMonth.year,
-                  month: selectedYearMonth.month,
-                }),
-            },
-          ]
-        : []),
-    ],
+  const { availableScheduleByDate } = useActivityReservationAvailability({
+    activityId,
+    schedules,
+    reservedScheduleIds,
   });
-
-  const availableSchedules = useMemo(
-    () => scheduleQueries.flatMap((query) => query.data ?? []),
-    [scheduleQueries]
-  );
-
-  const isAvailableSchedulesLoading = scheduleQueries.some(
-    (query) => query.isLoading
-  );
-  const isAvailableSchedulesError = scheduleQueries.some(
-    (query) => query.isError
-  );
-
-  const fallbackScheduleByDate = useMemo(() => {
-    return schedules.reduce<Record<string, TimeSlot[]>>(
-      (accumulator, schedule) => {
-        const dateKey = normalizeDateKey(schedule.date);
-        const nextSlot: TimeSlot = {
-          id: schedule.id,
-          startTime: schedule.startTime,
-          endTime: schedule.endTime,
-        };
-
-        if (!accumulator[dateKey]) {
-          accumulator[dateKey] = [nextSlot];
-        } else {
-          accumulator[dateKey].push(nextSlot);
-        }
-
-        return accumulator;
-      },
-      {}
-    );
-  }, [schedules]);
-
-  const availableScheduleByDate = useMemo(() => {
-    const fromAvailableApi = availableSchedules.reduce<
-      Record<string, (typeof availableSchedules)[number]['times']>
-    >((accumulator, item) => {
-      const dateKey = normalizeDateKey(item.date);
-      accumulator[dateKey] = item.times;
-      return accumulator;
-    }, {});
-
-    if (
-      isAvailableSchedulesLoading ||
-      isAvailableSchedulesError ||
-      Object.keys(fromAvailableApi).length === 0
-    ) {
-      return fallbackScheduleByDate;
-    }
-
-    return Object.entries(fromAvailableApi).reduce<Record<string, TimeSlot[]>>(
-      (accumulator, [dateKey, times]) => {
-        accumulator[dateKey] = times.map((time) => ({
-          id: time.id,
-          startTime: time.startTime,
-          endTime: time.endTime,
-        }));
-        return accumulator;
-      },
-      {}
-    );
-  }, [
-    availableSchedules,
-    fallbackScheduleByDate,
-    isAvailableSchedulesError,
-    isAvailableSchedulesLoading,
-  ]);
 
   const availableDateKeys = useMemo(
     () => Object.keys(availableScheduleByDate).sort(),
@@ -180,18 +50,7 @@ export const useActivityReservationCardState = ({
   );
 
   const hasSelectableDate = availableDateKeys.length > 0;
-  const initialSelectedDateKey = useMemo(() => {
-    const firstAvailableDateKey = availableDateKeys[0];
-    if (!firstAvailableDateKey) {
-      return null;
-    }
-
-    const todayDateKey = formatDateKey(new Date());
-    return firstAvailableDateKey === todayDateKey
-      ? firstAvailableDateKey
-      : null;
-  }, [availableDateKeys]);
-  const effectiveSelectedDateKey = selectedDateKey ?? initialSelectedDateKey;
+  const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
     if (!effectiveSelectedDateKey) {
@@ -202,7 +61,7 @@ export const useActivityReservationCardState = ({
     return new Date(year, month - 1, day);
   }, [effectiveSelectedDateKey]);
 
-  const selectedDate = parsedSelectedDate;
+  const selectedDate = useMemo(() => parsedSelectedDate, [parsedSelectedDate]);
 
   const availableTimeSlots = useMemo<TimeSlot[]>(() => {
     if (!effectiveSelectedDateKey) {
@@ -218,16 +77,19 @@ export const useActivityReservationCardState = ({
     }
 
     if (!selectedTimeSlot) {
-      return availableTimeSlots[0];
+      return null;
     }
 
     return (
-      availableTimeSlots.find((slot) => slot.id === selectedTimeSlot.id) ??
-      availableTimeSlots[0]
+      availableTimeSlots.find((slot) => slot.id === selectedTimeSlot.id) ?? null
     );
   }, [availableTimeSlots, selectedTimeSlot]);
 
-  const displayCurrentDate = currentDate ?? selectedDate ?? new Date();
+  const displayCurrentDate = useMemo(
+    () => currentDate ?? selectedDate ?? new Date(),
+    [currentDate, selectedDate]
+  );
+
   const monthTitle = useMemo(
     () =>
       `${displayCurrentDate.getFullYear()}년 ${displayCurrentDate.getMonth() + 1}월`,
@@ -238,12 +100,78 @@ export const useActivityReservationCardState = ({
     () => pricePerPerson * headCount,
     [headCount, pricePerPerson]
   );
+  const isReservationAvailable = Boolean(
+    activeSelectedTimeSlot && hasSelectableDate
+  );
+
+  const refreshAvailableSchedule = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
+    });
+
+    await queryClient.refetchQueries({
+      queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
+      type: 'active',
+    });
+  };
+
+  const { mutate: submitReservation, isPending: isReservationSubmitting } =
+    useMutation({
+      mutationFn: async () => {
+        if (!activeSelectedTimeSlot) {
+          return;
+        }
+
+        await fetchInstanceClient(
+          `/api/proxy/activities/${activityId}/reservations`,
+          {
+            method: 'POST',
+            body: {
+              scheduleId: activeSelectedTimeSlot.id,
+              headCount,
+            },
+          }
+        );
+      },
+      onSuccess: async () => {
+        if (activeSelectedTimeSlot) {
+          setReservedScheduleIds((prev) =>
+            prev.includes(activeSelectedTimeSlot.id)
+              ? prev
+              : [...prev, activeSelectedTimeSlot.id]
+          );
+        }
+
+        await refreshAvailableSchedule();
+
+        setSelectedDateKey(null);
+        setSelectedTimeSlot(null);
+        setHeadCount(1);
+        setIsDateSheetOpen(false);
+        setIsSuccessModalOpen(true);
+      },
+      onError: async (error) => {
+        if (!(error instanceof ApiError) || error.status !== 409) {
+          return;
+        }
+
+        if (activeSelectedTimeSlot) {
+          setReservedScheduleIds((prev) =>
+            prev.includes(activeSelectedTimeSlot.id)
+              ? prev
+              : [...prev, activeSelectedTimeSlot.id]
+          );
+        }
+
+        setSelectedTimeSlot(null);
+        await refreshAvailableSchedule();
+      },
+    });
 
   const selectedDateText = useMemo(() => {
     if (!selectedDate) {
       return '-';
     }
-
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -266,6 +194,10 @@ export const useActivityReservationCardState = ({
 
   const handleCloseDateSheet = () => {
     setIsDateSheetOpen(false);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
   };
 
   const handleMoveToHeadCountStep = () => {
@@ -308,6 +240,13 @@ export const useActivityReservationCardState = ({
     }
   };
 
+  const handleSubmitReservation = () => {
+    if (!isReservationAvailable || isReservationSubmitting) {
+      return;
+    }
+    submitReservation();
+  };
+
   const tileDisabled = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') {
       return false;
@@ -319,8 +258,11 @@ export const useActivityReservationCardState = ({
 
   return {
     isDateSheetOpen,
+    isSuccessModalOpen,
     mobileSheetStep,
     hasSelectableDate,
+    isReservationAvailable,
+    isReservationSubmitting,
     selectedDate,
     displayCurrentDate,
     monthTitle,
@@ -331,6 +273,7 @@ export const useActivityReservationCardState = ({
     totalPrice,
     handleOpenDateSheet,
     handleCloseDateSheet,
+    handleCloseSuccessModal,
     handleMoveToHeadCountStep,
     handleMoveToDateTimeStep,
     handleDateChange,
@@ -338,6 +281,7 @@ export const useActivityReservationCardState = ({
     handleSelectTimeSlot,
     handleDecreaseHeadCount,
     handleIncreaseHeadCount,
+    handleSubmitReservation,
     tileDisabled,
   };
 };
