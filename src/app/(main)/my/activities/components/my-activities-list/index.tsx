@@ -39,7 +39,7 @@ export function MyActivitiesList() {
             return (
               <ActivityCard key={id}>
                 <ActivityCard.Info
-                  index={index}
+                  priority={index === 0}
                   title={title}
                   activityId={id}
                   bannerImageUrl={bannerImageUrl}

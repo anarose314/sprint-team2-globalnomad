@@ -60,7 +60,7 @@ export function ReserveList() {
             return (
               <ActivityCard key={id}>
                 <ActivityCard.Info
-                  index={index}
+                  priority={index === 0}
                   title={activity.title}
                   activityId={activity.id}
                   bannerImageUrl={activity.bannerImageUrl}

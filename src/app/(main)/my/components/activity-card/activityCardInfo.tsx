@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface ActivityCardInfoProps {
-  index: number;
+  priority?: boolean;
   title: string;
   activityId: number;
   bannerImageUrl: string;
@@ -11,7 +11,7 @@ interface ActivityCardInfoProps {
 }
 
 export function ActivityCardInfo({
-  index,
+  priority,
   title,
   activityId,
   bannerImageUrl,
@@ -32,7 +32,7 @@ export function ActivityCardInfo({
           fill
           src={bannerImageUrl}
           alt={title}
-          priority={index === 0}
+          priority={priority}
           sizes="(min-width: 768px) 25vw, 33vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
