@@ -3,22 +3,17 @@
 import { useMemo, useRef, useState } from 'react';
 import Calendar from 'react-calendar';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
-import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import { ReservationCalendarDayTile } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationCalendarDayTile';
 import { ReservationDetailSheet } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet';
 import { useDesktopSheetPosition } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useDesktopSheetPosition';
+import { useReservationCalendarData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/hooks/useReservationCalendarData';
 import { ReservationEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import {
   parseDateQueryKey,
   toDateFromDateKey,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/dateQuery';
-import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
-import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
@@ -65,6 +60,12 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
   const activeStartDate = detailDate
     ? new Date(detailDate.getFullYear(), detailDate.getMonth(), 1)
     : currentDate;
+  const { detailData, eventCountsByDate } = useReservationCalendarData({
+    activityId,
+    currentYear,
+    currentMonth,
+    reservedScheduleDateKey: selectedDateKey,
+  });
   const {
     desktopSheetPosition,
     setDesktopSheetPositionFromTile,
@@ -74,108 +75,6 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     currentDate,
     detailDate,
   });
-
-  const { data: reservationDashboard = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-      activityId,
-      currentYear,
-      currentMonth,
-    ],
-    queryFn: () =>
-      fetchReservationDashboard({
-        activityId: activityId as number,
-        year: currentYear,
-        month: currentMonth,
-      }),
-    enabled: activityId !== null,
-  });
-
-  const { data: reservedSchedules = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      selectedDateKey,
-    ],
-    queryFn: () =>
-      fetchReservedSchedule({
-        activityId: activityId as number,
-        date: selectedDateKey as string,
-      }),
-    enabled: activityId !== null && Boolean(selectedDateKey),
-  });
-
-  const eventCountsByDate = useMemo<
-    Record<string, ReservationEventCounts>
-  >(() => {
-    const todayDateKey = formatDateKey(new Date());
-    const eventCounts = reservationDashboard.reduce<
-      Record<string, ReservationEventCounts>
-    >((accumulator, item) => {
-      const completed = Math.max(item.reservations.completed, 0);
-      const confirmed = Math.max(item.reservations.confirmed, 0);
-      const pending = Math.max(item.reservations.pending, 0);
-      const isPastDate = item.date < todayDateKey;
-      const shiftedCompleted = isPastDate ? completed + confirmed : completed;
-      const shiftedConfirmed = isPastDate ? 0 : confirmed;
-
-      const eventCounts: ReservationEventCounts = {};
-      if (pending > 0) eventCounts.pending = pending;
-      if (shiftedConfirmed > 0) eventCounts.confirmed = shiftedConfirmed;
-      if (shiftedCompleted > 0) eventCounts.completed = shiftedCompleted;
-
-      if (Object.keys(eventCounts).length > 0) {
-        accumulator[item.date] = eventCounts;
-      }
-
-      return accumulator;
-    }, {});
-
-    // 현재 선택 날짜는 reserved-schedule 집계값으로 보정
-    if (selectedDateKey) {
-      const now = new Date();
-      const normalized = reservedSchedules.reduce(
-        (accumulator, schedule) => {
-          accumulator.pending += Math.max(schedule.count.pending, 0);
-          const confirmedCount = Math.max(schedule.count.confirmed, 0);
-          if (confirmedCount > 0) {
-            if (isScheduleEnded(selectedDateKey, schedule.endTime, now)) {
-              accumulator.completed += confirmedCount;
-            } else {
-              accumulator.confirmed += confirmedCount;
-            }
-          }
-          return accumulator;
-        },
-        { pending: 0, confirmed: 0, completed: 0 }
-      );
-
-      const completed = Math.max(
-        eventCounts[selectedDateKey]?.completed ?? 0,
-        0
-      );
-      const mergedCompleted = Math.max(completed, normalized.completed);
-
-      const mergedDailyCounts: ReservationEventCounts = {};
-      if (normalized.pending > 0)
-        mergedDailyCounts.pending = normalized.pending;
-      if (normalized.confirmed > 0)
-        mergedDailyCounts.confirmed = normalized.confirmed;
-      if (mergedCompleted > 0) mergedDailyCounts.completed = mergedCompleted;
-
-      if (Object.keys(mergedDailyCounts).length > 0) {
-        eventCounts[selectedDateKey] = mergedDailyCounts;
-      }
-    }
-
-    return eventCounts;
-  }, [reservationDashboard, reservedSchedules, selectedDateKey]);
-
-  const detailData = useMemo(() => {
-    return buildReservationDetailData({
-      reservedSchedules,
-    });
-  }, [reservedSchedules]);
 
   const updateDateQuery = (nextDateKey: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
