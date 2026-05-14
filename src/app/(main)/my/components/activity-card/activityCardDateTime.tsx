@@ -11,8 +11,8 @@ export function ActivityCardDateTime({
 }: ActivityCardDateTimeProps) {
   return (
     <time
+      dateTime={`${date}T${startTime}`}
       className="typo-sm-medium 2xl:typo-lg-medium flex gap-2 text-gray-500"
-      dateTime={`${date} · ${startTime} - ${endTime}`}
     >
       {`${date} · ${startTime} - ${endTime}`}
     </time>
