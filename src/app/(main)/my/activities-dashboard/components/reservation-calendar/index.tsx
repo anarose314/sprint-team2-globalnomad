@@ -66,15 +66,12 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
     currentMonth,
     reservedScheduleDateKey: selectedDateKey,
   });
-  const {
-    desktopSheetPosition,
-    setDesktopSheetPositionFromTile,
-    clearDesktopSheetPosition,
-  } = useDesktopSheetPosition({
-    calendarRootRef,
-    currentDate,
-    detailDate,
-  });
+  const { desktopSheetPosition, setDesktopSheetPositionFromTile } =
+    useDesktopSheetPosition({
+      calendarRootRef,
+      currentDate,
+      detailDate,
+    });
 
   const updateDateQuery = (nextDateKey: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -174,7 +171,6 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           desktopPosition={desktopSheetPosition}
           onClose={() => {
             updateDateQuery(null);
-            clearDesktopSheetPosition();
           }}
         />
       ) : null}
