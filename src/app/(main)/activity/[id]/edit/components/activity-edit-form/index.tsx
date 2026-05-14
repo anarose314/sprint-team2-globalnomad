@@ -11,7 +11,7 @@ interface ActivityEditFormProps {
 }
 
 export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
-  const { data: activityData, isLoading } = useActivityDetail(activityId);
+  const { data: activityData } = useActivityDetail(activityId);
   const { mutate: updateActivity, isPending } = usePatchActivities();
 
   const handleEditSubmit = (data: ActivityFormValues) => {
@@ -68,11 +68,6 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
 
     updateActivity(payload);
   };
-
-  // TODO: 로딩 화면 출력
-  if (isLoading) return <div>데이터를 불러오는 중입니다...</div>;
-  // TODO: 에러 화면 출력
-  if (!activityData) return <div>데이터를 찾을 수 없습니다.</div>;
 
   const defaultSchedules = (activityData.schedules || []).map((sched) => ({
     id: String(sched.id),
