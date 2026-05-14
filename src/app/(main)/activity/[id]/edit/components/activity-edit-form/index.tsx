@@ -1,5 +1,6 @@
 'use client';
 
+import { getActivityUpdatePayload } from '@/app/(main)/activity/[id]/edit/utils/getActivityUpdatePayload';
 import { ActivityForm } from '@/app/(main)/activity/components/activity-form';
 import { ActivityFormValues } from '@/app/(main)/activity/components/activity-form/activityForm.schema';
 import { useActivityDetail } from '@/app/(main)/activity/hooks/useActivityDetail';
@@ -17,56 +18,7 @@ export function ActivityEditForm({ activityId }: ActivityEditFormProps) {
   const handleEditSubmit = (data: ActivityFormValues) => {
     if (!activityData) return;
 
-    // [1] 서브 이미지 비교
-    const originalImages = activityData.subImages || [];
-    const finalImageUrls = data.subImageUrls || [];
-
-    const subImageIdsToRemove = originalImages
-      .filter((orig) => !finalImageUrls.includes(orig.imageUrl))
-      .map((orig) => orig.id);
-
-    const subImageUrlsToAdd = finalImageUrls.filter(
-      (finalUrl) => !originalImages.some((orig) => orig.imageUrl === finalUrl)
-    );
-
-    // [2] 스케줄 비교
-    const originalSchedules = activityData.schedules || [];
-    const finalSchedules = data.schedules;
-
-    const scheduleIdsToRemove = originalSchedules
-      .filter(
-        (orig) =>
-          !finalSchedules.some((final) => String(final.id) === String(orig.id))
-      )
-      .map((orig) => orig.id);
-
-    const schedulesToAdd = finalSchedules
-      .filter(
-        (final) =>
-          !originalSchedules.some(
-            (orig) => String(orig.id) === String(final.id)
-          )
-      )
-      .map(({ id: _id, ...rest }) => rest);
-
-    // [3] 최종 Payload 조립 및 API 호출
-    const payload = {
-      activityId,
-      body: {
-        title: data.title,
-        category: data.category,
-        description: data.description,
-        price: data.price,
-        address: data.address,
-        bannerImageUrl: data.bannerImageUrl,
-        subImageIdsToRemove,
-        subImageUrlsToAdd,
-        scheduleIdsToRemove,
-        schedulesToAdd,
-      },
-    };
-
-    updateActivity(payload);
+    updateActivity(getActivityUpdatePayload(activityId, data, activityData));
   };
 
   const defaultSchedules = (activityData.schedules || []).map((sched) => ({
