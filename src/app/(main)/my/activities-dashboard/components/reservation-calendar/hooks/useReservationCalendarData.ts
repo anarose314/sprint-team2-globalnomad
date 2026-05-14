@@ -7,18 +7,9 @@ import {
   ReservationEventCounts,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
+import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { formatDateKey } from '@/shared/utils/formatDate';
-
-const normalizeTimeWithSeconds = (time: string) => {
-  const [hour = '00', minute = '00', second = '00'] = time.split(':');
-  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
-};
-
-const isScheduleEnded = (dateKey: string, endTime: string, now: Date) => {
-  const endAt = new Date(`${dateKey}T${normalizeTimeWithSeconds(endTime)}`);
-  return !Number.isNaN(endAt.getTime()) && endAt.getTime() <= now.getTime();
-};
 
 interface UseReservationCalendarDataProps {
   activityId: number | null;

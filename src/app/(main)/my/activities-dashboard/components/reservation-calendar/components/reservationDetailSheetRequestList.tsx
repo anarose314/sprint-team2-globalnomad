@@ -66,7 +66,7 @@ export function ReservationDetailSheetRequestList({
     const hasConfirmedReservations = selectedTimeSlotCount.confirmed > 0;
     const emptyMessage =
       activeTab === 'pending' && hasConfirmedReservations
-        ? '승인 내역이 존재합니다.'
+        ? '승인된 예약이 있습니다.'
         : activeTab === 'declined' && hasConfirmedReservations
           ? '거절된 예약이 없습니다.'
           : isDateReservationEmpty

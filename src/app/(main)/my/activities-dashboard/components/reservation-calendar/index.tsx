@@ -15,22 +15,13 @@ import {
   toDateFromDateKey,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/dateQuery';
 import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
+import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { IcArrowLeft, IcArrowRight } from '@/shared/assets/icons';
 import { WEEKDAY } from '@/shared/constants/calendar.constants';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { cn } from '@/shared/utils/cn';
 import { formatDateKey } from '@/shared/utils/formatDate';
 import '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservation-calendar.css';
-
-const normalizeTimeWithSeconds = (time: string) => {
-  const [hour = '00', minute = '00', second = '00'] = time.split(':');
-  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
-};
-
-const isScheduleEnded = (dateKey: string, endTime: string, now: Date) => {
-  const endAt = new Date(`${dateKey}T${normalizeTimeWithSeconds(endTime)}`);
-  return !Number.isNaN(endAt.getTime()) && endAt.getTime() <= now.getTime();
-};
 
 /**
  * 예약 현황 페이지의 월간 예약 캘린더
