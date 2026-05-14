@@ -23,11 +23,16 @@ export async function generateMetadata({
   }
 }
 
-export default function ActivityEditPage() {
+export default async function ActivityEditPage({
+  params,
+}: ActivityEditPageProps) {
+  const { id } = await params;
+  const activityId = Number(id);
+
   return (
     <div className="mx-auto mt-7.5 mb-9 w-full max-w-175 md:mt-10 md:mb-16 2xl:mb-30">
       <Heading>내 체험 수정</Heading>
-      <ActivityEditForm />
+      <ActivityEditForm activityId={activityId} />
     </div>
   );
 }

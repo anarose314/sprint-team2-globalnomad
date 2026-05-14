@@ -8,6 +8,7 @@ import type {
 } from '@/app/(main)/activity/apis/activities.types';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
+import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
 /**
  * 체험 목록을 조회하는 API 함수
@@ -88,6 +89,19 @@ export const patchActivities = async ({
     {
       method: 'PATCH',
       body,
+    }
+  );
+};
+
+/**
+ * 특정 체험 1개의 상세 정보를 조회하는 API 함수
+ */
+export const fetchActivityDetail = async (activityId: number) => {
+  return await fetchInstance<ActivityDetailResponse>(
+    `/activities/${activityId}`,
+    {
+      method: 'GET',
+      cache: 'no-store',
     }
   );
 };
