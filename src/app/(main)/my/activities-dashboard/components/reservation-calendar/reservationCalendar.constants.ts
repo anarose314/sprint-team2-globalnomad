@@ -23,5 +23,5 @@ export const STATUS_META: Record<
 export const STATUS_POSITION_CLASS: Record<ReservationEventStatus, string> = {
   pending: 'reservation-calendar__event-badge--pending',
   confirmed: 'reservation-calendar__event-badge--confirmed',
-  completed: 'reservation-calendar__event-badge--declined',
+  completed: 'reservation-calendar__event-badge--completed',
 };
