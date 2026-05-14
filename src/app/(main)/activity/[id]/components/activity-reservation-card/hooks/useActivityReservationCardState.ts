@@ -48,16 +48,26 @@ export const useActivityReservationCardState = ({
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
   const [mobileSheetStep, setMobileSheetStep] =
     useState<MobileSheetStep>('dateTime');
+  const activeMonthDate = currentDate ?? new Date();
+  const activeYear = activeMonthDate.getFullYear();
+  const activeMonth = activeMonthDate.getMonth() + 1;
 
   const {
     data: availableSchedules = [],
     isLoading: isAvailableSchedulesLoading,
     isError: isAvailableSchedulesError,
   } = useQuery({
-    queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
+    queryKey: [
+      ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
+      activityId,
+      activeYear,
+      activeMonth,
+    ],
     queryFn: () =>
       fetchActivityAvailableSchedule({
         activityId,
+        year: activeYear,
+        month: activeMonth,
       }),
   });
 
