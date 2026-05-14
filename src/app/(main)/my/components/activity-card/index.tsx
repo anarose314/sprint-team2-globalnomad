@@ -1,21 +1,42 @@
-import Link from 'next/link';
-import { ActivityCardProps } from '@/app/(main)/my/components/activity-card/activityCard.types';
+import { ActivityCardButtons } from '@/app/(main)/my/components/activity-card/activityCardButtons';
+import { ActivityCardDateTime } from '@/app/(main)/my/components/activity-card/activityCardDateTime';
+import { ActivityCardHeading } from '@/app/(main)/my/components/activity-card/activityCardHeading';
+import { ActivityCardInfo } from '@/app/(main)/my/components/activity-card/activityCardInfo';
+import { ActivityCardLayout } from '@/app/(main)/my/components/activity-card/activityCardLayout';
+import { ActivityCardPrice } from '@/app/(main)/my/components/activity-card/activityCardPrice';
+import { ActivityCardRating } from '@/app/(main)/my/components/activity-card/activityCardRating';
+import { ActivityCardStatus } from '@/app/(main)/my/components/activity-card/activityCardStatus';
 
 /**
- * [예약 내역] 및 [내 체험 관리] 에서 사용하는 카드 형태의 링크 컴포넌트.
+ * [예약 내역] 및 [내 체험 관리] 목록에서 사용하는 카드 형태의 컴파운드 컴포넌트
+ * 레이아웃 내에 정보 영역(Info)과 하단 액션 영역(Buttons)을 분리하여 목적에 맞게 조합
+ *
  * @example
- * <ActivityCard href={`/activity/${activityId}`}>
- *   <div className="flex-1 px-4 py-4">카드 텍스트 내용</div>
- *   <figure className="relative w-1/3">이미지 영역</figure>
+ * <ActivityCard>
+ *   <ActivityCard.Info
+ *     index={0}
+ *     title="체험 제목"
+ *     activityId={123}
+ *     bannerImageUrl="/image.png"
+ *   >
+ *     <ActivityCard.Status status="pending" />
+ *     <ActivityCard.Heading title="체험 제목" />
+ *     <ActivityCard.Price price={15000} headCount={2} />
+ *   </ActivityCard.Info>
+ *
+ *   <ActivityCard.Buttons>
+ *     <Button>수정하기</Button>
+ *     <Button>삭제하기</Button>
+ *   </ActivityCard.Buttons>
  * </ActivityCard>
  */
-export function ActivityCard({ href, children }: ActivityCardProps) {
-  return (
-    <Link
-      href={href}
-      className="shadow-card group flex min-h-45 justify-between overflow-hidden rounded-3xl"
-    >
-      {children}
-    </Link>
-  );
-}
+export const ActivityCard = Object.assign(ActivityCardLayout, {
+  Info: ActivityCardInfo,
+  Buttons: ActivityCardButtons,
+  // 서브 파츠
+  DateTime: ActivityCardDateTime,
+  Heading: ActivityCardHeading,
+  Price: ActivityCardPrice,
+  Rating: ActivityCardRating,
+  Status: ActivityCardStatus,
+});
