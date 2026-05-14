@@ -3,8 +3,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
+import { fetchMyReservedSchedules } from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
 import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
-import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
@@ -48,39 +48,16 @@ export const useActivityReservationAvailability = ({
       }),
   });
 
-  const { data: myReservedScheduleIds = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_RESERVATIONS,
-      activityId,
-      'reservedScheduleIds',
-    ],
-    queryFn: async () => {
-      const response = await fetchInstanceClient<{
-        reservations?: Array<{
-          scheduleId?: number;
-          status?: string;
-          activity?: { id?: number };
-        }>;
-      }>('/api/proxy/my-reservations', {
-        params: { size: 100 },
-      });
-
-      const reservations = Array.isArray(response?.reservations)
-        ? response.reservations
-        : [];
-
-      const blockedStatuses = new Set(['pending', 'confirmed', 'completed']);
-
-      return reservations
-        .filter(
-          (reservation) =>
-            reservation?.activity?.id === activityId &&
-            typeof reservation.scheduleId === 'number' &&
-            blockedStatuses.has(reservation.status ?? '')
-        )
-        .map((reservation) => reservation.scheduleId as number);
-    },
+  const { data: myReservedSchedules = [] } = useQuery({
+    queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
+    queryFn: fetchMyReservedSchedules,
   });
+
+  const myReservedScheduleIds = useMemo(() => {
+    return myReservedSchedules
+      .filter((reservation) => reservation.activityId === activityId)
+      .map((reservation) => reservation.scheduleId);
+  }, [activityId, myReservedSchedules]);
 
   const blockedScheduleIds = useMemo(() => {
     return Array.from(
