@@ -99,21 +99,24 @@ export const useReservationCalendarData = ({
     refetchInterval: activityId !== null ? 60_000 : false,
   });
 
-  const { data: reservedSchedules = [] } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      reservedScheduleDateKey,
-    ],
-    queryFn: () =>
-      fetchReservedSchedule({
-        activityId: activityId as number,
-        date: reservedScheduleDateKey as string,
-      }),
-    enabled: activityId !== null && Boolean(reservedScheduleDateKey),
-    refetchInterval:
-      activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
-  });
+  const { data: reservedSchedules = [], isFetched: isReservedScheduleFetched } =
+    useQuery({
+      queryKey: [
+        ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+        activityId,
+        reservedScheduleDateKey,
+      ],
+      queryFn: () =>
+        fetchReservedSchedule({
+          activityId: activityId as number,
+          date: reservedScheduleDateKey as string,
+        }),
+      enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+      refetchInterval:
+        activityId !== null && Boolean(reservedScheduleDateKey)
+          ? 60_000
+          : false,
+    });
 
   const { data: activitySchedules = [] } = useQuery({
     queryKey: [...QUERY_KEYS.ACTIVITIES, 'detailSchedules', activityId],
@@ -150,13 +153,18 @@ export const useReservationCalendarData = ({
   );
 
   /**
-   * reserved-schedule이 날짜별 스케줄·집계를 모두 주면 status별 N번 호출을 생략한다.
+   * reserved-schedule이 날짜별 스케줄·집계를 모두 주면 status별 3×N 호출 생략
    * (행이 비거나 집계가 전부 0이면 예약 목록 totalCount로 보정하기 위해 per-status 조회 유지)
+   *
+   * reserved 응답 전에는 `data`가 기본값 `[]`라서, 그때 판단하면 불필요한 다수 요청이 나가므로
+   * `isReservedScheduleFetched` 이후에만 본 플래그 사용, 벌크 API가 생기면 이 분기 전체를 대체 가능
    */
   const shouldFetchPerScheduleReservationCounts = useMemo(() => {
     if (!reservedScheduleDateKey || scheduleCandidates.length === 0) {
       return false;
     }
+    if (!isReservedScheduleFetched) return false;
+
     if (reservedSchedules.length === 0) return true;
 
     const reservedByScheduleId = new Map(
@@ -176,8 +184,17 @@ export const useReservationCalendarData = ({
     });
 
     return !hasAnyNonZeroCount;
-  }, [reservedScheduleDateKey, reservedSchedules, scheduleCandidates]);
+  }, [
+    isReservedScheduleFetched,
+    reservedScheduleDateKey,
+    reservedSchedules,
+    scheduleCandidates,
+  ]);
 
+  /**
+   * 스케줄×상태별 예약 목록 totalCount (백엔드 벌크 집계 API 부재 시 폴백)
+   * `shouldFetchPerScheduleReservationCounts`가 false면 빈 배열을 넘겨 요청을 만들지 않음
+   */
   const scheduleStatusQueries = useQueries({
     queries: shouldFetchPerScheduleReservationCounts
       ? scheduleCandidates.flatMap((schedule) =>
@@ -196,7 +213,10 @@ export const useReservationCalendarData = ({
                 scheduleId: schedule.scheduleId,
                 status,
               }),
-            enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+            enabled:
+              activityId !== null &&
+              Boolean(reservedScheduleDateKey) &&
+              shouldFetchPerScheduleReservationCounts,
             staleTime: 60_000,
           }))
         )
