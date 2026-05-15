@@ -31,7 +31,7 @@ function ReservationCalendarCardSkeleton() {
         </div>
 
         <div className="mt-0 grid grid-cols-7 gap-0.5 pt-1">
-          {Array.from({ length: 35 }).map((_, i) => (
+          {Array.from({ length: 42 }).map((_, i) => (
             <Skeleton
               key={i}
               className="min-h-26 w-full rounded-md md:min-h-31"
