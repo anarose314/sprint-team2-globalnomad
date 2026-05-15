@@ -109,31 +109,80 @@ export const useReservationCalendarData = ({
     [schedulesBySelectedDate]
   );
 
+  /**
+   * reserved-schedule이 날짜별 스케줄·집계를 모두 주면 status별 N번 호출을 생략한다.
+   * (행이 비거나 집계가 전부 0이면 예약 목록 totalCount로 보정하기 위해 per-status 조회 유지)
+   */
+  const shouldFetchPerScheduleReservationCounts = useMemo(() => {
+    if (!reservedScheduleDateKey || scheduleCandidates.length === 0) {
+      return false;
+    }
+    if (reservedSchedules.length === 0) return true;
+
+    const reservedByScheduleId = new Map(
+      reservedSchedules.map((row) => [row.scheduleId, row])
+    );
+    const coversAllActivitySlots = scheduleCandidates.every((candidate) =>
+      reservedByScheduleId.has(candidate.scheduleId)
+    );
+    if (!coversAllActivitySlots) return true;
+
+    const hasAnyNonZeroCount = reservedSchedules.some((row) => {
+      const pending = Math.max(row.count.pending, 0);
+      const confirmed = Math.max(row.count.confirmed, 0);
+      const declined = Math.max(row.count.declined, 0);
+      const completed = Math.max(row.count.completed ?? 0, 0);
+      return pending + confirmed + declined + completed > 0;
+    });
+
+    return !hasAnyNonZeroCount;
+  }, [reservedScheduleDateKey, reservedSchedules, scheduleCandidates]);
+
   const scheduleStatusQueries = useQueries({
-    queries: scheduleCandidates.flatMap((schedule) =>
-      (['pending', 'confirmed', 'declined'] as const).map((status) => ({
-        queryKey: [
-          ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
-          activityId,
-          reservedScheduleDateKey,
-          schedule.scheduleId,
-          status,
-          'totalCount',
-        ],
-        queryFn: () =>
-          fetchActivityReservations({
-            activityId: activityId as number,
-            scheduleId: schedule.scheduleId,
-            status,
-          }),
-        enabled:
-          activityId !== null &&
-          Boolean(reservedScheduleDateKey) &&
-          scheduleCandidates.length > 0,
-        staleTime: 60_000,
-      }))
-    ),
+    queries: shouldFetchPerScheduleReservationCounts
+      ? scheduleCandidates.flatMap((schedule) =>
+          (['pending', 'confirmed', 'declined'] as const).map((status) => ({
+            queryKey: [
+              ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
+              activityId,
+              reservedScheduleDateKey,
+              schedule.scheduleId,
+              status,
+              'totalCount',
+            ],
+            queryFn: () =>
+              fetchActivityReservations({
+                activityId: activityId as number,
+                scheduleId: schedule.scheduleId,
+                status,
+              }),
+            enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+            staleTime: 60_000,
+          }))
+        )
+      : [],
   });
+
+  const countsFromReservedScheduleByScheduleId = useMemo(() => {
+    const map = new Map<
+      number,
+      {
+        pending: number;
+        confirmed: number;
+        declined: number;
+        completed: number;
+      }
+    >();
+    for (const row of reservedSchedules) {
+      map.set(row.scheduleId, {
+        pending: Math.max(row.count.pending, 0),
+        confirmed: Math.max(row.count.confirmed, 0),
+        declined: Math.max(row.count.declined, 0),
+        completed: Math.max(row.count.completed ?? 0, 0),
+      });
+    }
+    return map;
+  }, [reservedSchedules]);
 
   const confirmedCountByScheduleId = useMemo(() => {
     const counts = scheduleCandidates.reduce<Record<number, number>>(
@@ -145,15 +194,26 @@ export const useReservationCalendarData = ({
     );
 
     scheduleCandidates.forEach((schedule, scheduleIndex) => {
-      const queryIndex = scheduleIndex * 3 + 1;
-      counts[schedule.scheduleId] = Math.max(
-        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
-        0
-      );
+      const fromReserved =
+        countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
+          ?.confirmed ?? 0;
+      if (shouldFetchPerScheduleReservationCounts) {
+        const queryIndex = scheduleIndex * 3 + 1;
+        const fromQuery =
+          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+      } else {
+        counts[schedule.scheduleId] = fromReserved;
+      }
     });
 
     return counts;
-  }, [scheduleCandidates, scheduleStatusQueries]);
+  }, [
+    countsFromReservedScheduleByScheduleId,
+    scheduleCandidates,
+    scheduleStatusQueries,
+    shouldFetchPerScheduleReservationCounts,
+  ]);
 
   const pendingCountByScheduleId = useMemo(() => {
     const counts = scheduleCandidates.reduce<Record<number, number>>(
@@ -165,15 +225,26 @@ export const useReservationCalendarData = ({
     );
 
     scheduleCandidates.forEach((schedule, scheduleIndex) => {
-      const queryIndex = scheduleIndex * 3;
-      counts[schedule.scheduleId] = Math.max(
-        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
-        0
-      );
+      const fromReserved =
+        countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
+          ?.pending ?? 0;
+      if (shouldFetchPerScheduleReservationCounts) {
+        const queryIndex = scheduleIndex * 3;
+        const fromQuery =
+          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+      } else {
+        counts[schedule.scheduleId] = fromReserved;
+      }
     });
 
     return counts;
-  }, [scheduleCandidates, scheduleStatusQueries]);
+  }, [
+    countsFromReservedScheduleByScheduleId,
+    scheduleCandidates,
+    scheduleStatusQueries,
+    shouldFetchPerScheduleReservationCounts,
+  ]);
 
   const declinedCountByScheduleId = useMemo(() => {
     const counts = scheduleCandidates.reduce<Record<number, number>>(
@@ -185,15 +256,26 @@ export const useReservationCalendarData = ({
     );
 
     scheduleCandidates.forEach((schedule, scheduleIndex) => {
-      const queryIndex = scheduleIndex * 3 + 2;
-      counts[schedule.scheduleId] = Math.max(
-        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
-        0
-      );
+      const fromReserved =
+        countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
+          ?.declined ?? 0;
+      if (shouldFetchPerScheduleReservationCounts) {
+        const queryIndex = scheduleIndex * 3 + 2;
+        const fromQuery =
+          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+      } else {
+        counts[schedule.scheduleId] = fromReserved;
+      }
     });
 
     return counts;
-  }, [scheduleCandidates, scheduleStatusQueries]);
+  }, [
+    countsFromReservedScheduleByScheduleId,
+    scheduleCandidates,
+    scheduleStatusQueries,
+    shouldFetchPerScheduleReservationCounts,
+  ]);
 
   /**
    * reserved-schedule 행이 비거나 집계가 늦어도,
@@ -454,6 +536,7 @@ export const useReservationCalendarData = ({
     reservedScheduleRowsForDetail,
     scheduleCandidates,
     reservedSchedules,
+    shouldFetchPerScheduleReservationCounts,
   ]);
 
   return {
