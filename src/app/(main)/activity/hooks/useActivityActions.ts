@@ -80,6 +80,8 @@ export const useActivityActions = ({
   });
 
   const handleDeleteConfirm = () => {
+    if (isDeleting) return;
+
     if (selectedId) {
       confirmDelete(selectedId);
     }
