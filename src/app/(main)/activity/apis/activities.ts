@@ -134,3 +134,15 @@ export const fetchActivityDetail = async (activityId: number) => {
     }
   );
 };
+
+/**
+ * 체험 삭제를 하는 API 호출 함수 (BFF 경유)
+ */
+export const deleteActivity = async (activityId: number) => {
+  return await fetchInstanceClient<void>(
+    `/api/proxy/my-activities/${activityId}`,
+    {
+      method: 'DELETE',
+    }
+  );
+};
