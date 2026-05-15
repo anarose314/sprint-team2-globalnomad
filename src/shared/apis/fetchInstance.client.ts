@@ -54,12 +54,27 @@ const refreshTokens = (): Promise<void> => {
 };
 
 /**
+ * 세션 만료 처리가 이미 실행되었는지 여부.
+ *
+ * 동시에 여러 요청이 401을 받고 refresh도 실패한 경우, 각 요청의 catch 블록이
+ * 각각 handleSessionExpired를 호출하여 토스트/navigation이 중복 실행되는 것을 방지.
+ *
+ * 페이지 이동(window.location.href)으로 모듈이 재로드되면 자연스럽게 reset된다.
+ */
+let isSessionExpiredHandled = false;
+
+/**
  * 세션 만료 처리 — 토스트 안내 후 로그인 페이지로 강제 이동.
  *
  * window.location.href를 사용하여 풀 페이지 리로드를 강제한다.
  * SPA navigation(router.push)은 클라이언트 상태가 남아있을 수 있어 부적합.
+ *
+ * 동시 호출되어도 한 번만 실행된다(guard).
  */
 const handleSessionExpired = () => {
+  if (isSessionExpiredHandled) return;
+  isSessionExpiredHandled = true;
+
   useToastStore.getState().actions.showToast({
     theme: 'warning',
     message: '세션이 만료되었습니다. 다시 로그인해 주세요.',
