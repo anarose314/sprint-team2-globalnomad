@@ -1,0 +1,62 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+@import 'tailwindcss';
+@import './fonts.css';
+@import './colors.css';
+
+@theme {
+  /* Spacing */
+  --spacing-em: 1em;
+
+  /* Z-Index */
+  --z-index-base: 10; /* Base Content */
+  --z-index-header: 100; /* Navigation & Layout */
+  --z-index-not-found: 200; /* Not Found */
+  --z-index-dropdown: 500; /* Floating UI */
+  --z-index-modal-backdrop: 900; /* Full-screen Overlays */
+  --z-index-modal: 1000; /* Full-screen Overlays */
+  --z-index-toast: 1100; /* Toast */
+
+  /* BreakPoint */
+  --breakpoint-xs: 375px;
+
+  /* Focus ring */
+  --color-ring: var(--color-primary-500);
+}
+
+@layer base {
+  /* 키보드 포커스 outline 색상 */
+  :focus-visible {
+    outline-color: var(--color-primary-500);
+  }
+}
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@utility skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-100) 25%,
+    var(--color-gray-50) 50%,
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* 브라우저별 기본 스크롤바를 숨기는 유틸리티 클래스 */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

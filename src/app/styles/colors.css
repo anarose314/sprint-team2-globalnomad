@@ -1,0 +1,48 @@
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-gray-25: #f8f8f8;
+  --color-gray-50: #edeef2;
+  --color-gray-100: #e0e0e5;
+  --color-gray-200: #c6c8cf;
+  --color-gray-300: #b3b4bc;
+  --color-gray-400: #9fa0a7;
+  --color-gray-500: #84858c;
+  --color-gray-600: #707177;
+  --color-gray-700: #5d5d61;
+  --color-gray-800: #49494c;
+  --color-gray-900: #323236;
+  --color-gray-950: #1f1f22;
+
+  --color-primary-25: #f8fbfe;
+  --color-primary-50: #f1f7fc;
+  --color-primary-100: #eaf3fa;
+  --color-primary-500: #70acde;
+  --color-primary-600: #4b91c9;
+  --color-primary-700: #3576a9;
+
+  --color-teal-100: #f0f9f8;
+  --color-teal-200: #ddf9f9;
+  --color-teal-500: #4db5a7;
+  --color-teal-700: #1790a0;
+
+  --color-red-100: #fdf2f2;
+  --color-red-500: #f96767;
+  --color-red-700: #d67b7b;
+
+  --color-orange-100: #fff8dd;
+  --color-orange-700: #ffb051;
+
+  --color-yellow-500: #ffcb02;
+
+  --color-error: #ff2727;
+  --color-warning: #ffc021;
+  --color-info: #2f86eb;
+
+  /* Box Shadows */
+  --shadow-custom: 0 4px 16px 0 rgba(31, 31, 34, 0.05);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-review-card: 0 4px 24px 0 rgba(156, 180, 202, 0.2);
+}
