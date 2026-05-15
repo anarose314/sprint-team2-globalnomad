@@ -7,6 +7,8 @@ import type {
 } from '@/app/(main)/activity/apis/activities.types';
 import { useActivities } from '@/app/(main)/activity/hooks/useActivities';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
+import { ActivityCardListSkeleton } from '@/app/(main)/components/activity-card-list-skeleton';
+import { ActivitySectionStatus } from '@/app/(main)/components/activity-section-status';
 import type { AllActivitySectionProps } from '@/app/(main)/components/all-activity-section/allActivitySection.types';
 import {
   MAIN_CATEGORIES,
@@ -35,6 +37,13 @@ const getServerDesktopPageSizeSnapshot = () => false;
 const isActivitySort = (value: string): value is ActivitySort => {
   return MAIN_SORT_OPTIONS.some((option) => option.value === value);
 };
+
+const ACTIVITY_GRID_CLASS_NAME = cn(
+  'grid w-full grid-cols-1 gap-4 gap-y-6',
+  'xs:grid-cols-2',
+  'md:grid-cols-3 md:gap-6',
+  '2xl:grid-cols-4'
+);
 
 /**
  * 메인 페이지 모든 체험 섹션 컴포넌트
@@ -186,35 +195,33 @@ export function AllActivitySection({
       )}
 
       {isPending && (
-        <p className="typo-md-medium py-10 text-center text-gray-500">
-          체험을 불러오는 중입니다.
-        </p>
+        <ActivityCardListSkeleton
+          count={pageSize}
+          className={ACTIVITY_GRID_CLASS_NAME}
+          message="모든 체험 목록을 불러오는 중입니다."
+        />
       )}
 
       {isError && (
-        <p className="typo-md-medium py-10 text-center text-red-500">
-          체험을 불러오지 못했습니다.
-        </p>
+        <ActivitySectionStatus
+          message="체험을 불러오지 못했습니다."
+          tone="error"
+        />
       )}
 
       {!isPending && !isError && activities.length === 0 && (
-        <p className="typo-md-medium py-10 text-center text-gray-500">
-          {isSearchMode
-            ? '검색 결과가 없습니다.'
-            : '조건에 맞는 체험이 없습니다.'}
-        </p>
+        <ActivitySectionStatus
+          message={
+            isSearchMode
+              ? '검색 결과가 없습니다.'
+              : '조건에 맞는 체험이 없습니다.'
+          }
+        />
       )}
 
       {!isPending && !isError && activities.length > 0 && (
         <>
-          <ul
-            className={cn(
-              'grid w-full grid-cols-1 gap-4 gap-y-6',
-              'xs:grid-cols-2',
-              'md:grid-cols-3 md:gap-6',
-              '2xl:grid-cols-4'
-            )}
-          >
+          <ul className={ACTIVITY_GRID_CLASS_NAME}>
             {activities.map((activity) => (
               <li key={activity.id}>
                 <ActivityCard activity={activity} />
