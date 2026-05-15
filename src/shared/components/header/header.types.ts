@@ -1,5 +1,10 @@
 export interface HeaderUser {
-  name: string;
+  nickname: string;
+  profileImageUrl: string | null;
+}
+
+export interface HeaderProfileAvatarProps {
+  user: HeaderUser;
 }
 
 export interface HeaderProps {
