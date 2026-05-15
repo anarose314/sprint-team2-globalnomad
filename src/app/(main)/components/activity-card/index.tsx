@@ -22,6 +22,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
       href={`/activity/${activity.id}`}
       className="block h-full"
       aria-label={`${activity.title} 상세 페이지로 이동`}
+      draggable={false}
     >
       <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
         <div className="relative aspect-square w-full bg-gray-200">
@@ -32,6 +33,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               fill
               sizes="(min-width: 1536px) 262px, (min-width: 768px) 33vw, 50vw"
               className="object-cover"
+              draggable={false}
             />
           )}
         </div>
