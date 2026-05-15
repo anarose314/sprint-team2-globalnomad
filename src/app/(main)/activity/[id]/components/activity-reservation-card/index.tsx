@@ -29,6 +29,7 @@ export function ActivityReservationCard({
   const {
     isDateSheetOpen,
     isSuccessModalOpen,
+    isLoginRequiredModalOpen,
     mobileSheetStep,
     hasSelectableDate,
     isReservationAvailable,
@@ -44,6 +45,8 @@ export function ActivityReservationCard({
     handleOpenDateSheet,
     handleCloseDateSheet,
     handleCloseSuccessModal,
+    handleCloseLoginRequiredModal,
+    handleConfirmLoginRequired,
     handleMoveToHeadCountStep,
     handleMoveToDateTimeStep,
     handleDateChange,
@@ -117,6 +120,16 @@ export function ActivityReservationCard({
           <OneButtonModal
             message="예약이 완료되었습니다."
             onConfirm={handleCloseSuccessModal}
+          />
+        </ModalOverlay>
+      ) : null}
+
+      {isLoginRequiredModalOpen ? (
+        <ModalOverlay onClose={handleCloseLoginRequiredModal}>
+          <OneButtonModal
+            message="로그인이 필요한 서비스입니다. 예약을 진행하려면 로그인해 주세요."
+            buttonText="로그인하기"
+            onConfirm={handleConfirmLoginRequired}
           />
         </ModalOverlay>
       ) : null}

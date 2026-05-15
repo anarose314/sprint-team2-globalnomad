@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   CalendarValue,
@@ -25,6 +26,7 @@ export const useActivityReservationCardState = ({
   pricePerPerson,
   schedules,
 }: UseActivityReservationCardStateProps) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [headCount, setHeadCount] = useState(1);
@@ -35,6 +37,8 @@ export const useActivityReservationCardState = ({
   );
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
   const [mobileSheetStep, setMobileSheetStep] =
     useState<MobileSheetStep>('dateTime');
 
@@ -151,6 +155,11 @@ export const useActivityReservationCardState = ({
         setIsSuccessModalOpen(true);
       },
       onError: async (error) => {
+        if (error instanceof ApiError && error.status === 401) {
+          setIsLoginRequiredModalOpen(true);
+          return;
+        }
+
         if (!(error instanceof ApiError) || error.status !== 409) {
           return;
         }
@@ -198,6 +207,15 @@ export const useActivityReservationCardState = ({
 
   const handleCloseSuccessModal = () => {
     setIsSuccessModalOpen(false);
+  };
+
+  const handleCloseLoginRequiredModal = () => {
+    setIsLoginRequiredModalOpen(false);
+  };
+
+  const handleConfirmLoginRequired = () => {
+    setIsLoginRequiredModalOpen(false);
+    router.push('/login');
   };
 
   const handleMoveToHeadCountStep = () => {
@@ -259,6 +277,7 @@ export const useActivityReservationCardState = ({
   return {
     isDateSheetOpen,
     isSuccessModalOpen,
+    isLoginRequiredModalOpen,
     mobileSheetStep,
     hasSelectableDate,
     isReservationAvailable,
@@ -274,6 +293,8 @@ export const useActivityReservationCardState = ({
     handleOpenDateSheet,
     handleCloseDateSheet,
     handleCloseSuccessModal,
+    handleCloseLoginRequiredModal,
+    handleConfirmLoginRequired,
     handleMoveToHeadCountStep,
     handleMoveToDateTimeStep,
     handleDateChange,
