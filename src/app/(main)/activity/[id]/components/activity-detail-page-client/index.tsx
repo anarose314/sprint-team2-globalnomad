@@ -1,16 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { ActivityDetailContent } from '@/app/(main)/activity/[id]/components/activity-detail-content';
 import { ActivityImageGallery } from '@/app/(main)/activity/[id]/components/activity-image-gallery';
 import { ActivityInfoHeader } from '@/app/(main)/activity/[id]/components/activity-info-header';
 import { ActivityReservationCard } from '@/app/(main)/activity/[id]/components/activity-reservation-card';
 import { ActivityReviewsSection } from '@/app/(main)/activity/[id]/components/activity-reviews/activityReviewsSection';
-import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
+import { useActivityActions } from '@/app/(main)/activity/hooks/useActivityActions';
 import { TwoButtonModal } from '@/shared/components/modal';
 import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
-import { useShowToast } from '@/shared/store/useToastStore';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
 interface ActivityDetailPageClientProps {
@@ -28,62 +25,20 @@ export function ActivityDetailPageClient({
   activity,
   isOwner,
 }: ActivityDetailPageClientProps) {
-  const router = useRouter();
-  const showToast = useShowToast();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const subImageUrls = Array.isArray(activity.subImages)
     ? activity.subImages.map((image) => image.imageUrl)
     : [];
 
-  const handleEdit = () => {
-    router.push(`/activity/${activity.id}/edit`);
-  };
-
-  const handleDelete = () => {
-    if (isDeleting) {
-      return;
-    }
-
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (isDeleting) {
-      return;
-    }
-
-    try {
-      setIsDeleteModalOpen(false);
-      setIsDeleting(true);
-      await fetchInstanceClient<unknown>(
-        `/api/proxy/my-activities/${activity.id}`,
-        {
-          method: 'DELETE',
-        }
-      );
-
-      showToast({
-        theme: 'success',
-        message: '체험이 삭제되었습니다.',
-      });
-      router.replace('/my/activities');
-    } catch (error) {
-      showToast({
-        theme: 'error',
-        message:
-          error instanceof Error
-            ? error.message
-            : '체험 삭제 중 오류가 발생했습니다.',
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  const {
+    isOpen,
+    handleEdit,
+    handleDeleteRequest,
+    handleDeleteCancel,
+    handleDeleteConfirm,
+  } = useActivityActions({
+    initialActivityId: activity.id,
+    onSuccessRedirect: '/my/activities',
+  });
 
   return (
     <div className="py-6 pb-40 md:py-8 md:pb-40 2xl:py-10 2xl:pb-10">
@@ -107,7 +62,7 @@ export function ActivityDetailPageClient({
                 address={activity.address}
                 isOwner={isOwner}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteRequest}
               />
             </div>
 
@@ -128,7 +83,7 @@ export function ActivityDetailPageClient({
                 address={activity.address}
                 isOwner={isOwner}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteRequest}
               />
             </div>
             {!isOwner && (
@@ -143,13 +98,13 @@ export function ActivityDetailPageClient({
           </div>
         </div>
       </div>
-      {isDeleteModalOpen ? (
-        <ModalOverlay onClose={handleCloseDeleteModal}>
+      {isOpen ? (
+        <ModalOverlay onClose={handleDeleteCancel}>
           <TwoButtonModal
             message="정말 이 체험을 삭제하시겠습니까?"
             cancelText="취소"
             confirmText="삭제"
-            onCancel={handleCloseDeleteModal}
+            onCancel={handleDeleteCancel}
             onConfirm={handleDeleteConfirm}
           />
         </ModalOverlay>
