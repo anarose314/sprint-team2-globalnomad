@@ -9,8 +9,8 @@ interface BuildReservationDetailDataProps {
  * 예약 상태가 존재하는 시간 슬롯만 상세 패널용 데이터로 변환
  *
  * 노출 대상:
- * - pending / confirmed / declined 중 하나라도 1 이상
- * - completed는 서버 상태 전환 값으로 사용하지 않고, UI에서 시간 경과 시 뱃지로만 처리
+ * - pending / confirmed / declined / completed 중 하나라도 1 이상
+ * - completed는 서버 집계이며, 상세 패널 슬롯 노출·승인 탭 목록 조회에 반영한다.
  */
 export const buildReservationDetailData = ({
   reservedSchedules,
@@ -20,7 +20,8 @@ export const buildReservationDetailData = ({
       const pending = Math.max(schedule.count.pending, 0);
       const confirmed = Math.max(schedule.count.confirmed, 0);
       const declined = Math.max(schedule.count.declined, 0);
-      return pending + confirmed + declined > 0;
+      const completed = Math.max(schedule.count.completed ?? 0, 0);
+      return pending + confirmed + declined + completed > 0;
     })
     .map((schedule) => ({
       scheduleId: schedule.scheduleId,
@@ -32,6 +33,7 @@ export const buildReservationDetailData = ({
         pending: Math.max(schedule.count.pending, 0),
         confirmed: Math.max(schedule.count.confirmed, 0),
         declined: Math.max(schedule.count.declined, 0),
+        completed: Math.max(schedule.count.completed ?? 0, 0),
       },
       sortKey: schedule.startTime,
     }))

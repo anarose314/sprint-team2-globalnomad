@@ -82,9 +82,25 @@ export const useReservationDetailSheet = ({
     isSelectedTimeSlotEnded,
   });
 
+  const selectedTimeSlotCount = useMemo(
+    () =>
+      selectedTimeSlot?.count ?? {
+        pending: 0,
+        confirmed: 0,
+        declined: 0,
+        completed: 0,
+      },
+    [selectedTimeSlot]
+  );
+
   const tabCount = useMemo(() => {
-    return selectedTimeSlot?.count ?? { pending: 0, confirmed: 0, declined: 0 };
-  }, [selectedTimeSlot]);
+    const completed = selectedTimeSlotCount.completed ?? 0;
+    return {
+      pending: selectedTimeSlotCount.pending,
+      confirmed: selectedTimeSlotCount.confirmed + completed,
+      declined: selectedTimeSlotCount.declined,
+    };
+  }, [selectedTimeSlotCount]);
 
   const isDateReservationEmpty = useMemo(() => {
     const timeSlots = detailData?.timeSlots ?? [];
@@ -106,7 +122,7 @@ export const useReservationDetailSheet = ({
   return {
     activeTab,
     requests,
-    selectedTimeSlotCount: tabCount,
+    selectedTimeSlotCount,
     isLoadingRequests,
     isFetchingNextPage,
     hasMoreRequests,

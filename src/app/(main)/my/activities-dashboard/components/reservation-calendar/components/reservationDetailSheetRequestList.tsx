@@ -55,10 +55,12 @@ export function ReservationDetailSheetRequestList({
   };
 
   const getEmptyMessage = () => {
-    const hasConfirmed = selectedTimeSlotCount.confirmed > 0;
-    if (activeTab === 'pending' && hasConfirmed)
+    const hasApprovedSlot =
+      selectedTimeSlotCount.confirmed > 0 ||
+      (selectedTimeSlotCount.completed ?? 0) > 0;
+    if (activeTab === 'pending' && hasApprovedSlot)
       return '승인된 예약이 있습니다.';
-    if (activeTab === 'declined' && hasConfirmed)
+    if (activeTab === 'declined' && hasApprovedSlot)
       return '거절된 예약이 없습니다.';
     if (isDateReservationEmpty) return '해당 날짜에 예약 내역이 없습니다.';
     return '해당 시간대에 예약 내역이 없습니다.';

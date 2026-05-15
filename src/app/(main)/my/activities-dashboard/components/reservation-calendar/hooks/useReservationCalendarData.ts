@@ -12,6 +12,7 @@ import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard
 import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { ActivitySchedule } from '@/shared/types/activityDetail.types';
+import { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
 interface UseReservationCalendarDataProps {
@@ -194,6 +195,76 @@ export const useReservationCalendarData = ({
     return counts;
   }, [scheduleCandidates, scheduleStatusQueries]);
 
+  /**
+   * reserved-schedule 행이 비거나 집계가 늦어도,
+   * 체험 상세 스케줄 + 예약 목록 totalCount(pending/confirmed/declined)로 슬롯을 복구한다.
+   * (예약 목록 API는 status=completed를 지원하지 않아 completed 건수는 reserved-schedule만 사용)
+   */
+  const reservedScheduleRowsForDetail = useMemo((): ReservedScheduleItem[] => {
+    const mergeCountsWithQueries = (
+      row: ReservedScheduleItem
+    ): ReservedScheduleItem => {
+      const id = row.scheduleId;
+      return {
+        ...row,
+        count: {
+          pending: Math.max(
+            row.count.pending,
+            pendingCountByScheduleId[id] ?? 0
+          ),
+          confirmed: Math.max(
+            row.count.confirmed,
+            confirmedCountByScheduleId[id] ?? 0
+          ),
+          declined: Math.max(
+            row.count.declined,
+            declinedCountByScheduleId[id] ?? 0
+          ),
+          completed: Math.max(row.count.completed ?? 0, 0),
+        },
+      };
+    };
+
+    const enrichedReserved = reservedSchedules.map(mergeCountsWithQueries);
+    const reservedById = new Map(
+      enrichedReserved.map((row) => [row.scheduleId, row])
+    );
+
+    const fromActivity = scheduleCandidates.map((candidate) => {
+      const existing = reservedById.get(candidate.scheduleId);
+      if (existing) return existing;
+      const id = candidate.scheduleId;
+      return {
+        scheduleId: id,
+        startTime: candidate.startTime,
+        endTime: candidate.endTime,
+        count: {
+          pending: pendingCountByScheduleId[id] ?? 0,
+          confirmed: confirmedCountByScheduleId[id] ?? 0,
+          declined: declinedCountByScheduleId[id] ?? 0,
+          completed: 0,
+        },
+      };
+    });
+
+    const activityIds = new Set(
+      scheduleCandidates.map((candidate) => candidate.scheduleId)
+    );
+    const extras = enrichedReserved.filter(
+      (row) => !activityIds.has(row.scheduleId)
+    );
+
+    return [...fromActivity, ...extras].sort((a, b) =>
+      a.startTime.localeCompare(b.startTime)
+    );
+  }, [
+    reservedSchedules,
+    scheduleCandidates,
+    pendingCountByScheduleId,
+    confirmedCountByScheduleId,
+    declinedCountByScheduleId,
+  ]);
+
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
@@ -227,6 +298,7 @@ export const useReservationCalendarData = ({
       const normalized = reservedSchedules.reduce(
         (accumulator, schedule) => {
           accumulator.pending += Math.max(schedule.count.pending, 0);
+          accumulator.completed += Math.max(schedule.count.completed ?? 0, 0);
           const confirmedCount = Math.max(schedule.count.confirmed, 0);
           if (confirmedCount > 0) {
             if (
@@ -269,7 +341,7 @@ export const useReservationCalendarData = ({
     }
 
     const builtFromReservedSchedules = buildReservationDetailData({
-      reservedSchedules,
+      reservedSchedules: reservedScheduleRowsForDetail,
     });
 
     if (builtFromReservedSchedules.timeSlots.length > 0) {
@@ -355,41 +427,16 @@ export const useReservationCalendarData = ({
       return { timeSlots: [] };
     }
 
-    const now = new Date();
-    const confirmedTargetSchedule = candidateSchedules
-      .map((schedule) => ({
-        scheduleId: schedule.scheduleId,
-        signalCount:
-          (pendingCountByScheduleId[schedule.scheduleId] ?? 0) +
-          (confirmedCountByScheduleId[schedule.scheduleId] ?? 0) +
-          (declinedCountByScheduleId[schedule.scheduleId] ?? 0),
-      }))
-      .sort((a, b) => b.signalCount - a.signalCount)[0];
-    const endedSchedules = candidateSchedules.filter((schedule) =>
-      isScheduleEnded(reservedScheduleDateKey, schedule.endTime, now)
-    );
-    const targetScheduleId =
-      confirmedTargetSchedule && confirmedTargetSchedule.signalCount > 0
-        ? confirmedTargetSchedule.scheduleId
-        : (endedSchedules[0]?.scheduleId ?? candidateSchedules[0].scheduleId);
-
     const synthesizedReservedSchedules = candidateSchedules.map((schedule) => {
-      const isTarget = schedule.scheduleId === targetScheduleId;
-
+      const scheduleId = schedule.scheduleId;
       return {
-        scheduleId: schedule.scheduleId,
+        scheduleId,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
         count: {
-          pending: isTarget
-            ? (pendingCountByScheduleId[schedule.scheduleId] ?? 0)
-            : 0,
-          confirmed: isTarget
-            ? (confirmedCountByScheduleId[schedule.scheduleId] ?? 0)
-            : 0,
-          declined: isTarget
-            ? (declinedCountByScheduleId[schedule.scheduleId] ?? 0)
-            : 0,
+          pending: pendingCountByScheduleId[scheduleId] ?? 0,
+          confirmed: confirmedCountByScheduleId[scheduleId] ?? 0,
+          declined: declinedCountByScheduleId[scheduleId] ?? 0,
           completed: 0,
         },
       };
@@ -404,6 +451,7 @@ export const useReservationCalendarData = ({
     eventCountsByDate,
     pendingCountByScheduleId,
     reservedScheduleDateKey,
+    reservedScheduleRowsForDetail,
     scheduleCandidates,
     reservedSchedules,
   ]);
