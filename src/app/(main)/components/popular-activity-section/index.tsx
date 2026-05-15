@@ -1,8 +1,6 @@
 'use client';
 
 import {
-  type MouseEvent,
-  type PointerEvent,
   type UIEvent,
   useCallback,
   useRef,
@@ -18,10 +16,10 @@ import {
   POPULAR_ACTIVITY_PAGE_SIZE,
 } from '@/app/(main)/main.constants';
 import { Heading } from '@/shared/components/heading';
+import { useDragScroll } from '@/shared/hooks/useDragScroll';
 import { cn } from '@/shared/utils/cn';
 
 const SCROLL_LOAD_THRESHOLD = 80;
-const DRAG_SCROLL_CLICK_THRESHOLD = 5;
 
 const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
   'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
@@ -71,10 +69,7 @@ const getServerDesktopLayoutSnapshot = () => false;
 export function PopularActivitySection() {
   const [desktopPageIndex, setDesktopPageIndex] = useState(0);
   const isLoadNextPageLockedRef = useRef(false);
-  const isDragScrollingRef = useRef(false);
-  const hasDraggedScrollRef = useRef(false);
-  const dragStartClientXRef = useRef(0);
-  const dragStartScrollLeftRef = useRef(0);
+  const { scrollRef, events } = useDragScroll<HTMLUListElement>();
 
   const {
     data,
@@ -94,6 +89,9 @@ export function PopularActivitySection() {
   const pages = data?.pages ?? [];
   const allActivities = pages.flatMap((page) => page.activities);
   const desktopPages = pages.filter((page) => page.activities.length > 0);
+  const totalCount = pages[0]?.totalCount ?? 0;
+  const hasLoadedAllActivities =
+    totalCount > 0 && allActivities.length >= totalCount;
 
   const safeDesktopPageIndex = Math.min(
     desktopPageIndex,
@@ -105,14 +103,15 @@ export function PopularActivitySection() {
 
   const activities = isDesktopLayout ? desktopActivities : allActivities;
 
-  const canLoadNextPage = Boolean(hasNextPage) && !isFetchingNextPage;
+  const canLoadNextPage =
+    Boolean(hasNextPage) && !isFetchingNextPage && !hasLoadedAllActivities;
 
   const canMovePreviousDesktopPage =
     isDesktopLayout && safeDesktopPageIndex > 0;
 
   const canMoveNextDesktopPage =
     isDesktopLayout &&
-    (safeDesktopPageIndex < desktopPages.length - 1 || Boolean(hasNextPage));
+    (safeDesktopPageIndex < desktopPages.length - 1 || canLoadNextPage);
 
   const shouldShowPreviousButton = canMovePreviousDesktopPage;
   const shouldShowNextButton = canMoveNextDesktopPage;
@@ -167,74 +166,6 @@ export function PopularActivitySection() {
     }
   };
 
-  const handleHorizontalScrollPointerDown = (
-    event: PointerEvent<HTMLUListElement>
-  ) => {
-    if (
-      isDesktopLayout ||
-      event.pointerType !== 'mouse' ||
-      event.button !== 0
-    ) {
-      return;
-    }
-
-    isDragScrollingRef.current = true;
-    hasDraggedScrollRef.current = false;
-    dragStartClientXRef.current = event.clientX;
-    dragStartScrollLeftRef.current = event.currentTarget.scrollLeft;
-
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const handleHorizontalScrollPointerMove = (
-    event: PointerEvent<HTMLUListElement>
-  ) => {
-    if (!isDragScrollingRef.current || isDesktopLayout) {
-      return;
-    }
-
-    const dragDistance = event.clientX - dragStartClientXRef.current;
-
-    if (Math.abs(dragDistance) > DRAG_SCROLL_CLICK_THRESHOLD) {
-      hasDraggedScrollRef.current = true;
-      event.preventDefault();
-    }
-
-    event.currentTarget.scrollLeft =
-      dragStartScrollLeftRef.current - dragDistance;
-  };
-
-  const handleHorizontalScrollPointerEnd = (
-    event: PointerEvent<HTMLUListElement>
-  ) => {
-    if (!isDragScrollingRef.current) {
-      return;
-    }
-
-    isDragScrollingRef.current = false;
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-
-    if (hasDraggedScrollRef.current) {
-      window.setTimeout(() => {
-        hasDraggedScrollRef.current = false;
-      }, 0);
-    }
-  };
-
-  const handleHorizontalScrollClickCapture = (
-    event: MouseEvent<HTMLUListElement>
-  ) => {
-    if (!hasDraggedScrollRef.current) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-  };
-
   return (
     <section>
       <Heading
@@ -267,12 +198,9 @@ export function PopularActivitySection() {
       {!isPending && !isError && activities.length > 0 && (
         <div className="relative">
           <ul
+            ref={scrollRef}
             onScroll={handleHorizontalScroll}
-            onPointerDown={handleHorizontalScrollPointerDown}
-            onPointerMove={handleHorizontalScrollPointerMove}
-            onPointerUp={handleHorizontalScrollPointerEnd}
-            onPointerCancel={handleHorizontalScrollPointerEnd}
-            onClickCapture={handleHorizontalScrollClickCapture}
+            {...events}
             className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
           >
             {activities.map((activity) => (
