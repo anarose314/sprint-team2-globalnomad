@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMyInfo } from '@/app/(main)/my/profile/hooks/useMyInfo';
 import { Header } from '@/shared/components/header';
 import type { HeaderUser } from '@/shared/components/header/header.types';
@@ -41,12 +41,14 @@ export function MainHeaderWithDrawer({
   });
 
   // 클라이언트 캐시 데이터가 있으면 그것을, 없으면 서버에서 받은 초기값을 사용한다.
-  const user: HeaderUser | undefined = queryUser
-    ? {
-        nickname: queryUser.nickname,
-        profileImageUrl: queryUser.profileImageUrl,
-      }
-    : initialUser;
+  const user = useMemo<HeaderUser | undefined>(() => {
+    return queryUser
+      ? {
+          nickname: queryUser.nickname,
+          profileImageUrl: queryUser.profileImageUrl,
+        }
+      : initialUser;
+  }, [queryUser, initialUser]);
 
   const openDrawer = useCallback(() => {
     setIsDrawerOpen(true);

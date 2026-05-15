@@ -1,4 +1,3 @@
-// src/app/(main)/my/profile/hooks/useMyInfo.ts
 import { useQuery } from '@tanstack/react-query';
 import { fetchMyInfo } from '@/app/(main)/my/profile/apis/myInfo';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -12,7 +11,7 @@ export const myInfoOptions = () => ({
 });
 
 /**
- * 내 정보 페이지에서 사용하는 커스텀 훅
+ * 내 정보를 가져오는 커스텀 훅
  *
  * @param options 쿼리 옵션 (enabled 등)
  *
