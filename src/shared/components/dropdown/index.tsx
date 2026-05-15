@@ -14,11 +14,14 @@ import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
+import { useDropdownKeyboard } from '@/shared/components/dropdown/useDropdownKeyboard';
 import {
   INPUT_ERROR_MESSAGE_STYLE,
   INPUT_ERROR_STYLE,
   INPUT_LABEL_STYLE,
 } from '@/shared/components/input/input.constants';
+import { useClickOutside } from '@/shared/hooks/useClickOutside';
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
 import { cn } from '@/shared/utils/cn';
 
 /**
@@ -60,119 +63,34 @@ export function Dropdown({
   const hasOpened = useRef(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const listboxRef = useRef<HTMLUListElement>(null);
   const dropdownId = useId();
   const listboxId = `${dropdownId}-listbox`;
   const buttonId = `${dropdownId}-button`;
+
   const selectedOption = options.find((option) => option.value === value);
   const isDisabled = disabled || options.length === 0;
   const isFieldVariant = variant === 'field' || variant === 'fieldInput';
-
-  const listboxRef = useRef<HTMLUListElement>(null);
-
-  const searchString = useRef('');
-  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
-
   const triggerLabel =
     variant === 'chip' ? placeholder : (selectedOption?.label ?? placeholder);
-
   const isPlaceholder = !selectedOption && isFieldVariant;
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const { key } = event;
-
-    // 1. 타이핑 검색 로직
-    // 일반 문자/숫자 키가 눌렸을 때 (Ctrl, Alt 등 특수키 제외)
-    if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
-      event.preventDefault();
-      searchString.current += key.toLowerCase();
-
-      // 500ms가 지나면 누적된 문자열 초기화 (연속 타이핑 감지용)
-      if (searchTimeout.current) clearTimeout(searchTimeout.current);
-      searchTimeout.current = setTimeout(() => {
-        searchString.current = '';
-      }, 500);
-
-      // 누적된 문자열로 시작하는 첫 번째 옵션 찾기
-      const matchIndex = options.findIndex((option) =>
-        option.label.toLowerCase().startsWith(searchString.current)
-      );
-
-      if (matchIndex !== -1) {
-        setFocusedIndex(matchIndex);
-        if (!isOpen) {
-          handleOptionClick(options[matchIndex]);
-        } else if (listboxRef.current) {
-          listboxRef.current.scrollTop = matchIndex * optionHeight;
-        }
-      }
-      return;
-    }
-
-    // 2. 방향키 및 엔터 로직
-    if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(key)) return;
-
-    event.preventDefault();
-
-    // 메뉴가 닫혀있을 때
-    if (!isOpen) {
-      if (key === 'Enter') return setIsOpen(true);
-
-      const currentIndex = Math.max(
-        options.findIndex((opt) => opt.value === value),
-        0
-      );
-      const nextIndex =
-        key === 'ArrowDown'
-          ? Math.min(currentIndex + 1, options.length - 1)
-          : Math.max(currentIndex - 1, 0);
-
-      setFocusedIndex(nextIndex);
-      handleOptionClick(options[nextIndex]);
-      return;
-    }
-
-    // 메뉴가 열려있을 때
-    if (key === 'Enter') {
-      if (focusedIndex >= 0 && focusedIndex < options.length) {
-        handleOptionClick(options[focusedIndex]);
-      }
-      return;
-    }
-
-    const nextIndex =
-      key === 'ArrowDown'
-        ? Math.min(focusedIndex + 1, options.length - 1)
-        : Math.max(focusedIndex - 1, 0);
-
-    setFocusedIndex(nextIndex);
-
-    // 방향키 이동 시 스크롤 보정
-    if (listboxRef.current) {
-      if (key === 'ArrowDown') {
-        const itemBottom = (nextIndex + 1) * optionHeight;
-        const visibleBottom = listboxRef.current.scrollTop + menuMaxHeight;
-        if (itemBottom > visibleBottom)
-          listboxRef.current.scrollTop = itemBottom - menuMaxHeight;
-      } else {
-        const itemTop = nextIndex * optionHeight;
-        const visibleTop = listboxRef.current.scrollTop;
-        if (itemTop < visibleTop) listboxRef.current.scrollTop = itemTop;
-      }
-    }
-  };
 
   const handleToggle = () => {
     if (isDisabled) return;
+
+    if (!isOpen) {
+      const selectedIndex = options.findIndex(
+        (option) => option.value === value
+      );
+      setFocusedIndex(selectedIndex !== -1 ? selectedIndex : -1);
+    }
 
     setIsOpen((prev) => !prev);
   };
 
   const handleOptionClick = (option: DropdownOption) => {
     if (option.disabled) return;
-
     onChange(option.value, option);
     setIsOpen(false);
   };
@@ -181,6 +99,25 @@ export function Dropdown({
     if (isOpen) return;
     if (onBlur) onBlur();
   };
+
+  useClickOutside(dropdownRef, () => {
+    if (isOpen) setIsOpen(false);
+  });
+
+  useEscapeKey(() => setIsOpen(false), isOpen);
+
+  const { handleKeyDown } = useDropdownKeyboard({
+    isOpen,
+    setIsOpen,
+    options,
+    value,
+    focusedIndex,
+    setFocusedIndex,
+    handleOptionClick,
+    listboxRef,
+    optionHeight,
+    menuMaxHeight,
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -191,43 +128,12 @@ export function Dropdown({
   }, [isOpen, onBlur]);
 
   useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (event: PointerEvent) => {
-      if (!dropdownRef.current) return;
-      if (!dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('keydown', handleEscapeKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     if (isOpen && listboxRef.current) {
       const selectedIndex = options.findIndex(
         (option) => option.value === value
       );
-
       if (selectedIndex !== -1) {
-        const scrollPosition = selectedIndex * optionHeight;
-        listboxRef.current.scrollTop = scrollPosition;
+        listboxRef.current.scrollTop = selectedIndex * optionHeight;
       }
     }
   }, [isOpen, options, value, optionHeight]);
@@ -282,7 +188,6 @@ export function Dropdown({
           >
             {triggerLabel}
           </span>
-
           <IcArrowDown
             aria-hidden="true"
             className={cn(
@@ -325,13 +230,15 @@ export function Dropdown({
                     className={cn(
                       'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
                       isSelected && 'bg-primary-100 text-primary-500',
-                      isOptionDisabled &&
-                        'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400',
+                      isOptionDisabled && 'cursor-not-allowed text-gray-400',
                       index === focusedIndex &&
+                        !isOptionDisabled &&
                         'bg-primary-100 text-primary-500'
                     )}
                     style={{ height: optionHeight }}
-                    onPointerEnter={() => setFocusedIndex(index)}
+                    onPointerEnter={() =>
+                      !isOptionDisabled && setFocusedIndex(index)
+                    }
                     onClick={() => handleOptionClick(option)}
                   >
                     <span className="truncate">{option.label}</span>
