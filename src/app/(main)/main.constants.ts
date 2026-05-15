@@ -1,12 +1,8 @@
 import type { MainCategory, MainSortOption } from '@/app/(main)/main.types';
 
-const MAIN_BANNER_IMAGE_URL =
-  'https://sprint-fe-project.s3.ap-northeast-2.amazonaws.com/globalnomad/activity_registration_image/21-1_3229_1775042497661.png';
-
 export const MAIN_BANNER = {
-  imageUrl: MAIN_BANNER_IMAGE_URL,
-  title: '함께 배우면 즐거운 스트릿 댄스',
-  description: '1월의 인기 체험 BEST 🔥',
+  title: 'FIND YOUR EXPERIENCE',
+  description: '당신만의 특별한 체험을 발견하세요',
 };
 
 export const MAIN_CATEGORIES: MainCategory[] = [

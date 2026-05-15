@@ -1,5 +1,8 @@
 import Image from 'next/image';
-import { MAIN_BANNER } from '@/app/(main)/main.constants';
+import {
+  MAIN_BANNER,
+  MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
+} from '@/app/(main)/main.constants';
 import { Heading } from '@/shared/components/heading';
 
 /**
@@ -16,11 +19,11 @@ export function MainBanner() {
     <section>
       <div className="relative h-45 overflow-hidden rounded-3xl bg-gray-300 md:h-93.75 2xl:h-125">
         <Image
-          src={MAIN_BANNER.imageUrl}
+          src="/main.webp"
           alt=""
           fill
           priority
-          sizes="(min-width: 1536px) 1120px, 100vw"
+          sizes={`${MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY} 1120px, 100vw`}
           className="object-cover"
         />
 
