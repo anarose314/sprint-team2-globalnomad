@@ -69,6 +69,9 @@ export function Dropdown({
 
   const listboxRef = useRef<HTMLUListElement>(null);
 
+  const searchString = useRef('');
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
 
@@ -79,6 +82,36 @@ export function Dropdown({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const { key } = event;
+
+    // 1. 타이핑 검색 로직
+    // 일반 문자/숫자 키가 눌렸을 때 (Ctrl, Alt 등 특수키 제외)
+    if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      searchString.current += key.toLowerCase();
+
+      // 500ms가 지나면 누적된 문자열 초기화 (연속 타이핑 감지용)
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+      searchTimeout.current = setTimeout(() => {
+        searchString.current = '';
+      }, 500);
+
+      // 누적된 문자열로 시작하는 첫 번째 옵션 찾기
+      const matchIndex = options.findIndex((option) =>
+        option.label.toLowerCase().startsWith(searchString.current)
+      );
+
+      if (matchIndex !== -1) {
+        setFocusedIndex(matchIndex);
+        if (!isOpen) {
+          handleOptionClick(options[matchIndex]);
+        } else if (listboxRef.current) {
+          listboxRef.current.scrollTop = matchIndex * optionHeight;
+        }
+      }
+      return;
+    }
+
+    // 2. 방향키 및 엔터 로직
     if (!['ArrowDown', 'ArrowUp', 'Enter'].includes(key)) return;
 
     event.preventDefault();
@@ -116,7 +149,7 @@ export function Dropdown({
 
     setFocusedIndex(nextIndex);
 
-    // 스크롤 보정
+    // 방향키 이동 시 스크롤 보정
     if (listboxRef.current) {
       if (key === 'ArrowDown') {
         const itemBottom = (nextIndex + 1) * optionHeight;
