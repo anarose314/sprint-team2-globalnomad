@@ -108,7 +108,7 @@ export function Header({
                   aria-label={`${user.nickname}님의 마이페이지 메뉴 열기`}
                   aria-expanded={isProfileMenuOpen}
                   aria-controls={profileMenuId}
-                  className="flex items-center gap-2"
+                  className="flex cursor-pointer items-center gap-2"
                 >
                   <HeaderProfileAvatar user={user} />
                 </button>
