@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthFooter } from '@/app/(auth)/components/auth-footer';
 import {
@@ -55,8 +56,13 @@ export function LoginForm() {
     <main className="mx-auto flex min-h-screen w-full max-w-160 flex-col items-center justify-center px-6 py-10">
       {/* 로고 — 모바일은 아이콘만, 태블릿+ 는 세로형 */}
       <div className="mb-10 flex flex-col items-center gap-4">
-        <LogoIcon aria-hidden="true" className="w-20 md:hidden" />
-        <LogoVertical aria-hidden="true" className="hidden w-63.75 md:block" />
+        <Link href="/" aria-label="GlobalNomad 메인으로 이동">
+          <LogoIcon aria-hidden="true" className="w-20 md:hidden" />
+          <LogoVertical
+            aria-hidden="true"
+            className="hidden w-63.75 md:block"
+          />
+        </Link>
         <h1 className="sr-only">GlobalNomad</h1>
       </div>
 
