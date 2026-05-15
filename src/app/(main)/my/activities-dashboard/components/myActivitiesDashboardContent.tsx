@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMyActivitiesForDashboard } from '@/app/(main)/my/activities-dashboard/apis/myActivitiesDashboard';
+import { ActivitiesDashboardSkeleton } from '@/app/(main)/my/activities-dashboard/components/activities-dashboard-skeleton';
 import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendarClient';
 import { Dropdown } from '@/shared/components/dropdown';
 import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
@@ -86,6 +87,10 @@ export function MyActivitiesDashboardContent() {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  if (isLoading) {
+    return <ActivitiesDashboardSkeleton scope="full" />;
+  }
+
   return (
     <>
       <Dropdown
@@ -95,12 +100,8 @@ export function MyActivitiesDashboardContent() {
             ? String(resolvedSelectedActivityId)
             : ''
         }
-        placeholder={
-          isLoading
-            ? '내 체험 목록을 불러오는 중입니다'
-            : '등록한 체험이 없습니다'
-        }
-        disabled={isLoading || !activityOptions.length}
+        placeholder="등록한 체험이 없습니다"
+        disabled={!activityOptions.length}
         className="mt-6 2xl:mt-7.5"
         triggerClassName="shadow-custom"
         onChange={handleActivityChange}
