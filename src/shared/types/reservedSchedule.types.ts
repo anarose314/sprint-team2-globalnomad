@@ -6,5 +6,6 @@ export interface ReservedScheduleItem {
     declined: number;
     confirmed: number;
     pending: number;
+    completed?: number;
   };
 }

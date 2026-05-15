@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
+import { fetchActivityDetail } from '@/app/(main)/activity/apis/activities';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
+import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import {
   ReservationDetailData,
@@ -9,6 +11,7 @@ import {
 import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
 import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
 interface UseReservationCalendarDataProps {
@@ -17,6 +20,18 @@ interface UseReservationCalendarDataProps {
   currentMonth: number;
   reservedScheduleDateKey: string | null;
 }
+
+const normalizeDateKey = (rawDate: string) => {
+  const trimmed = rawDate.trim();
+  const shortDate = trimmed.slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
+    return shortDate;
+  }
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return trimmed;
+  return formatDateKey(parsed);
+};
 
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
@@ -60,6 +75,125 @@ export const useReservationCalendarData = ({
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
+  const { data: activitySchedules = [] } = useQuery({
+    queryKey: [...QUERY_KEYS.ACTIVITIES, 'detailSchedules', activityId],
+    queryFn: async () => {
+      const detail = await fetchActivityDetail(activityId as number);
+      return detail.schedules ?? [];
+    },
+    enabled: activityId !== null && Boolean(reservedScheduleDateKey),
+    staleTime: 5 * 60_000,
+  });
+
+  const schedulesBySelectedDate = useMemo(
+    () =>
+      reservedScheduleDateKey
+        ? activitySchedules
+            .filter(
+              (schedule: ActivitySchedule) =>
+                normalizeDateKey(schedule.date) === reservedScheduleDateKey
+            )
+            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+        : [],
+    [activitySchedules, reservedScheduleDateKey]
+  );
+
+  const scheduleCandidates = useMemo(
+    () =>
+      schedulesBySelectedDate.map((schedule) => ({
+        scheduleId: schedule.id,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+      })),
+    [schedulesBySelectedDate]
+  );
+
+  const scheduleStatusQueries = useQueries({
+    queries: scheduleCandidates.flatMap((schedule) =>
+      (['pending', 'confirmed', 'declined'] as const).map((status) => ({
+        queryKey: [
+          ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
+          activityId,
+          reservedScheduleDateKey,
+          schedule.scheduleId,
+          status,
+          'totalCount',
+        ],
+        queryFn: () =>
+          fetchActivityReservations({
+            activityId: activityId as number,
+            scheduleId: schedule.scheduleId,
+            status,
+          }),
+        enabled:
+          activityId !== null &&
+          Boolean(reservedScheduleDateKey) &&
+          scheduleCandidates.length > 0,
+        staleTime: 60_000,
+      }))
+    ),
+  });
+
+  const confirmedCountByScheduleId = useMemo(() => {
+    const counts = scheduleCandidates.reduce<Record<number, number>>(
+      (accumulator, schedule) => {
+        accumulator[schedule.scheduleId] = 0;
+        return accumulator;
+      },
+      {}
+    );
+
+    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+      const queryIndex = scheduleIndex * 3 + 1;
+      counts[schedule.scheduleId] = Math.max(
+        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
+        0
+      );
+    });
+
+    return counts;
+  }, [scheduleCandidates, scheduleStatusQueries]);
+
+  const pendingCountByScheduleId = useMemo(() => {
+    const counts = scheduleCandidates.reduce<Record<number, number>>(
+      (accumulator, schedule) => {
+        accumulator[schedule.scheduleId] = 0;
+        return accumulator;
+      },
+      {}
+    );
+
+    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+      const queryIndex = scheduleIndex * 3;
+      counts[schedule.scheduleId] = Math.max(
+        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
+        0
+      );
+    });
+
+    return counts;
+  }, [scheduleCandidates, scheduleStatusQueries]);
+
+  const declinedCountByScheduleId = useMemo(() => {
+    const counts = scheduleCandidates.reduce<Record<number, number>>(
+      (accumulator, schedule) => {
+        accumulator[schedule.scheduleId] = 0;
+        return accumulator;
+      },
+      {}
+    );
+
+    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+      const queryIndex = scheduleIndex * 3 + 2;
+      counts[schedule.scheduleId] = Math.max(
+        scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0,
+        0
+      );
+    });
+
+    return counts;
+  }, [scheduleCandidates, scheduleStatusQueries]);
+
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
@@ -67,10 +201,11 @@ export const useReservationCalendarData = ({
     const eventCounts = reservationDashboard.reduce<
       Record<string, ReservationEventCounts>
     >((accumulator, item) => {
+      const itemDateKey = normalizeDateKey(item.date);
       const completed = Math.max(item.reservations.completed, 0);
       const confirmed = Math.max(item.reservations.confirmed, 0);
       const pending = Math.max(item.reservations.pending, 0);
-      const isPastDate = item.date < todayDateKey;
+      const isPastDate = itemDateKey < todayDateKey;
       const shiftedCompleted = isPastDate ? completed + confirmed : completed;
       const shiftedConfirmed = isPastDate ? 0 : confirmed;
 
@@ -80,7 +215,7 @@ export const useReservationCalendarData = ({
       if (shiftedCompleted > 0) dailyEventCounts.completed = shiftedCompleted;
 
       if (Object.keys(dailyEventCounts).length > 0) {
-        accumulator[item.date] = dailyEventCounts;
+        accumulator[itemDateKey] = dailyEventCounts;
       }
 
       return accumulator;
@@ -129,10 +264,149 @@ export const useReservationCalendarData = ({
   }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
-    return buildReservationDetailData({
+    if (!reservedScheduleDateKey) {
+      return { timeSlots: [] };
+    }
+
+    const builtFromReservedSchedules = buildReservationDetailData({
       reservedSchedules,
     });
-  }, [reservedSchedules]);
+
+    if (builtFromReservedSchedules.timeSlots.length > 0) {
+      return builtFromReservedSchedules;
+    }
+
+    const hasAnyScheduleReservation = scheduleCandidates.some((schedule) => {
+      const scheduleId = schedule.scheduleId;
+      return (
+        (pendingCountByScheduleId[scheduleId] ?? 0) +
+          (confirmedCountByScheduleId[scheduleId] ?? 0) +
+          (declinedCountByScheduleId[scheduleId] ?? 0) >
+        0
+      );
+    });
+
+    if (!hasAnyScheduleReservation) {
+      const selectedDayCounts = eventCountsByDate[reservedScheduleDateKey];
+      const pendingCount = Math.max(selectedDayCounts?.pending ?? 0, 0);
+      const confirmedCount = Math.max(selectedDayCounts?.confirmed ?? 0, 0);
+      const completedCount = Math.max(selectedDayCounts?.completed ?? 0, 0);
+      const hasAnyDailyReservation =
+        pendingCount + confirmedCount + completedCount > 0;
+
+      if (!hasAnyDailyReservation) {
+        return { timeSlots: [] };
+      }
+
+      const fallbackCandidates =
+        reservedSchedules.length > 0
+          ? [...reservedSchedules]
+              .sort((a, b) => a.startTime.localeCompare(b.startTime))
+              .map((schedule) => ({
+                scheduleId: schedule.scheduleId,
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+              }))
+          : scheduleCandidates;
+
+      if (fallbackCandidates.length === 0) {
+        return { timeSlots: [] };
+      }
+
+      const now = new Date();
+      const endedSchedules = fallbackCandidates.filter((schedule) =>
+        isScheduleEnded(reservedScheduleDateKey, schedule.endTime, now)
+      );
+      const targetScheduleId =
+        endedSchedules[0]?.scheduleId ?? fallbackCandidates[0].scheduleId;
+
+      return buildReservationDetailData({
+        reservedSchedules: fallbackCandidates.map((schedule) => ({
+          scheduleId: schedule.scheduleId,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          count: {
+            pending:
+              schedule.scheduleId === targetScheduleId ? pendingCount : 0,
+            // completed 조회/전환 없이 confirmed 라인에서 유지하고, 뱃지만 UI에서 완료로 바꾼다.
+            confirmed:
+              schedule.scheduleId === targetScheduleId
+                ? confirmedCount + completedCount
+                : 0,
+            declined: 0,
+            completed: 0,
+          },
+        })),
+      });
+    }
+
+    const candidateSchedules =
+      scheduleCandidates.length > 0
+        ? scheduleCandidates
+        : [...reservedSchedules]
+            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+            .map((schedule) => ({
+              scheduleId: schedule.scheduleId,
+              startTime: schedule.startTime,
+              endTime: schedule.endTime,
+            }));
+
+    if (candidateSchedules.length === 0) {
+      return { timeSlots: [] };
+    }
+
+    const now = new Date();
+    const confirmedTargetSchedule = candidateSchedules
+      .map((schedule) => ({
+        scheduleId: schedule.scheduleId,
+        signalCount:
+          (pendingCountByScheduleId[schedule.scheduleId] ?? 0) +
+          (confirmedCountByScheduleId[schedule.scheduleId] ?? 0) +
+          (declinedCountByScheduleId[schedule.scheduleId] ?? 0),
+      }))
+      .sort((a, b) => b.signalCount - a.signalCount)[0];
+    const endedSchedules = candidateSchedules.filter((schedule) =>
+      isScheduleEnded(reservedScheduleDateKey, schedule.endTime, now)
+    );
+    const targetScheduleId =
+      confirmedTargetSchedule && confirmedTargetSchedule.signalCount > 0
+        ? confirmedTargetSchedule.scheduleId
+        : (endedSchedules[0]?.scheduleId ?? candidateSchedules[0].scheduleId);
+
+    const synthesizedReservedSchedules = candidateSchedules.map((schedule) => {
+      const isTarget = schedule.scheduleId === targetScheduleId;
+
+      return {
+        scheduleId: schedule.scheduleId,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+        count: {
+          pending: isTarget
+            ? (pendingCountByScheduleId[schedule.scheduleId] ?? 0)
+            : 0,
+          confirmed: isTarget
+            ? (confirmedCountByScheduleId[schedule.scheduleId] ?? 0)
+            : 0,
+          declined: isTarget
+            ? (declinedCountByScheduleId[schedule.scheduleId] ?? 0)
+            : 0,
+          completed: 0,
+        },
+      };
+    });
+
+    return buildReservationDetailData({
+      reservedSchedules: synthesizedReservedSchedules,
+    });
+  }, [
+    confirmedCountByScheduleId,
+    declinedCountByScheduleId,
+    eventCountsByDate,
+    pendingCountByScheduleId,
+    reservedScheduleDateKey,
+    scheduleCandidates,
+    reservedSchedules,
+  ]);
 
   return {
     detailData,

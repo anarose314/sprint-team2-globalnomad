@@ -2,7 +2,11 @@ import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 
 const RESERVATION_PAGE_SIZE = 10;
-type ReservationRequestStatus = 'pending' | 'confirmed' | 'declined';
+type ReservationRequestStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'declined'
+  | 'completed';
 
 interface ReservationRequestItem {
   id: number;
