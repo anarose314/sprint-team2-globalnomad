@@ -17,7 +17,7 @@ export function ActivitySectionStatus({
 }: ActivitySectionStatusProps) {
   return (
     <p
-      role={tone === 'error' ? 'alert' : undefined}
+      role={tone === 'error' ? 'alert' : 'status'}
       className={cn(
         'typo-md-medium py-10 text-center',
         tone === 'error' ? 'text-red-500' : 'text-gray-500',

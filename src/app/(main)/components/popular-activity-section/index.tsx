@@ -249,6 +249,7 @@ export function PopularActivitySection() {
         <ActivityCardListSkeleton
           count={POPULAR_ACTIVITY_PAGE_SIZE}
           className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
+          message="인기 체험 목록을 불러오는 중입니다."
         />
       )}
 

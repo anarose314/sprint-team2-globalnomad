@@ -8,16 +8,21 @@ import { ActivityCardSkeleton } from '@/app/(main)/components/activity-card-skel
  * - 스크린 리더 사용자에게는 로딩 상태 메시지를 별도로 제공한다.
  *
  * @example
- * <ActivityCardListSkeleton count={6} className="grid grid-cols-2" />
+ * <ActivityCardListSkeleton
+ *   count={6}
+ *   className="grid grid-cols-2"
+ *   message="모든 체험 목록을 불러오는 중입니다."
+ * />
  */
 export function ActivityCardListSkeleton({
   count,
   className,
+  message = '체험 목록을 불러오는 중입니다.',
 }: ActivityCardListSkeletonProps) {
   return (
     <>
       <span className="sr-only" role="status">
-        체험 목록을 불러오는 중입니다.
+        {message}
       </span>
 
       <ul className={className} aria-hidden="true">

@@ -198,6 +198,7 @@ export function AllActivitySection({
         <ActivityCardListSkeleton
           count={pageSize}
           className={ACTIVITY_GRID_CLASS_NAME}
+          message="모든 체험 목록을 불러오는 중입니다."
         />
       )}
 

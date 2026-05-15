@@ -1,4 +1,5 @@
 export interface ActivityCardListSkeletonProps {
   count: number;
-  className: string;
+  className?: string;
+  message?: string;
 }
