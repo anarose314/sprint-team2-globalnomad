@@ -8,7 +8,7 @@ import {
   ReservationDetailData,
   ReservationEventCounts,
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
+import { buildReservationCalendarDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/buildReservationCalendarDetailData';
 import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { ActivitySchedule } from '@/shared/types/activityDetail.types';
@@ -479,127 +479,29 @@ export const useReservationCalendarData = ({
     return eventCounts;
   }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
 
-  const detailData = useMemo<ReservationDetailData>(() => {
-    if (!reservedScheduleDateKey) {
-      return { timeSlots: [] };
-    }
-
-    const builtFromReservedSchedules = buildReservationDetailData({
-      reservedSchedules: reservedScheduleRowsForDetail,
-    });
-
-    if (builtFromReservedSchedules.timeSlots.length > 0) {
-      return builtFromReservedSchedules;
-    }
-
-    const hasAnyScheduleReservation = scheduleCandidates.some((schedule) => {
-      const scheduleId = schedule.scheduleId;
-      return (
-        (pendingCountByScheduleId[scheduleId] ?? 0) +
-          (confirmedCountByScheduleId[scheduleId] ?? 0) +
-          (declinedCountByScheduleId[scheduleId] ?? 0) >
-        0
-      );
-    });
-
-    if (!hasAnyScheduleReservation) {
-      const selectedDayCounts = eventCountsByDate[reservedScheduleDateKey];
-      const pendingCount = Math.max(selectedDayCounts?.pending ?? 0, 0);
-      const confirmedCount = Math.max(selectedDayCounts?.confirmed ?? 0, 0);
-      const completedCount = Math.max(selectedDayCounts?.completed ?? 0, 0);
-      const hasAnyDailyReservation =
-        pendingCount + confirmedCount + completedCount > 0;
-
-      if (!hasAnyDailyReservation) {
-        return { timeSlots: [] };
-      }
-
-      const fallbackCandidates =
-        reservedSchedules.length > 0
-          ? [...reservedSchedules]
-              .sort((a, b) => a.startTime.localeCompare(b.startTime))
-              .map((schedule) => ({
-                scheduleId: schedule.scheduleId,
-                startTime: schedule.startTime,
-                endTime: schedule.endTime,
-              }))
-          : scheduleCandidates;
-
-      if (fallbackCandidates.length === 0) {
-        return { timeSlots: [] };
-      }
-
-      const now = new Date();
-      const endedSchedules = fallbackCandidates.filter((schedule) =>
-        isScheduleEnded(reservedScheduleDateKey, schedule.endTime, now)
-      );
-      const targetScheduleId =
-        endedSchedules[0]?.scheduleId ?? fallbackCandidates[0].scheduleId;
-
-      return buildReservationDetailData({
-        reservedSchedules: fallbackCandidates.map((schedule) => ({
-          scheduleId: schedule.scheduleId,
-          startTime: schedule.startTime,
-          endTime: schedule.endTime,
-          count: {
-            pending:
-              schedule.scheduleId === targetScheduleId ? pendingCount : 0,
-            // completed 조회/전환 없이 confirmed 라인에서 유지하고, 뱃지만 UI에서 완료로 바꾼다.
-            confirmed:
-              schedule.scheduleId === targetScheduleId
-                ? confirmedCount + completedCount
-                : 0,
-            declined: 0,
-            completed: 0,
-          },
-        })),
-      });
-    }
-
-    const candidateSchedules =
-      scheduleCandidates.length > 0
-        ? scheduleCandidates
-        : [...reservedSchedules]
-            .sort((a, b) => a.startTime.localeCompare(b.startTime))
-            .map((schedule) => ({
-              scheduleId: schedule.scheduleId,
-              startTime: schedule.startTime,
-              endTime: schedule.endTime,
-            }));
-
-    if (candidateSchedules.length === 0) {
-      return { timeSlots: [] };
-    }
-
-    const synthesizedReservedSchedules = candidateSchedules.map((schedule) => {
-      const scheduleId = schedule.scheduleId;
-      return {
-        scheduleId,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        count: {
-          pending: pendingCountByScheduleId[scheduleId] ?? 0,
-          confirmed: confirmedCountByScheduleId[scheduleId] ?? 0,
-          declined: declinedCountByScheduleId[scheduleId] ?? 0,
-          completed: 0,
-        },
-      };
-    });
-
-    return buildReservationDetailData({
-      reservedSchedules: synthesizedReservedSchedules,
-    });
-  }, [
-    confirmedCountByScheduleId,
-    declinedCountByScheduleId,
-    eventCountsByDate,
-    pendingCountByScheduleId,
-    reservedScheduleDateKey,
-    reservedScheduleRowsForDetail,
-    scheduleCandidates,
-    reservedSchedules,
-    shouldFetchPerScheduleReservationCounts,
-  ]);
+  const detailData = useMemo<ReservationDetailData>(
+    () =>
+      buildReservationCalendarDetailData({
+        reservedScheduleDateKey,
+        reservedScheduleRowsForDetail,
+        scheduleCandidates,
+        pendingCountByScheduleId,
+        confirmedCountByScheduleId,
+        declinedCountByScheduleId,
+        eventCountsByDate,
+        reservedSchedules,
+      }),
+    [
+      confirmedCountByScheduleId,
+      declinedCountByScheduleId,
+      eventCountsByDate,
+      pendingCountByScheduleId,
+      reservedScheduleDateKey,
+      reservedScheduleRowsForDetail,
+      scheduleCandidates,
+      reservedSchedules,
+    ]
+  );
 
   return {
     detailData,
