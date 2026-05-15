@@ -12,7 +12,7 @@ interface ActivitiesDashboardSkeletonProps {
 function ReservationCalendarCardSkeleton() {
   return (
     <div className="mt-7 w-full md:mt-6" aria-hidden="true">
-      <div className="reservation-status-calendar min-h-192 w-full rounded-3xl border-0 bg-white px-6 pt-6 pb-6">
+      <div className="reservation-status-calendar min-h-192 pt-6 pb-6 md:min-h-194.25 md:px-5 md:pt-6 md:pb-5.75">
         <div className="flex h-11 items-center justify-between">
           <Skeleton height={24} width={24} rounded="md" />
           <Skeleton height={22} className="mx-4 w-40 md:w-48" />
