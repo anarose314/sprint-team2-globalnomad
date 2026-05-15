@@ -4,6 +4,7 @@ import { fetchActivityDetail } from '@/app/(main)/activity/apis/activities';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
+import { useCurrentTimestamp } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/useCurrentTimestamp';
 import {
   ReservationDetailData,
   ReservationEventCounts,
@@ -82,6 +83,7 @@ export const useReservationCalendarData = ({
   currentMonth,
   reservedScheduleDateKey,
 }: UseReservationCalendarDataProps) => {
+  const nowTimestamp = useCurrentTimestamp(activityId !== null);
   const { data: reservationDashboard = [] } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
@@ -423,7 +425,8 @@ export const useReservationCalendarData = ({
   const eventCountsByDate = useMemo<
     Record<string, ReservationEventCounts>
   >(() => {
-    const todayDateKey = formatDateKey(new Date());
+    const now = new Date(nowTimestamp);
+    const todayDateKey = formatDateKey(now);
     const eventCounts = reservationDashboard.reduce<
       Record<string, ReservationEventCounts>
     >((accumulator, item) => {
@@ -449,7 +452,6 @@ export const useReservationCalendarData = ({
 
     // 현재 선택 날짜는 reserved-schedule 집계값으로 보정한다.
     if (reservedScheduleDateKey) {
-      const now = new Date();
       const normalized = reservedSchedules.reduce(
         (accumulator, schedule) => {
           accumulator.pending += Math.max(schedule.count.pending, 0);
@@ -488,7 +490,12 @@ export const useReservationCalendarData = ({
     }
 
     return eventCounts;
-  }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
+  }, [
+    nowTimestamp,
+    reservationDashboard,
+    reservedScheduleDateKey,
+    reservedSchedules,
+  ]);
 
   const detailData = useMemo<ReservationDetailData>(
     () =>
