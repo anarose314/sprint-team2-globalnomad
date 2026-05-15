@@ -19,6 +19,9 @@ interface MainHeaderWithDrawerProps {
  *
  * - Header의 모바일 프로필 버튼 클릭 시 마이페이지 드로어를 연다.
  * - 메뉴 이동, 로그아웃 버튼 클릭, md 이상 화면 전환 시 드로어를 닫는다.
+ *
+ * @example
+ * <MainHeaderWithDrawer user={user} />
  */
 export function MainHeaderWithDrawer({
   user,

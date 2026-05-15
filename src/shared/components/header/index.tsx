@@ -1,17 +1,46 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { IcBellOff, IcBellOn, IcProfile } from '@/shared/assets/icons';
 import { LogoHorizontal, LogoIcon } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons/button';
-import type { HeaderProps } from '@/shared/components/header/header.types';
+import type {
+  HeaderProfileAvatarProps,
+  HeaderProps,
+} from '@/shared/components/header/header.types';
+
+/**
+ * Header에서 사용하는 프로필 아바타 컴포넌트
+ *
+ * - profileImageUrl이 있으면 프로필 이미지를 표시한다.
+ * - profileImageUrl이 없으면 기본 프로필 아이콘을 표시한다.
+ *
+ * @example
+ * <HeaderProfileAvatar user={user} />
+ */
+export function HeaderProfileAvatar({ user }: HeaderProfileAvatarProps) {
+  if (user.profileImageUrl) {
+    return (
+      <Image
+        src={user.profileImageUrl}
+        alt=""
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-full object-cover"
+      />
+    );
+  }
+
+  return <IcProfile className="h-8 w-8" aria-hidden="true" />;
+}
 
 /**
  * 메인 페이지 공통 Header 컴포넌트
  *
  * - 메인 라우트 그룹에서 공통으로 사용하는 상단 내비게이션 영역
  * - PC/태블릿에서는 가로형 로고를, 모바일에서는 아이콘 로고를 표시한다.
- * - 로그인 상태에서 알림, 프로필 아이콘, 유저 이름을 표시한다.
+ * - 로그인 상태에서 알림, 프로필 이미지, 유저 닉네임을 표시한다.
  * - 모바일 로그인 상태에서는 프로필 아이콘 클릭 시 외부에서 주입한 메뉴 열기 동작을 실행할 수 있다.
  * - 비로그인 상태에서는 로그인/회원가입 버튼을 표시한다.
  * - 알림 목록 열기 동작은 `onNotificationClick` prop을 통해 외부에서 주입한다.
@@ -21,7 +50,7 @@ import type { HeaderProps } from '@/shared/components/header/header.types';
  *
  * @example
  * <Header
- *   user={{ name: '정만철' }}
+ *   user={{ nickname: '정만철', profileImageUrl: null }}
  *   hasNotification
  *   onNotificationClick={handleNotificationClick}
  * />
@@ -76,20 +105,20 @@ export function Header({
                 <button
                   type="button"
                   onClick={onProfileClick}
-                  aria-label={`${user.name}님의 마이페이지 메뉴 열기`}
+                  aria-label={`${user.nickname}님의 마이페이지 메뉴 열기`}
                   aria-expanded={isProfileMenuOpen}
                   aria-controls={profileMenuId}
                   className="flex items-center gap-2"
                 >
-                  <IcProfile className="h-8 w-8" aria-hidden="true" />
+                  <HeaderProfileAvatar user={user} />
                 </button>
               ) : (
                 <Link
                   href="/my/profile"
                   className="flex items-center gap-2"
-                  aria-label={`${user.name}님의 마이페이지로 이동`}
+                  aria-label={`${user.nickname}님의 마이페이지로 이동`}
                 >
-                  <IcProfile className="h-8 w-8" aria-hidden="true" />
+                  <HeaderProfileAvatar user={user} />
                 </Link>
               )}
             </div>
@@ -97,10 +126,12 @@ export function Header({
             <Link
               href="/my/profile"
               className="hidden items-center gap-3 md:flex"
-              aria-label={`${user.name}님의 마이페이지로 이동`}
+              aria-label={`${user.nickname}님의 마이페이지로 이동`}
             >
-              <IcProfile className="h-8 w-8" aria-hidden="true" />
-              <span className="typo-md-medium text-gray-950">{user.name}</span>
+              <HeaderProfileAvatar user={user} />
+              <span className="typo-md-medium text-gray-950">
+                {user.nickname}
+              </span>
             </Link>
           </div>
         ) : (
