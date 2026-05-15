@@ -93,7 +93,7 @@ export const useDesktopSheetPosition = ({
     }
 
     const targetTile = calendarRoot.querySelector(
-      '.reservation-calendar__day-tile--detail-target'
+      '.reservation-status-calendar__day-tile--detail-target'
     ) as HTMLElement | null;
 
     if (!targetTile) return;

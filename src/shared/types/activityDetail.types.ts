@@ -10,6 +10,17 @@ export interface ActivitySchedule {
   endTime: string;
 }
 
+export interface ActivityAvailableScheduleTime {
+  id: number;
+  startTime: string;
+  endTime: string;
+}
+
+export interface ActivityAvailableScheduleItem {
+  date: string;
+  times: ActivityAvailableScheduleTime[];
+}
+
 export interface ActivityDetailResponse {
   id: number;
   userId: number;

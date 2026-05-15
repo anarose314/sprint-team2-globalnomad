@@ -21,7 +21,7 @@ export const STATUS_META: Record<
 
 /** 상태별 배지 세로 위치 클래스 매핑 */
 export const STATUS_POSITION_CLASS: Record<ReservationEventStatus, string> = {
-  pending: 'reservation-calendar__event-badge--pending',
-  confirmed: 'reservation-calendar__event-badge--confirmed',
-  completed: 'reservation-calendar__event-badge--completed',
+  pending: 'reservation-status-calendar__event-badge--pending',
+  confirmed: 'reservation-status-calendar__event-badge--confirmed',
+  completed: 'reservation-status-calendar__event-badge--completed',
 };

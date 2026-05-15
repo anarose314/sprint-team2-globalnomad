@@ -27,16 +27,16 @@ export function ReservationCalendarDayTile({
   const dayOfWeek = date.getDay();
   const weekendTextClassName =
     dayOfWeek === 0
-      ? 'reservation-calendar__day-number--sunday'
+      ? 'reservation-status-calendar__day-number--sunday'
       : dayOfWeek === 6
-        ? 'reservation-calendar__day-number--saturday'
+        ? 'reservation-status-calendar__day-number--saturday'
         : '';
 
   return (
-    <div className="reservation-calendar__day-overlay">
-      <div className="reservation-calendar__day-number-wrap">
+    <div className="reservation-status-calendar__day-overlay">
+      <div className="reservation-status-calendar__day-number-wrap">
         <span
-          className={`reservation-calendar__day-number ${weekendTextClassName} ${isMuted ? 'reservation-calendar__day-number--muted' : ''}`}
+          className={`reservation-status-calendar__day-number ${weekendTextClassName} ${isMuted ? 'reservation-status-calendar__day-number--muted' : ''}`}
         >
           {date.getDate()}
         </span>
@@ -45,7 +45,7 @@ export function ReservationCalendarDayTile({
 
       {eventCounts ? (
         <div
-          className={`reservation-calendar__event-badge-list ${isMuted ? 'reservation-calendar__meta--muted' : ''}`}
+          className={`reservation-status-calendar__event-badge-list ${isMuted ? 'reservation-status-calendar__meta--muted' : ''}`}
         >
           {STATUS_ORDER.map((status) => {
             const count = eventCounts[status];
