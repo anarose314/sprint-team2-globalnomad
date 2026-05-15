@@ -30,7 +30,7 @@ function ReservationCalendarCardSkeleton() {
               height={14}
               className="mx-auto w-7"
               rounded="sm"
-              variant="pulse"
+              variant="shimmer"
             />
           ))}
         </div>

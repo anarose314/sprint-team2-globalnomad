@@ -1,0 +1,25 @@
+.section {
+  margin-inline: auto;
+  margin-bottom: 66px;
+}
+
+.activitySelectButton {
+  margin-top: 24px;
+  height: 54px;
+}
+
+@media (min-width: 768px) {
+  .section {
+    margin-bottom: 172px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .section {
+    margin-bottom: 160px;
+  }
+
+  .activitySelectButton {
+    margin-top: 30px;
+  }
+}
