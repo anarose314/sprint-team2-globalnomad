@@ -34,6 +34,55 @@ const normalizeDateKey = (rawDate: string) => {
   return formatDateKey(parsed);
 };
 
+/** 스케줄별 예약 건수 조회에 사용하는 상태 — 순서는 `useQueries` 입력과 결과 매핑에 동일하게 사용 */
+const SCHEDULE_RESERVATION_COUNT_STATUSES = [
+  'pending',
+  'confirmed',
+  'declined',
+] as const;
+
+type ScheduleReservationCountStatus =
+  (typeof SCHEDULE_RESERVATION_COUNT_STATUSES)[number];
+
+type ScheduleReservationCountTotals = Record<
+  ScheduleReservationCountStatus,
+  number
+>;
+
+const emptyScheduleReservationCountTotals =
+  (): ScheduleReservationCountTotals => ({
+    pending: 0,
+    confirmed: 0,
+    declined: 0,
+  });
+
+/**
+ * `useQueries`에 넣은 순서(scheduleCandidates × STATUSES)와 동일하게
+ * 응답 배열을 스케줄 ID → 상태별 totalCount 맵으로 변환한다.
+ */
+const mapScheduleReservationQueryResultsToTotalsByScheduleId = (
+  scheduleCandidates: ReadonlyArray<{ scheduleId: number }>,
+  queryResults: ReadonlyArray<{ data?: { totalCount: number } | undefined }>
+): Map<number, ScheduleReservationCountTotals> => {
+  const map = new Map<number, ScheduleReservationCountTotals>();
+  const statuses = SCHEDULE_RESERVATION_COUNT_STATUSES;
+  let queryIndex = 0;
+
+  for (const candidate of scheduleCandidates) {
+    const totals = emptyScheduleReservationCountTotals();
+    for (const status of statuses) {
+      totals[status] = Math.max(
+        queryResults[queryIndex]?.data?.totalCount ?? 0,
+        0
+      );
+      queryIndex += 1;
+    }
+    map.set(candidate.scheduleId, totals);
+  }
+
+  return map;
+};
+
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
  */
@@ -141,7 +190,7 @@ export const useReservationCalendarData = ({
   const scheduleStatusQueries = useQueries({
     queries: shouldFetchPerScheduleReservationCounts
       ? scheduleCandidates.flatMap((schedule) =>
-          (['pending', 'confirmed', 'declined'] as const).map((status) => ({
+          SCHEDULE_RESERVATION_COUNT_STATUSES.map((status) => ({
             queryKey: [
               ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
               activityId,
@@ -162,6 +211,21 @@ export const useReservationCalendarData = ({
         )
       : [],
   });
+
+  const listApiTotalCountByScheduleId = useMemo(
+    () =>
+      shouldFetchPerScheduleReservationCounts
+        ? mapScheduleReservationQueryResultsToTotalsByScheduleId(
+            scheduleCandidates,
+            scheduleStatusQueries
+          )
+        : new Map<number, ScheduleReservationCountTotals>(),
+    [
+      scheduleCandidates,
+      scheduleStatusQueries,
+      shouldFetchPerScheduleReservationCounts,
+    ]
+  );
 
   const countsFromReservedScheduleByScheduleId = useMemo(() => {
     const map = new Map<
@@ -193,15 +257,15 @@ export const useReservationCalendarData = ({
       {}
     );
 
-    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+    scheduleCandidates.forEach((schedule) => {
       const fromReserved =
         countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
           ?.confirmed ?? 0;
       if (shouldFetchPerScheduleReservationCounts) {
-        const queryIndex = scheduleIndex * 3 + 1;
-        const fromQuery =
-          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
-        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+        const fromList =
+          listApiTotalCountByScheduleId.get(schedule.scheduleId)?.confirmed ??
+          0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromList);
       } else {
         counts[schedule.scheduleId] = fromReserved;
       }
@@ -210,8 +274,8 @@ export const useReservationCalendarData = ({
     return counts;
   }, [
     countsFromReservedScheduleByScheduleId,
+    listApiTotalCountByScheduleId,
     scheduleCandidates,
-    scheduleStatusQueries,
     shouldFetchPerScheduleReservationCounts,
   ]);
 
@@ -224,15 +288,14 @@ export const useReservationCalendarData = ({
       {}
     );
 
-    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+    scheduleCandidates.forEach((schedule) => {
       const fromReserved =
         countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
           ?.pending ?? 0;
       if (shouldFetchPerScheduleReservationCounts) {
-        const queryIndex = scheduleIndex * 3;
-        const fromQuery =
-          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
-        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+        const fromList =
+          listApiTotalCountByScheduleId.get(schedule.scheduleId)?.pending ?? 0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromList);
       } else {
         counts[schedule.scheduleId] = fromReserved;
       }
@@ -241,8 +304,8 @@ export const useReservationCalendarData = ({
     return counts;
   }, [
     countsFromReservedScheduleByScheduleId,
+    listApiTotalCountByScheduleId,
     scheduleCandidates,
-    scheduleStatusQueries,
     shouldFetchPerScheduleReservationCounts,
   ]);
 
@@ -255,15 +318,14 @@ export const useReservationCalendarData = ({
       {}
     );
 
-    scheduleCandidates.forEach((schedule, scheduleIndex) => {
+    scheduleCandidates.forEach((schedule) => {
       const fromReserved =
         countsFromReservedScheduleByScheduleId.get(schedule.scheduleId)
           ?.declined ?? 0;
       if (shouldFetchPerScheduleReservationCounts) {
-        const queryIndex = scheduleIndex * 3 + 2;
-        const fromQuery =
-          scheduleStatusQueries[queryIndex]?.data?.totalCount ?? 0;
-        counts[schedule.scheduleId] = Math.max(fromReserved, fromQuery);
+        const fromList =
+          listApiTotalCountByScheduleId.get(schedule.scheduleId)?.declined ?? 0;
+        counts[schedule.scheduleId] = Math.max(fromReserved, fromList);
       } else {
         counts[schedule.scheduleId] = fromReserved;
       }
@@ -272,8 +334,8 @@ export const useReservationCalendarData = ({
     return counts;
   }, [
     countsFromReservedScheduleByScheduleId,
+    listApiTotalCountByScheduleId,
     scheduleCandidates,
-    scheduleStatusQueries,
     shouldFetchPerScheduleReservationCounts,
   ]);
 
