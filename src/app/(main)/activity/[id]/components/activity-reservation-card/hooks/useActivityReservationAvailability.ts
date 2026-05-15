@@ -7,29 +7,13 @@ import { fetchMyReservedSchedules } from '@/app/(main)/activity/[id]/apis/myRese
 import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
-import { formatDateKey } from '@/shared/utils/formatDate';
+import { normalizeCalendarDateKey } from '@/shared/utils/formatDate';
 
 interface UseActivityReservationAvailabilityProps {
   activityId: number;
   schedules: ActivitySchedule[];
   reservedScheduleIds: number[];
 }
-
-const normalizeDateKey = (rawDate: string) => {
-  const trimmed = rawDate.trim();
-  const shortDate = trimmed.slice(0, 10);
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
-    return shortDate;
-  }
-
-  const parsed = new Date(trimmed);
-  if (Number.isNaN(parsed.getTime())) {
-    return trimmed;
-  }
-
-  return formatDateKey(parsed);
-};
 
 const parseYearMonthFromDateKey = (dateKey: string) => {
   const [year, month] = dateKey.split('-').map(Number);
@@ -100,7 +84,7 @@ export const useActivityReservationAvailability = ({
     const uniqueYearMonth = new Set<string>();
 
     schedules.forEach((schedule) => {
-      const dateKey = normalizeDateKey(schedule.date);
+      const dateKey = normalizeCalendarDateKey(schedule.date);
       const { year, month } = parseYearMonthFromDateKey(dateKey);
       if (Number.isInteger(year) && Number.isInteger(month)) {
         uniqueYearMonth.add(`${year}-${String(month).padStart(2, '0')}`);
@@ -167,7 +151,7 @@ export const useActivityReservationAvailability = ({
           return accumulator;
         }
 
-        const dateKey = normalizeDateKey(schedule.date);
+        const dateKey = normalizeCalendarDateKey(schedule.date);
         if (!isUpcomingTimeSlot(dateKey, schedule.startTime, now)) {
           return accumulator;
         }
@@ -196,7 +180,7 @@ export const useActivityReservationAvailability = ({
     const fromAvailableApi = availableSchedules.reduce<
       Record<string, (typeof availableSchedules)[number]['times']>
     >((accumulator, item) => {
-      const dateKey = normalizeDateKey(item.date);
+      const dateKey = normalizeCalendarDateKey(item.date);
       const filteredTimes = item.times.filter(
         (time) =>
           !blockedScheduleIds.includes(time.id) &&

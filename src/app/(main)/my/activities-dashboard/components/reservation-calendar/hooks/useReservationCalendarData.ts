@@ -13,7 +13,10 @@ import { isScheduleEnded } from '@/app/(main)/my/activities-dashboard/components
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
-import { formatDateKey } from '@/shared/utils/formatDate';
+import {
+  formatDateKey,
+  normalizeCalendarDateKey,
+} from '@/shared/utils/formatDate';
 
 interface UseReservationCalendarDataProps {
   activityId: number | null;
@@ -22,19 +25,6 @@ interface UseReservationCalendarDataProps {
   reservedScheduleDateKey: string | null;
 }
 
-const normalizeDateKey = (rawDate: string) => {
-  const trimmed = rawDate.trim();
-  const shortDate = trimmed.slice(0, 10);
-  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
-    return shortDate;
-  }
-
-  const parsed = new Date(trimmed);
-  if (Number.isNaN(parsed.getTime())) return trimmed;
-  return formatDateKey(parsed);
-};
-
-/** 스케줄별 예약 건수 조회에 사용하는 상태 — 순서는 `useQueries` 입력과 결과 매핑에 동일하게 사용 */
 const SCHEDULE_RESERVATION_COUNT_STATUSES = [
   'pending',
   'confirmed',
@@ -141,7 +131,8 @@ export const useReservationCalendarData = ({
         ? activitySchedules
             .filter(
               (schedule: ActivitySchedule) =>
-                normalizeDateKey(schedule.date) === reservedScheduleDateKey
+                normalizeCalendarDateKey(schedule.date) ===
+                reservedScheduleDateKey
             )
             .sort((a, b) => a.startTime.localeCompare(b.startTime))
         : [],
@@ -416,7 +407,7 @@ export const useReservationCalendarData = ({
     const eventCounts = reservationDashboard.reduce<
       Record<string, ReservationEventCounts>
     >((accumulator, item) => {
-      const itemDateKey = normalizeDateKey(item.date);
+      const itemDateKey = normalizeCalendarDateKey(item.date);
       const completed = Math.max(item.reservations.completed, 0);
       const confirmed = Math.max(item.reservations.confirmed, 0);
       const pending = Math.max(item.reservations.pending, 0);
