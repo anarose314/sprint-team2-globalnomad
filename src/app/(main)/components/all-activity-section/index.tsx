@@ -38,7 +38,7 @@ const isActivitySort = (value: string): value is ActivitySort => {
   return MAIN_SORT_OPTIONS.some((option) => option.value === value);
 };
 
-const activityGridClassName = cn(
+const ACTIVITY_GRID_CLASS_NAME = cn(
   'grid w-full grid-cols-1 gap-4 gap-y-6',
   'xs:grid-cols-2',
   'md:grid-cols-3 md:gap-6',
@@ -197,7 +197,7 @@ export function AllActivitySection({
       {isPending && (
         <ActivityCardListSkeleton
           count={pageSize}
-          className={activityGridClassName}
+          className={ACTIVITY_GRID_CLASS_NAME}
         />
       )}
 
@@ -220,7 +220,7 @@ export function AllActivitySection({
 
       {!isPending && !isError && activities.length > 0 && (
         <>
-          <ul className={activityGridClassName}>
+          <ul className={ACTIVITY_GRID_CLASS_NAME}>
             {activities.map((activity) => (
               <li key={activity.id}>
                 <ActivityCard activity={activity} />

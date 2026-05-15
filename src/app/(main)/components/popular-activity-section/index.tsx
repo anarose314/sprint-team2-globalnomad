@@ -23,7 +23,7 @@ import { cn } from '@/shared/utils/cn';
 const SCROLL_LOAD_THRESHOLD = 80;
 const DRAG_SCROLL_CLICK_THRESHOLD = 5;
 
-const popularActivityListClassName = cn(
+const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
   'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
   'cursor-grab active:cursor-grabbing 2xl:cursor-auto 2xl:active:cursor-auto',
   '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
@@ -248,7 +248,7 @@ export function PopularActivitySection() {
       {isPending && (
         <ActivityCardListSkeleton
           count={POPULAR_ACTIVITY_PAGE_SIZE}
-          className={popularActivityListClassName}
+          className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
         />
       )}
 
@@ -272,7 +272,7 @@ export function PopularActivitySection() {
             onPointerUp={handleHorizontalScrollPointerEnd}
             onPointerCancel={handleHorizontalScrollPointerEnd}
             onClickCapture={handleHorizontalScrollClickCapture}
-            className={popularActivityListClassName}
+            className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
           >
             {activities.map((activity) => (
               <li key={activity.id} className="w-full">
