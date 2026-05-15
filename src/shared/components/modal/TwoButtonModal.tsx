@@ -22,6 +22,7 @@ interface TwoButtonModalProps {
   confirmText?: string;
   onCancel?: () => void;
   onConfirm?: () => void;
+  isPending?: boolean;
 }
 
 export function TwoButtonModal({
@@ -30,6 +31,7 @@ export function TwoButtonModal({
   confirmText = '확인',
   onCancel,
   onConfirm,
+  isPending = false,
 }: TwoButtonModalProps) {
   return (
     <ModalBase
@@ -44,6 +46,7 @@ export function TwoButtonModal({
             size="lg"
             onClick={onCancel}
             className="w-full max-w-31.5"
+            disabled={isPending}
           >
             {cancelText}
           </Button>
@@ -53,6 +56,7 @@ export function TwoButtonModal({
             size="lg"
             onClick={onConfirm}
             className="w-full max-w-31.5"
+            disabled={isPending}
           >
             {confirmText}
           </Button>
