@@ -1,3 +1,4 @@
+// src/app/(main)/my/profile/hooks/useMyInfo.ts
 import { useQuery } from '@tanstack/react-query';
 import { fetchMyInfo } from '@/app/(main)/my/profile/apis/myInfo';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -13,11 +14,20 @@ export const myInfoOptions = () => ({
 /**
  * 내 정보 페이지에서 사용하는 커스텀 훅
  *
+ * @param options 쿼리 옵션 (enabled 등)
+ *
  * @example
  * ```ts
- * const { data: user, isLoading, isError } = useMyInfo();
+ * // 기본 사용
+ * const { data: user } = useMyInfo();
+ *
+ * // 조건부 호출 (비로그인 상태 회피 등)
+ * const { data: user } = useMyInfo({ enabled: Boolean(initialUser) });
  * ```
  */
-export const useMyInfo = () => {
-  return useQuery(myInfoOptions());
+export const useMyInfo = (options?: { enabled?: boolean }) => {
+  return useQuery({
+    ...myInfoOptions(),
+    ...options,
+  });
 };
