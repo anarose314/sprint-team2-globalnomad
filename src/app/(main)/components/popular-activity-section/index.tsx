@@ -202,6 +202,7 @@ export function PopularActivitySection() {
             onScroll={handleHorizontalScroll}
             {...events}
             className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
+            onDragStart={(event) => event.preventDefault()}
           >
             {activities.map((activity) => (
               <li key={activity.id} className="w-full">
