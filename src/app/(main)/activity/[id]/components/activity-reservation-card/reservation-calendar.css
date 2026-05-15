@@ -108,6 +108,24 @@
   @apply text-primary-600;
 }
 
+/**
+ * 오늘이 일·토 열이어도 주말 글자색보다 회색 원 배지의 흰 숫자가 우선 (nth-child 규칙 특이성 보정)
+ */
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--now:nth-child(7n + 1):not(
+    .react-calendar__tile--active
+  )
+  > abbr,
+.activity-booking-calendar
+  .react-calendar__month-view__days
+  button.react-calendar__tile--now:nth-child(7n):not(
+    .react-calendar__tile--active
+  )
+  > abbr {
+  @apply text-white;
+}
+
 .activity-booking-calendar
   .react-calendar__month-view__days__day--neighboringMonth
   > abbr {

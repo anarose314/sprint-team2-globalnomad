@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { ActivitiesDashboardSkeleton } from '@/app/(main)/my/activities-dashboard/components/activities-dashboard-skeleton';
 
 interface ReservationCalendarClientProps {
   activityId: number | null;
@@ -13,12 +14,7 @@ const ReservationCalendar = dynamic(
     ),
   {
     ssr: false,
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="shadow-card bg-gray-25 mt-7 h-192 w-full animate-pulse rounded-3xl md:mt-6"
-      />
-    ),
+    loading: () => <ActivitiesDashboardSkeleton scope="calendar" />,
   }
 );
 
