@@ -127,7 +127,7 @@ export function ActivityReservationCard({
       {isLoginRequiredModalOpen ? (
         <ModalOverlay onClose={handleCloseLoginRequiredModal}>
           <OneButtonModal
-            message="로그인이 필요한 서비스입니다. 예약을 진행하려면 로그인해 주세요."
+            message="로그인이 필요한 서비스입니다."
             buttonText="로그인하기"
             onConfirm={handleConfirmLoginRequired}
           />
