@@ -66,6 +66,8 @@ export function Dropdown({
   const isDisabled = disabled || options.length === 0;
   const isFieldVariant = variant === 'field' || variant === 'fieldInput';
 
+  const listboxRef = useRef<HTMLUListElement>(null);
+
   // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
 
@@ -128,6 +130,19 @@ export function Dropdown({
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && listboxRef.current) {
+      const selectedIndex = options.findIndex(
+        (option) => option.value === value
+      );
+
+      if (selectedIndex !== -1) {
+        const scrollPosition = selectedIndex * optionHeight;
+        listboxRef.current.scrollTop = scrollPosition;
+      }
+    }
+  }, [isOpen, options, value, optionHeight]);
 
   return (
     <div>
@@ -193,6 +208,7 @@ export function Dropdown({
           <ul
             id={listboxId}
             role="listbox"
+            ref={listboxRef}
             className={cn(
               // 공통 필수 속성 및 비활성화 상태
               'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
