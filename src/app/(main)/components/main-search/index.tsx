@@ -1,6 +1,6 @@
 'use client';
 
-import type { SubmitEventHandler } from 'react';
+import { type SubmitEventHandler, useId } from 'react';
 import type { MainSearchProps } from '@/app/(main)/components/main-search/mainSearch.types';
 import { IcSearch } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
@@ -16,6 +16,8 @@ import { Heading } from '@/shared/components/heading';
  * <MainSearch value={keyword} onChange={setKeyword} onSearch={handleSearch} />
  */
 export function MainSearch({ value, onChange, onSearch }: MainSearchProps) {
+  const searchInputId = useId();
+
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     onSearch(value.trim());
@@ -38,10 +40,13 @@ export function MainSearch({ value, onChange, onSearch }: MainSearchProps) {
         <IcSearch className="h-5 w-5 shrink-0 text-gray-400" />
 
         <input
+          id={searchInputId}
+          name="keyword"
           type="search"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="내가 원하는 체험은"
+          aria-label="체험 검색어"
           className="typo-lg-medium min-w-0 flex-1 bg-transparent text-gray-950 outline-none placeholder:text-gray-400"
         />
 

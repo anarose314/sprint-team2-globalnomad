@@ -11,16 +11,6 @@ export type MainCategoryValue =
 
 export type MainSortValue = 'price_asc' | 'price_desc';
 
-export interface MainActivity {
-  id: number;
-  title: string;
-  price: number;
-  rating: number;
-  reviewCount: number;
-  bannerImageUrl: string;
-  category: MainCategoryValue;
-}
-
 export interface MainCategory {
   label: string;
   value: MainCategoryValue;

@@ -3,9 +3,11 @@ import type {
   ActivityImageResponse,
   ActivityMutationResponse,
   FetchActivitiesParams,
+  FetchPopularActivitiesParams,
   PatchActivities,
   PostActivities,
 } from '@/app/(main)/activity/apis/activities.types';
+import { POPULAR_ACTIVITY_PAGE_SIZE } from '@/app/(main)/main.constants';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { fetchInstance } from '@/shared/apis/fetchInstance.core';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
@@ -44,6 +46,33 @@ export const fetchActivities = async ({
       category,
       keyword,
     },
+    cache: 'no-store',
+  });
+};
+
+/**
+ * 인기 체험 목록을 커서 기반으로 조회하는 API 함수
+ *
+ * - 댓글 수가 많은 순으로 인기 체험을 조회한다.
+ * - 첫 요청에서는 cursorId를 보내지 않는다.
+ * - 응답 cursorId가 0이어도 다음 요청에 포함해야 하므로 null 여부로만 분기한다.
+ *
+ * @example
+ * fetchPopularActivities({ pageParam: null })
+ */
+export const fetchPopularActivities = async ({
+  pageParam = null,
+}: FetchPopularActivitiesParams) => {
+  const params = {
+    method: 'cursor',
+    size: POPULAR_ACTIVITY_PAGE_SIZE,
+    sort: 'most_reviewed',
+    ...(pageParam !== null && { cursorId: pageParam }),
+  };
+
+  return await fetchInstance<ActivitiesResponse>('/activities', {
+    method: 'GET',
+    params,
     cache: 'no-store',
   });
 };
