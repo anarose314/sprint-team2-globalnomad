@@ -49,7 +49,7 @@ export const useActivityActions = ({
   };
 
   const { mutate: confirmDelete, isPending: isDeleting } = useMutation({
-    mutationFn: (id: number) => deleteActivity(id),
+    mutationFn: deleteActivity,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.ACTIVITIES,
@@ -59,8 +59,6 @@ export const useActivityActions = ({
       });
 
       showToast({ theme: 'success', message: '체험이 삭제되었습니다.' });
-      closeModal();
-      if (!initialActivityId) setSelectedId(null);
 
       if (onSuccessRedirect) {
         router.replace(onSuccessRedirect);
@@ -74,6 +72,8 @@ export const useActivityActions = ({
             ? error.message
             : '체험 삭제 중 오류가 발생했습니다.',
       });
+    },
+    onSettled: () => {
       closeModal();
       if (!initialActivityId) setSelectedId(null);
     },
