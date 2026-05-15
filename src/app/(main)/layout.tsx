@@ -25,7 +25,7 @@ const getCurrentHeaderUser = async (): Promise<HeaderUser | undefined> => {
       return undefined;
     }
 
-    return undefined;
+    throw error;
   }
 };
 
