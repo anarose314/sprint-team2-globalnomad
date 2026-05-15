@@ -12,19 +12,23 @@ function ImageSlot({
   src,
   alt,
   className,
+  sizes = '(max-width: 768px) 100vw, 50vw',
 }: {
   src?: string;
   alt: string;
   className?: string;
+  sizes?: string;
 }) {
   return (
-    <div className={cn('relative overflow-hidden bg-gray-100', className)}>
+    <div
+      className={cn('relative min-h-0 overflow-hidden bg-gray-100', className)}
+    >
       {src ? (
         <Image
           src={src}
           alt={alt}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes={sizes}
           className="object-cover"
         />
       ) : null}
@@ -42,38 +46,108 @@ function ImageSlot({
  *   title={activity.title}
  * />
  */
+const GALLERY_FRAME =
+  'aspect-327/188 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128';
+
 export function ActivityImageGallery({
   bannerImageUrl,
   subImageUrls = [],
   title = '체험',
   className,
 }: ActivityImageGalleryProps) {
-  const [subImage1, subImage2] = subImageUrls;
+  const imageUrls = [
+    ...(bannerImageUrl ? [bannerImageUrl] : []),
+    ...subImageUrls.filter(Boolean),
+  ];
+  const count = imageUrls.length;
+
+  if (count === 0) {
+    return <div className={cn(GALLERY_FRAME, 'bg-gray-100', className)} />;
+  }
+
+  if (count === 1) {
+    return (
+      <div className={cn(GALLERY_FRAME, 'relative', className)}>
+        <ImageSlot
+          src={imageUrls[0]}
+          alt={title}
+          className="h-full w-full"
+          sizes="(max-width: 768px) 100vw, 75vw"
+        />
+      </div>
+    );
+  }
+
+  if (count === 2) {
+    return (
+      <div
+        className={cn(GALLERY_FRAME, 'flex min-h-0 flex-col gap-2', className)}
+      >
+        <ImageSlot
+          src={imageUrls[0]}
+          alt={`${title} 이미지 1`}
+          className="min-h-0 flex-1"
+          sizes="(max-width: 768px) 100vw, 75vw"
+        />
+        <ImageSlot
+          src={imageUrls[1]}
+          alt={`${title} 이미지 2`}
+          className="min-h-0 flex-1"
+          sizes="(max-width: 768px) 100vw, 75vw"
+        />
+      </div>
+    );
+  }
+
+  if (count === 3) {
+    return (
+      <div
+        className={cn(
+          GALLERY_FRAME,
+          'grid grid-cols-2 grid-rows-2 gap-2',
+          className
+        )}
+      >
+        <ImageSlot
+          src={imageUrls[0]}
+          alt={title}
+          className="row-span-2 h-full min-h-0"
+        />
+        <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+          <ImageSlot
+            src={imageUrls[1]}
+            alt={`${title} 추가 이미지 1`}
+            className="min-h-0 flex-1"
+          />
+          <ImageSlot
+            src={imageUrls[2]}
+            alt={`${title} 추가 이미지 2`}
+            className="min-h-0 flex-1"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const quad = imageUrls.slice(0, 4);
 
   return (
     <div
       className={cn(
-        'grid aspect-327/188 grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128',
+        GALLERY_FRAME,
+        'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
         className
       )}
     >
-      <ImageSlot
-        src={bannerImageUrl}
-        alt={title}
-        className="row-span-2 h-full"
-      />
-      <div className="row-span-2 flex h-full flex-col gap-2">
+      {quad.map((url, index) => (
         <ImageSlot
-          src={subImage1}
-          alt={`${title} 추가 이미지 1`}
-          className="flex-1"
+          key={`${url}-${index}`}
+          src={url}
+          alt={`${title} 이미지 ${index + 1}`}
+          className="min-h-0"
+          sizes="(max-width: 768px) 50vw, 38vw"
         />
-        <ImageSlot
-          src={subImage2}
-          alt={`${title} 추가 이미지 2`}
-          className="flex-1"
-        />
-      </div>
+      ))}
     </div>
   );
 }
