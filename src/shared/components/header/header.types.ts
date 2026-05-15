@@ -3,6 +3,10 @@ export interface HeaderUser {
   profileImageUrl: string | null;
 }
 
+export interface HeaderProfileAvatarProps {
+  user: HeaderUser;
+}
+
 export interface HeaderProps {
   user?: HeaderUser;
   hasNotification?: boolean;
