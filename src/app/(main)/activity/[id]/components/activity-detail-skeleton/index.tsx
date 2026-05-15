@@ -85,24 +85,49 @@ function DesktopReservationCardSkeleton() {
 function ActivityReviewsSectionSkeleton() {
   return (
     <section className="mt-8 w-full md:mt-10" aria-hidden="true">
-      <Skeleton height={24} className="w-24" />
-      <div className="mt-6 flex flex-col gap-6">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-24 md:h-7 md:w-28" />
+        <Skeleton className="h-5 w-10 md:h-6 md:w-12" />
+      </div>
+
+      <div className="mt-6 flex flex-col items-center md:mt-10">
+        <Skeleton className="h-9 w-14 md:h-10.5 md:w-16" />
+        <Skeleton className="mt-1 h-5 w-28 md:h-6 md:w-32" />
+        <div className="mt-1 flex items-center gap-1">
+          <Skeleton height={16} width={16} rounded="sm" />
+          <Skeleton className="h-5 w-28 md:h-6 md:w-32" />
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-10 md:mt-8 md:gap-5">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="border-b border-gray-100 pb-6 last:border-b-0 last:pb-0"
-          >
-            <div className="flex items-start gap-3">
-              <Skeleton height={40} width={40} rounded="full" />
-              <div className="min-w-0 flex-1">
-                <Skeleton height={16} className="w-24" />
-                <Skeleton height={14} className="mt-2 w-full" />
-                <Skeleton height={14} className="mt-1 w-[92%]" />
-                <Skeleton height={14} className="mt-1 w-4/5" />
+          <div key={i} className="shadow-review-card rounded-3xl bg-white p-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-28 md:h-6 md:w-32" />
+                <Skeleton className="h-4 w-20 md:h-5 md:w-24" />
+              </div>
+              <div className="mt-1.5 flex items-center gap-1">
+                {Array.from({ length: 5 }).map((__, j) => (
+                  <Skeleton
+                    key={j}
+                    height={16}
+                    width={16}
+                    rounded="sm"
+                    className="shrink-0"
+                  />
+                ))}
               </div>
             </div>
+            <Skeleton fullWidth className="mt-2 h-4 md:mt-3 md:h-5" />
+            <Skeleton fullWidth className="mt-2 h-4 md:h-5" />
+            <Skeleton className="mt-2 h-4 w-3/5 md:h-5" />
           </div>
         ))}
+      </div>
+
+      <div className="mt-7.5 flex justify-center md:mt-10">
+        <Skeleton height={40} className="w-48 rounded-xl md:w-56" />
       </div>
     </section>
   );
