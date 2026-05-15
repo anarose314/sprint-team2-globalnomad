@@ -7,7 +7,7 @@ import { generateId } from '@/shared/utils/generateId';
 
 type ToastData = Omit<ToastProps, 'onClose'>;
 
-const useToastStore = create(
+export const useToastStore = create(
   immer(
     combine({ toasts: [] as ToastData[] }, (set) => ({
       actions: {
