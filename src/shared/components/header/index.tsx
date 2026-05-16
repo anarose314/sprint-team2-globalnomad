@@ -1,14 +1,10 @@
 'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
-import { IcBellOff, IcBellOn, IcProfile } from '@/shared/assets/icons';
 import { LogoHorizontal, LogoIcon } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons/button';
-import type {
-  HeaderProfileAvatarProps,
-  HeaderProps,
-} from '@/shared/components/header/header.types';
+import type { HeaderProps } from '@/shared/components/header/header.types';
+import { HeaderProfileAvatar } from '@/shared/components/header/headerProfileAvatar';
+import { HeaderProfileDropdown } from '@/shared/components/header/headerProfileDropdown';
 
 /**
  * Header에서 사용하는 프로필 아바타 컴포넌트
@@ -19,21 +15,6 @@ import type {
  * @example
  * <HeaderProfileAvatar user={user} />
  */
-export function HeaderProfileAvatar({ user }: HeaderProfileAvatarProps) {
-  if (user.profileImageUrl) {
-    return (
-      <Image
-        src={user.profileImageUrl}
-        alt=""
-        width={32}
-        height={32}
-        className="h-8 w-8 rounded-full object-cover"
-      />
-    );
-  }
-
-  return <IcProfile className="h-8 w-8" aria-hidden="true" />;
-}
 
 /**
  * 메인 페이지 공통 Header 컴포넌트
@@ -57,14 +38,10 @@ export function HeaderProfileAvatar({ user }: HeaderProfileAvatarProps) {
  */
 export function Header({
   user,
-  hasNotification = false,
-  onNotificationClick,
   onProfileClick,
   isProfileMenuOpen = false,
   profileMenuId,
 }: HeaderProps) {
-  const BellIcon = hasNotification ? IcBellOn : IcBellOff;
-
   return (
     <header className="z-header sticky top-0 h-14 shrink-0 border-b border-gray-50 bg-white px-6 md:h-20">
       <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between">
@@ -84,22 +61,6 @@ export function Header({
 
         {user ? (
           <div className="flex items-center gap-5">
-            <button
-              type="button"
-              aria-label={
-                hasNotification
-                  ? '새 알림이 있습니다. 알림 목록 열기'
-                  : '알림 목록 열기'
-              }
-              onClick={onNotificationClick}
-              className="flex h-8 w-8 items-center justify-center"
-            >
-              <BellIcon
-                className="block h-6 w-6 text-gray-600"
-                aria-hidden="true"
-              />
-            </button>
-
             <div className="md:hidden">
               {onProfileClick ? (
                 <button
@@ -123,16 +84,9 @@ export function Header({
               )}
             </div>
 
-            <Link
-              href="/my/profile"
-              className="hidden items-center gap-3 md:flex"
-              aria-label={`${user.nickname}님의 마이페이지로 이동`}
-            >
-              <HeaderProfileAvatar user={user} />
-              <span className="typo-md-medium text-gray-950">
-                {user.nickname}
-              </span>
-            </Link>
+            <div className="hidden md:block">
+              <HeaderProfileDropdown user={user} />
+            </div>
           </div>
         ) : (
           <nav aria-label="인증 메뉴">
