@@ -16,7 +16,9 @@ export const isValidReserveTime = (
   date: string,
   startTime: string
 ): boolean => {
-  const limitDate = new Date().getTime() + 60 * 60 * 1000;
+  const now = new Date();
+  now.setSeconds(0, 0);
+  const limitDate = now.getTime() + 60 * 60 * 1000;
   const targetDate = new Date(`${date}T${startTime}`).getTime();
 
   return limitDate <= targetDate;
