@@ -148,3 +148,46 @@ export const peekKakaoPendingSignup = (): KakaoPendingSignup | null => {
     return null;
   }
 };
+
+/**
+ * 카카오 OAuth 흐름에서 from 경로 임시 저장 키.
+ *
+ * 사용자가 /login?from=... 등으로 진입 후 카카오 로그인 버튼을 누르면
+ * 외부 사이트(카카오)로 이동하므로 React state로는 from을 보존할 수 없다.
+ * sessionStorage에 임시 저장하여 콜백 후 onSuccess 시점에 활용한다.
+ */
+const KAKAO_OAUTH_FROM_KEY = 'kakao_oauth_from';
+
+/**
+ * 카카오 OAuth 흐름의 from 경로를 sessionStorage에 저장한다.
+ * 카카오 인증 URL로 이동하기 직전에 호출.
+ *
+ * from 로그인/가입 성공 후 redirect할 경로
+ */
+export const setKakaoFrom = (from: string): void => {
+  sessionStorage.setItem(KAKAO_OAUTH_FROM_KEY, from);
+};
+
+/**
+ * 카카오 OAuth 흐름의 from 경로를 읽기만 한다 (삭제하지 않음).
+ *
+ * 재시도 가능성(예: 닉네임 중복으로 가입 실패 후 재시도)을 고려하여
+ * 즉시 삭제하지 않고, 실제 로그인/가입이 성공한 시점에 `consumeKakaoFrom`으로 삭제한다.
+ *
+ * 저장된 from 경로, 없으면 null
+ */
+export const peekKakaoFrom = (): string | null => {
+  return sessionStorage.getItem(KAKAO_OAUTH_FROM_KEY);
+};
+
+/**
+ * 카카오 OAuth 흐름의 from 경로를 읽고 즉시 삭제한다.
+ * 로그인/가입 성공 후 redirect 시점에 호출.
+ *
+ * 저장된 from 경로, 없으면 null
+ */
+export const consumeKakaoFrom = (): string | null => {
+  const from = sessionStorage.getItem(KAKAO_OAUTH_FROM_KEY);
+  if (from) sessionStorage.removeItem(KAKAO_OAUTH_FROM_KEY);
+  return from;
+};

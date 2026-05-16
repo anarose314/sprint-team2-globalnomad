@@ -116,7 +116,14 @@ export const proxy = async (request: NextRequest) => {
   }
 
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE_NAME);
+
+  // 인증 실패 시 redirect할 로그인 URL.
+  // 사용자가 원래 가려던 경로를 from query로 보존하여 로그인 후 그 경로로 돌아갈 수 있도록 한다.
   const loginUrl = new URL(LOGIN_PATH, request.url);
+  loginUrl.searchParams.set(
+    'from',
+    request.nextUrl.pathname + request.nextUrl.search
+  );
 
   if (!refreshToken) {
     return NextResponse.redirect(loginUrl);
