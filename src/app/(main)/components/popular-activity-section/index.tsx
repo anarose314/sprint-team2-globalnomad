@@ -11,12 +11,26 @@ import {
 } from 'react';
 import { usePopularActivitiesInfinite } from '@/app/(main)/activity/hooks/usePopularActivitiesInfinite';
 import { ActivityCard } from '@/app/(main)/components/activity-card';
-import { MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY } from '@/app/(main)/main.constants';
+import { ActivityCardListSkeleton } from '@/app/(main)/components/activity-card-list-skeleton';
+import { ActivitySectionStatus } from '@/app/(main)/components/activity-section-status';
+import {
+  MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
+  POPULAR_ACTIVITY_PAGE_SIZE,
+} from '@/app/(main)/main.constants';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
 const SCROLL_LOAD_THRESHOLD = 80;
 const DRAG_SCROLL_CLICK_THRESHOLD = 5;
+
+const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
+  'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
+  'cursor-grab active:cursor-grabbing 2xl:cursor-auto 2xl:active:cursor-auto',
+  '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
+  'xs:auto-cols-[calc((100%-1rem)/2.1)]',
+  'md:-mr-7.5 md:ml-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:pr-7.5 md:pl-0',
+  '2xl:mx-0 2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible 2xl:px-0'
+);
 
 const subscribeDesktopLayout = (onStoreChange: () => void) => {
   if (typeof window === 'undefined') {
@@ -232,21 +246,22 @@ export function PopularActivitySection() {
       </Heading>
 
       {isPending && (
-        <p className="typo-md-medium py-10 text-center text-gray-500">
-          인기 체험을 불러오는 중입니다.
-        </p>
+        <ActivityCardListSkeleton
+          count={POPULAR_ACTIVITY_PAGE_SIZE}
+          className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
+          message="인기 체험 목록을 불러오는 중입니다."
+        />
       )}
 
       {isError && (
-        <p className="typo-md-medium py-10 text-center text-red-500">
-          인기 체험을 불러오지 못했습니다.
-        </p>
+        <ActivitySectionStatus
+          message="인기 체험을 불러오지 못했습니다."
+          tone="error"
+        />
       )}
 
       {!isPending && !isError && activities.length === 0 && (
-        <p className="typo-md-medium py-10 text-center text-gray-500">
-          인기 체험이 없습니다.
-        </p>
+        <ActivitySectionStatus message="인기 체험이 없습니다." />
       )}
 
       {!isPending && !isError && activities.length > 0 && (
@@ -258,14 +273,7 @@ export function PopularActivitySection() {
             onPointerUp={handleHorizontalScrollPointerEnd}
             onPointerCancel={handleHorizontalScrollPointerEnd}
             onClickCapture={handleHorizontalScrollClickCapture}
-            className={cn(
-              'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
-              'cursor-grab active:cursor-grabbing 2xl:cursor-auto 2xl:active:cursor-auto',
-              '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
-              'xs:auto-cols-[calc((100%-1rem)/2.1)]',
-              'md:-mr-7.5 md:ml-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:pr-7.5 md:pl-0',
-              '2xl:mx-0 2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible 2xl:px-0'
-            )}
+            className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
           >
             {activities.map((activity) => (
               <li key={activity.id} className="w-full">
