@@ -161,6 +161,11 @@ export function Dropdown({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={isOpen ? listboxId : undefined}
+          aria-activedescendant={
+            isOpen && focusedIndex >= 0
+              ? `${listboxId}-option-${focusedIndex}`
+              : undefined
+          }
           className={cn(
             // 공통 필수 속성 및 비활성화 상태
             'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
@@ -223,6 +228,7 @@ export function Dropdown({
               return (
                 <li key={option.value}>
                   <button
+                    id={`${listboxId}-option-${index}`}
                     type="button"
                     role="option"
                     disabled={isOptionDisabled}

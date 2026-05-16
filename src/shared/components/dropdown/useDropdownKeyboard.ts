@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent, RefObject } from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
 
 interface UseDropdownKeyboardProps {
@@ -33,8 +33,25 @@ export const useDropdownKeyboard = ({
   const searchString = useRef('');
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 컴포넌트 언마운트 시 메모리 누수 방지
+  useEffect(() => {
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, []);
+
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     const { key } = event;
+
+    // 비활성화된 옵션은 건너뛰기
+    const getNextIndex = (current: number, step: number): number => {
+      let next = current + step;
+      while (next >= 0 && next < options.length) {
+        if (!options[next].disabled) return next;
+        next += step;
+      }
+      return current;
+    };
 
     // 1. 타이핑 검색 로직 (Typeahead)
     // 일반 문자/숫자 키가 눌렸을 때 (Ctrl, Alt 등 특수키 제외)
@@ -49,8 +66,10 @@ export const useDropdownKeyboard = ({
       }, 500);
 
       // 누적된 문자열로 시작하는 첫 번째 옵션 찾기
-      const matchIndex = options.findIndex((option) =>
-        option.label.toLowerCase().startsWith(searchString.current)
+      const matchIndex = options.findIndex(
+        (option) =>
+          !option.disabled &&
+          option.label.toLowerCase().startsWith(searchString.current)
       );
 
       if (matchIndex !== -1) {
@@ -80,10 +99,11 @@ export const useDropdownKeyboard = ({
         options.findIndex((opt) => opt.value === value),
         0
       );
+
       const nextIndex =
         key === 'ArrowDown'
-          ? Math.min(currentIndex + 1, options.length - 1)
-          : Math.max(currentIndex - 1, 0);
+          ? getNextIndex(currentIndex, 1)
+          : getNextIndex(currentIndex, -1);
 
       setFocusedIndex(nextIndex);
       handleOptionClick(options[nextIndex]);
@@ -100,22 +120,25 @@ export const useDropdownKeyboard = ({
 
     const nextIndex =
       key === 'ArrowDown'
-        ? Math.min(focusedIndex + 1, options.length - 1)
-        : Math.max(focusedIndex - 1, 0);
+        ? getNextIndex(focusedIndex, 1)
+        : getNextIndex(focusedIndex, -1);
 
     setFocusedIndex(nextIndex);
 
     // 방향키 이동 시 스크롤 보정
-    if (listboxRef.current) {
+    if (listboxRef.current && nextIndex !== focusedIndex) {
       if (key === 'ArrowDown') {
         const itemBottom = (nextIndex + 1) * optionHeight;
         const visibleBottom = listboxRef.current.scrollTop + menuMaxHeight;
-        if (itemBottom > visibleBottom)
+        if (itemBottom > visibleBottom) {
           listboxRef.current.scrollTop = itemBottom - menuMaxHeight;
+        }
       } else {
         const itemTop = nextIndex * optionHeight;
         const visibleTop = listboxRef.current.scrollTop;
-        if (itemTop < visibleTop) listboxRef.current.scrollTop = itemTop;
+        if (itemTop < visibleTop) {
+          listboxRef.current.scrollTop = itemTop;
+        }
       }
     }
   };
