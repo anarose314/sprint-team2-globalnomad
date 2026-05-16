@@ -21,8 +21,9 @@ import { validateImageFile } from '@/shared/utils/validateImageFile';
  * 마이페이지에서 공용으로 사용하는 사이드바 컴포넌트.
  *
  * - 현재 경로에 해당하는 메뉴를 자동으로 활성화한다.
- * - 프로필 이미지 변경/제거를 자체적으로 처리한다.
- * - 로그아웃 시 인증 쿠키 삭제, 캐시 클리어, 메인 페이지로 이동을 모두 처리한다.
+ * - 프로필 이미지 영역에 마우스 호버 또는 키보드 포커스 시 오버레이로 수정 아이콘이 표시된다.
+ * - 사용자가 업로드한 이미지가 있을 때만 우상단에 삭제 버튼이 노출되며, 호버 시 시각 정리를 위해 숨겨진다.
+ * - 로그아웃 시 인증 쿠키 삭제, 캐시 클리어, 메인 페이지 이동을 모두 처리한다.
  * - variant에 따라 데스크탑 사이드바와 모바일 드로어 내부 메뉴로 재사용한다.
  */
 export function Sidebar({
@@ -69,7 +70,7 @@ export function Sidebar({
   };
 
   const handleLogout = () => {
-    onNavigate?.(); // 드로어 모드일 경우 드로어 먼저 닫기
+    onNavigate?.();
     logout();
     onLogout?.();
   };
@@ -90,9 +91,14 @@ export function Sidebar({
           isDrawer ? 'mb-6' : 'mb-3 2xl:mb-6'
         )}
       >
-        <div
+        {/* 이미지 원 = 버튼 (peer 추가) */}
+        <button
+          type="button"
+          onClick={handleProfileEdit}
+          disabled={isProfileImageMutating}
+          aria-label="프로필 이미지 수정"
           className={cn(
-            'relative aspect-square overflow-hidden rounded-full bg-blue-50',
+            'group peer relative block aspect-square cursor-pointer overflow-hidden rounded-full bg-blue-50 disabled:cursor-not-allowed',
             isDrawer ? 'w-24' : 'w-17.5 2xl:w-28'
           )}
         >
@@ -109,21 +115,26 @@ export function Sidebar({
               <IcProfile className="h-full w-full" aria-hidden="true" />
             </div>
           )}
-        </div>
 
-        <button
-          type="button"
-          onClick={handleProfileEdit}
-          disabled={isProfileImageMutating}
-          aria-label="프로필 이미지 수정"
-          className={cn(
-            'absolute right-1 bottom-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1.75 text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
-            isDrawer ? 'h-7.5 w-7.5' : 'h-6 w-6 2xl:h-7.5 2xl:w-7.5'
-          )}
-        >
-          <IcEdit className="h-full w-full" aria-hidden="true" />
+          {/* 호버/포커스 시 나타나는 오버레이 + 수정 아이콘 */}
+          <div
+            className={cn(
+              'absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200',
+              'group-hover:opacity-100 group-focus-visible:opacity-100',
+              'group-disabled:opacity-0'
+            )}
+            aria-hidden="true"
+          >
+            <IcEdit
+              className={cn(
+                'text-white',
+                isDrawer ? 'h-8 w-8' : 'h-6 w-6 2xl:h-8 2xl:w-8'
+              )}
+            />
+          </div>
         </button>
 
+        {/* 이미지 삭제 버튼 (사용자 업로드 이미지가 있을 때만, 호버/포커스 시 숨김) */}
         {hasProfileImage && (
           <button
             type="button"
@@ -131,7 +142,9 @@ export function Sidebar({
             disabled={isProfileImageMutating}
             aria-label="프로필 이미지 삭제"
             className={cn(
-              'absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1 text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
+              'absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-gray-400 p-1 text-white transition-opacity duration-200 hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60',
+              'peer-hover:pointer-events-none peer-hover:opacity-0',
+              'peer-focus-visible:pointer-events-none peer-focus-visible:opacity-0',
               isDrawer ? 'h-6 w-6' : 'h-5 w-5 2xl:h-6 2xl:w-6'
             )}
           >
