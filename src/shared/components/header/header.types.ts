@@ -9,9 +9,10 @@ export interface HeaderProfileAvatarProps {
 
 export interface HeaderProps {
   user?: HeaderUser;
-  hasNotification?: boolean;
-  onNotificationClick?: () => void;
   onProfileClick?: () => void;
   isProfileMenuOpen?: boolean;
   profileMenuId?: string;
+}
+export interface HeaderProfileDropdownProps {
+  user: HeaderUser;
 }
