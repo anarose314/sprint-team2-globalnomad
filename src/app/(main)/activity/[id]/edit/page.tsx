@@ -5,6 +5,7 @@ import { ActivityEditForm } from '@/app/(main)/activity/[id]/edit/components/act
 import { ActivityEditPageProps } from '@/app/(main)/activity/[id]/edit/edit.types';
 import { ActivityFormSkeleton } from '@/app/(main)/activity/components/activity-form-skeleton';
 import { ApiError } from '@/shared/apis/apiError';
+import { LOGIN_PATH } from '@/shared/apis/auth/auth.constants';
 import type { User } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { Heading } from '@/shared/components/heading';
@@ -41,7 +42,9 @@ export default async function ActivityEditPage({
 
   const [meResult, activityResult] = await Promise.allSettled([
     fetchInstanceServer<User>('/users/me', { cache: 'no-store' }),
-    fetchInstanceServer<ActivityDetailResponse>(`/activities/${activityId}`),
+    fetchInstanceServer<ActivityDetailResponse>(`/activities/${activityId}`, {
+      cache: 'no-store',
+    }),
   ]);
 
   const me = meResult.status === 'fulfilled' ? meResult.value : null;
@@ -56,7 +59,11 @@ export default async function ActivityEditPage({
 
   const activity = activityResult.value;
 
-  if (!me || activity.userId !== me.id) {
+  if (!me) {
+    redirect(`${LOGIN_PATH}?from=/activity/${activityId}/edit`);
+  }
+
+  if (activity.userId !== me.id) {
     redirect(`/activity/${activityId}?error=${URL_QUERY_ERRORS.UNAUTHORIZED}`);
   }
 
