@@ -17,6 +17,12 @@ import {
 } from '@/shared/apis/fetchInstance.core';
 import { useToastStore } from '@/shared/store/useToastStore';
 
+/** `fetchInstanceClient` 전용 옵션 — 코어 `fetchInstance`에는 전달되지 않는다. */
+export type FetchInstanceClientOptions = FetchInstanceOptions & {
+  /** true면 401 처리 중 토큰 갱신 실패·재시도 401 시 전역 로그인 리다이렉트 없이 ApiError만 throw */
+  skipSessionExpiredRedirect?: boolean;
+};
+
 /** 토큰 재발급 BFF 엔드포인트 — retry 대상에서 제외 (무한 루프 방지) */
 const REFRESH_ENDPOINT = '/api/auth/tokens';
 
@@ -95,7 +101,7 @@ const handleSessionExpired = () => {
  */
 export const fetchInstanceClient = async <T>(
   endpoint: string,
-  options: FetchInstanceOptions = {}
+  options: FetchInstanceClientOptions = {}
 ): Promise<T> => {
   if (!endpoint.startsWith('/')) {
     throw new Error(`endpoint는 '/'로 시작해야 합니다: "${endpoint}"`);
