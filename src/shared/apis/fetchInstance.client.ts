@@ -89,7 +89,7 @@ const handleSessionExpired = () => {
   });
 
   // 사용자가 작업 중이던 경로를 from query로 보존
-  const from = window.location.pathname;
+  const from = window.location.pathname + window.location.search;
   window.location.href = `${LOGIN_PATH}?from=${encodeURIComponent(from)}`;
 };
 
