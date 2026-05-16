@@ -64,7 +64,7 @@ export const useActivityReservationCardState = ({
       return;
     }
 
-    const earliestDateKey = availableDateKeysSignature.split(',')[0];
+    const earliestDateKey = availableDateKeys[0];
     if (!earliestDateKey) {
       return;
     }
