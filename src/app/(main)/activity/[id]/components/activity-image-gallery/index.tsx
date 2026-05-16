@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
+import { ActivityImageLightbox } from '@/app/(main)/activity/[id]/components/activity-image-gallery/activity-image-lightbox';
+import { GalleryImageSlot } from '@/app/(main)/activity/[id]/components/activity-image-gallery/gallery-image-slot';
 import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
 import { cn } from '@/shared/utils/cn';
 
@@ -10,71 +11,6 @@ interface ActivityImageGalleryProps {
   subImageUrls?: string[];
   title?: string;
   className?: string;
-}
-
-/** `src`가 바뀔 때마다 리마운트되어 로드 상태가 초기화됨 */
-function GalleryImageSlotInner({
-  src,
-  alt,
-  sizes,
-}: {
-  src: string;
-  alt: string;
-  sizes: string;
-}) {
-  const [loaded, setLoaded] = useState(false);
-
-  const handleImgRef = useCallback((el: HTMLImageElement | null) => {
-    if (el?.complete && el.naturalWidth > 0) {
-      setLoaded(true);
-    }
-  }, []);
-
-  return (
-    <>
-      {!loaded ? (
-        <div
-          className="skeleton-shimmer pointer-events-none absolute inset-0 z-0"
-          aria-hidden
-        />
-      ) : null}
-      <Image
-        ref={handleImgRef}
-        src={src}
-        alt={alt}
-        fill
-        sizes={sizes}
-        className={cn(
-          'object-cover transition-opacity duration-300',
-          loaded ? 'opacity-100' : 'opacity-0'
-        )}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
-      />
-    </>
-  );
-}
-
-function GalleryImageSlot({
-  src,
-  alt,
-  className,
-  sizes = '(max-width: 768px) 100vw, 50vw',
-}: {
-  src?: string;
-  alt: string;
-  className?: string;
-  sizes?: string;
-}) {
-  return (
-    <div
-      className={cn('relative min-h-0 overflow-hidden bg-gray-100', className)}
-    >
-      {src ? (
-        <GalleryImageSlotInner key={src} src={src} alt={alt} sizes={sizes} />
-      ) : null}
-    </div>
-  );
 }
 
 /**
@@ -98,112 +34,204 @@ export function ActivityImageGallery({
     ...subImageUrls.filter(Boolean),
   ];
   const count = imageUrls.length;
+  /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */
+  const lightboxUrls = imageUrls;
+
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const lightbox =
+    lightboxIndex !== null && lightboxUrls[lightboxIndex] ? (
+      <ActivityImageLightbox
+        urls={lightboxUrls}
+        title={title}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={setLightboxIndex}
+      />
+    ) : null;
 
   if (count === 0) {
     return (
-      <div
-        className={cn(
-          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-          'bg-gray-100',
-          className
-        )}
-      />
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'bg-gray-100',
+            className
+          )}
+        />
+        {lightbox}
+      </>
     );
   }
 
   if (count === 1) {
     return (
-      <div
-        className={cn(
-          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-          'relative',
-          className
-        )}
-      >
-        <GalleryImageSlot
-          src={imageUrls[0]}
-          alt={title}
-          className="h-full w-full"
-          sizes="(max-width: 768px) 100vw, 75vw"
-        />
-      </div>
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'relative',
+            className
+          )}
+        >
+          <GalleryImageSlot
+            src={imageUrls[0]}
+            alt={title}
+            className="h-full w-full"
+            sizes="(max-width: 768px) 100vw, 75vw"
+            onOpen={() => setLightboxIndex(0)}
+          />
+        </div>
+        {lightbox}
+      </>
     );
   }
 
   if (count === 2) {
     return (
-      <div
-        className={cn(
-          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-          'flex min-h-0 flex-col gap-2',
-          className
-        )}
-      >
-        <GalleryImageSlot
-          src={imageUrls[0]}
-          alt={`${title} 이미지 1`}
-          className="min-h-0 flex-1"
-          sizes="(max-width: 768px) 100vw, 75vw"
-        />
-        <GalleryImageSlot
-          src={imageUrls[1]}
-          alt={`${title} 이미지 2`}
-          className="min-h-0 flex-1"
-          sizes="(max-width: 768px) 100vw, 75vw"
-        />
-      </div>
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'flex min-h-0 flex-col gap-2',
+            className
+          )}
+        >
+          <GalleryImageSlot
+            src={imageUrls[0]}
+            alt={`${title} 이미지 1`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 100vw, 75vw"
+            onOpen={() => setLightboxIndex(0)}
+          />
+          <GalleryImageSlot
+            src={imageUrls[1]}
+            alt={`${title} 이미지 2`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 100vw, 75vw"
+            onOpen={() => setLightboxIndex(1)}
+          />
+        </div>
+        {lightbox}
+      </>
     );
   }
 
   if (count === 3) {
     return (
-      <div
-        className={cn(
-          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-          'grid grid-cols-2 grid-rows-2 gap-2',
-          className
-        )}
-      >
-        <GalleryImageSlot
-          src={imageUrls[0]}
-          alt={title}
-          className="row-span-2 h-full min-h-0"
-        />
-        <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'grid grid-cols-2 grid-rows-2 gap-2',
+            className
+          )}
+        >
           <GalleryImageSlot
-            src={imageUrls[1]}
-            alt={`${title} 추가 이미지 1`}
-            className="min-h-0 flex-1"
+            src={imageUrls[0]}
+            alt={title}
+            className="row-span-2 h-full min-h-0"
+            onOpen={() => setLightboxIndex(0)}
           />
-          <GalleryImageSlot
-            src={imageUrls[2]}
-            alt={`${title} 추가 이미지 2`}
-            className="min-h-0 flex-1"
-          />
+          <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+            <GalleryImageSlot
+              src={imageUrls[1]}
+              alt={`${title} 추가 이미지 1`}
+              className="min-h-0 flex-1"
+              onOpen={() => setLightboxIndex(1)}
+            />
+            <GalleryImageSlot
+              src={imageUrls[2]}
+              alt={`${title} 추가 이미지 2`}
+              className="min-h-0 flex-1"
+              onOpen={() => setLightboxIndex(2)}
+            />
+          </div>
         </div>
-      </div>
+        {lightbox}
+      </>
     );
   }
 
-  const quad = imageUrls.slice(0, 4);
+  if (count === 4) {
+    return (
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
+            className
+          )}
+        >
+          {imageUrls.map((url, index) => (
+            <GalleryImageSlot
+              key={`${url}-${index}`}
+              src={url}
+              alt={`${title} 이미지 ${index + 1}`}
+              className="min-h-0"
+              sizes="(max-width: 768px) 50vw, 38vw"
+              onOpen={() => setLightboxIndex(index)}
+            />
+          ))}
+        </div>
+        {lightbox}
+      </>
+    );
+  }
+
+  const five = imageUrls.slice(0, 5);
 
   return (
-    <div
-      className={cn(
-        ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-        'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
-        className
-      )}
-    >
-      {quad.map((url, index) => (
-        <GalleryImageSlot
-          key={`${url}-${index}`}
-          src={url}
-          alt={`${title} 이미지 ${index + 1}`}
-          className="min-h-0"
-          sizes="(max-width: 768px) 50vw, 38vw"
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={cn(
+          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+          'flex min-h-0 gap-2',
+          className
+        )}
+      >
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
+          <GalleryImageSlot
+            src={five[0]}
+            alt={`${title} 이미지 1`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(0)}
+          />
+          <GalleryImageSlot
+            src={five[1]}
+            alt={`${title} 이미지 2`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(1)}
+          />
+        </div>
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
+          <GalleryImageSlot
+            src={five[2]}
+            alt={`${title} 이미지 3`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(2)}
+          />
+          <GalleryImageSlot
+            src={five[3]}
+            alt={`${title} 이미지 4`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(3)}
+          />
+          <GalleryImageSlot
+            src={five[4]}
+            alt={`${title} 이미지 5`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(4)}
+          />
+        </div>
+      </div>
+      {lightbox}
+    </>
   );
 }
