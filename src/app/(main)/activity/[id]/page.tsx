@@ -78,6 +78,13 @@ export default async function ActivityDetailPage({
   }
 
   const isOwner = currentUserId === activity.userId;
+  const isAuthenticated = currentUserId !== null;
 
-  return <ActivityDetailPageClient activity={activity} isOwner={isOwner} />;
+  return (
+    <ActivityDetailPageClient
+      activity={activity}
+      isOwner={isOwner}
+      isAuthenticated={isAuthenticated}
+    />
+  );
 }

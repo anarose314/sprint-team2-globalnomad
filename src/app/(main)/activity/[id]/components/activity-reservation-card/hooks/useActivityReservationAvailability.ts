@@ -13,6 +13,8 @@ interface UseActivityReservationAvailabilityProps {
   activityId: number;
   schedules: ActivitySchedule[];
   reservedScheduleIds: number[];
+  /** false면 `/my-reservations` 호출을 하지 않는다(비로그인 401 시 전역 로그인 이동 방지). */
+  isAuthenticated: boolean;
 }
 
 const normalizeDateKey = (rawDate: string) => {
@@ -95,6 +97,7 @@ export const useActivityReservationAvailability = ({
   activityId,
   schedules,
   reservedScheduleIds,
+  isAuthenticated,
 }: UseActivityReservationAvailabilityProps) => {
   const queryTargetMonths = useMemo(() => {
     const uniqueYearMonth = new Set<string>();
@@ -144,6 +147,7 @@ export const useActivityReservationAvailability = ({
   const { data: myReservedSchedules = [] } = useQuery({
     queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
     queryFn: fetchMyReservedSchedules,
+    enabled: isAuthenticated,
   });
 
   const myReservedScheduleIds = useMemo(() => {

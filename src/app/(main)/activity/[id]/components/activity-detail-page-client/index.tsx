@@ -13,6 +13,8 @@ import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 interface ActivityDetailPageClientProps {
   activity: ActivityDetailResponse;
   isOwner: boolean;
+  /** 로그인한 사용자만 내 예약 조회 API를 호출한다(비로그인 시 401 → 로그인 리다이렉트 방지). */
+  isAuthenticated: boolean;
 }
 
 /**
@@ -24,6 +26,7 @@ interface ActivityDetailPageClientProps {
 export function ActivityDetailPageClient({
   activity,
   isOwner,
+  isAuthenticated,
 }: ActivityDetailPageClientProps) {
   const subImageUrls = Array.isArray(activity.subImages)
     ? activity.subImages.map((image) => image.imageUrl)
@@ -93,6 +96,7 @@ export function ActivityDetailPageClient({
                   activityId={activity.id}
                   pricePerPerson={activity.price}
                   schedules={activity.schedules}
+                  isAuthenticated={isAuthenticated}
                 />
               </div>
             )}

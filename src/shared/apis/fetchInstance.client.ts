@@ -4,7 +4,8 @@
  * 코어 fetchInstance 위에 다음 기능을 추가한다:
  * - `/api/`로 시작하는 endpoint는 BFF (same-origin) 호출로 자동 인식
  * - 401 응답 시 자동으로 토큰 재발급 (single-flight) 후 원래 요청 재시도
- * - refresh 자체 실패 시 세션 만료 처리 (토스트 안내 + 로그인 페이지 이동)
+ * - refresh 자체 실패 시 세션 만료 처리 (토스트 안내 + 로그인 페이지 이동),
+ *   단 `skipSessionExpiredRedirect: true`이면 리다이렉트 없이 401을 그대로 throw
  *
  * 인증은 BFF의 httpOnly 쿠키로 처리되므로, 클라이언트가 토큰을 직접 다루지 않는다.
  */
@@ -15,6 +16,12 @@ import {
   type FetchInstanceOptions,
 } from '@/shared/apis/fetchInstance.core';
 import { useToastStore } from '@/shared/store/useToastStore';
+
+/** `fetchInstanceClient` 전용 옵션 — 코어 `fetchInstance`에는 전달되지 않는다. */
+export type FetchInstanceClientOptions = FetchInstanceOptions & {
+  /** true면 401 처리 중 토큰 갱신 실패·재시도 401 시 전역 로그인 리다이렉트 없이 ApiError만 throw */
+  skipSessionExpiredRedirect?: boolean;
+};
 
 /** 토큰 재발급 BFF 엔드포인트 — retry 대상에서 제외 (무한 루프 방지) */
 const REFRESH_ENDPOINT = '/api/auth/tokens';
@@ -90,18 +97,20 @@ const handleSessionExpired = () => {
  *
  * 401 응답 시 자동으로 토큰 갱신을 시도하고, 성공하면 원래 요청을 재시도한다.
  * 갱신 자체가 실패하면(401 응답) 세션 만료로 간주하여 로그인 페이지로 이동시킨다.
+ * `skipSessionExpiredRedirect`가 true면 이동하지 않고 ApiError만 전파한다.
  */
 export const fetchInstanceClient = async <T>(
   endpoint: string,
-  options: FetchInstanceOptions = {}
+  options: FetchInstanceClientOptions = {}
 ): Promise<T> => {
   if (!endpoint.startsWith('/')) {
     throw new Error(`endpoint는 '/'로 시작해야 합니다: "${endpoint}"`);
   }
 
   const isBffCall = endpoint.startsWith('/api/');
+  const { skipSessionExpiredRedirect, ...restOptions } = options;
   const requestOptions: FetchInstanceOptions = {
-    ...options,
+    ...restOptions,
     absoluteUrl: options.absoluteUrl ?? isBffCall,
   };
 
@@ -122,8 +131,10 @@ export const fetchInstanceClient = async <T>(
     try {
       await refreshTokens();
     } catch {
-      // refresh 실패 — 세션 만료 처리
-      handleSessionExpired();
+      // refresh 실패 — 세션 만료 처리(호출부에서 401 UI 처리하는 경우는 제외)
+      if (!skipSessionExpiredRedirect) {
+        handleSessionExpired();
+      }
       throw error;
     }
 
@@ -132,7 +143,11 @@ export const fetchInstanceClient = async <T>(
     try {
       return await fetchInstance<T>(endpoint, requestOptions);
     } catch (retryError) {
-      if (retryError instanceof ApiError && retryError.status === 401) {
+      if (
+        retryError instanceof ApiError &&
+        retryError.status === 401 &&
+        !skipSessionExpiredRedirect
+      ) {
         handleSessionExpired();
       }
       throw retryError;
