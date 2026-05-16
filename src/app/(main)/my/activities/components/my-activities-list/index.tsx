@@ -84,6 +84,7 @@ export function MyActivitiesList() {
                 confirmText="삭제"
                 onCancel={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
+                isPending={isDeleting}
               />
             </ModalOverlay>
           )}
