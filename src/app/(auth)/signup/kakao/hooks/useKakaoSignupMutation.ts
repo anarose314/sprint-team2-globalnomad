@@ -2,8 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
+import { consumeKakaoFrom } from '@/shared/apis/auth/kakao';
 import { kakaoSignup } from '@/shared/apis/auth/kakaoSignup';
 import { useShowToast } from '@/shared/store/useToastStore';
+import { getSafeRedirectPath } from '@/shared/utils/getSafeRedirectPath';
 
 /**
  * 카카오 간편 회원가입 mutation hook.
@@ -16,7 +18,9 @@ import { useShowToast } from '@/shared/store/useToastStore';
  * 일반 회원가입과 달리 백엔드 단일 호출로 회원가입+로그인이 완료되므로
  * 부분 실패 시나리오는 없다.
  *
- * 성공 시 토스트 안내 + 메인 페이지로 리다이렉트한다.
+ * 성공 시 토스트 안내 + sessionStorage에 보존된 from 경로(AuthFooter에서 저장)를
+ * 검증하여 해당 경로로, 없으면 메인 페이지로 리다이렉트한다.
+ *
  * 에러 케이스별 처리는 호출부에서 mutate 의 onError 옵션으로.
  */
 export const useKakaoSignupMutation = () => {
@@ -30,7 +34,10 @@ export const useKakaoSignupMutation = () => {
         theme: 'success',
         message: '카카오 회원가입이 완료되었습니다.',
       });
-      router.replace('/');
+
+      // 카카오 흐름 진입 시 보존한 from 경로를 꺼내 검증 후 redirect
+      const from = consumeKakaoFrom();
+      router.replace(getSafeRedirectPath(from));
     },
   });
 };

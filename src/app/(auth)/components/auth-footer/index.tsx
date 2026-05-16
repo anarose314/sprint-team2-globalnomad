@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { KakaoAuthButton } from '@/app/(auth)/components/kakao-auth-button';
 import {
   buildKakaoAuthUrl,
+  consumeKakaoFrom,
   type KakaoAuthIntent,
+  setKakaoFrom,
 } from '@/shared/apis/auth/kakao';
 import { useShowToast } from '@/shared/store/useToastStore';
 
@@ -41,7 +44,6 @@ const FOOTER_TEXTS: Record<
   },
 };
 
-/** AuthFooter의 mode를 카카오 OAuth intent로 매핑 */
 const MODE_TO_KAKAO_INTENT: Record<AuthFooterMode, KakaoAuthIntent> = {
   signin: 'signin',
   signup: 'signup',
@@ -54,6 +56,8 @@ const MODE_TO_KAKAO_INTENT: Record<AuthFooterMode, KakaoAuthIntent> = {
  * `mode` prop에 따라 모든 텍스트와 링크가 자동 결정된다.
  *
  * 카카오 버튼 클릭 시 인가 URL을 생성하고 카카오 인증 페이지로 리다이렉트한다.
+ * URL의 `from` query가 있으면 sessionStorage에 보존하여 카카오 흐름 후
+ * 해당 경로로 redirect할 수 있도록 한다.
  * 인가 URL 생성 실패(환경변수 누락, sessionStorage 접근 불가 등) 시
  * 토스트로 안내한다.
  *
@@ -64,9 +68,19 @@ const MODE_TO_KAKAO_INTENT: Record<AuthFooterMode, KakaoAuthIntent> = {
 export function AuthFooter({ mode }: AuthFooterProps) {
   const texts = FOOTER_TEXTS[mode];
   const showToast = useShowToast();
+  const searchParams = useSearchParams();
 
   const handleKakaoClick = () => {
     try {
+      // URL의 from query를 sessionStorage에 보존 (카카오 흐름 후 redirect용)
+      // from이 없으면 기존 값 정리 (이전 카카오 흐름의 잔여 데이터 방지)
+      const from = searchParams.get('from');
+      if (from) {
+        setKakaoFrom(from);
+      } else {
+        consumeKakaoFrom();
+      }
+
       const intent = MODE_TO_KAKAO_INTENT[mode];
       const authUrl = buildKakaoAuthUrl(intent);
       window.location.href = authUrl;
