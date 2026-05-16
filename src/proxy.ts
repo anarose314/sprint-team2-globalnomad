@@ -108,7 +108,7 @@ const tryRefreshTokens = async (
  *
  * @see fetchInstance.client.ts — API 호출 시점의 토큰 갱신 (이 미들웨어와 별개 흐름)
  */
-export const middleware = async (request: NextRequest) => {
+export const proxy = async (request: NextRequest) => {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME);
 
   if (accessToken) {
