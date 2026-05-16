@@ -1,14 +1,9 @@
 'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
-import { IcProfile } from '@/shared/assets/icons';
 import { LogoHorizontal, LogoIcon } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons/button';
-import type {
-  HeaderProfileAvatarProps,
-  HeaderProps,
-} from '@/shared/components/header/header.types';
+import type { HeaderProps } from '@/shared/components/header/header.types';
+import { HeaderProfileAvatar } from '@/shared/components/header/headerProfileAvatar';
 import { HeaderProfileDropdown } from '@/shared/components/header/headerProfileDropdown';
 
 /**
@@ -20,21 +15,6 @@ import { HeaderProfileDropdown } from '@/shared/components/header/headerProfileD
  * @example
  * <HeaderProfileAvatar user={user} />
  */
-export function HeaderProfileAvatar({ user }: HeaderProfileAvatarProps) {
-  if (user.profileImageUrl) {
-    return (
-      <Image
-        src={user.profileImageUrl}
-        alt=""
-        width={32}
-        height={32}
-        className="h-8 w-8 rounded-full object-cover"
-      />
-    );
-  }
-
-  return <IcProfile className="h-8 w-8" aria-hidden="true" />;
-}
 
 /**
  * 메인 페이지 공통 Header 컴포넌트

@@ -4,8 +4,8 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IcArrowDown } from '@/shared/assets/icons';
-import { HeaderProfileAvatar } from '@/shared/components/header';
 import type { HeaderProfileDropdownProps } from '@/shared/components/header/header.types';
+import { HeaderProfileAvatar } from '@/shared/components/header/headerProfileAvatar';
 import { MENU_ITEMS } from '@/shared/components/sidebar/sidebar.constants';
 import { useClickOutside } from '@/shared/hooks/useClickOutside';
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
@@ -21,7 +21,7 @@ import { cn } from '@/shared/utils/cn';
  *
  * 모바일(md 미만)에서는 별도의 메뉴 UI를 사용하므로 이 컴포넌트는 데스크탑 전용이다.
  */
-export const HeaderProfileDropdown = ({ user }: HeaderProfileDropdownProps) => {
+export function HeaderProfileDropdown({ user }: HeaderProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -102,4 +102,4 @@ export const HeaderProfileDropdown = ({ user }: HeaderProfileDropdownProps) => {
       )}
     </div>
   );
-};
+}
