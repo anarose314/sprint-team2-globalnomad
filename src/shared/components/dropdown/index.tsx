@@ -14,11 +14,14 @@ import type {
   DropdownOption,
   DropdownProps,
 } from '@/shared/components/dropdown/dropdown.types';
+import { useDropdownKeyboard } from '@/shared/components/dropdown/useDropdownKeyboard';
 import {
   INPUT_ERROR_MESSAGE_STYLE,
   INPUT_ERROR_STYLE,
   INPUT_LABEL_STYLE,
 } from '@/shared/components/input/input.constants';
+import { useClickOutside } from '@/shared/hooks/useClickOutside';
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
 import { cn } from '@/shared/utils/cn';
 
 /**
@@ -56,33 +59,38 @@ export function Dropdown({
   onBlur,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const hasOpened = useRef(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const listboxRef = useRef<HTMLUListElement>(null);
   const dropdownId = useId();
   const listboxId = `${dropdownId}-listbox`;
   const buttonId = `${dropdownId}-button`;
+
   const selectedOption = options.find((option) => option.value === value);
   const isDisabled = disabled || options.length === 0;
   const isFieldVariant = variant === 'field' || variant === 'fieldInput';
-
-  // 옵션 목록은 기본 5개까지만 노출하고, 초과 시 내부 스크롤됩니다.
   const menuMaxHeight = optionHeight * maxVisibleOptions;
-
   const triggerLabel =
     variant === 'chip' ? placeholder : (selectedOption?.label ?? placeholder);
-
   const isPlaceholder = !selectedOption && isFieldVariant;
 
   const handleToggle = () => {
     if (isDisabled) return;
+
+    if (!isOpen) {
+      const selectedIndex = options.findIndex(
+        (option) => option.value === value
+      );
+      setFocusedIndex(selectedIndex !== -1 ? selectedIndex : -1);
+    }
 
     setIsOpen((prev) => !prev);
   };
 
   const handleOptionClick = (option: DropdownOption) => {
     if (option.disabled) return;
-
     onChange(option.value, option);
     setIsOpen(false);
   };
@@ -91,6 +99,25 @@ export function Dropdown({
     if (isOpen) return;
     if (onBlur) onBlur();
   };
+
+  useClickOutside(dropdownRef, () => {
+    if (isOpen) setIsOpen(false);
+  });
+
+  useEscapeKey(() => setIsOpen(false), isOpen);
+
+  const { handleKeyDown } = useDropdownKeyboard({
+    isOpen,
+    setIsOpen,
+    options,
+    value,
+    focusedIndex,
+    setFocusedIndex,
+    handleOptionClick,
+    listboxRef,
+    optionHeight,
+    menuMaxHeight,
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -101,38 +128,21 @@ export function Dropdown({
   }, [isOpen, onBlur]);
 
   useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (event: PointerEvent) => {
-      if (!dropdownRef.current) return;
-      if (!dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+    if (isOpen && listboxRef.current) {
+      const selectedIndex = options.findIndex(
+        (option) => option.value === value
+      );
+      if (selectedIndex !== -1) {
+        listboxRef.current.scrollTop = selectedIndex * optionHeight;
       }
-    };
-
-    document.addEventListener('pointerdown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('keydown', handleEscapeKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [isOpen]);
+    }
+  }, [isOpen, options, value, optionHeight]);
 
   return (
     <div>
       <div
         ref={dropdownRef}
+        onKeyDown={handleKeyDown}
         className={cn(
           'relative',
           isFieldVariant ? 'w-full' : 'inline-block',
@@ -151,6 +161,11 @@ export function Dropdown({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={isOpen ? listboxId : undefined}
+          aria-activedescendant={
+            isOpen && focusedIndex >= 0
+              ? `${listboxId}-option-${focusedIndex}`
+              : undefined
+          }
           className={cn(
             // 공통 필수 속성 및 비활성화 상태
             'typo-lg-medium flex cursor-pointer items-center border bg-white text-gray-950 transition-colors',
@@ -178,7 +193,6 @@ export function Dropdown({
           >
             {triggerLabel}
           </span>
-
           <IcArrowDown
             aria-hidden="true"
             className={cn(
@@ -193,6 +207,7 @@ export function Dropdown({
           <ul
             id={listboxId}
             role="listbox"
+            ref={listboxRef}
             className={cn(
               // 공통 필수 속성 및 비활성화 상태
               'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
@@ -206,25 +221,30 @@ export function Dropdown({
             )}
             style={{ maxHeight: menuMaxHeight }}
           >
-            {options.map((option) => {
+            {options.map((option, index) => {
               const isSelected = option.value === value;
               const isOptionDisabled = option.disabled;
 
               return (
                 <li key={option.value}>
                   <button
+                    id={`${listboxId}-option-${index}`}
                     type="button"
                     role="option"
                     disabled={isOptionDisabled}
                     aria-selected={isSelected}
                     className={cn(
                       'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
-                      'hover:bg-primary-100 hover:text-primary-500',
                       isSelected && 'bg-primary-100 text-primary-500',
-                      isOptionDisabled &&
-                        'cursor-not-allowed text-gray-400 hover:bg-white hover:text-gray-400'
+                      isOptionDisabled && 'cursor-not-allowed text-gray-400',
+                      index === focusedIndex &&
+                        !isOptionDisabled &&
+                        'bg-primary-100 text-primary-500'
                     )}
                     style={{ height: optionHeight }}
+                    onPointerEnter={() =>
+                      !isOptionDisabled && setFocusedIndex(index)
+                    }
                     onClick={() => handleOptionClick(option)}
                   >
                     <span className="truncate">{option.label}</span>
