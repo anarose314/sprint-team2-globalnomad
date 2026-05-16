@@ -19,16 +19,19 @@ const getRatingSatisfactionLabel = (rating: number): string => {
     return '보통';
   }
 
-  if (rating < 2) {
+  // formatRating과 동일하게 소수점 첫째 자리까지 반올림하여 비교
+  const roundedRating = Number(rating.toFixed(1));
+
+  if (roundedRating < 2) {
     return '매우 불만족';
   }
-  if (rating < 3) {
+  if (roundedRating < 3) {
     return '불만족';
   }
-  if (rating < 4) {
+  if (roundedRating < 4) {
     return '보통';
   }
-  if (rating < 4.8) {
+  if (roundedRating < 4.8) {
     return '만족';
   }
   return '매우 만족';
