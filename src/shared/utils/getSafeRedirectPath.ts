@@ -12,7 +12,10 @@ import { MAIN_PATH } from '@/shared/apis/auth/auth.constants';
  * - null/undefined/빈 문자열: 메인 페이지로 fallback
  * - `/`로 시작하지 않음 (상대 경로): 차단
  * - `//`로 시작 (protocol-relative URL): 차단 (//evil.com 형식)
- * - URL 디코딩 후 protocol 포함 (`javascript:`, `http:` 등): 차단
+ * - `/\`로 시작 (백슬래시 우회): 차단 (일부 브라우저가 \를 /로 정규화하여
+ *    /\evil.com → //evil.com 으로 해석할 수 있음)
+ * - URL 디코딩 후 위 패턴이 나타나는 경우: 차단 (인코딩 우회 방어)
+ * - 디코딩 후 protocol 포함 (`javascript:`, `http:` 등): 차단
  *
  * from 검증할 경로 (보통 searchParams.get('from')의 결과)
  * 안전한 경로. 검증 실패 시 MAIN_PATH(메인 페이지) 반환.
@@ -21,7 +24,10 @@ import { MAIN_PATH } from '@/shared/apis/auth/auth.constants';
  * getSafeRedirectPath('/my/profile')           // → '/my/profile'
  * getSafeRedirectPath('https://evil.com')      // → '/'
  * getSafeRedirectPath('//evil.com')            // → '/'
+ * getSafeRedirectPath('/\\evil.com')           // → '/' (백슬래시 우회)
  * getSafeRedirectPath('javascript:alert(1)')   // → '/'
+ * getSafeRedirectPath('%2F%2Fevil.com')        // → '/' (인코딩 우회)
+ * getSafeRedirectPath('%2F%5Cevil.com')        // → '/' (인코딩된 백슬래시)
  * getSafeRedirectPath(null)                    // → '/'
  */
 export const getSafeRedirectPath = (
@@ -32,14 +38,16 @@ export const getSafeRedirectPath = (
   // 1. '/'로 시작해야 내부 경로
   if (!from.startsWith('/')) return MAIN_PATH;
 
-  // 2. '//'로 시작하면 protocol-relative URL (외부 사이트 가능)
-  if (from.startsWith('//')) return MAIN_PATH;
+  // 2. '//' 또는 '/\'로 시작하면 protocol-relative URL (외부 사이트 가능)
+  //    일부 브라우저는 \를 /로 정규화하여 /\evil.com을 //evil.com 처럼 해석
+  if (from.startsWith('//') || from.startsWith('/\\')) return MAIN_PATH;
 
   // 3. URL 디코딩 후 검증 (인코딩 우회 방어)
-  //    예: %2F%2Fevil.com → //evil.com
+  //    예: %2F%2Fevil.com → //evil.com, %2F%5Cevil.com → /\evil.com
   try {
     const decoded = decodeURIComponent(from);
-    if (decoded.startsWith('//')) return MAIN_PATH;
+    if (decoded.startsWith('//') || decoded.startsWith('/\\')) return MAIN_PATH;
+
     // protocol 문자 (`:`)가 첫 '/' 이전에 있으면 위험
     // 예: javascript:..., http:..., //evil.com 등
     const firstSlashIndex = decoded.indexOf('/');
