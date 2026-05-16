@@ -15,3 +15,6 @@ export interface HeaderProps {
   isProfileMenuOpen?: boolean;
   profileMenuId?: string;
 }
+export interface HeaderProfileDropdownProps {
+  user: HeaderUser;
+}
