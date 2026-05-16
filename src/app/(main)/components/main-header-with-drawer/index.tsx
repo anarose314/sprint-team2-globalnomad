@@ -29,8 +29,6 @@ interface MainHeaderWithDrawerProps {
  */
 export function MainHeaderWithDrawer({
   user: initialUser,
-  hasNotification = false,
-  onNotificationClick,
 }: MainHeaderWithDrawerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -78,8 +76,6 @@ export function MainHeaderWithDrawer({
     <>
       <Header
         user={user}
-        hasNotification={hasNotification}
-        onNotificationClick={onNotificationClick}
         onProfileClick={openDrawer}
         isProfileMenuOpen={isDrawerOpen}
         profileMenuId={isDrawerOpen ? MOBILE_MY_MENU_ID : undefined}
