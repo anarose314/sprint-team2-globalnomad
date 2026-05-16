@@ -20,6 +20,11 @@ interface FetchInstanceOptions extends Omit<RequestInit, 'body'> {
   /** 인증에 사용할 accessToken (클라/서버 래퍼에서 주입) */
   accessToken?: string | null;
   /**
+   * 클라이언트 래퍼(`fetchInstanceClient`) 전용.
+   * true면 401 처리 중 토큰 갱신 실패·재시도 401 시 전역 세션 만료 리다이렉트를 하지 않고 ApiError만 throw한다.
+   */
+  skipSessionExpiredRedirect?: boolean;
+  /**
    * true 면 BASE_URL 을 prepend 하지 않고 endpoint 를 그대로 사용한다.
    *
    * BFF (Next.js Route Handler) 같은 same-origin 호출에 활용.
@@ -66,7 +71,16 @@ export const fetchInstance = async <T>(
   endpoint: string,
   options: FetchInstanceOptions = {}
 ): Promise<T> => {
-  const { body, params, headers, accessToken, absoluteUrl, ...rest } = options;
+  const {
+    body,
+    params,
+    headers,
+    accessToken,
+    absoluteUrl,
+    skipSessionExpiredRedirect,
+    ...rest
+  } = options;
+  void skipSessionExpiredRedirect;
 
   // 1) 최종 URL 만들기
   //    - absoluteUrl: true 면 endpoint 그대로 (BFF 같은 same-origin 호출용)

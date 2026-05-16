@@ -19,12 +19,15 @@ interface ActivityReservationCardProps {
   activityId: number;
   pricePerPerson: number;
   schedules: ActivitySchedule[];
+  /** false면 내 예약 조회를 건너뛴다(비로그인 시 불필요한 401·로그인 리다이렉트 방지). */
+  isAuthenticated: boolean;
 }
 
 export function ActivityReservationCard({
   activityId,
   pricePerPerson,
   schedules,
+  isAuthenticated,
 }: ActivityReservationCardProps) {
   const {
     isDateSheetOpen,
@@ -60,6 +63,7 @@ export function ActivityReservationCard({
     activityId,
     pricePerPerson,
     schedules,
+    isAuthenticated,
   });
 
   return (

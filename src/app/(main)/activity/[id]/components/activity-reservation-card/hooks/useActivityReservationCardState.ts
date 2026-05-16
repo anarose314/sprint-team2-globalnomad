@@ -19,12 +19,14 @@ interface UseActivityReservationCardStateProps {
   activityId: number;
   pricePerPerson: number;
   schedules: ActivitySchedule[];
+  isAuthenticated: boolean;
 }
 
 export const useActivityReservationCardState = ({
   activityId,
   pricePerPerson,
   schedules,
+  isAuthenticated,
 }: UseActivityReservationCardStateProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -46,6 +48,7 @@ export const useActivityReservationCardState = ({
     activityId,
     schedules,
     reservedScheduleIds,
+    isAuthenticated,
   });
 
   const availableDateKeys = useMemo(
@@ -134,6 +137,7 @@ export const useActivityReservationCardState = ({
               scheduleId: activeSelectedTimeSlot.id,
               headCount,
             },
+            skipSessionExpiredRedirect: true,
           }
         );
       },
