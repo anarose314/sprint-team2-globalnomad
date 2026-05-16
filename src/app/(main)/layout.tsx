@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { GlobalQueryToast } from '@/app/(main)/components/global-query-toast';
 import { MainHeaderWithDrawer } from '@/app/(main)/components/main-header-with-drawer';
 import { MainLayoutWrapper } from '@/app/(main)/components/main-layout-wrapper';
 import { ApiError } from '@/shared/apis/apiError';
@@ -35,6 +37,11 @@ export default async function MainLayout({ children }: MainLayoutProps) {
   return (
     <>
       <MainHeaderWithDrawer user={user} />
+
+      {/* 백그라운드에서 URL을 감지하고 토스트를 띄우는 역할 */}
+      <Suspense fallback={null}>
+        <GlobalQueryToast />
+      </Suspense>
 
       <MainLayoutWrapper>{children}</MainLayoutWrapper>
 

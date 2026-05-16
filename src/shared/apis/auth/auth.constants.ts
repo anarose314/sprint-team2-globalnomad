@@ -54,3 +54,11 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS = {
  * 콜백 페이지에서 이 경로로 redirect한다.
  */
 export const KAKAO_SIGNUP_NICKNAME_PATH = '/signup/kakao';
+
+/**
+ * 인증 실패 및 비로그인 상태 시 리다이렉트할 기본 로그인 페이지 경로.
+ *
+ * @example
+ * redirect(`${LOGIN_PATH}?from=/activity/${activityId}/edit`);
+ */
+export const LOGIN_PATH = '/login';
