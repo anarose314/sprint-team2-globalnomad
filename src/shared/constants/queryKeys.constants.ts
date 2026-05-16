@@ -11,3 +11,7 @@ export const QUERY_KEYS = {
   MY_ACTIVITY_RESERVATIONS: ['myActivityReservations'],
   MY_INFO: ['myInfo'],
 } as const;
+
+export const URL_QUERY_ERRORS = {
+  UNAUTHORIZED: 'unauthorized',
+} as const;

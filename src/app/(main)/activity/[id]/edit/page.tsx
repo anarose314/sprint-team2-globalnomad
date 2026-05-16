@@ -1,12 +1,15 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ActivityEditForm } from '@/app/(main)/activity/[id]/edit/components/activity-edit-form';
 import { ActivityEditPageProps } from '@/app/(main)/activity/[id]/edit/edit.types';
 import { ActivityFormSkeleton } from '@/app/(main)/activity/components/activity-form-skeleton';
+import { ApiError } from '@/shared/apis/apiError';
+import type { User } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { Heading } from '@/shared/components/heading';
-import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
+import { URL_QUERY_ERRORS } from '@/shared/constants/queryKeys.constants';
+import type { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
 /**
  * 동적 메타데이터 생성
@@ -34,6 +37,27 @@ export default async function ActivityEditPage({
 
   if (!Number.isFinite(activityId)) {
     notFound();
+  }
+
+  const [meResult, activityResult] = await Promise.allSettled([
+    fetchInstanceServer<User>('/users/me', { cache: 'no-store' }),
+    fetchInstanceServer<ActivityDetailResponse>(`/activities/${activityId}`),
+  ]);
+
+  const me = meResult.status === 'fulfilled' ? meResult.value : null;
+
+  if (activityResult.status === 'rejected') {
+    const error = activityResult.reason;
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
+
+  const activity = activityResult.value;
+
+  if (!me || activity.userId !== me.id) {
+    redirect(`/activity/${activityId}?error=${URL_QUERY_ERRORS.UNAUTHORIZED}`);
   }
 
   return (
