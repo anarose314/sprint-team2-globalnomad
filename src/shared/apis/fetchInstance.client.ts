@@ -11,6 +11,7 @@
  */
 
 import { ApiError } from '@/shared/apis/apiError';
+import { LOGIN_PATH } from '@/shared/apis/auth/auth.constants';
 import {
   fetchInstance,
   type FetchInstanceOptions,
@@ -86,7 +87,10 @@ const handleSessionExpired = () => {
     theme: 'warning',
     message: '세션이 만료되었습니다. 다시 로그인해 주세요.',
   });
-  window.location.href = '/login';
+
+  // 사용자가 작업 중이던 경로를 from query로 보존
+  const from = window.location.pathname;
+  window.location.href = `${LOGIN_PATH}?from=${encodeURIComponent(from)}`;
 };
 
 /**
