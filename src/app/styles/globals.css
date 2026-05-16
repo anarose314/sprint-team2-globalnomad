@@ -54,6 +54,11 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* 긴 연속 문자·URL도 컨테이너 폭 안에서 줄바꿈 (체험 제목/설명 등) */
+@utility wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
 /* 체험 상세,예약 현황 스켈레톤: 기본보다 조금 느린 shimmer */
 .skeleton-shimmer-scope-slow .skeleton-shimmer {
   animation-duration: 3s;
