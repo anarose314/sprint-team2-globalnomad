@@ -15,6 +15,7 @@
  */
 import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
+import { Spinner } from '@/shared/components/spinner';
 
 interface TwoButtonModalProps {
   message: string;
@@ -26,7 +27,7 @@ interface TwoButtonModalProps {
 }
 
 export function TwoButtonModal({
-  message: title,
+  message,
   cancelText = '아니오',
   confirmText = '확인',
   onCancel,
@@ -58,12 +59,12 @@ export function TwoButtonModal({
             className="w-full max-w-31.5"
             disabled={isPending}
           >
-            {confirmText}
+            {isPending ? <Spinner /> : confirmText}
           </Button>
         </div>
       }
     >
-      <p className="typo-2lg-bold text-center text-gray-950">{title}</p>
+      <p className="typo-2lg-bold text-center text-gray-950">{message}</p>
     </ModalBase>
   );
 }
