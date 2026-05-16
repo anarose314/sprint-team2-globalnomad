@@ -1,4 +1,8 @@
+'use client';
+
+import { useCallback, useState } from 'react';
 import Image from 'next/image';
+import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/app/(main)/activity/[id]/components/activity-image-gallery/constants';
 import { cn } from '@/shared/utils/cn';
 
 interface ActivityImageGalleryProps {
@@ -8,7 +12,50 @@ interface ActivityImageGalleryProps {
   className?: string;
 }
 
-function ImageSlot({
+/** `src`가 바뀔 때마다 리마운트되어 로드 상태가 초기화됨 */
+function GalleryImageSlotInner({
+  src,
+  alt,
+  sizes,
+}: {
+  src: string;
+  alt: string;
+  sizes: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+
+  const handleImgRef = useCallback((el: HTMLImageElement | null) => {
+    if (el?.complete && el.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, []);
+
+  return (
+    <>
+      {!loaded ? (
+        <div
+          className="skeleton-shimmer pointer-events-none absolute inset-0 z-0"
+          aria-hidden
+        />
+      ) : null}
+      <Image
+        ref={handleImgRef}
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        className={cn(
+          'object-cover transition-opacity duration-300',
+          loaded ? 'opacity-100' : 'opacity-0'
+        )}
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+      />
+    </>
+  );
+}
+
+function GalleryImageSlot({
   src,
   alt,
   className,
@@ -24,13 +71,7 @@ function ImageSlot({
       className={cn('relative min-h-0 overflow-hidden bg-gray-100', className)}
     >
       {src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={sizes}
-          className="object-cover"
-        />
+        <GalleryImageSlotInner key={src} src={src} alt={alt} sizes={sizes} />
       ) : null}
     </div>
   );
@@ -46,9 +87,6 @@ function ImageSlot({
  *   title={activity.title}
  * />
  */
-const GALLERY_FRAME =
-  'aspect-327/188 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128';
-
 export function ActivityImageGallery({
   bannerImageUrl,
   subImageUrls = [],
@@ -62,13 +100,27 @@ export function ActivityImageGallery({
   const count = imageUrls.length;
 
   if (count === 0) {
-    return <div className={cn(GALLERY_FRAME, 'bg-gray-100', className)} />;
+    return (
+      <div
+        className={cn(
+          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+          'bg-gray-100',
+          className
+        )}
+      />
+    );
   }
 
   if (count === 1) {
     return (
-      <div className={cn(GALLERY_FRAME, 'relative', className)}>
-        <ImageSlot
+      <div
+        className={cn(
+          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+          'relative',
+          className
+        )}
+      >
+        <GalleryImageSlot
           src={imageUrls[0]}
           alt={title}
           className="h-full w-full"
@@ -81,15 +133,19 @@ export function ActivityImageGallery({
   if (count === 2) {
     return (
       <div
-        className={cn(GALLERY_FRAME, 'flex min-h-0 flex-col gap-2', className)}
+        className={cn(
+          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+          'flex min-h-0 flex-col gap-2',
+          className
+        )}
       >
-        <ImageSlot
+        <GalleryImageSlot
           src={imageUrls[0]}
           alt={`${title} 이미지 1`}
           className="min-h-0 flex-1"
           sizes="(max-width: 768px) 100vw, 75vw"
         />
-        <ImageSlot
+        <GalleryImageSlot
           src={imageUrls[1]}
           alt={`${title} 이미지 2`}
           className="min-h-0 flex-1"
@@ -103,23 +159,23 @@ export function ActivityImageGallery({
     return (
       <div
         className={cn(
-          GALLERY_FRAME,
+          ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
           'grid grid-cols-2 grid-rows-2 gap-2',
           className
         )}
       >
-        <ImageSlot
+        <GalleryImageSlot
           src={imageUrls[0]}
           alt={title}
           className="row-span-2 h-full min-h-0"
         />
         <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
-          <ImageSlot
+          <GalleryImageSlot
             src={imageUrls[1]}
             alt={`${title} 추가 이미지 1`}
             className="min-h-0 flex-1"
           />
-          <ImageSlot
+          <GalleryImageSlot
             src={imageUrls[2]}
             alt={`${title} 추가 이미지 2`}
             className="min-h-0 flex-1"
@@ -134,13 +190,13 @@ export function ActivityImageGallery({
   return (
     <div
       className={cn(
-        GALLERY_FRAME,
+        ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
         'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
         className
       )}
     >
       {quad.map((url, index) => (
-        <ImageSlot
+        <GalleryImageSlot
           key={`${url}-${index}`}
           src={url}
           alt={`${title} 이미지 ${index + 1}`}

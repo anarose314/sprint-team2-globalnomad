@@ -1,3 +1,4 @@
+import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/app/(main)/activity/[id]/components/activity-image-gallery/constants';
 import { Skeleton } from '@/shared/components/skeleton';
 import { cn } from '@/shared/utils/cn';
 
@@ -18,22 +19,37 @@ function ActivityInfoHeaderSkeleton({ className }: { className?: string }) {
   );
 }
 
-function ActivityImageGallerySkeleton({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        'grid aspect-327/188 grid-cols-2 grid-rows-2 gap-2 overflow-hidden rounded-3xl md:aspect-684/360 2xl:aspect-auto 2xl:h-128',
-        className
-      )}
-      aria-hidden="true"
-    >
-      <Skeleton
-        className="row-span-2 h-full min-h-0"
-        fullWidth
-        rounded="none"
-        variant="shimmer"
-      />
-      <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+export type ActivityDetailGalleryImageCount = 1 | 2 | 3 | 4;
+
+function ActivityImageGallerySkeleton({
+  className,
+  imageCount = 3,
+}: {
+  className?: string;
+  /** 실제 갤러리와 동일한 격자. 초기 로딩에서는 개수를 모르면 기본 3. */
+  imageCount?: ActivityDetailGalleryImageCount;
+}) {
+  const frame = cn(ACTIVITY_IMAGE_GALLERY_FRAME_CLASS, className);
+
+  if (imageCount === 1) {
+    return (
+      <div className={cn(frame, 'flex min-h-0 flex-col')} aria-hidden="true">
+        <Skeleton
+          className="min-h-0 flex-1"
+          fullWidth
+          rounded="none"
+          variant="shimmer"
+        />
+      </div>
+    );
+  }
+
+  if (imageCount === 2) {
+    return (
+      <div
+        className={cn(frame, 'flex min-h-0 flex-col gap-2')}
+        aria-hidden="true"
+      >
         <Skeleton
           className="min-h-0 flex-1"
           fullWidth
@@ -47,6 +63,53 @@ function ActivityImageGallerySkeleton({ className }: { className?: string }) {
           variant="shimmer"
         />
       </div>
+    );
+  }
+
+  if (imageCount === 3) {
+    return (
+      <div
+        className={cn(frame, 'grid grid-cols-2 grid-rows-2 gap-2')}
+        aria-hidden="true"
+      >
+        <Skeleton
+          className="row-span-2 h-full min-h-0"
+          fullWidth
+          rounded="none"
+          variant="shimmer"
+        />
+        <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(frame, 'grid min-h-0 grid-cols-2 grid-rows-2 gap-2')}
+      aria-hidden="true"
+    >
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton
+          key={i}
+          className="h-full min-h-0"
+          fullWidth
+          rounded="none"
+          variant="shimmer"
+        />
+      ))}
     </div>
   );
 }
@@ -174,18 +237,28 @@ function ActivityReviewsSectionSkeleton() {
   );
 }
 
+export interface ActivityDetailSkeletonProps {
+  /** 갤러리 이미지 개수(1~4)에 맞는 스켈레톤 격자. 초기 로딩에서는 알 수 없어 기본 3. */
+  galleryImageCount?: ActivityDetailGalleryImageCount;
+}
+
 /**
  * 체험 상세 페이지 로딩용 스켈레톤
  *
  * `ActivityDetailPageClient` 레이아웃(이미지 갤러리·헤더·본문·리뷰·예약 카드)에 맞춘 플레이스홀더
  */
-export function ActivityDetailSkeleton() {
+export function ActivityDetailSkeleton({
+  galleryImageCount = 3,
+}: ActivityDetailSkeletonProps = {}) {
   return (
-    <div className="py-6 pb-40 md:py-8 md:pb-40 2xl:py-10 2xl:pb-10">
+    <div className="skeleton-shimmer-scope-slow py-6 pb-40 md:py-8 md:pb-40 2xl:py-10 2xl:pb-10">
       <div className="mx-auto w-full">
         <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
           <div className="2xl:col-span-3">
-            <ActivityImageGallerySkeleton className="mb-5 md:mb-6 2xl:mb-10" />
+            <ActivityImageGallerySkeleton
+              className="mb-5 md:mb-6 2xl:mb-10"
+              imageCount={galleryImageCount}
+            />
 
             <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:hidden">
               <ActivityInfoHeaderSkeleton />

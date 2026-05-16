@@ -55,11 +55,15 @@ export function ActivitiesDashboardSkeleton({
   scope = 'full',
 }: ActivitiesDashboardSkeletonProps) {
   if (scope === 'calendar') {
-    return <ReservationCalendarCardSkeleton />;
+    return (
+      <div className="skeleton-shimmer-scope-slow">
+        <ReservationCalendarCardSkeleton />
+      </div>
+    );
   }
 
   return (
-    <div aria-hidden="true">
+    <div className="skeleton-shimmer-scope-slow" aria-hidden="true">
       <Skeleton
         fullWidth
         className="shadow-custom mt-6 h-14 rounded-2xl 2xl:mt-7.5"
