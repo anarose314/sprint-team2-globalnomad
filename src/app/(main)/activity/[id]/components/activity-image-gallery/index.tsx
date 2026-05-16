@@ -146,6 +146,11 @@ function ActivityImageLightbox({
   const total = urls.length;
   const canNavigate = total > 1;
   const imageSlotRef = useRef<HTMLDivElement>(null);
+  const prevIndexRef = useRef<number | null>(null);
+
+  const [slideAnim, setSlideAnim] = useState<'from-right' | 'from-left' | null>(
+    null
+  );
 
   const handlePanelPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -153,6 +158,9 @@ function ActivityImageLightbox({
 
       const t = event.target;
       if (t instanceof Element && t.closest('button')) return;
+      if (t instanceof Element && t.closest('[data-lightbox-image-slot]')) {
+        return;
+      }
 
       const container = imageSlotRef.current;
       const img = container?.querySelector('img');
@@ -175,6 +183,33 @@ function ActivityImageLightbox({
     [onClose]
   );
 
+  const handleImageSlotClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return;
+      const container = imageSlotRef.current;
+      const img = container?.querySelector('img');
+      if (
+        container &&
+        img instanceof HTMLImageElement &&
+        img.complete &&
+        img.naturalWidth > 0
+      ) {
+        const cr = container.getBoundingClientRect();
+        if (
+          !isPointerOnObjectContainContent(
+            event.clientX,
+            event.clientY,
+            cr,
+            img
+          )
+        ) {
+          onClose();
+        }
+      }
+    },
+    [onClose]
+  );
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!canNavigate) return;
@@ -190,6 +225,26 @@ function ActivityImageLightbox({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [canNavigate, index, onNavigate, total]);
+
+  useEffect(() => {
+    if (prevIndexRef.current === null) {
+      prevIndexRef.current = index;
+      return;
+    }
+    if (prevIndexRef.current === index) return;
+    const dir = index > prevIndexRef.current ? 'from-right' : 'from-left';
+    prevIndexRef.current = index;
+
+    let clearAnim: number | undefined;
+    const raf = requestAnimationFrame(() => {
+      setSlideAnim(dir);
+      clearAnim = window.setTimeout(() => setSlideAnim(null), 200);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      if (clearAnim) window.clearTimeout(clearAnim);
+    };
+  }, [index]);
 
   if (!url) return null;
 
@@ -237,16 +292,37 @@ function ActivityImageLightbox({
 
           <div
             ref={imageSlotRef}
+            data-lightbox-image-slot
             className="relative isolate h-[min(78vh,720px)] min-h-[12rem] min-w-0 flex-1 basis-0 md:min-h-[16rem]"
+            onClick={handleImageSlotClick}
           >
-            <Image
-              src={url}
-              alt={`${title} 이미지 ${index + 1}`}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 1152px"
-              priority
-            />
+            <div
+              key={url}
+              className="relative h-full w-full"
+              style={
+                slideAnim === 'from-right'
+                  ? {
+                      animation:
+                        'lightbox-enter-from-right 0.18s ease-out both',
+                    }
+                  : slideAnim === 'from-left'
+                    ? {
+                        animation:
+                          'lightbox-enter-from-left 0.18s ease-out both',
+                      }
+                    : undefined
+              }
+            >
+              <Image
+                src={url}
+                alt={`${title} 이미지 ${index + 1}`}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 1152px"
+                priority
+                draggable={false}
+              />
+            </div>
           </div>
 
           {canNavigate ? (
@@ -292,7 +368,8 @@ export function ActivityImageGallery({
     ...subImageUrls.filter(Boolean),
   ];
   const count = imageUrls.length;
-  const lightboxUrls = count > 4 ? imageUrls.slice(0, 4) : [...imageUrls];
+  /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */
+  const lightboxUrls = imageUrls.length > 5 ? imageUrls.slice(0, 5) : imageUrls;
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
@@ -411,27 +488,82 @@ export function ActivityImageGallery({
     );
   }
 
-  const quad = imageUrls.slice(0, 4);
+  if (count === 4) {
+    return (
+      <>
+        <div
+          className={cn(
+            ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
+            'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
+            className
+          )}
+        >
+          {imageUrls.map((url, index) => (
+            <GalleryImageSlot
+              key={`${url}-${index}`}
+              src={url}
+              alt={`${title} 이미지 ${index + 1}`}
+              className="min-h-0"
+              sizes="(max-width: 768px) 50vw, 38vw"
+              onOpen={() => setLightboxIndex(index)}
+            />
+          ))}
+        </div>
+        {lightbox}
+      </>
+    );
+  }
+
+  const five = imageUrls.slice(0, 5);
 
   return (
     <>
       <div
         className={cn(
           ACTIVITY_IMAGE_GALLERY_FRAME_CLASS,
-          'grid min-h-0 grid-cols-2 grid-rows-2 gap-2',
+          'flex min-h-0 gap-2',
           className
         )}
       >
-        {quad.map((url, index) => (
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
           <GalleryImageSlot
-            key={`${url}-${index}`}
-            src={url}
-            alt={`${title} 이미지 ${index + 1}`}
-            className="min-h-0"
+            src={five[0]}
+            alt={`${title} 이미지 1`}
+            className="min-h-0 flex-1"
             sizes="(max-width: 768px) 50vw, 38vw"
-            onOpen={() => setLightboxIndex(index)}
+            onOpen={() => setLightboxIndex(0)}
           />
-        ))}
+          <GalleryImageSlot
+            src={five[1]}
+            alt={`${title} 이미지 2`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(1)}
+          />
+        </div>
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
+          <GalleryImageSlot
+            src={five[2]}
+            alt={`${title} 이미지 3`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(2)}
+          />
+          <GalleryImageSlot
+            src={five[3]}
+            alt={`${title} 이미지 4`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(3)}
+          />
+          <GalleryImageSlot
+            src={five[4]}
+            alt={`${title} 이미지 5`}
+            className="min-h-0 flex-1"
+            sizes="(max-width: 768px) 50vw, 38vw"
+            onOpen={() => setLightboxIndex(4)}
+          />
+        </div>
       </div>
       {lightbox}
     </>

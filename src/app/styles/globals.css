@@ -40,6 +40,29 @@
   }
 }
 
+/* 체험 상세 이미지 라이트박스: 좌우 전환 시 짧은 슬라이드 인 */
+@keyframes lightbox-enter-from-right {
+  from {
+    opacity: 0.82;
+    transform: translate3d(12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lightbox-enter-from-left {
+  from {
+    opacity: 0.82;
+    transform: translate3d(-12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @utility skeleton-shimmer {
   /* 모바일·Safari에서도 그라데이션 애니메이션이 안정적으로 보이도록 레이어 분리 */
   transform: translateZ(0);

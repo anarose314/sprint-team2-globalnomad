@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
@@ -57,6 +57,41 @@ export const useActivityReservationCardState = ({
   );
 
   const hasSelectableDate = availableDateKeys.length > 0;
+  const availableDateKeysSignature = availableDateKeys.join(',');
+
+  useEffect(() => {
+    if (!availableDateKeysSignature) {
+      return;
+    }
+
+    const earliestDateKey = availableDateKeysSignature.split(',')[0];
+    if (!earliestDateKey) {
+      return;
+    }
+
+    const now = new Date();
+    const todayKey = formatDateKey(now);
+
+    if (earliestDateKey !== todayKey) {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      setSelectedDateKey((prev) => (prev !== null ? prev : todayKey));
+
+      setCurrentDate((prev) => {
+        if (prev !== null) {
+          return prev;
+        }
+
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [availableDateKeysSignature]);
   const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {

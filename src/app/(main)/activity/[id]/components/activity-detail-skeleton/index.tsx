@@ -19,7 +19,7 @@ function ActivityInfoHeaderSkeleton({ className }: { className?: string }) {
   );
 }
 
-export type ActivityDetailGalleryImageCount = 1 | 2 | 3 | 4;
+export type ActivityDetailGalleryImageCount = 1 | 2 | 3 | 4 | 5;
 
 function ActivityImageGallerySkeleton({
   className,
@@ -79,6 +79,47 @@ function ActivityImageGallerySkeleton({
           variant="shimmer"
         />
         <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (imageCount === 5) {
+    return (
+      <div className={cn(frame, 'flex min-h-0 gap-2')} aria-hidden="true">
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
+        </div>
+        <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
+          <Skeleton
+            className="min-h-0 flex-1"
+            fullWidth
+            rounded="none"
+            variant="shimmer"
+          />
           <Skeleton
             className="min-h-0 flex-1"
             fullWidth
@@ -238,7 +279,7 @@ function ActivityReviewsSectionSkeleton() {
 }
 
 export interface ActivityDetailSkeletonProps {
-  /** 갤러리 이미지 개수(1~4)에 맞는 스켈레톤 격자. 초기 로딩에서는 알 수 없어 기본 3. */
+  /** 갤러리 이미지 개수(1~5)에 맞는 스켈레톤 격자. 초기 로딩에서는 알 수 없어 기본 3. */
   galleryImageCount?: ActivityDetailGalleryImageCount;
 }
 
