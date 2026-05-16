@@ -1,5 +1,6 @@
 import { KebabDropdown } from '@/app/(main)/activity/[id]/components/activity-info-header/kebab-dropdown';
 import { IcMap, IcStar } from '@/shared/assets/icons';
+import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
 
 export interface ActivityInfoHeaderProps {
@@ -50,9 +51,12 @@ export function ActivityInfoHeader({
       </div>
 
       {/* 제목 */}
-      <h2 className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-tight wrap-anywhere text-gray-950">
+      <Heading
+        as="h2"
+        className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-tight wrap-anywhere text-gray-950"
+      >
         {title}
-      </h2>
+      </Heading>
 
       {/* 별점 */}
       <div className="mt-1 flex items-center gap-1">
