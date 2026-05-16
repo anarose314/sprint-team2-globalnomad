@@ -31,6 +31,7 @@ export function ActivityDetailPageClient({
 
   const {
     isOpen,
+    isDeleting,
     handleEdit,
     handleDeleteRequest,
     handleDeleteCancel,
@@ -106,6 +107,7 @@ export function ActivityDetailPageClient({
             confirmText="삭제"
             onCancel={handleDeleteCancel}
             onConfirm={handleDeleteConfirm}
+            isPending={isDeleting}
           />
         </ModalOverlay>
       ) : null}

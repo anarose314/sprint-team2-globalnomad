@@ -2,12 +2,13 @@ import { cva } from 'class-variance-authority';
 import type { SkeletonProps } from '@/shared/components/skeleton/skeleton.types';
 import { cn } from '@/shared/utils/cn';
 
-const skeletonStyle = cva('bg-gray-100', {
+/** shimmer는 `skeleton-shimmer`가 배경을 담당하므로 `bg-gray-100`과 함께 쓰면 그라데이션이 덮일 수 있음 */
+const skeletonStyle = cva('', {
   variants: {
     variant: {
-      pulse: 'animate-pulse',
+      pulse: 'animate-pulse bg-gray-100',
       shimmer: 'skeleton-shimmer overflow-hidden',
-      none: '',
+      none: 'bg-gray-100',
     },
     rounded: {
       none: 'rounded-none',
