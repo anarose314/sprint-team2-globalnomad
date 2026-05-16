@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import Image from 'next/image';
-import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/app/(main)/activity/[id]/components/activity-image-gallery/constants';
+import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
 import { cn } from '@/shared/utils/cn';
 
 interface ActivityImageGalleryProps {

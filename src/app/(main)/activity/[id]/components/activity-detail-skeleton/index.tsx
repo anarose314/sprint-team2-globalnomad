@@ -1,5 +1,5 @@
-import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/app/(main)/activity/[id]/components/activity-image-gallery/constants';
 import { Skeleton } from '@/shared/components/skeleton';
+import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
 import { cn } from '@/shared/utils/cn';
 
 function ActivityInfoHeaderSkeleton({ className }: { className?: string }) {
