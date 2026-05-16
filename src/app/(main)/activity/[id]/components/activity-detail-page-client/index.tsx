@@ -46,7 +46,7 @@ export function ActivityDetailPageClient({
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
       <div className="mx-auto w-full">
         <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
-          <div className="2xl:col-span-3">
+          <div className="min-w-0 2xl:col-span-3">
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={subImageUrls}
@@ -74,7 +74,7 @@ export function ActivityDetailPageClient({
             <ActivityReviewsSection activityId={activity.id} />
           </div>
 
-          <div className="2xl:col-span-2 2xl:self-stretch">
+          <div className="min-w-0 2xl:col-span-2 2xl:self-stretch">
             <div className="mb-8 hidden w-full max-w-103 2xl:block">
               <ActivityInfoHeader
                 category={activity.category}

@@ -40,7 +40,7 @@ export function ActivityInfoHeader({
   const formattedRating = Number.isFinite(rating) ? rating.toFixed(1) : '-';
 
   return (
-    <div className={cn('flex flex-col', className)}>
+    <div className={cn('flex min-w-0 flex-col', className)}>
       {/* 카테고리 + 케밥 */}
       <div className="flex items-center justify-between">
         <span className="typo-sm-medium md:typo-md-medium tracking-tight text-gray-700">
@@ -50,7 +50,7 @@ export function ActivityInfoHeader({
       </div>
 
       {/* 제목 */}
-      <h2 className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-tight text-gray-950">
+      <h2 className="typo-2lg-bold md:typo-2xl-bold mt-1 tracking-tight wrap-anywhere text-gray-950">
         {title}
       </h2>
 
