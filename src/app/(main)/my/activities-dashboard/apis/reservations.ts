@@ -198,13 +198,16 @@ export const collectPendingReservationIdsForSchedule = async ({
 
 /**
  * 대기 예약 id 목록 일괄 거절
- * 한 스케줄에 대기 건이 매우 많을 수 있어 전부 병렬로 보내지 않고 청크 단위로 나눔
+ * 한 스케줄에 대기 건이 매우 많을 수 있어 전부 병렬로 보내지 않고 청크 단위로 나눈다.
+ * 청크 내 한 건이 실패해도 나머지는 계속 처리한다(`Promise.allSettled`).
  */
 export const declinePendingReservationIds = async (
   activityId: number,
   reservationIds: number[]
 ): Promise<void> => {
   if (reservationIds.length === 0) return;
+
+  const rejectionReasons: unknown[] = [];
 
   for (
     let offset = 0;
@@ -215,7 +218,7 @@ export const declinePendingReservationIds = async (
       offset,
       offset + DECLINE_PENDING_RESERVATIONS_CONCURRENCY
     );
-    await Promise.all(
+    const results = await Promise.allSettled(
       chunk.map((reservationId) =>
         updateActivityReservationStatus({
           activityId,
@@ -224,6 +227,18 @@ export const declinePendingReservationIds = async (
         })
       )
     );
+
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        rejectionReasons.push(result.reason);
+      }
+    }
+  }
+
+  if (rejectionReasons.length > 0) {
+    const first = rejectionReasons[0];
+    if (first instanceof Error) throw first;
+    throw new Error(String(first ?? '일부 예약 거절에 실패했습니다.'));
   }
 };
 
