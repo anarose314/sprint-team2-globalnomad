@@ -48,6 +48,66 @@
       transform: translateY(0);
     }
   }
+
+  /* 공통 모달: 오버레이·패널 */
+  --animate-modal-backdrop-in: modal-backdrop-in 0.22s ease-out forwards;
+  --animate-modal-backdrop-out: modal-backdrop-out 0.2s ease-in forwards;
+  --animate-modal-content-in: modal-content-in 0.32s
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-modal-content-out: modal-content-out 0.2s ease-in forwards;
+  --animate-modal-footer-button-in: modal-footer-button-in 0.28s
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes modal-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modal-backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes modal-content-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.5rem, 0) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes modal-content-out {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, 0.35rem, 0) scale(0.985);
+    }
+  }
+
+  @keyframes modal-footer-button-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.35rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
 }
 
 @layer base {

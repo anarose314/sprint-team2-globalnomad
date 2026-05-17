@@ -12,6 +12,8 @@
  *   onConfirm={handleClose}
  * />
  */
+'use client';
+
 import { Button } from '@/shared/components/buttons/button';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 
