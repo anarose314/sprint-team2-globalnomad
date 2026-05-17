@@ -1,7 +1,11 @@
 import { cva } from 'class-variance-authority';
 
 export const BASE_CLASS =
-  'inline-flex items-center justify-center gap-1 [letter-spacing:-0.025em] cursor-pointer transition-colors duration-200 disabled:cursor-not-allowed';
+  'inline-flex items-center justify-center gap-1 [letter-spacing:-0.025em] cursor-pointer select-none ' +
+  'transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out ' +
+  'motion-reduce:transition-colors motion-reduce:duration-150 ' +
+  'motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none motion-reduce:active:!scale-100 ' +
+  'disabled:cursor-not-allowed';
 
 /**
  * primary / secondary 두 variant 와 lg / md / sm size 를
@@ -16,20 +20,20 @@ export const BUTTON_VARIANTS = cva(BASE_CLASS, {
     variant: {
       primary: [
         'bg-primary-500 font-bold text-white',
-        'hover:bg-primary-500/80',
-        'active:bg-primary-700 active:scale-[0.98]',
+        'hover:bg-primary-500/80 hover:shadow-primary-500/25 hover:-translate-y-px hover:shadow-md',
+        'active:bg-primary-700 active:shadow-primary-500/20 active:translate-y-0 active:scale-[0.98] active:shadow-sm',
         'disabled:bg-gray-200 disabled:text-gray-50',
-        'disabled:hover:bg-gray-200',
-        'disabled:active:scale-100 disabled:active:bg-gray-200',
+        'disabled:hover:translate-y-0 disabled:hover:bg-gray-200 disabled:hover:shadow-none',
+        'disabled:active:scale-100 disabled:active:bg-gray-200 disabled:active:shadow-none',
       ],
       secondary: [
         'border border-gray-200 bg-white font-medium text-gray-600',
-        'hover:border-gray-300 hover:bg-gray-50',
-        'active:scale-[0.98] active:border-gray-400 active:bg-gray-400 active:text-white',
+        'hover:-translate-y-px hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-900/8',
+        'active:translate-y-0 active:scale-[0.98] active:border-gray-400 active:bg-gray-400 active:text-white active:shadow-none',
         'aria-pressed:border-primary-500 aria-pressed:bg-primary-500 aria-pressed:text-white',
         'aria-pressed:hover:border-primary-500 aria-pressed:hover:bg-primary-500',
         'disabled:border-gray-200 disabled:bg-white disabled:text-gray-200',
-        'disabled:hover:border-gray-200 disabled:hover:bg-white',
+        'disabled:hover:translate-y-0 disabled:hover:border-gray-200 disabled:hover:bg-white disabled:hover:shadow-none',
         'disabled:aria-pressed:border-gray-200 disabled:aria-pressed:bg-white disabled:aria-pressed:text-gray-200',
         'disabled:active:scale-100 disabled:active:border-gray-200 disabled:active:bg-white disabled:active:text-gray-200',
       ],
