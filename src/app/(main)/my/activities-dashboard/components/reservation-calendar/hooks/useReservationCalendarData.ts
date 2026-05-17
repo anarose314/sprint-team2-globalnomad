@@ -34,9 +34,12 @@ interface UseReservationCalendarDataProps {
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
  *
- * 선택한 날짜(`reservedScheduleDateKey`)의 스케줄만 조회한 뒤, 체험 시작 시각이 지난 슬롯의 대기(pending) 예약을
- * 클라이언트에서 자동 거절
- * 범위가 선택일로 한정되므로 장기적으로는 서버(Cron·배치·조회 시 정리 등)에서 처리하는 편이 안전함
+ * 월간 `reservation-dashboard`를 우선 사용하고, 동일 응답에 포함된 날짜(및 상세 패널에서 선택한 날)에 한해
+ * `reserved-schedule`을 추가 조회
+ * 월의 모든 일자를 한꺼번에 조회하지 않음
+ *
+ * 선택한 날짜의 스케줄을 조회한 뒤 체험 시작 시각이 지난 슬롯의 대기(pending) 예약을 클라이언트에서 자동 거절
+ * 범위가 선택일로 한정되므로 장기적으로는 서버(Cron·배치·조회 시 정리 등)에서 처리하는 편이 안전
  *
  * 무효화(invalidate)로 `reservedSchedules`가 다시 불리면 이 effect가 재실행될 수 있음
  * 서버 반영 지연 등으로 pending이 남아 있으면 동일 스케줄에 대한 거절을 반복 호출할 위험이 있어 스케줄 ID별로 한 번만 시도
@@ -84,22 +87,25 @@ export const useReservationCalendarData = ({
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
-  const monthDateKeysForPrefetch = useMemo(() => {
-    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-    return Array.from({ length: daysInMonth }, (_, index) => {
-      const day = index + 1;
-      return formatDateKey(new Date(currentYear, currentMonth - 1, day));
-    }).filter(
-      (dateKey) =>
-        reservedScheduleDateKey === null || dateKey !== reservedScheduleDateKey
-    );
-  }, [currentYear, currentMonth, reservedScheduleDateKey]);
+  const prefetchKeysExcludingSelected = useMemo(() => {
+    const keys = new Set<string>();
+    reservationDashboard.forEach((item) => keys.add(item.date));
+    if (reservedScheduleDateKey) keys.add(reservedScheduleDateKey);
+
+    return Array.from(keys)
+      .filter(
+        (dateKey) =>
+          reservedScheduleDateKey === null ||
+          dateKey !== reservedScheduleDateKey
+      )
+      .sort((a, b) => a.localeCompare(b));
+  }, [reservationDashboard, reservedScheduleDateKey]);
 
   const reservedSchedulesPerDayQueries = useQueries({
     queries:
       activityId === null
         ? []
-        : monthDateKeysForPrefetch.map((dateKey) => ({
+        : prefetchKeysExcludingSelected.map((dateKey) => ({
             queryKey: [
               ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
               activityId,
@@ -215,17 +221,32 @@ export const useReservationCalendarData = ({
       return accumulator;
     }, {});
 
-    const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
-
-    monthDateKeysForPrefetch.forEach((dateKey, index) => {
-      scheduleDataByDate.set(
-        dateKey,
-        reservedSchedulesPerDayQueries[index]?.data ?? []
-      );
-    });
-
+    const scheduleDateKeys = new Set<string>();
+    reservationDashboard.forEach((item) => scheduleDateKeys.add(item.date));
     if (reservedScheduleDateKey) {
-      scheduleDataByDate.set(reservedScheduleDateKey, reservedSchedules);
+      scheduleDateKeys.add(reservedScheduleDateKey);
+    }
+
+    const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
+    const sortedScheduleDateKeys = Array.from(scheduleDateKeys).sort((a, b) =>
+      a.localeCompare(b)
+    );
+
+    for (const dateKey of sortedScheduleDateKeys) {
+      let schedules: ReservedScheduleItem[];
+      if (
+        reservedScheduleDateKey !== null &&
+        dateKey === reservedScheduleDateKey
+      ) {
+        schedules = reservedSchedules;
+      } else {
+        const prefetchIndex = prefetchKeysExcludingSelected.indexOf(dateKey);
+        schedules =
+          prefetchIndex >= 0
+            ? (reservedSchedulesPerDayQueries[prefetchIndex]?.data ?? [])
+            : [];
+      }
+      scheduleDataByDate.set(dateKey, schedules);
     }
 
     const nowForSchedules = new Date();
@@ -256,7 +277,7 @@ export const useReservationCalendarData = ({
     reservationDashboard,
     reservedScheduleDateKey,
     reservedSchedules,
-    monthDateKeysForPrefetch,
+    prefetchKeysExcludingSelected,
     reservedSchedulesPerDayQueries,
   ]);
 
