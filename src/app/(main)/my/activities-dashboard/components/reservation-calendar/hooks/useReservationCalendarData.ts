@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import {
   collectPendingReservationIdsForSchedule,
@@ -34,9 +34,9 @@ interface UseReservationCalendarDataProps {
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
  *
- * 월간 `reservation-dashboard`를 우선 사용하고, 동일 응답에 포함된 날짜(및 상세 패널에서 선택한 날)에 한해
- * `reserved-schedule`을 추가 조회
- * 월의 모든 일자를 한꺼번에 조회하지 않음
+ * 월간 `reservation-dashboard`로 달력 배지·알림 도트를 구성하고, 상세 패널이 연 선택일에 한해
+ * `reserved-schedule`을 조회해 배지 집계를 스케줄 단위로 보정
+ * 대시보드에 없는 날을 URL로만 열었을 때의 도트는 선택일 스케줄 응답으로만 보강
  *
  * 선택한 날짜의 스케줄을 조회한 뒤 체험 시작 시각이 지난 슬롯의 대기(pending) 예약을 클라이언트에서 자동 거절
  * 범위가 선택일로 한정되므로 장기적으로는 서버(Cron·배치·조회 시 정리 등)에서 처리하는 편이 안전
@@ -85,39 +85,6 @@ export const useReservationCalendarData = ({
     enabled: activityId !== null && Boolean(reservedScheduleDateKey),
     refetchInterval:
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
-  });
-
-  const prefetchKeysExcludingSelected = useMemo(() => {
-    const keys = new Set<string>();
-    reservationDashboard.forEach((item) => keys.add(item.date));
-    if (reservedScheduleDateKey) keys.add(reservedScheduleDateKey);
-
-    return Array.from(keys)
-      .filter(
-        (dateKey) =>
-          reservedScheduleDateKey === null ||
-          dateKey !== reservedScheduleDateKey
-      )
-      .sort((a, b) => a.localeCompare(b));
-  }, [reservationDashboard, reservedScheduleDateKey]);
-
-  const reservedSchedulesPerDayQueries = useQueries({
-    queries:
-      activityId === null
-        ? []
-        : prefetchKeysExcludingSelected.map((dateKey) => ({
-            queryKey: [
-              ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-              activityId,
-              dateKey,
-            ],
-            queryFn: () =>
-              fetchReservedSchedule({
-                activityId,
-                date: dateKey,
-              }),
-            staleTime: 60_000,
-          })),
   });
 
   useEffect(() => {
@@ -217,46 +184,25 @@ export const useReservationCalendarData = ({
       return accumulator;
     }, {});
 
-    const scheduleDateKeys = new Set<string>();
-    reservationDashboard.forEach((item) => scheduleDateKeys.add(item.date));
     if (reservedScheduleDateKey) {
-      scheduleDateKeys.add(reservedScheduleDateKey);
-    }
-
-    const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
-    const sortedScheduleDateKeys = Array.from(scheduleDateKeys).sort((a, b) =>
-      a.localeCompare(b)
-    );
-
-    for (const dateKey of sortedScheduleDateKeys) {
-      let schedules: ReservedScheduleItem[];
-      if (
-        reservedScheduleDateKey !== null &&
-        dateKey === reservedScheduleDateKey
-      ) {
-        schedules = reservedSchedules;
-      } else {
-        const prefetchIndex = prefetchKeysExcludingSelected.indexOf(dateKey);
-        schedules =
-          prefetchIndex >= 0
-            ? (reservedSchedulesPerDayQueries[prefetchIndex]?.data ?? [])
-            : [];
-      }
-      scheduleDataByDate.set(dateKey, schedules);
-    }
-
-    const nowForSchedules = new Date();
-    scheduleDataByDate.forEach((schedules, dateKey) => {
-      const hasSlotActivity = schedules.some((schedule) => {
+      const hasSelectedDaySlotActivity = reservedSchedules.some((schedule) => {
         const pending = Math.max(schedule.count.pending ?? 0, 0);
         const confirmed = Math.max(schedule.count.confirmed ?? 0, 0);
         const declined = Math.max(schedule.count.declined ?? 0, 0);
         return pending + confirmed + declined > 0;
       });
-      if (hasSlotActivity) {
-        notificationDotByDate[dateKey] = true;
+      if (hasSelectedDaySlotActivity) {
+        notificationDotByDate[reservedScheduleDateKey] = true;
       }
+    }
 
+    const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
+    if (reservedScheduleDateKey) {
+      scheduleDataByDate.set(reservedScheduleDateKey, reservedSchedules);
+    }
+
+    const nowForSchedules = new Date();
+    scheduleDataByDate.forEach((schedules, dateKey) => {
       const merged = mergeScheduleOverlayIntoEventCounts(
         dateKey,
         schedules,
@@ -269,13 +215,7 @@ export const useReservationCalendarData = ({
     });
 
     return { eventCountsByDate: eventCounts, notificationDotByDate };
-  }, [
-    reservationDashboard,
-    reservedScheduleDateKey,
-    reservedSchedules,
-    prefetchKeysExcludingSelected,
-    reservedSchedulesPerDayQueries,
-  ]);
+  }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
     return buildReservationDetailData({
