@@ -26,6 +26,8 @@ interface FetchActivityReservationsProps {
   scheduleId: number;
   status: ReservationRequestStatus;
   cursorId?: number | null;
+  /** 목록 조회 page size, 생략 시 UI 목록과 동일한 페이지 크기(10) */
+  size?: number;
 }
 
 interface UpdateActivityReservationStatusProps {
@@ -54,6 +56,7 @@ export const fetchActivityReservations = async ({
   scheduleId,
   status,
   cursorId = null,
+  size = RESERVATION_PAGE_SIZE,
 }: FetchActivityReservationsProps): Promise<ReservationRequestsResponse> => {
   const response = await fetchInstanceClient<unknown>(
     `/api/proxy/my-activities/${activityId}/reservations`,
@@ -61,7 +64,7 @@ export const fetchActivityReservations = async ({
       params: {
         scheduleId,
         status,
-        size: RESERVATION_PAGE_SIZE,
+        size,
         ...(cursorId !== null && { cursorId }),
       },
     }
@@ -152,6 +155,7 @@ interface CollectPendingReservationIdsForScheduleProps {
 
 /**
  * 스케줄 단위로 대기(pending) 예약 id를 커서 페이징으로 모두 수집
+ * UI 목록(10건)보다 큰 페이지로 조회해 왕복 횟수를 줄임
  */
 export const collectPendingReservationIdsForSchedule = async ({
   activityId,
@@ -168,6 +172,7 @@ export const collectPendingReservationIdsForSchedule = async ({
       scheduleId,
       status: 'pending',
       cursorId,
+      size: 50,
     });
 
     pendingPage.reservations.forEach((reservation) => {
