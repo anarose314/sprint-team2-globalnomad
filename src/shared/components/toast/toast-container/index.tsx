@@ -15,7 +15,7 @@ export function ToastContainer() {
       className={cn(
         'z-toast pointer-events-none fixed bottom-5 flex flex-col gap-2',
         'left-1/2 -translate-x-1/2 items-center',
-        'md:right-5 md:left-auto md:translate-x-0 md:items-end'
+        'md:top-5 md:bottom-auto'
       )}
     >
       {toasts.map((toast) => (
