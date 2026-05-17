@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   approveReservationWithAutoDecline,
-  fetchActivityReservations,
+  collectPendingReservationIdsForSchedule,
+  declinePendingReservationIds,
   updateActivityReservationStatus,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -76,46 +77,15 @@ export const useReservationStatusUpdate = ({
           status,
         });
 
-        const autoDeclineTargets: number[] = [];
-        const visitedCursorIds = new Set<number>();
-        let cursorId: number | null = null;
-
-        do {
-          const pendingPage = await fetchActivityReservations({
+        const autoDeclineTargets =
+          await collectPendingReservationIdsForSchedule({
             activityId,
             scheduleId,
-            status: 'pending',
-            cursorId,
+            excludeReservationId: reservationId,
           });
-
-          pendingPage.reservations.forEach((reservation) => {
-            if (reservation.id === reservationId) return;
-            autoDeclineTargets.push(reservation.id);
-          });
-
-          if (
-            pendingPage.cursorId !== null &&
-            visitedCursorIds.has(pendingPage.cursorId)
-          ) {
-            break;
-          }
-          if (pendingPage.cursorId !== null) {
-            visitedCursorIds.add(pendingPage.cursorId);
-          }
-
-          cursorId = pendingPage.cursorId;
-        } while (cursorId !== null);
 
         if (autoDeclineTargets.length > 0) {
-          await Promise.all(
-            autoDeclineTargets.map((targetReservationId) =>
-              updateActivityReservationStatus({
-                activityId,
-                reservationId: targetReservationId,
-                status: 'declined',
-              })
-            )
-          );
+          await declinePendingReservationIds(activityId, autoDeclineTargets);
         }
       },
       onSuccess: async (_, variables) => {

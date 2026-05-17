@@ -10,6 +10,8 @@ interface ReservationCalendarDayTileProps {
   date: Date;
   isCurrentMonth: boolean;
   eventCounts?: ReservationEventCounts;
+  /** 예약 내역이 있으면 빨간 도트 표시 */
+  showNotificationDot?: boolean;
 }
 
 const STATUS_ORDER = Object.keys(STATUS_META) as ReservationEventStatus[];
@@ -22,8 +24,13 @@ export function ReservationCalendarDayTile({
   date,
   isCurrentMonth,
   eventCounts,
+  showNotificationDot = false,
 }: ReservationCalendarDayTileProps) {
   const isMuted = !isCurrentMonth;
+  const hasBadgeCounts =
+    eventCounts !== undefined &&
+    Object.values(eventCounts).some((value) => value > 0);
+  const shouldShowNotificationDot = showNotificationDot || hasBadgeCounts;
   const dayOfWeek = date.getDay();
   const weekendTextClassName =
     dayOfWeek === 0
@@ -40,7 +47,9 @@ export function ReservationCalendarDayTile({
         >
           {date.getDate()}
         </span>
-        {eventCounts ? <NotificationDot isMuted={isMuted} /> : null}
+        {shouldShowNotificationDot ? (
+          <NotificationDot isMuted={isMuted} />
+        ) : null}
       </div>
 
       {eventCounts ? (

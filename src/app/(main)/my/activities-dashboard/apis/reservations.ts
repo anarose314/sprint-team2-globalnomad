@@ -142,6 +142,78 @@ export const updateActivityReservationStatus = async ({
   );
 };
 
+interface CollectPendingReservationIdsForScheduleProps {
+  activityId: number;
+  scheduleId: number;
+  excludeReservationId?: number | null;
+}
+
+/**
+ * 스케줄 단위로 대기(pending) 예약 id를 커서 페이징으로 모두 수집한다.
+ */
+export const collectPendingReservationIdsForSchedule = async ({
+  activityId,
+  scheduleId,
+  excludeReservationId = null,
+}: CollectPendingReservationIdsForScheduleProps): Promise<number[]> => {
+  const ids: number[] = [];
+  const visitedCursorIds = new Set<number>();
+  let cursorId: number | null = null;
+
+  do {
+    const pendingPage = await fetchActivityReservations({
+      activityId,
+      scheduleId,
+      status: 'pending',
+      cursorId,
+    });
+
+    pendingPage.reservations.forEach((reservation) => {
+      if (
+        excludeReservationId !== null &&
+        reservation.id === excludeReservationId
+      ) {
+        return;
+      }
+      ids.push(reservation.id);
+    });
+
+    if (
+      pendingPage.cursorId !== null &&
+      visitedCursorIds.has(pendingPage.cursorId)
+    ) {
+      break;
+    }
+    if (pendingPage.cursorId !== null) {
+      visitedCursorIds.add(pendingPage.cursorId);
+    }
+
+    cursorId = pendingPage.cursorId;
+  } while (cursorId !== null);
+
+  return ids;
+};
+
+/**
+ * 대기 예약 id 목록을 일괄 거절한다.
+ */
+export const declinePendingReservationIds = async (
+  activityId: number,
+  reservationIds: number[]
+): Promise<void> => {
+  if (reservationIds.length === 0) return;
+
+  await Promise.all(
+    reservationIds.map((reservationId) =>
+      updateActivityReservationStatus({
+        activityId,
+        reservationId,
+        status: 'declined',
+      })
+    )
+  );
+};
+
 /**
  * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도한다.
  * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백을 수행한다.

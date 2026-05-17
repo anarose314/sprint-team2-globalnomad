@@ -124,10 +124,6 @@
   @apply top-14;
 }
 
-.reservation-status-calendar__event-badge--declined {
-  @apply top-20;
-}
-
 .reservation-status-calendar__event-badge--completed {
   @apply top-20;
 }
@@ -344,10 +340,6 @@
 
   .reservation-status-calendar__event-badge--confirmed {
     @apply top-17.75;
-  }
-
-  .reservation-status-calendar__event-badge--declined {
-    @apply top-24;
   }
 
   .reservation-status-calendar__event-badge--completed {
