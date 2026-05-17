@@ -63,7 +63,6 @@ export function ReserveFilter() {
             <li key={label} className="shrink-0">
               <FilterButton
                 label={STATUS_TEXT[label]}
-                showIcon={false}
                 state={isSelected ? 'active' : 'normal'}
                 className="h-10"
                 onClick={() => handleFilterClick(label)}

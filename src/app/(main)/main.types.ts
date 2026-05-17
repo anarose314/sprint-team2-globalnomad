@@ -1,5 +1,5 @@
+import type { ComponentType, SVGProps } from 'react';
 import type { ActivityCategory } from '@/app/(main)/activity/apis/activities.types';
-import type { FilterCategory } from '@/shared/components/buttons';
 
 export type MainCategoryValue =
   | 'art'
@@ -15,7 +15,7 @@ export interface MainCategory {
   label: string;
   value: MainCategoryValue;
   apiValue: ActivityCategory;
-  iconCategory: FilterCategory;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
 export interface MainSortOption {
