@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatDetailDate } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
 import { ReservationDetailSheetRequestList } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetRequestList';
 import { ReservationDetailSheetTabs } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheetTabs';
@@ -9,6 +10,16 @@ import { Heading } from '@/shared/components/heading';
 import { OneButtonModal, TwoButtonModal } from '@/shared/components/modal';
 import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
 import { cn } from '@/shared/utils/cn';
+
+/** 닫힘 전용 키프레임 길이와 맞춤 (모바일 바텀시트·배경 320ms, 2xl 플로팅 300ms 중 긴 쪽) */
+const DETAIL_SHEET_CLOSE_MS = 320;
+
+function getDetailSheetCloseDurationMs() {
+  if (typeof window === 'undefined') return DETAIL_SHEET_CLOSE_MS;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 0
+    : DETAIL_SHEET_CLOSE_MS;
+}
 
 interface ReservationDetailSheetProps {
   activityId: number;
@@ -42,6 +53,38 @@ export function ReservationDetailSheet({
   desktopPosition,
   onClose,
 }: ReservationDetailSheetProps) {
+  const isClosingRef = useRef(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    setIsClosing(true);
+    const durationMs = getDetailSheetCloseDurationMs();
+    closeTimerRef.current = setTimeout(() => {
+      onClose();
+    }, durationMs);
+  }, [onClose]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    isClosingRef.current = false;
+    if (!isOpen && closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    // effect 본문에서 동기 setState는 React Compiler 경고 대상 → 다음 마이크로태스크로 미룸
+    queueMicrotask(() => {
+      setIsClosing(false);
+    });
+  }, [isOpen]);
+
   const {
     activeTab,
     requests,
@@ -72,7 +115,7 @@ export function ReservationDetailSheet({
     isOpen,
     selectedDate,
     detailData,
-    onClose,
+    onClose: requestClose,
   });
   const timeSlotOptions = detailData?.timeSlots.length
     ? detailData.timeSlots.map((timeSlot) => ({
@@ -85,15 +128,21 @@ export function ReservationDetailSheet({
 
   return (
     <div
-      className="reservation-detail-sheet__backdrop"
+      className={cn(
+        'reservation-detail-sheet__backdrop',
+        isClosing && 'reservation-detail-sheet__backdrop--closing'
+      )}
       role="dialog"
       aria-modal="true"
       aria-label="예약 상세"
-      onClick={onClose}
+      onClick={requestClose}
     >
       <section
         ref={sheetRef}
-        className="reservation-detail-sheet"
+        className={cn(
+          'reservation-detail-sheet',
+          isClosing && 'reservation-detail-sheet--closing'
+        )}
         style={desktopPosition ?? undefined}
         onClick={(event) => event.stopPropagation()}
       >
@@ -106,7 +155,7 @@ export function ReservationDetailSheet({
               type="button"
               className="reservation-detail-sheet__close"
               aria-label="예약 상세 닫기"
-              onClick={onClose}
+              onClick={requestClose}
             >
               <IcClose className="h-5 w-5" />
             </button>

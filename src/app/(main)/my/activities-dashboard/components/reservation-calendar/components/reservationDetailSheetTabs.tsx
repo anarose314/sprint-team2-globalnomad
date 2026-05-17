@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import {
   DETAIL_TABS,
   ReservationTab,
@@ -19,8 +20,17 @@ export function ReservationDetailSheetTabs({
   tabCount,
   onChangeTab,
 }: ReservationDetailSheetTabsProps) {
+  const activeIndex = DETAIL_TABS.indexOf(activeTab);
+  const tabNavStyle = {
+    '--reservation-detail-tab-index': activeIndex,
+  } as CSSProperties;
+
   return (
-    <nav className="reservation-detail-sheet__tabs">
+    <nav
+      className="reservation-detail-sheet__tabs"
+      style={tabNavStyle}
+      aria-label="예약 상태 탭"
+    >
       {DETAIL_TABS.map((tabKey) => (
         <button
           key={tabKey}
@@ -34,6 +44,7 @@ export function ReservationDetailSheetTabs({
           {TAB_LABEL[tabKey]} {tabCount[tabKey]}
         </button>
       ))}
+      <span className="reservation-detail-sheet__tab-indicator" aria-hidden />
     </nav>
   );
 }
