@@ -2,6 +2,7 @@
 
 import { IcPlus } from '@/shared/assets/icons';
 import { INPUT_ERROR_STYLE } from '@/shared/components/input/input.constants';
+import { Spinner } from '@/shared/components/spinner';
 import { cn } from '@/shared/utils/cn';
 
 export interface AddImageButtonProps {
@@ -11,6 +12,7 @@ export interface AddImageButtonProps {
   disabled?: boolean;
   onDisabledClick?: () => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
+  isPending?: boolean;
 }
 
 /**
@@ -26,6 +28,7 @@ export function AddImageButton({
   disabled,
   onDisabledClick,
   inputRef,
+  isPending,
 }: AddImageButtonProps) {
   return (
     <button
@@ -52,12 +55,18 @@ export function AddImageButton({
         className
       )}
     >
-      <span className="flex h-7.5 w-7.5 shrink-0 items-center justify-center md:h-10 md:w-10">
-        <IcPlus className="h-3.75 w-3.75 md:h-5 md:w-5" />
-      </span>
-      <span className="typo-xs-medium md:typo-md-medium leading-4">
-        이미지 등록
-      </span>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <>
+          <span className="flex h-7.5 w-7.5 shrink-0 items-center justify-center md:h-10 md:w-10">
+            <IcPlus className="h-3.75 w-3.75 md:h-5 md:w-5" />
+          </span>
+          <span className="typo-xs-medium md:typo-md-medium leading-4">
+            이미지 등록
+          </span>
+        </>
+      )}
     </button>
   );
 }
