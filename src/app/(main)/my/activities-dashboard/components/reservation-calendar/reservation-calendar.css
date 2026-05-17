@@ -280,7 +280,7 @@
 }
 
 .reservation-detail-sheet__confirm-modal {
-  @apply w-full max-w-lg;
+  @apply mx-auto flex w-full max-w-lg justify-center;
 }
 
 .reservation-detail-sheet__confirm-modal .max-w-100 {

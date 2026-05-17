@@ -13,7 +13,10 @@
  *   onConfirm={handleConfirm}
  * />
  */
+'use client';
+
 import { Button } from '@/shared/components/buttons/button';
+import { useRequestModalClose } from '@/shared/components/modal/modal-overlay/modal-overlay-close-context';
 import { ModalBase } from '@/shared/components/modal/ModalBase';
 import { Spinner } from '@/shared/components/spinner';
 
@@ -34,6 +37,16 @@ export function TwoButtonModal({
   onConfirm,
   isPending = false,
 }: TwoButtonModalProps) {
+  const overlayClose = useRequestModalClose();
+
+  const handleCancel = () => {
+    if (overlayClose) {
+      overlayClose.requestClose();
+      return;
+    }
+    onCancel?.();
+  };
+
   return (
     <ModalBase
       role="alertdialog"
@@ -45,7 +58,7 @@ export function TwoButtonModal({
           <Button
             variant="secondary"
             size="lg"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="w-full max-w-31.5"
             disabled={isPending}
           >

@@ -9,6 +9,7 @@ import {
   IcClose,
 } from '@/shared/assets/icons';
 import { ModalOverlay } from '@/shared/components/modal/modal-overlay';
+import { useRequestModalClose } from '@/shared/components/modal/modal-overlay/modal-overlay-close-context';
 import { cn } from '@/shared/utils/cn';
 
 /** `object-contain`으로 그려진 비트맵 영역(레터박스 제외) 안인지 */
@@ -50,6 +51,15 @@ export function ActivityImageLightbox({
   onClose,
   onNavigate,
 }: ActivityImageLightboxProps) {
+  const overlayClose = useRequestModalClose();
+
+  const requestDismiss = useCallback(() => {
+    if (overlayClose) {
+      overlayClose.requestClose();
+      return;
+    }
+    onClose();
+  }, [overlayClose, onClose]);
   const url = urls[index];
   const total = urls.length;
   const canNavigate = total > 1;
@@ -86,9 +96,9 @@ export function ActivityImageLightbox({
         }
       }
 
-      onClose();
+      requestDismiss();
     },
-    [onClose]
+    [requestDismiss]
   );
 
   const handleImageSlotClick = useCallback(
@@ -111,11 +121,11 @@ export function ActivityImageLightbox({
             img
           )
         ) {
-          onClose();
+          requestDismiss();
         }
       }
     },
-    [onClose]
+    [requestDismiss]
   );
 
   useEffect(() => {
@@ -157,7 +167,7 @@ export function ActivityImageLightbox({
   if (!url) return null;
 
   const navButtonClass =
-    'inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full leading-none text-white transition-colors hover:bg-white/15 active:bg-white/25 md:size-12';
+    'inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full leading-none text-white transition-colors duration-200 ease-out hover:bg-white/15 active:bg-white/25 motion-safe:active:scale-95 md:size-12';
 
   const navIconClass = 'block h-10 w-10 shrink-0';
 
@@ -167,14 +177,14 @@ export function ActivityImageLightbox({
       className="px-3 py-6 sm:px-6 md:px-10 md:py-10"
     >
       <div
-        className="flex w-full max-w-7xl flex-col lg:max-w-[min(100%,88rem)]"
+        className="mx-auto flex w-full max-w-7xl flex-col lg:max-w-screen-2xl"
         onPointerDown={handlePanelPointerDown}
       >
         <div className="mb-2 flex shrink-0 justify-end md:mb-3">
           <button
             type="button"
             aria-label="닫기"
-            onClick={onClose}
+            onClick={requestDismiss}
             className={navButtonClass}
           >
             <IcClose aria-hidden className="block size-6 shrink-0" />
@@ -201,7 +211,7 @@ export function ActivityImageLightbox({
           <div
             ref={imageSlotRef}
             data-lightbox-image-slot
-            className="relative isolate h-[min(78vh,720px)] min-h-[12rem] min-w-0 flex-1 basis-0 md:min-h-[16rem]"
+            className="relative isolate aspect-video max-h-dvh min-h-48 w-full max-w-full min-w-0 flex-1 basis-0 md:min-h-64"
             onClick={handleImageSlotClick}
           >
             <div

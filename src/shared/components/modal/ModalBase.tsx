@@ -21,6 +21,7 @@ import type { ReactNode } from 'react';
 import { useId } from 'react';
 import { IcClose } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+import { useRequestModalClose } from '@/shared/components/modal/modal-overlay/modal-overlay-close-context';
 import { cn } from '@/shared/utils/cn';
 
 interface ModalBaseProps {
@@ -46,13 +47,22 @@ export function ModalBase({
 }: ModalBaseProps) {
   const titleId = useId();
   const isHeaderVisible = Boolean(title || onClose);
+  const overlayClose = useRequestModalClose();
+
+  const handleHeaderClose = () => {
+    if (overlayClose) {
+      overlayClose.requestClose();
+      return;
+    }
+    onClose?.();
+  };
 
   return (
     <div
       role={role}
       aria-modal="true"
       aria-labelledby={title ? titleId : undefined}
-      className={cn('w-full max-w-135 rounded-3xl bg-white', className)}
+      className={cn('mx-auto w-full max-w-135 rounded-3xl bg-white', className)}
     >
       {isHeaderVisible && (
         <div className="relative px-7 pt-7">
@@ -65,8 +75,8 @@ export function ModalBase({
             <button
               type="button"
               aria-label="닫기"
-              onClick={onClose}
-              className="absolute top-7 right-7 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
+              onClick={handleHeaderClose}
+              className="absolute top-7 right-7 flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors duration-200 ease-out hover:bg-gray-100 motion-safe:active:scale-90"
             >
               <IcClose aria-hidden="true" className="h-5 w-5" />
             </button>
@@ -88,6 +98,8 @@ export function ModalBase({
         <div
           className={cn(
             'flex items-center justify-center gap-3 px-7 pb-7',
+            'motion-safe:[&_button]:animate-modal-footer-button-in',
+            'motion-safe:[&_button:nth-of-type(2)]:delay-75',
             footerClassName
           )}
         >
