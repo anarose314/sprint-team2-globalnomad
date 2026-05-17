@@ -2,6 +2,8 @@ import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 
 const RESERVATION_PAGE_SIZE = 10;
+/** 대기 예약 일괄 거절 시 동시 PATCH 상한(동시 연결·서버 부하 완화) */
+const DECLINE_PENDING_RESERVATIONS_CONCURRENCY = 5;
 type ReservationRequestStatus = 'pending' | 'confirmed' | 'declined';
 
 interface ReservationRequestItem {
@@ -24,6 +26,8 @@ interface FetchActivityReservationsProps {
   scheduleId: number;
   status: ReservationRequestStatus;
   cursorId?: number | null;
+  /** 목록 조회 page size, 생략 시 UI 목록과 동일한 페이지 크기(10) */
+  size?: number;
 }
 
 interface UpdateActivityReservationStatusProps {
@@ -52,6 +56,7 @@ export const fetchActivityReservations = async ({
   scheduleId,
   status,
   cursorId = null,
+  size = RESERVATION_PAGE_SIZE,
 }: FetchActivityReservationsProps): Promise<ReservationRequestsResponse> => {
   const response = await fetchInstanceClient<unknown>(
     `/api/proxy/my-activities/${activityId}/reservations`,
@@ -59,7 +64,7 @@ export const fetchActivityReservations = async ({
       params: {
         scheduleId,
         status,
-        size: RESERVATION_PAGE_SIZE,
+        size,
         ...(cursorId !== null && { cursorId }),
       },
     }
@@ -126,7 +131,7 @@ export const fetchActivityReservations = async ({
 };
 
 /**
- * 내 체험 예약 상태를 승인/거절로 변경한다.
+ * 내 체험 예약 상태를 승인/거절로 변경
  */
 export const updateActivityReservationStatus = async ({
   activityId,
@@ -142,9 +147,109 @@ export const updateActivityReservationStatus = async ({
   );
 };
 
+interface CollectPendingReservationIdsForScheduleProps {
+  activityId: number;
+  scheduleId: number;
+  excludeReservationId?: number | null;
+}
+
 /**
- * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도한다.
- * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백을 수행한다.
+ * 스케줄 단위로 대기(pending) 예약 id를 커서 페이징으로 모두 수집
+ * UI 목록(10건)보다 큰 페이지로 조회해 왕복 횟수를 줄임
+ */
+export const collectPendingReservationIdsForSchedule = async ({
+  activityId,
+  scheduleId,
+  excludeReservationId = null,
+}: CollectPendingReservationIdsForScheduleProps): Promise<number[]> => {
+  const ids: number[] = [];
+  const visitedCursorIds = new Set<number>();
+  let cursorId: number | null = null;
+
+  do {
+    const pendingPage = await fetchActivityReservations({
+      activityId,
+      scheduleId,
+      status: 'pending',
+      cursorId,
+      size: 50,
+    });
+
+    pendingPage.reservations.forEach((reservation) => {
+      if (
+        excludeReservationId !== null &&
+        reservation.id === excludeReservationId
+      ) {
+        return;
+      }
+      ids.push(reservation.id);
+    });
+
+    if (
+      pendingPage.cursorId !== null &&
+      visitedCursorIds.has(pendingPage.cursorId)
+    ) {
+      break;
+    }
+    if (pendingPage.cursorId !== null) {
+      visitedCursorIds.add(pendingPage.cursorId);
+    }
+
+    cursorId = pendingPage.cursorId;
+  } while (cursorId !== null);
+
+  return ids;
+};
+
+/**
+ * 대기 예약 id 목록 일괄 거절
+ * 한 스케줄에 대기 건이 매우 많을 수 있어 전부 병렬로 보내지 않고 청크 단위로 나눈다.
+ * 청크 내 한 건이 실패해도 나머지는 계속 처리한다(`Promise.allSettled`).
+ */
+export const declinePendingReservationIds = async (
+  activityId: number,
+  reservationIds: number[]
+): Promise<void> => {
+  if (reservationIds.length === 0) return;
+
+  const rejectionReasons: unknown[] = [];
+
+  for (
+    let offset = 0;
+    offset < reservationIds.length;
+    offset += DECLINE_PENDING_RESERVATIONS_CONCURRENCY
+  ) {
+    const chunk = reservationIds.slice(
+      offset,
+      offset + DECLINE_PENDING_RESERVATIONS_CONCURRENCY
+    );
+    const results = await Promise.allSettled(
+      chunk.map((reservationId) =>
+        updateActivityReservationStatus({
+          activityId,
+          reservationId,
+          status: 'declined',
+        })
+      )
+    );
+
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        rejectionReasons.push(result.reason);
+      }
+    }
+  }
+
+  if (rejectionReasons.length > 0) {
+    const first = rejectionReasons[0];
+    if (first instanceof Error) throw first;
+    throw new Error(String(first ?? '일부 예약 거절에 실패했습니다.'));
+  }
+};
+
+/**
+ * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도
+ * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백 수행
  */
 export const approveReservationWithAutoDecline = async ({
   activityId,

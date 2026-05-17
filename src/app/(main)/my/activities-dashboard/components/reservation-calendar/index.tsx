@@ -60,12 +60,13 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
   const activeStartDate = detailDate
     ? new Date(detailDate.getFullYear(), detailDate.getMonth(), 1)
     : currentDate;
-  const { detailData, eventCountsByDate } = useReservationCalendarData({
-    activityId,
-    currentYear,
-    currentMonth,
-    reservedScheduleDateKey: selectedDateKey,
-  });
+  const { detailData, eventCountsByDate, notificationDotByDate } =
+    useReservationCalendarData({
+      activityId,
+      currentYear,
+      currentMonth,
+      reservedScheduleDateKey: selectedDateKey,
+    });
   const { desktopSheetPosition, setDesktopSheetPositionFromTile } =
     useDesktopSheetPosition({
       calendarRootRef,
@@ -140,14 +141,16 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           const isCurrentMonth =
             date.getMonth() === visibleMonthDate.getMonth() &&
             date.getFullYear() === visibleMonthDate.getFullYear();
+          const dateKey = formatDateKey(date);
           const eventCounts: ReservationEventCounts | undefined =
-            eventCountsByDate[formatDateKey(date)];
+            eventCountsByDate[dateKey];
 
           return (
             <ReservationCalendarDayTile
               date={date}
               isCurrentMonth={isCurrentMonth}
               eventCounts={eventCounts}
+              showNotificationDot={notificationDotByDate[dateKey] === true}
             />
           );
         }}

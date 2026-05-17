@@ -11,7 +11,7 @@ interface EventBadgeProps {
 }
 
 /**
- * 이벤트 배지 컴포넌트 (예약 / 승인 / 완료)
+ * 달력 타일용 이벤트 배지 (예약 / 승인 / 완료)
  */
 export function EventBadge({ status, count }: EventBadgeProps) {
   return (
