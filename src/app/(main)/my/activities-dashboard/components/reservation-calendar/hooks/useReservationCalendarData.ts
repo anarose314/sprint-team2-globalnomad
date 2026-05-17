@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import {
@@ -25,8 +25,14 @@ interface UseReservationCalendarDataProps {
 }
 
 /**
- * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합한다.
- * 선택한 날짜의 스케줄을 불러온 뒤, 체험 시작 시각이 지난 시간대에 남아 있는 대기(pending) 예약은 자동으로 거절한다.
+ * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
+ *
+ * 선택한 날짜(`reservedScheduleDateKey`)의 스케줄만 조회한 뒤, 체험 시작 시각이 지난 슬롯의 대기(pending) 예약을
+ * 클라이언트에서 자동 거절
+ * 범위가 선택일로 한정되므로 장기적으로는 서버(Cron·배치·조회 시 정리 등)에서 처리하는 편이 안전함
+ *
+ * 무효화(invalidate)로 `reservedSchedules`가 다시 불리면 이 effect가 재실행될 수 있음
+ * 서버 반영 지연 등으로 pending이 남아 있으면 동일 스케줄에 대한 거절을 반복 호출할 위험이 있어 스케줄 ID별로 한 번만 시도
  */
 export const useReservationCalendarData = ({
   activityId,
@@ -35,6 +41,8 @@ export const useReservationCalendarData = ({
   reservedScheduleDateKey,
 }: UseReservationCalendarDataProps) => {
   const queryClient = useQueryClient();
+  /** 선택일·체험이 바뀌기 전까지 자동 거절을 이미 시도한 `scheduleId` (무한 invalidate 루프 방지) */
+  const autoDeclineAttemptedScheduleIdsRef = useRef<Set<number>>(new Set());
 
   const { data: reservationDashboard = [] } = useQuery({
     queryKey: [
@@ -100,6 +108,10 @@ export const useReservationCalendarData = ({
   });
 
   useEffect(() => {
+    autoDeclineAttemptedScheduleIdsRef.current.clear();
+  }, [activityId, reservedScheduleDateKey]);
+
+  useEffect(() => {
     if (activityId === null || reservedScheduleDateKey === null) return;
     if (reservedSchedules.length === 0) return;
 
@@ -110,14 +122,19 @@ export const useReservationCalendarData = ({
         isScheduleStartReached(reservedScheduleDateKey, schedule.startTime, now)
     );
 
-    if (startPassedWithPending.length === 0) return;
+    const candidates = startPassedWithPending.filter(
+      (schedule) =>
+        !autoDeclineAttemptedScheduleIdsRef.current.has(schedule.scheduleId)
+    );
+
+    if (candidates.length === 0) return;
 
     let cancelled = false;
 
     void (async () => {
       let declinedAny = false;
 
-      for (const schedule of startPassedWithPending) {
+      for (const schedule of candidates) {
         if (cancelled) return;
 
         try {
@@ -132,6 +149,8 @@ export const useReservationCalendarData = ({
           declinedAny = true;
         } catch {
           // 다음 스케줄 처리 계속
+        } finally {
+          autoDeclineAttemptedScheduleIdsRef.current.add(schedule.scheduleId);
         }
       }
 
