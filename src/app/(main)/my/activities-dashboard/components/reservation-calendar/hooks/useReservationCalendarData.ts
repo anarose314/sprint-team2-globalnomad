@@ -17,6 +17,13 @@ import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
+/** 체험별 예약 현황 화면에서 함께 갱신해야 하는 쿼리 루트(공통 부모 키는 없고 접두사만 다름) */
+const ACTIVITY_RESERVATION_CACHE_ROOTS = new Set<string>([
+  QUERY_KEYS.MY_ACTIVITY_RESERVATIONS[0],
+  QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE[0],
+  QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD[0],
+]);
+
 interface UseReservationCalendarDataProps {
   activityId: number | null;
   currentYear: number;
@@ -156,20 +163,18 @@ export const useReservationCalendarData = ({
 
       if (cancelled || !declinedAny) return;
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS, activityId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE, activityId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [
-            ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-            activityId,
-          ],
-        }),
-      ]);
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey;
+          if (!Array.isArray(key) || key.length < 2) return false;
+          if (key[1] !== activityId) return false;
+          const root = key[0];
+          return (
+            typeof root === 'string' &&
+            ACTIVITY_RESERVATION_CACHE_ROOTS.has(root)
+          );
+        },
+      });
     })();
 
     return () => {
