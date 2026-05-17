@@ -125,7 +125,7 @@ export const useReservationCalendarData = ({
     const now = new Date();
     const startPassedWithPending = reservedSchedules.filter(
       (schedule) =>
-        Math.max(schedule.count.pending, 0) > 0 &&
+        Math.max(schedule.count.pending ?? 0, 0) > 0 &&
         isScheduleStartReached(reservedScheduleDateKey, schedule.startTime, now)
     );
 
