@@ -50,6 +50,8 @@ export function ReserveFilter() {
   );
 
   const handleFilterReset = useCallback(() => {
+    if (!currentStatus) return;
+
     const params = new URLSearchParams(searchParams.toString());
     params.delete('status');
 
@@ -57,7 +59,7 @@ export function ReserveFilter() {
     const href = queryString ? `${pathname}?${queryString}` : pathname;
 
     router.replace(href, { scroll: false });
-  }, [pathname, router, searchParams]);
+  }, [currentStatus, pathname, router, searchParams]);
 
   return (
     <div className="relative -mx-6 mt-3.5">
