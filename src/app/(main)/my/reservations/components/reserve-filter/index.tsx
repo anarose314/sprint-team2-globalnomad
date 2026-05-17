@@ -48,6 +48,16 @@ export function ReserveFilter() {
     [currentStatus, pathname, router, searchParams]
   );
 
+  const handleFilterReset = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('status');
+
+    const queryString = params.toString();
+    const href = queryString ? `${pathname}?${queryString}` : pathname;
+
+    router.replace(href, { scroll: false });
+  }, [pathname, router, searchParams]);
+
   return (
     <div className="relative -mx-6 mt-3.5">
       <ul
@@ -56,6 +66,14 @@ export function ReserveFilter() {
         onScroll={handleScroll}
         className="scrollbar-hide flex gap-2 overflow-x-auto px-6"
       >
+        <li className="shrink-0">
+          <FilterButton
+            label="전체"
+            state={currentStatus ? 'normal' : 'active'}
+            className="h-10 min-w-20.5 md:min-w-23.25"
+            onClick={handleFilterReset}
+          />
+        </li>
         {FILTER_ORDER.map((label) => {
           const isSelected = currentStatus === label;
 
@@ -64,7 +82,7 @@ export function ReserveFilter() {
               <FilterButton
                 label={STATUS_TEXT[label]}
                 state={isSelected ? 'active' : 'normal'}
-                className="h-10"
+                className="h-10 min-w-20.5 md:min-w-23.25"
                 onClick={() => handleFilterClick(label)}
               />
             </li>
