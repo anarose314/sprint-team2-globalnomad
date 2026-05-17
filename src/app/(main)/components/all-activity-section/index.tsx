@@ -11,12 +11,12 @@ import { ActivityCardListSkeleton } from '@/app/(main)/components/activity-card-
 import { ActivitySectionStatus } from '@/app/(main)/components/activity-section-status';
 import type { AllActivitySectionProps } from '@/app/(main)/components/all-activity-section/allActivitySection.types';
 import {
-  MAIN_CATEGORIES,
   MAIN_DESKTOP_PAGE_SIZE,
   MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
   MAIN_PAGE_SIZE,
   MAIN_SORT_OPTIONS,
 } from '@/app/(main)/main.constants';
+import { MAIN_CATEGORIES } from '@/app/(main)/mainCategories.constants';
 import { FilterButton } from '@/shared/components/buttons';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Heading } from '@/shared/components/heading';
@@ -182,7 +182,7 @@ export function AllActivitySection({
             <li key={category.value} className="shrink-0">
               <FilterButton
                 label={category.label}
-                category={category.iconCategory}
+                icon={<category.Icon />}
                 state={
                   selectedCategory === category.apiValue ? 'active' : 'normal'
                 }

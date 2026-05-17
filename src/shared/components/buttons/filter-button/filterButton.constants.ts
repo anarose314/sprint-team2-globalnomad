@@ -1,24 +1,4 @@
-import type { SVGProps } from 'react';
 import { cva } from 'class-variance-authority';
-import {
-  IcArt,
-  IcBus,
-  IcFood,
-  IcSport,
-  IcTour,
-  IcWellbeing,
-} from '@/shared/assets/icons';
-
-type CategoryIconComponent = React.FC<SVGProps<SVGSVGElement>>;
-
-export const CATEGORY_ICON_MAP = {
-  art: IcArt,
-  food: IcFood,
-  bus: IcBus,
-  sport: IcSport,
-  tour: IcTour,
-  wellbeing: IcWellbeing,
-} satisfies Record<string, CategoryIconComponent>;
 
 /**
  * 아이콘 크기 Tailwind 클래스

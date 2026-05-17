@@ -1,49 +1,54 @@
 'use client';
 
-import { IcArt } from '@/shared/assets/icons';
+import { cloneElement, isValidElement, useMemo } from 'react';
 import {
-  CATEGORY_ICON_MAP,
   FILTER_ICON_CLASS,
   filterButtonVariants,
 } from '@/shared/components/buttons/filter-button/filterButton.constants';
 import type { FilterButtonProps } from '@/shared/components/buttons/filter-button/filterButton.types';
 import { cn } from '@/shared/utils/cn';
 
-export type { FilterCategory } from '@/shared/components/buttons/filter-button/filterButton.types';
+export type { FilterButtonProps } from '@/shared/components/buttons/filter-button/filterButton.types';
 
 /**
- * 홈 화면 카테고리 필터링에 사용하는 pill 형태 버튼
+ * pill 형태의 필터·토글용 버튼
  *
  * - `state="normal"` : 흰 배경 + 회색 테두리
  * - `state="active"` : 검정 배경 + 흰 텍스트
  * - 반응형 크기: 모바일 h-[37px] → PC/TB h-11 (md: 기준)
  *
  * @example
- * <FilterButton label="아트" category="art" state="normal" />
+ * <FilterButton label="문화 · 예술" icon={<IcArt />} state="normal" />
  *
  * @example
- * <FilterButton label="음식" category="food" state="active" />
- *
- * @example
- * <FilterButton label="전체" showIcon={false} state="normal" />
+ * <FilterButton label="예약 완료" state="active" />
  *
  * @example
  * <FilterButton
  *   label="스포츠"
- *   category="sport"
- *   state={selected === 'sport' ? 'active' : 'normal'}
- *   onClick={() => setSelected('sport')}
+ *   icon={<IcSport />}
+ *   state={selected ? 'active' : 'normal'}
+ *   onClick={handleClick}
  * />
  */
 export function FilterButton({
   label,
-  category,
-  showIcon = true,
+  icon,
   state = 'normal',
   className,
   ...rest
 }: FilterButtonProps) {
-  const IconComponent = category ? CATEGORY_ICON_MAP[category] : IcArt;
+  const styledIcon = useMemo(() => {
+    if (!icon || !isValidElement(icon)) {
+      return icon;
+    }
+
+    const iconElement = icon as React.ReactElement<{ className?: string }>;
+
+    return cloneElement(iconElement, {
+      className: cn(iconElement.props.className, FILTER_ICON_CLASS),
+    });
+  }, [icon]);
 
   return (
     <button
@@ -51,7 +56,7 @@ export function FilterButton({
       className={cn(filterButtonVariants({ state }), className)}
       {...rest}
     >
-      {showIcon && <IconComponent className={FILTER_ICON_CLASS} />}
+      {styledIcon}
       <span>{label}</span>
     </button>
   );

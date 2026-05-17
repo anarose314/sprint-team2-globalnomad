@@ -1,4 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import {
+  IcArt,
+  IcBus,
+  IcFood,
+  IcSport,
+  IcTour,
+  IcWellbeing,
+} from '@/shared/assets/icons';
 import { FilterButton } from '@/shared/components/buttons/filter-button';
 
 const meta: Meta<typeof FilterButton> = {
@@ -8,10 +16,9 @@ const meta: Meta<typeof FilterButton> = {
     layout: 'centered',
   },
   args: {
-    label: '아트',
-    category: 'art',
+    label: '문화 · 예술',
+    icon: <IcArt />,
     state: 'normal',
-    showIcon: true,
   },
 };
 
@@ -29,20 +36,19 @@ export const Active: Story = {
 export const NoIcon: Story = {
   args: {
     label: '전체',
-    showIcon: false,
-    category: undefined,
+    icon: undefined,
   },
 };
 
 export const categories: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
-      <FilterButton label="아트" category="art" />
-      <FilterButton label="음식" category="food" />
-      <FilterButton label="버스" category="bus" />
-      <FilterButton label="스포츠" category="sport" />
-      <FilterButton label="투어" category="tour" />
-      <FilterButton label="웰빙" category="wellbeing" />
+      <FilterButton label="문화 · 예술" icon={<IcArt />} />
+      <FilterButton label="식음료" icon={<IcFood />} />
+      <FilterButton label="관광" icon={<IcBus />} />
+      <FilterButton label="스포츠" icon={<IcSport />} />
+      <FilterButton label="투어" icon={<IcTour />} />
+      <FilterButton label="웰빙" icon={<IcWellbeing />} />
     </div>
   ),
 };
