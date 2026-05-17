@@ -158,8 +158,9 @@ export const useReservationCalendarData = ({
           if (ids.length === 0) continue;
           if (cancelled) return;
 
-          await declinePendingReservationIds(activityId, ids);
+          // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
           declinedAny = true;
+          await declinePendingReservationIds(activityId, ids);
         } catch {
           // 다음 스케줄 처리 계속
         } finally {
