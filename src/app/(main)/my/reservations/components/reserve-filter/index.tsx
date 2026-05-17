@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
+  FILTER_BUTTON_CLASS,
   FILTER_ORDER,
   SCROLL_END_THRESHOLD,
 } from '@/app/(main)/my/reservations/components/reserve-filter/reserveFilter.constants';
@@ -70,7 +71,7 @@ export function ReserveFilter() {
           <FilterButton
             label="전체"
             state={currentStatus ? 'normal' : 'active'}
-            className="h-10 min-w-20.5 md:min-w-23.25"
+            className={FILTER_BUTTON_CLASS}
             onClick={handleFilterReset}
           />
         </li>
@@ -82,7 +83,7 @@ export function ReserveFilter() {
               <FilterButton
                 label={STATUS_TEXT[label]}
                 state={isSelected ? 'active' : 'normal'}
-                className="h-10 min-w-20.5 md:min-w-23.25"
+                className={FILTER_BUTTON_CLASS}
                 onClick={() => handleFilterClick(label)}
               />
             </li>
