@@ -39,7 +39,7 @@ export function Toast({
 
   return (
     <div
-      className="animate-toast-slide-up md:animate-toast-slide-down shadow-toast pointer-events-auto flex min-h-14 w-xs items-center gap-3 rounded-xl bg-white p-3 ring-1 ring-black/5 transition-all md:w-md"
+      className="animate-toast-slide-up md:animate-toast-slide-down shadow-toast pointer-events-auto flex min-h-14 w-xs items-center gap-3 rounded-xl bg-white p-3 ring-1 ring-black/5 md:w-md"
       role="alert"
     >
       <div className={cn('shrink-0', colorClass)} aria-hidden="true">
