@@ -73,6 +73,18 @@ export function ReservationDetailSheet({
     };
   }, []);
 
+  useEffect(() => {
+    isClosingRef.current = false;
+    if (!isOpen && closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    // effect 본문에서 동기 setState는 React Compiler 경고 대상 → 다음 마이크로태스크로 미룸
+    queueMicrotask(() => {
+      setIsClosing(false);
+    });
+  }, [isOpen]);
+
   const {
     activeTab,
     requests,
