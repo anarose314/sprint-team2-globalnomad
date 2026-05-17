@@ -17,12 +17,12 @@ import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
-/** 체험별 예약 현황 화면에서 함께 갱신해야 하는 쿼리 루트(공통 부모 키는 없고 접두사만 다름) */
-const ACTIVITY_RESERVATION_CACHE_ROOTS = new Set<string>([
+/** 자동 거절 후 접두 `[root, activityId]`로 무효화할 쿼리 루트 */
+const ACTIVITY_RESERVATION_CACHE_ROOTS = [
   QUERY_KEYS.MY_ACTIVITY_RESERVATIONS[0],
   QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE[0],
   QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD[0],
-]);
+] as const;
 
 interface UseReservationCalendarDataProps {
   activityId: number | null;
@@ -169,18 +169,13 @@ export const useReservationCalendarData = ({
 
       if (cancelled || !declinedAny) return;
 
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          if (!Array.isArray(key) || key.length < 2) return false;
-          if (key[1] !== activityId) return false;
-          const root = key[0];
-          return (
-            typeof root === 'string' &&
-            ACTIVITY_RESERVATION_CACHE_ROOTS.has(root)
-          );
-        },
-      });
+      await Promise.all(
+        ACTIVITY_RESERVATION_CACHE_ROOTS.map((root) =>
+          queryClient.invalidateQueries({
+            queryKey: [root, activityId],
+          })
+        )
+      );
     })();
 
     return () => {
