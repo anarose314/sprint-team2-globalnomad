@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   CalendarValue,
   MobileSheetStep,
@@ -9,6 +10,16 @@ import { TimeSlotButton } from '@/app/(main)/activity/[id]/components/time-slot-
 import { IcArrowLeft, IcMinus, IcPlus } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
+
+const MOBILE_RESERVATION_SHEET_CLOSE_MS = 320;
+
+function getMobileReservationSheetCloseMs() {
+  if (typeof window === 'undefined') return MOBILE_RESERVATION_SHEET_CLOSE_MS;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 0
+    : MOBILE_RESERVATION_SHEET_CLOSE_MS;
+}
 
 interface MobileReservationSheetProps {
   isOpen: boolean;
@@ -64,15 +75,45 @@ export function MobileReservationSheet({
   onSubmitReservation,
   tileDisabled,
 }: MobileReservationSheetProps) {
+  const isClosingRef = useRef(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    setIsClosing(true);
+    const durationMs = getMobileReservationSheetCloseMs();
+    closeTimerRef.current = setTimeout(() => {
+      onClose();
+    }, durationMs);
+  }, [onClose]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
   if (!isOpen) return null;
 
   return (
     <div
-      className="z-modal-backdrop animate-reservation-sheet-backdrop-in fixed inset-0 bg-black/60 2xl:hidden"
-      onClick={onClose}
+      className={cn(
+        'z-modal-backdrop fixed inset-0 bg-black/60 2xl:hidden',
+        isClosing
+          ? 'animate-reservation-sheet-backdrop-out'
+          : 'animate-reservation-sheet-backdrop-in'
+      )}
+      onClick={requestClose}
     >
       <section
-        className="animate-reservation-sheet-in shadow-review-card absolute right-0 bottom-0 left-0 max-h-dvh w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5"
+        className={cn(
+          'shadow-review-card absolute right-0 bottom-0 left-0 max-h-dvh w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5',
+          isClosing
+            ? 'animate-reservation-sheet-out'
+            : 'animate-reservation-sheet-in'
+        )}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mx-auto w-full max-w-186">

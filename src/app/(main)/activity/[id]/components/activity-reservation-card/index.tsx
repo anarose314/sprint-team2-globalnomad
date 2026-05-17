@@ -73,6 +73,11 @@ export function ActivityReservationCard({
         onOpenDateSheet={handleOpenDateSheet}
       />
       <MobileReservationSheet
+        key={
+          isDateSheetOpen
+            ? 'mobile-reservation-sheet-open'
+            : 'mobile-reservation-sheet-closed'
+        }
         isOpen={isDateSheetOpen}
         mobileSheetStep={mobileSheetStep}
         hasSelectableDate={hasSelectableDate}

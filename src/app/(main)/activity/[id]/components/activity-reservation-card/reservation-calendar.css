@@ -265,3 +265,56 @@
 .animate-reservation-sheet-in {
   animation: reservation-sheet-in 220ms ease-out;
 }
+
+/**
+ * @description
+ * 바텀시트 닫힘: 딤 페이드 아웃
+ */
+@keyframes reservation-sheet-backdrop-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/**
+ * @description
+ * 바텀시트 닫힘: 패널을 화면 아래로 슬라이드
+ */
+@keyframes reservation-sheet-out {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.animate-reservation-sheet-backdrop-out {
+  animation: reservation-sheet-backdrop-out 320ms ease-in forwards;
+}
+
+.animate-reservation-sheet-out {
+  animation: reservation-sheet-out 320ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-reservation-sheet-backdrop-in,
+  .animate-reservation-sheet-in,
+  .animate-reservation-sheet-backdrop-out,
+  .animate-reservation-sheet-out {
+    animation: none;
+  }
+
+  .animate-reservation-sheet-backdrop-out {
+    opacity: 0;
+  }
+
+  .animate-reservation-sheet-out {
+    transform: translate3d(0, 100%, 0);
+  }
+}
