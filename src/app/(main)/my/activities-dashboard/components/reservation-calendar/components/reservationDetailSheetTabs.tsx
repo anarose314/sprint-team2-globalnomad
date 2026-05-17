@@ -22,7 +22,7 @@ export function ReservationDetailSheetTabs({
 }: ReservationDetailSheetTabsProps) {
   const activeIndex = DETAIL_TABS.indexOf(activeTab);
   const tabNavStyle = {
-    ['--reservation-detail-tab-index' as string]: activeIndex,
+    '--reservation-detail-tab-index': activeIndex,
   } as CSSProperties;
 
   return (
