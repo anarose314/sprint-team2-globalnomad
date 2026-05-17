@@ -211,7 +211,7 @@ export function ActivityImageLightbox({
           <div
             ref={imageSlotRef}
             data-lightbox-image-slot
-            className="relative isolate aspect-video max-h-dvh min-h-48 w-full max-w-full min-w-0 flex-1 basis-0 md:min-h-64"
+            className="relative isolate h-[min(78vh,720px)] min-h-48 w-full max-w-full min-w-0 flex-1 basis-0 md:min-h-64"
             onClick={handleImageSlotClick}
           >
             <div

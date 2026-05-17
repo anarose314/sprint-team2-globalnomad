@@ -48,17 +48,27 @@ export function ModalOverlay({
       : document.getElementById('modal-root');
 
   const [isExiting, setIsExiting] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
+  /** SSR과 첫 클라이언트 렌더를 맞추기 위해 초기값은 false, 마운트 후 rAF로 동기화 */
+  const [reduceMotion, setReduceMotion] = useState(false);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onChange = () => setReduceMotion(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+
+    const syncFromMedia = () => {
+      setReduceMotion(mq.matches);
+    };
+
+    const rafId = requestAnimationFrame(() => {
+      syncFromMedia();
+    });
+
+    mq.addEventListener('change', syncFromMedia);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      mq.removeEventListener('change', syncFromMedia);
+    };
   }, []);
 
   const clearExitTimer = useCallback(() => {
@@ -161,8 +171,8 @@ export function ModalOverlay({
           onMouseDown={handleBackdropMouseDown}
         />
 
-        <div className="pointer-events-none relative z-10 flex min-h-dvh w-full min-w-0 flex-col items-center justify-center px-5 py-8 md:px-8">
-          <div className="box-border w-full max-w-full shrink-0">
+        <div className="pointer-events-none relative z-10 flex min-h-dvh w-full min-w-0 flex-col items-center px-5 py-8 md:px-8">
+          <div className="my-auto box-border w-full max-w-full shrink-0">
             <div
               data-modal-content
               className={cn(
