@@ -1,6 +1,6 @@
 'use client';
 
-import { cloneElement, isValidElement } from 'react';
+import { cloneElement, isValidElement, useMemo } from 'react';
 import {
   FILTER_ICON_CLASS,
   filterButtonVariants,
@@ -38,19 +38,17 @@ export function FilterButton({
   className,
   ...rest
 }: FilterButtonProps) {
-  const styledIcon =
-    icon && isValidElement(icon)
-      ? cloneElement(
-          icon as React.ReactElement<React.SVGProps<SVGSVGElement>>,
-          {
-            className: cn(
-              (icon as React.ReactElement<React.SVGProps<SVGSVGElement>>).props
-                .className,
-              FILTER_ICON_CLASS
-            ),
-          }
-        )
-      : icon;
+  const styledIcon = useMemo(() => {
+    if (!icon || !isValidElement(icon)) {
+      return icon;
+    }
+
+    const iconElement = icon as React.ReactElement<{ className?: string }>;
+
+    return cloneElement(iconElement, {
+      className: cn(iconElement.props.className, FILTER_ICON_CLASS),
+    });
+  }, [icon]);
 
   return (
     <button
