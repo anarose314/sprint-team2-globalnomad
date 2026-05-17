@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 export const BASE_CLASS =
   'inline-flex items-center justify-center gap-1 [letter-spacing:-0.025em] cursor-pointer select-none ' +
-  'transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out ' +
+  'transition duration-200 ease-out ' +
   'motion-reduce:transition-colors motion-reduce:duration-150 ' +
   'motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none motion-reduce:active:!scale-100 ' +
   'disabled:cursor-not-allowed';
