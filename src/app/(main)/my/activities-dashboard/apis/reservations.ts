@@ -2,6 +2,8 @@ import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 
 const RESERVATION_PAGE_SIZE = 10;
+/** 대기 예약 일괄 거절 시 동시 PATCH 상한(동시 연결·서버 부하 완화) */
+const DECLINE_PENDING_RESERVATIONS_CONCURRENCY = 5;
 type ReservationRequestStatus = 'pending' | 'confirmed' | 'declined';
 
 interface ReservationRequestItem {
@@ -126,7 +128,7 @@ export const fetchActivityReservations = async ({
 };
 
 /**
- * 내 체험 예약 상태를 승인/거절로 변경한다.
+ * 내 체험 예약 상태를 승인/거절로 변경
  */
 export const updateActivityReservationStatus = async ({
   activityId,
@@ -149,7 +151,7 @@ interface CollectPendingReservationIdsForScheduleProps {
 }
 
 /**
- * 스케줄 단위로 대기(pending) 예약 id를 커서 페이징으로 모두 수집한다.
+ * 스케줄 단위로 대기(pending) 예약 id를 커서 페이징으로 모두 수집
  */
 export const collectPendingReservationIdsForSchedule = async ({
   activityId,
@@ -195,7 +197,8 @@ export const collectPendingReservationIdsForSchedule = async ({
 };
 
 /**
- * 대기 예약 id 목록을 일괄 거절한다.
+ * 대기 예약 id 목록 일괄 거절
+ * 한 스케줄에 대기 건이 매우 많을 수 있어 전부 병렬로 보내지 않고 청크 단위로 나눔
  */
 export const declinePendingReservationIds = async (
   activityId: number,
@@ -203,20 +206,30 @@ export const declinePendingReservationIds = async (
 ): Promise<void> => {
   if (reservationIds.length === 0) return;
 
-  await Promise.all(
-    reservationIds.map((reservationId) =>
-      updateActivityReservationStatus({
-        activityId,
-        reservationId,
-        status: 'declined',
-      })
-    )
-  );
+  for (
+    let offset = 0;
+    offset < reservationIds.length;
+    offset += DECLINE_PENDING_RESERVATIONS_CONCURRENCY
+  ) {
+    const chunk = reservationIds.slice(
+      offset,
+      offset + DECLINE_PENDING_RESERVATIONS_CONCURRENCY
+    );
+    await Promise.all(
+      chunk.map((reservationId) =>
+        updateActivityReservationStatus({
+          activityId,
+          reservationId,
+          status: 'declined',
+        })
+      )
+    );
+  }
 };
 
 /**
- * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도한다.
- * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백을 수행한다.
+ * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도
+ * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백 수행
  */
 export const approveReservationWithAutoDecline = async ({
   activityId,
