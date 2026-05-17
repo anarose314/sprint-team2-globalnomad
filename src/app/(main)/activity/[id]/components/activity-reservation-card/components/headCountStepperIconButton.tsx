@@ -7,11 +7,19 @@ import {
   type ReactNode,
   useState,
 } from 'react';
-import {
-  HEAD_COUNT_STEPPER_ICON_BUTTON_CLASS,
-  HEAD_COUNT_STEPPER_PRESSED_ADDON_CLASS,
-} from '@/app/(main)/activity/[id]/components/activity-reservation-card/headCountStepper.constants';
 import { cn } from '@/shared/utils/cn';
+
+/** 24×24 원형 히트, 호버 시 SVG에만 drop-shadow (box-shadow는 사각 박스 느낌) */
+const STEP_ICON_BUTTON_CLASS =
+  'inline-flex h-6 w-6 shrink-0 cursor-pointer select-none items-center justify-center rounded-full ' +
+  'text-gray-800 transition-[transform,filter] duration-100 ease-out ' +
+  'enabled:hover:-translate-y-px enabled:hover:[&_svg]:drop-shadow-sm ' +
+  'motion-reduce:enabled:hover:translate-y-0 motion-reduce:enabled:hover:[&_svg]:drop-shadow-none';
+
+/** pointer down / Space·Enter hold 동안만 `cn(STEP_ICON_BUTTON_CLASS, …)`에 병합 */
+const STEP_ICON_PRESSED_CLASS =
+  'translate-y-px scale-90 duration-75 [&_svg]:drop-shadow-none ease-in ' +
+  'motion-reduce:translate-y-0 motion-reduce:scale-100';
 
 export type HeadCountStepperIconButtonProps = Omit<
   ComponentPropsWithoutRef<'button'>,
@@ -84,8 +92,8 @@ export function HeadCountStepperIconButton({
       {...rest}
       disabled={disabled}
       className={cn(
-        HEAD_COUNT_STEPPER_ICON_BUTTON_CLASS,
-        !disabled && pressed && HEAD_COUNT_STEPPER_PRESSED_ADDON_CLASS,
+        STEP_ICON_BUTTON_CLASS,
+        !disabled && pressed && STEP_ICON_PRESSED_CLASS,
         className
       )}
       onPointerDown={handlePointerDown}
