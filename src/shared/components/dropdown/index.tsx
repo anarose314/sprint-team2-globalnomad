@@ -206,8 +206,8 @@ export function Dropdown({
         {isOpen && (
           <div
             className={cn(
-              'z-dropdown absolute inset-x-0 top-full',
-              !isFieldVariant && 'min-w-0'
+              'z-dropdown absolute top-full',
+              isFieldVariant ? 'inset-x-0' : 'left-0'
             )}
           >
             <div className="animate-dropdown-menu-in motion-reduce:animate-none">
