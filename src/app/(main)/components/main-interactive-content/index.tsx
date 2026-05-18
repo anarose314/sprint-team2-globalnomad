@@ -12,7 +12,7 @@ import { useUpdateSearchParams } from '@/app/(main)/hooks/useUpdateSearchParams'
  *
  * - 검색 입력값과 실제 검색어 상태를 관리한다.
  * - 검색 실행 시 모든 체험 목록의 필터 상태를 초기화한다.
- * - 인기 체험은 검색/필터/정렬과 독립적으로 조회한다.
+ * - 인기 체험은 검색/필터/정렬과 독립적으로 유지한다.
  * - 검색어와 체험 목록 상태를 URL query string과 동기화한다.
  *
  * @example
@@ -34,17 +34,20 @@ export function MainInteractiveContent() {
   const handleSearch = (nextKeyword: string) => {
     const trimmedKeyword = nextKeyword.trim();
 
-    updateSearchParams((params) => {
-      if (trimmedKeyword) {
-        params.set('keyword', trimmedKeyword);
-      } else {
-        params.delete('keyword');
-      }
+    updateSearchParams(
+      (params) => {
+        if (trimmedKeyword) {
+          params.set('keyword', trimmedKeyword);
+        } else {
+          params.delete('keyword');
+        }
 
-      params.delete('category');
-      params.delete('sort');
-      params.delete('page');
-    });
+        params.delete('category');
+        params.delete('sort');
+        params.delete('page');
+      },
+      { history: 'push' }
+    );
   };
 
   const handleResetSearchInput = () => {
@@ -59,7 +62,7 @@ export function MainInteractiveContent() {
         onSearch={handleSearch}
       />
 
-      {!isSearchMode && <PopularActivitySection />}
+      <PopularActivitySection />
 
       <AllActivitySection
         keyword={keyword}
