@@ -204,55 +204,62 @@ export function Dropdown({
         </button>
 
         {isOpen && (
-          <ul
-            id={listboxId}
-            role="listbox"
-            ref={listboxRef}
+          <div
             className={cn(
-              // 공통 필수 속성 및 비활성화 상태
-              'z-dropdown absolute top-full left-0 overflow-y-auto border bg-white',
-              // 상수 파일의 디자인 및 커스텀 클래스
-              MENU_VARIANT_CLASS[variant],
-              menuClassName,
-              // 추가 상태
-              errorMessage &&
-                variant === 'fieldInput' &&
-                FIELD_INPUT_ERROR_FOCUS_CLASS
+              'z-dropdown absolute inset-x-0 top-full',
+              !isFieldVariant && 'min-w-0'
             )}
-            style={{ maxHeight: menuMaxHeight }}
           >
-            {options.map((option, index) => {
-              const isSelected = option.value === value;
-              const isOptionDisabled = option.disabled;
+            <div className="animate-dropdown-menu-in motion-reduce:animate-none">
+              <ul
+                id={listboxId}
+                role="listbox"
+                ref={listboxRef}
+                className={cn(
+                  'm-0 list-none overflow-y-auto border bg-white p-0 text-left',
+                  MENU_VARIANT_CLASS[variant],
+                  menuClassName,
+                  errorMessage &&
+                    variant === 'fieldInput' &&
+                    FIELD_INPUT_ERROR_FOCUS_CLASS
+                )}
+                style={{ maxHeight: menuMaxHeight }}
+              >
+                {options.map((option, index) => {
+                  const isSelected = option.value === value;
+                  const isOptionDisabled = option.disabled;
 
-              return (
-                <li key={option.value}>
-                  <button
-                    id={`${listboxId}-option-${index}`}
-                    type="button"
-                    role="option"
-                    disabled={isOptionDisabled}
-                    aria-selected={isSelected}
-                    className={cn(
-                      'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
-                      isSelected && 'bg-primary-100 text-primary-500',
-                      isOptionDisabled && 'cursor-not-allowed text-gray-400',
-                      index === focusedIndex &&
-                        !isOptionDisabled &&
-                        'bg-primary-100 text-primary-500'
-                    )}
-                    style={{ height: optionHeight }}
-                    onPointerEnter={() =>
-                      !isOptionDisabled && setFocusedIndex(index)
-                    }
-                    onClick={() => handleOptionClick(option)}
-                  >
-                    <span className="truncate">{option.label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+                  return (
+                    <li key={option.value}>
+                      <button
+                        id={`${listboxId}-option-${index}`}
+                        type="button"
+                        role="option"
+                        disabled={isOptionDisabled}
+                        aria-selected={isSelected}
+                        className={cn(
+                          'typo-lg-medium flex w-full cursor-pointer items-center px-5 text-left text-gray-950 transition-colors',
+                          isSelected && 'bg-primary-100 text-primary-500',
+                          isOptionDisabled &&
+                            'cursor-not-allowed text-gray-400',
+                          index === focusedIndex &&
+                            !isOptionDisabled &&
+                            'bg-primary-100 text-primary-500'
+                        )}
+                        style={{ height: optionHeight }}
+                        onPointerEnter={() =>
+                          !isOptionDisabled && setFocusedIndex(index)
+                        }
+                        onClick={() => handleOptionClick(option)}
+                      >
+                        <span className="truncate">{option.label}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
         )}
       </div>
       {errorMessage && (
