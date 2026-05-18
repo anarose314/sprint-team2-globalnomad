@@ -15,14 +15,6 @@ const PAGE_GROUP_SIZE = 5;
  * - 전체 페이지를 5개씩 묶어서(그룹) 현재 페이지가 속한 그룹만 표시.
  * - 현재페이지/전체페이지/변경 핸들러를 props로 주입받음
  *
- * @example
- * ```tsx
- * <Pagination
- *   currentPage={1}
- *   totalPages={20}  //TODO: 이후 API 연동 시 Math.ceil(totalCount / size) 로 변경하기
- *   onPageChange={(page) => console.log(page)}
- * />
- * ```
  */
 export function Pagination({
   currentPage,
