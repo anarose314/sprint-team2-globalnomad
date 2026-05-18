@@ -145,10 +145,10 @@ export function AllActivitySection({
           >
             {isSearchMode ? (
               <>
+                검색결과 :{' '}
                 <span className="typo-2lg-bold md:typo-xl-bold 2xl:typo-xl-bold">
                   {keyword}
                 </span>
-                으로 검색한 결과입니다.
               </>
             ) : (
               '모든 체험'
