@@ -7,6 +7,12 @@ const pad2 = (value: number) => String(value).padStart(2, '0');
  * formatDate('2026-05-04T12:00:00Z') // "2026. 05. 04"
  */
 export const formatDate = (isoDate: string) => {
+  const dateOnlyMatch = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    return `${year}. ${month}. ${day}`;
+  }
+
   const date = new Date(isoDate);
 
   if (Number.isNaN(date.getTime())) return '-';
