@@ -28,7 +28,7 @@ const PRESS_ANIM_DEBOUNCE_MS = 55;
  * - `state="active"` : 검정 배경 + 흰 텍스트(테두리는 배경색과 동일하게 유지해 폭이 바뀌지 않음)
  * - 반응형 크기: 모바일 h-[37px] → PC/TB h-11 (md: 기준)
  * - 눌림 피드백은 짧은 CSS 키프레임으로 처리한다. 클래스는 React `className`에 포함해 부모 리렌더 후에도 유지되며,
- *   맥 탭 투 클릭 대비로 `mousedown`/`pointerdown`/`click`에서 모두 트리거
+ *   포인터 입력은 `onPointerDown`에서만, 키보드(스페이스/엔터) 활성화는 `onClick`에서만 트리거해 중복 실행 방어
  *
  * @example
  * <FilterButton label="문화 · 예술" icon={<IcArt />} state="normal" />
@@ -51,13 +51,15 @@ export function FilterButton({
   className,
   disabled,
   onClick,
-  onMouseDown,
   onPointerDown,
+  onPointerUp,
+  onPointerLeave,
   onAnimationEnd,
   ...rest
 }: FilterButtonProps) {
   const rootRef = useRef<HTMLButtonElement>(null);
   const lastPressAnimAt = useRef(0);
+  const suppressNextClickBumpRef = useRef(false);
   const [pressToken, setPressToken] = useState(0);
 
   const styledIcon = useMemo(() => {
@@ -105,16 +107,6 @@ export function FilterButton({
     el.classList.add(FILTER_BUTTON_PRESS_ANIMATE_CLASS);
   }, [pressToken]);
 
-  const handlePressGesture = useCallback(
-    (e: React.MouseEvent | React.PointerEvent) => {
-      if (disabled || e.button !== 0) {
-        return;
-      }
-      bumpPressAnimation();
-    },
-    [disabled, bumpPressAnimation]
-  );
-
   return (
     <button
       {...rest}
@@ -128,21 +120,32 @@ export function FilterButton({
       )}
       onPointerDown={(e) => {
         onPointerDown?.(e);
-        if (e.defaultPrevented) {
+        if (e.defaultPrevented || disabled || e.button !== 0) {
           return;
         }
-        handlePressGesture(e);
+        suppressNextClickBumpRef.current = true;
+        bumpPressAnimation();
       }}
-      onMouseDown={(e) => {
-        onMouseDown?.(e);
-        if (e.defaultPrevented) {
-          return;
-        }
-        handlePressGesture(e);
+      onPointerUp={(e) => {
+        onPointerUp?.(e);
+        window.setTimeout(() => {
+          if (suppressNextClickBumpRef.current) {
+            suppressNextClickBumpRef.current = false;
+          }
+        }, 0);
+      }}
+      onPointerLeave={(e) => {
+        onPointerLeave?.(e);
+        suppressNextClickBumpRef.current = false;
       }}
       onClick={(e) => {
         onClick?.(e);
         if (e.defaultPrevented || disabled) {
+          suppressNextClickBumpRef.current = false;
+          return;
+        }
+        if (suppressNextClickBumpRef.current) {
+          suppressNextClickBumpRef.current = false;
           return;
         }
         bumpPressAnimation();
