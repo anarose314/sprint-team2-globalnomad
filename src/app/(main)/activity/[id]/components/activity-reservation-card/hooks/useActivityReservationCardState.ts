@@ -260,7 +260,7 @@ export const useActivityReservationCardState = ({
 
   const handleConfirmLoginRequired = () => {
     setIsLoginRequiredModalOpen(false);
-    router.push(`/login?from=${pathname}`);
+    router.push(`/login?from=${encodeURIComponent(pathname)}`);
   };
 
   const handleMoveToHeadCountStep = () => {

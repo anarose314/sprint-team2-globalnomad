@@ -97,7 +97,7 @@ export function Header({
               <li>
                 <Button
                   as={Link}
-                  href={`/login?from=${pathname}`}
+                  href={`/login?from=${encodeURIComponent(pathname)}`}
                   variant="secondary"
                   size="sm"
                   className="w-20"
@@ -108,7 +108,7 @@ export function Header({
               <li>
                 <Button
                   as={Link}
-                  href={`/signup?from=${pathname}`}
+                  href={`/signup?from=${encodeURIComponent(pathname)}`}
                   variant="primary"
                   size="sm"
                   className="w-20"
