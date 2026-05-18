@@ -12,7 +12,6 @@ import { useMyInfo } from '@/app/(main)/my/profile/hooks/useMyInfo';
 import { useUpdateMyInfoMutation } from '@/app/(main)/my/profile/hooks/useUpdateMyInfoMutation';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
-import { useShowToast } from '@/shared/store/useToastStore';
 
 /**
  * 마이페이지 - 내 정보 수정 폼.
@@ -22,11 +21,11 @@ import { useShowToast } from '@/shared/store/useToastStore';
  * - 비밀번호는 변경 시에만 입력 (빈 문자열 허용)
  * - dirtyFields 기준으로 변경된 필드만 PATCH 페이로드에 포함
  * - 비밀번호 토글은 공통 Input(type="password") 의 내장 기능 사용
+ * - 성공/실패 토스트는 useUpdateMyInfoMutation 내부에서 처리
  */
 export function ProfileForm() {
   const { data: user } = useMyInfo();
   const { mutate, isPending } = useUpdateMyInfoMutation();
-  const showToast = useShowToast();
 
   const {
     register,
@@ -70,23 +69,11 @@ export function ProfileForm() {
     mutate(payload, {
       onSuccess: (updatedUser) => {
         // 폼 상태를 새 값으로 리셋 → isDirty 다시 false → 저장 버튼 비활성화
+        // 성공 토스트는 useUpdateMyInfoMutation 에서 처리
         reset({
           nickname: updatedUser.nickname,
           newPassword: '',
           newPasswordConfirm: '',
-        });
-        showToast({
-          theme: 'success',
-          message: '정보가 수정되었습니다.',
-        });
-      },
-      onError: (error) => {
-        showToast({
-          theme: 'error',
-          message:
-            error instanceof Error
-              ? error.message
-              : '정보 수정에 실패했습니다.',
         });
       },
     });
