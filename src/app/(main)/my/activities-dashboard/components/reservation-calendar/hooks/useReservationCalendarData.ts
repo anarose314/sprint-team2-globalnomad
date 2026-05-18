@@ -26,9 +26,9 @@ const ACTIVITY_RESERVATION_CACHE_ROOTS = [
 
 const hasReservedSlotActivity = (schedules: ReservedScheduleItem[]) =>
   schedules.some((schedule) => {
-    const pending = Math.max(schedule.count.pending ?? 0, 0);
-    const confirmed = Math.max(schedule.count.confirmed ?? 0, 0);
-    const declined = Math.max(schedule.count.declined ?? 0, 0);
+    const pending = Math.max(schedule.count.pending, 0);
+    const confirmed = Math.max(schedule.count.confirmed, 0);
+    const declined = Math.max(schedule.count.declined, 0);
     return pending + confirmed + declined > 0;
   });
 
@@ -165,7 +165,7 @@ export const useReservationCalendarData = ({
 
     for (const { dateKey, schedules } of scheduleLoads) {
       for (const schedule of schedules) {
-        if (Math.max(schedule.count.pending ?? 0, 0) <= 0) continue;
+        if (Math.max(schedule.count.pending, 0) <= 0) continue;
         if (!isScheduleStartReached(dateKey, schedule.startTime, now)) continue;
         if (autoDeclineAttemptedScheduleIdsRef.current.has(schedule.scheduleId))
           continue;
