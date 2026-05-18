@@ -4,7 +4,7 @@ import {
   cloneElement,
   isValidElement,
   useCallback,
-  useLayoutEffect,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -28,7 +28,7 @@ const PRESS_ANIM_DEBOUNCE_MS = 55;
  * - `state="active"` : 검정 배경 + 흰 텍스트(테두리는 배경색과 동일하게 유지해 폭이 바뀌지 않음)
  * - 반응형 크기: 모바일 h-[37px] → PC/TB h-11 (md: 기준)
  * - 눌림 피드백은 짧은 CSS 키프레임으로 처리한다. 클래스는 React `className`에 포함해 부모 리렌더 후에도 유지되며,
- *   맥 탭 투 클릭 대비로 `mousedown`/`pointerdown`/`click`에서 모두 트리거한다.
+ *   맥 탭 투 클릭 대비로 `mousedown`/`pointerdown`/`click`에서 모두 트리거
  *
  * @example
  * <FilterButton label="문화 · 예술" icon={<IcArt />} state="normal" />
@@ -90,7 +90,7 @@ export function FilterButton({
     setPressToken((t) => t + 1);
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (pressToken === 0) {
       return;
     }

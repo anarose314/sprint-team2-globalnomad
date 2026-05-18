@@ -17,10 +17,10 @@ export const FILTER_BUTTON_PRESS_ANIMATE_CLASS = 'filter-button-press-animate';
  */
 export const filterButtonVariants = cva(
   [
-    'text-md px-em inline-flex h-9.25 cursor-pointer items-center justify-center gap-1 rounded-full',
+    'typo-md px-em inline-flex h-9.25 cursor-pointer items-center justify-center gap-1 rounded-full',
     'border font-medium text-gray-950',
     'transition-[background-color,border-color,color] duration-200 ease-out',
-    'md:h-11 md:gap-1.5 md:text-lg',
+    'md:typo-lg md:h-11 md:gap-1.5',
   ].join(' '),
   {
     variants: {
