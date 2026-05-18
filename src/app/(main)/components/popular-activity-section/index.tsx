@@ -200,7 +200,7 @@ export function PopularActivitySection() {
           <ul
             ref={scrollRef}
             onScroll={handleHorizontalScroll}
-            {...events}
+            {...(!isDesktopLayout && events)}
             className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
             onDragStart={(event) => event.preventDefault()}
           >
