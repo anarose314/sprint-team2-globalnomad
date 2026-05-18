@@ -40,7 +40,10 @@ const isActivityCategory = (value: string): value is ActivityCategory => {
 };
 
 const isActivitySort = (value: string): value is ActivitySort => {
-  return MAIN_SORT_OPTIONS.some((option) => option.value === value);
+  return (
+    value === 'latest' ||
+    MAIN_SORT_OPTIONS.some((option) => option.value === value)
+  );
 };
 
 const parsePageParam = (value: string | null) => {
