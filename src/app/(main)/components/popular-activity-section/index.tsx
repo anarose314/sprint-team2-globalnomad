@@ -109,21 +109,22 @@ export function PopularActivitySection() {
 
   const activities = isDesktopLayout ? desktopActivities : allActivities;
 
-  const canLoadNextPage =
-    Boolean(hasNextPage) && !isFetchingNextPage && !hasLoadedAllActivities;
+  const hasMorePopularToLoad = Boolean(hasNextPage) && !hasLoadedAllActivities;
+
+  const canFetchNextPage = hasMorePopularToLoad && !isFetchingNextPage;
 
   const canMovePreviousDesktopPage =
     isDesktopLayout && safeDesktopPageIndex > 0;
 
   const canMoveNextDesktopPage =
     isDesktopLayout &&
-    (safeDesktopPageIndex < desktopPages.length - 1 || canLoadNextPage);
+    (safeDesktopPageIndex < desktopPages.length - 1 || hasMorePopularToLoad);
 
   const shouldShowPreviousButton = canMovePreviousDesktopPage;
   const shouldShowNextButton = canMoveNextDesktopPage;
 
   const loadNextPage = useCallback(async () => {
-    if (!canLoadNextPage || isLoadNextPageLockedRef.current) return null;
+    if (!canFetchNextPage || isLoadNextPageLockedRef.current) return null;
 
     isLoadNextPageLockedRef.current = true;
 
@@ -132,7 +133,7 @@ export function PopularActivitySection() {
     } finally {
       isLoadNextPageLockedRef.current = false;
     }
-  }, [canLoadNextPage, fetchNextPage]);
+  }, [canFetchNextPage, fetchNextPage]);
 
   const handlePreviousButtonClick = () => {
     setDesktopPageIndex((prev) => Math.max(prev - 1, 0));
@@ -218,13 +219,9 @@ export function PopularActivitySection() {
                   transform: `translateX(-${safeDesktopPageIndex * desktopCarouselSlideFraction}%)`,
                 }}
               >
-                {desktopPages.map((page, pageIdx) => (
+                {desktopPages.map((page) => (
                   <ul
-                    key={
-                      page.activities[0]
-                        ? `popular-desktop-${page.activities[0].id}`
-                        : `popular-desktop-${pageIdx}`
-                    }
+                    key={`popular-desktop-${page.activities[0].id}`}
                     className="grid shrink-0 grid-cols-4 gap-6"
                     style={{ width: `${desktopCarouselSlideFraction}%` }}
                   >
@@ -256,12 +253,12 @@ export function PopularActivitySection() {
           {shouldShowPreviousButton && (
             <ArrowButton
               direction="left"
+              size="lg"
               onClick={handlePreviousButtonClick}
               aria-label="이전 인기 체험 보기"
               className={cn(
-                'shadow-card absolute top-1/2 left-0 hidden h-13.5 w-13.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
+                'shadow-card absolute top-1/2 left-0 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
                 'hover:text-gray-800 disabled:hover:text-gray-300',
-                '[&_svg]:h-7 [&_svg]:w-7',
                 '2xl:flex'
               )}
             />
@@ -270,14 +267,14 @@ export function PopularActivitySection() {
           {shouldShowNextButton && (
             <ArrowButton
               direction="right"
+              size="lg"
               onClick={() => {
                 void handleNextButtonClick();
               }}
               aria-label="인기 체험 더 불러오기"
               className={cn(
-                'shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
+                'shadow-card absolute top-1/2 right-0 hidden translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
                 'hover:text-gray-800 disabled:hover:text-gray-300',
-                '[&_svg]:h-7 [&_svg]:w-7',
                 '2xl:flex'
               )}
             />
