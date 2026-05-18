@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type {
   ActivityCategory,
@@ -87,7 +87,6 @@ export function AllActivitySection({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const hasMountedRef = useRef(false);
 
   const { scrollRef, events } = useDragScroll<HTMLUListElement>();
 
@@ -111,28 +110,6 @@ export function AllActivitySection({
     getServerDesktopPageSizeSnapshot
   );
 
-  const updateSearchParams = useCallback(
-    (updateParams: (params: URLSearchParams) => void) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      updateParams(params);
-
-      router.replace(createQueryString(pathname, params), { scroll: false });
-    },
-    [pathname, router, searchParams]
-  );
-
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      return;
-    }
-
-    updateSearchParams((params) => {
-      params.delete('page');
-    });
-  }, [isDesktopPageSize, updateSearchParams]);
-
   const pageSize = isDesktopPageSize ? MAIN_DESKTOP_PAGE_SIZE : MAIN_PAGE_SIZE;
   const currentPage = parsePageParam(searchParams.get('page'));
 
@@ -145,6 +122,17 @@ export function AllActivitySection({
   const sortParam = searchParams.get('sort');
   const selectedSort =
     sortParam && isActivitySort(sortParam) ? sortParam : 'latest';
+
+  const updateSearchParams = useCallback(
+    (updateParams: (params: URLSearchParams) => void) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      updateParams(params);
+
+      router.replace(createQueryString(pathname, params), { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
@@ -271,7 +259,6 @@ export function AllActivitySection({
             <FilterButton
               label="전체"
               state={!selectedCategory ? 'active' : 'normal'}
-              showIcon={false}
               className="whitespace-nowrap"
               onClick={handleAllCategoryClick}
             />
