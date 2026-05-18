@@ -176,7 +176,7 @@ export function ModalOverlay({
             <div
               data-modal-content
               className={cn(
-                'pointer-events-auto mx-auto box-border w-full max-w-full min-w-0 origin-center',
+                'pointer-events-auto box-border flex w-full max-w-full min-w-0 origin-center justify-center',
                 panelAnimClass
               )}
             >

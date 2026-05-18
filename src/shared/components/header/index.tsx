@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LogoHorizontal, LogoIcon } from '@/shared/assets/logos';
 import { Button } from '@/shared/components/buttons/button';
 import type { HeaderProps } from '@/shared/components/header/header.types';
@@ -42,6 +43,8 @@ export function Header({
   isProfileMenuOpen = false,
   profileMenuId,
 }: HeaderProps) {
+  const pathname = usePathname();
+
   return (
     <header className="z-header sticky top-0 h-14 shrink-0 border-b border-gray-50 bg-white px-6 md:h-20">
       <div className="mx-auto flex h-full w-full max-w-380 items-center justify-between">
@@ -94,7 +97,7 @@ export function Header({
               <li>
                 <Button
                   as={Link}
-                  href="/login"
+                  href={`/login?from=${encodeURIComponent(pathname)}`}
                   variant="secondary"
                   size="sm"
                   className="w-20"
@@ -105,7 +108,7 @@ export function Header({
               <li>
                 <Button
                   as={Link}
-                  href="/signup"
+                  href={`/signup?from=${encodeURIComponent(pathname)}`}
                   variant="primary"
                   size="sm"
                   className="w-20"

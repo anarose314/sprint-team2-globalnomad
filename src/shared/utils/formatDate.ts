@@ -7,11 +7,24 @@ const pad2 = (value: number) => String(value).padStart(2, '0');
  * formatDate('2026-05-04T12:00:00Z') // "2026. 05. 04"
  */
 export const formatDate = (isoDate: string) => {
-  const date = new Date(isoDate);
+  const parsedDate = new Date(isoDate);
+  if (Number.isNaN(parsedDate.getTime())) return '-';
 
-  if (Number.isNaN(date.getTime())) return '-';
+  const dateOnlyMatch = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    const utcDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+    const isValidDate =
+      utcDate.getUTCFullYear() === Number(year) &&
+      utcDate.getUTCMonth() + 1 === Number(month) &&
+      utcDate.getUTCDate() === Number(day);
 
-  return `${date.getFullYear()}. ${pad2(date.getMonth() + 1)}. ${pad2(date.getDate())}`;
+    if (!isValidDate) return '-';
+
+    return `${year}. ${month}. ${day}`;
+  }
+
+  return `${parsedDate.getFullYear()}. ${pad2(parsedDate.getMonth() + 1)}. ${pad2(parsedDate.getDate())}`;
 };
 
 /**
