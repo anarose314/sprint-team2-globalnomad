@@ -69,7 +69,7 @@ export const useReservationCalendarData = ({
     return (
       now.getFullYear() === currentYear && now.getMonth() + 1 === currentMonth
     );
-  }, [currentYear, currentMonth]);
+  }, [currentYear, currentMonth, todayDateKey]);
 
   const fetchTodayScheduleInBackground =
     isTodayInVisibleMonth &&
