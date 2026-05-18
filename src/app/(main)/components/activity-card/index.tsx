@@ -20,19 +20,19 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Link
       href={`/activity/${activity.id}`}
-      className="group block h-full"
+      className="block h-full"
       aria-label={`${activity.title} 상세 페이지로 이동`}
       draggable={false}
     >
-      <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white transition-transform duration-200 ease-out group-hover:-translate-y-1 group-focus-visible:-translate-y-1 motion-reduce:transition-none">
-        <div className="relative aspect-square w-full overflow-hidden bg-gray-200">
+      <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
+        <div className="relative aspect-square w-full bg-gray-200">
           {bannerImageUrl && (
             <Image
               src={bannerImageUrl}
               alt={`${activity.title} 대표 이미지`}
               fill
               sizes="(min-width: 1536px) 262px, (min-width: 768px) 33vw, 50vw"
-              className="object-cover transition-transform duration-300 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
+              className="object-cover"
               draggable={false}
             />
           )}
