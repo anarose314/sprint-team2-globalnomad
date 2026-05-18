@@ -1,11 +1,13 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { IcClose } from '@/shared/assets/icons';
 import type { SideDrawerProps } from '@/shared/components/side-drawer/sideDrawer.types';
 import { cn } from '@/shared/utils/cn';
+
+const SIDE_DRAWER_ANIMATION_DURATION = 200;
 
 /**
  * 공통 사이드 드로어 컴포넌트
@@ -30,15 +32,41 @@ export function SideDrawer({
   overlayClassName,
   panelClassName,
 }: SideDrawerProps) {
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
   const portalRoot =
     typeof document === 'undefined'
       ? null
       : (document.getElementById('modal-root') ?? document.body);
 
+  const handleClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+
+    setIsVisible(false);
+
+    closeTimerRef.current = setTimeout(() => {
+      onClose();
+      closeTimerRef.current = null;
+    }, SIDE_DRAWER_ANIMATION_DURATION);
+  }, [onClose]);
+
   useEffect(() => {
     document.body.classList.add('overflow-hidden');
 
+    const animationFrameId = requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+
     return () => {
+      cancelAnimationFrame(animationFrameId);
+
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+
       document.body.classList.remove('overflow-hidden');
     };
   }, []);
@@ -49,7 +77,7 @@ export function SideDrawer({
     const handleEscapeKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
 
-      onClose();
+      handleClose();
     };
 
     window.addEventListener('keydown', handleEscapeKeyDown);
@@ -57,13 +85,13 @@ export function SideDrawer({
     return () => {
       window.removeEventListener('keydown', handleEscapeKeyDown);
     };
-  }, [closeOnEscape, onClose]);
+  }, [closeOnEscape, handleClose]);
 
   const handleOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (!closeOnOverlayClick) return;
     if (event.target !== event.currentTarget) return;
 
-    onClose();
+    handleClose();
   };
 
   if (!portalRoot) return null;
@@ -71,7 +99,8 @@ export function SideDrawer({
   return createPortal(
     <div
       className={cn(
-        'z-modal-backdrop fixed inset-0 flex justify-end bg-black/30',
+        'z-modal-backdrop fixed inset-0 flex justify-end bg-black/30 transition-opacity duration-200 ease-out',
+        isVisible ? 'opacity-100' : 'opacity-0',
         overlayClassName
       )}
       onMouseDown={handleOverlayMouseDown}
@@ -82,13 +111,14 @@ export function SideDrawer({
         aria-modal="true"
         aria-label={ariaLabel}
         className={cn(
-          'z-modal relative h-dvh w-75 max-w-full overflow-y-auto bg-white',
+          'z-modal relative h-dvh w-75 max-w-full overflow-y-auto bg-white transition-transform duration-200 ease-out',
+          isVisible ? 'translate-x-0' : 'translate-x-full',
           panelClassName
         )}
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="사이드 메뉴 닫기"
           className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center text-gray-600"
         >
