@@ -41,10 +41,15 @@ export function SideDrawer({
       : (document.getElementById('modal-root') ?? document.body);
 
   const handleClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+
     setIsVisible(false);
 
     closeTimerRef.current = setTimeout(() => {
       onClose();
+      closeTimerRef.current = null;
     }, SIDE_DRAWER_ANIMATION_DURATION);
   }, [onClose]);
 
