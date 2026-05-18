@@ -1,6 +1,8 @@
 import { ActivityFormValues } from '@/app/(main)/activity/components/activity-form/activityForm.schema';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 
+const normalizeTime = (time: string) => time.slice(0, 5);
+
 /**
  * 체험 수정 폼 데이터를 API 요청 규격(Payload)에 맞게 변환하는 유틸 함수
  *
@@ -50,8 +52,8 @@ export const getActivityUpdatePayload = (
     return (
       original &&
       (original.date !== final.date ||
-        original.startTime !== final.startTime ||
-        original.endTime !== final.endTime)
+        normalizeTime(original.startTime) !== normalizeTime(final.startTime) ||
+        normalizeTime(original.endTime) !== normalizeTime(final.endTime))
     );
   });
 
