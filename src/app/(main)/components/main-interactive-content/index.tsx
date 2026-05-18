@@ -62,7 +62,9 @@ export function MainInteractiveContent() {
         onSearch={handleSearch}
       />
 
-      <PopularActivitySection />
+      <div className={isSearchMode ? 'hidden' : undefined}>
+        <PopularActivitySection />
+      </div>
 
       <AllActivitySection
         keyword={keyword}
