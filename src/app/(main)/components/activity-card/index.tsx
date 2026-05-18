@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { ActivityCardProps } from '@/app/(main)/components/activity-card/activityCard.types';
 import { IcStar } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
 
 /**
  * 메인 페이지 체험 카드 컴포넌트
@@ -20,19 +21,36 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Link
       href={`/activity/${activity.id}`}
-      className="block h-full"
+      className={cn(
+        'group block h-full',
+        'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out',
+        'hover:-translate-y-1',
+        'active:scale-[0.98]',
+        'motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100'
+      )}
       aria-label={`${activity.title} 상세 페이지로 이동`}
       draggable={false}
     >
-      <article className="shadow-card h-full w-full overflow-hidden rounded-3xl bg-white">
-        <div className="relative aspect-square w-full bg-gray-200">
+      <article
+        className={cn(
+          'shadow-card h-full w-full overflow-hidden rounded-3xl bg-white',
+          'motion-safe:transition-shadow motion-safe:duration-200',
+          'group-hover:shadow-lg'
+        )}
+      >
+        <div className="relative aspect-square w-full overflow-hidden bg-gray-200">
           {bannerImageUrl && (
             <Image
               src={bannerImageUrl}
               alt={`${activity.title} 대표 이미지`}
               fill
               sizes="(min-width: 1536px) 262px, (min-width: 768px) 33vw, 50vw"
-              className="object-cover"
+              className={cn(
+                'object-cover',
+                'motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out',
+                'group-hover:scale-105',
+                'motion-reduce:group-hover:scale-100'
+              )}
               draggable={false}
             />
           )}

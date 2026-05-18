@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  type CSSProperties,
   type UIEvent,
   useCallback,
   useRef,
@@ -15,20 +16,33 @@ import {
   MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
   POPULAR_ACTIVITY_PAGE_SIZE,
 } from '@/app/(main)/main.constants';
+import { ArrowButton } from '@/shared/components/buttons';
 import { Heading } from '@/shared/components/heading';
 import { useDragScroll } from '@/shared/hooks/useDragScroll';
 import { cn } from '@/shared/utils/cn';
 
-const SCROLL_LOAD_THRESHOLD = 80;
-
-const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
+const POPULAR_ACTIVITY_MOBILE_LIST_CLASS_NAME = cn(
   'scrollbar-hide grid grid-flow-col overflow-x-auto pb-4 select-none',
-  'cursor-grab active:cursor-grabbing 2xl:cursor-auto 2xl:active:cursor-auto',
+  'cursor-grab active:cursor-grabbing',
   '-mx-6 auto-cols-[calc((100%-1rem)/1.15)] gap-4 px-6',
   'xs:auto-cols-[calc((100%-1rem)/2.1)]',
-  'md:-mr-7.5 md:ml-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:pr-7.5 md:pl-0',
+  'md:-mr-7.5 md:ml-0 md:auto-cols-[calc((100%-3rem)/3)] md:gap-6 md:pr-7.5 md:pl-0'
+);
+
+const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
+  POPULAR_ACTIVITY_MOBILE_LIST_CLASS_NAME,
+  '2xl:cursor-auto 2xl:active:cursor-auto',
   '2xl:mx-0 2xl:auto-cols-auto 2xl:grid-flow-row 2xl:grid-cols-4 2xl:overflow-visible 2xl:px-0'
 );
+
+const SCROLL_LOAD_THRESHOLD = 80;
+
+/** 데스크톱 인기 체험 캐러셀 — Style Guide: 동적 값은 CSS 변수로만 전달 */
+const POPULAR_DESKTOP_CAROUSEL_CSS_VARS = {
+  trackWidth: '--popular-desktop-carousel-track-w',
+  translateX: '--popular-desktop-carousel-translate-x',
+  slideWidth: '--popular-desktop-carousel-slide-w',
+} as const;
 
 const subscribeDesktopLayout = (onStoreChange: () => void) => {
   if (typeof window === 'undefined') {
@@ -103,21 +117,22 @@ export function PopularActivitySection() {
 
   const activities = isDesktopLayout ? desktopActivities : allActivities;
 
-  const canLoadNextPage =
-    Boolean(hasNextPage) && !isFetchingNextPage && !hasLoadedAllActivities;
+  const hasMorePopularToLoad = Boolean(hasNextPage) && !hasLoadedAllActivities;
+
+  const canFetchNextPage = hasMorePopularToLoad && !isFetchingNextPage;
 
   const canMovePreviousDesktopPage =
     isDesktopLayout && safeDesktopPageIndex > 0;
 
   const canMoveNextDesktopPage =
     isDesktopLayout &&
-    (safeDesktopPageIndex < desktopPages.length - 1 || canLoadNextPage);
+    (safeDesktopPageIndex < desktopPages.length - 1 || hasMorePopularToLoad);
 
   const shouldShowPreviousButton = canMovePreviousDesktopPage;
   const shouldShowNextButton = canMoveNextDesktopPage;
 
   const loadNextPage = useCallback(async () => {
-    if (!canLoadNextPage || isLoadNextPageLockedRef.current) return null;
+    if (!canFetchNextPage || isLoadNextPageLockedRef.current) return null;
 
     isLoadNextPageLockedRef.current = true;
 
@@ -126,7 +141,7 @@ export function PopularActivitySection() {
     } finally {
       isLoadNextPageLockedRef.current = false;
     }
-  }, [canLoadNextPage, fetchNextPage]);
+  }, [canFetchNextPage, fetchNextPage]);
 
   const handlePreviousButtonClick = () => {
     setDesktopPageIndex((prev) => Math.max(prev - 1, 0));
@@ -166,6 +181,15 @@ export function PopularActivitySection() {
     }
   };
 
+  const desktopCarouselPageCount = Math.max(desktopPages.length, 1);
+  const desktopCarouselSlideFraction = 100 / desktopCarouselPageCount;
+
+  const popularDesktopCarouselTrackStyle = {
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.trackWidth]: `${desktopCarouselPageCount * 100}%`,
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.translateX]: `-${safeDesktopPageIndex * desktopCarouselSlideFraction}%`,
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.slideWidth]: `${desktopCarouselSlideFraction}%`,
+  } as CSSProperties;
+
   return (
     <section>
       <Heading
@@ -197,46 +221,74 @@ export function PopularActivitySection() {
 
       {!isPending && !isError && activities.length > 0 && (
         <div className="relative">
-          <ul
-            ref={scrollRef}
-            onScroll={handleHorizontalScroll}
-            {...(!isDesktopLayout && events)}
-            className={POPULAR_ACTIVITY_LIST_CLASS_NAME}
-            onDragStart={(event) => event.preventDefault()}
-          >
-            {activities.map((activity) => (
-              <li key={activity.id} className="w-full">
-                <ActivityCard activity={activity} />
-              </li>
-            ))}
-          </ul>
+          {isDesktopLayout ? (
+            <div className="w-full overflow-hidden pt-2 pb-4">
+              <div
+                className={cn(
+                  'flex w-(--popular-desktop-carousel-track-w) translate-x-(--popular-desktop-carousel-translate-x)',
+                  'motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out',
+                  'motion-reduce:transition-none'
+                )}
+                style={popularDesktopCarouselTrackStyle}
+              >
+                {desktopPages.map((page) => (
+                  <ul
+                    key={'popular-desktop-' + page.activities[0].id}
+                    className="grid w-(--popular-desktop-carousel-slide-w) shrink-0 grid-cols-4 gap-6"
+                  >
+                    {page.activities.map((activity) => (
+                      <li key={activity.id} className="min-w-0">
+                        <ActivityCard activity={activity} />
+                      </li>
+                    ))}
+                  </ul>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <ul
+              ref={scrollRef}
+              onScroll={handleHorizontalScroll}
+              {...events}
+              className={POPULAR_ACTIVITY_MOBILE_LIST_CLASS_NAME}
+              onDragStart={(event) => event.preventDefault()}
+            >
+              {activities.map((activity) => (
+                <li key={activity.id} className="w-full">
+                  <ActivityCard activity={activity} />
+                </li>
+              ))}
+            </ul>
+          )}
 
           {shouldShowPreviousButton && (
-            <button
-              type="button"
+            <ArrowButton
+              direction="left"
+              size="lg"
               onClick={handlePreviousButtonClick}
               aria-label="이전 인기 체험 보기"
-              className="shadow-card absolute top-1/2 left-0 hidden h-13.5 w-13.5 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white 2xl:flex"
-            >
-              <span
-                aria-hidden="true"
-                className="h-3 w-3 rotate-45 border-b-2 border-l-2 border-gray-950"
-              />
-            </button>
+              className={cn(
+                'shadow-card absolute top-1/2 left-0 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
+                'hover:text-gray-800',
+                '2xl:flex'
+              )}
+            />
           )}
 
           {shouldShowNextButton && (
-            <button
-              type="button"
-              onClick={handleNextButtonClick}
+            <ArrowButton
+              direction="right"
+              size="lg"
+              onClick={() => {
+                void handleNextButtonClick();
+              }}
               aria-label="인기 체험 더 불러오기"
-              className="shadow-card absolute top-1/2 right-0 hidden h-13.5 w-13.5 translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white 2xl:flex"
-            >
-              <span
-                aria-hidden="true"
-                className="h-3 w-3 rotate-45 border-t-2 border-r-2 border-gray-950"
-              />
-            </button>
+              className={cn(
+                'shadow-card absolute top-1/2 right-0 hidden translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
+                'hover:text-gray-800',
+                '2xl:flex'
+              )}
+            />
           )}
         </div>
       )}
