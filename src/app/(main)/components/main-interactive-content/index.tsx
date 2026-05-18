@@ -1,19 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AllActivitySection } from '@/app/(main)/components/all-activity-section';
 import { MainSearch } from '@/app/(main)/components/main-search';
 import { PopularActivitySection } from '@/app/(main)/components/popular-activity-section';
-
-const createQueryString = (
-  pathname: string,
-  params: URLSearchParams
-): string => {
-  const queryString = params.toString();
-
-  return queryString ? `${pathname}?${queryString}` : pathname;
-};
+import { useUpdateSearchParams } from '@/app/(main)/hooks/useUpdateSearchParams';
 
 /**
  * 메인 페이지 상호작용 영역 컴포넌트
@@ -27,9 +19,8 @@ const createQueryString = (
  * <MainInteractiveContent />
  */
 export function MainInteractiveContent() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const updateSearchParams = useUpdateSearchParams();
 
   const keyword = searchParams.get('keyword') ?? '';
   const isSearchMode = keyword.trim().length > 0;
@@ -39,17 +30,6 @@ export function MainInteractiveContent() {
   useEffect(() => {
     setSearchInputValue(keyword);
   }, [keyword]);
-
-  const updateSearchParams = useCallback(
-    (updateParams: (params: URLSearchParams) => void) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      updateParams(params);
-
-      router.replace(createQueryString(pathname, params), { scroll: false });
-    },
-    [pathname, router, searchParams]
-  );
 
   const handleSearch = (nextKeyword: string) => {
     const trimmedKeyword = nextKeyword.trim();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useSyncExternalStore } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import type {
   ActivityCategory,
   ActivitySort,
@@ -11,6 +11,7 @@ import { ActivityCard } from '@/app/(main)/components/activity-card';
 import { ActivityCardListSkeleton } from '@/app/(main)/components/activity-card-list-skeleton';
 import { ActivitySectionStatus } from '@/app/(main)/components/activity-section-status';
 import type { AllActivitySectionProps } from '@/app/(main)/components/all-activity-section/allActivitySection.types';
+import { useUpdateSearchParams } from '@/app/(main)/hooks/useUpdateSearchParams';
 import {
   MAIN_DESKTOP_PAGE_SIZE,
   MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY,
@@ -52,15 +53,6 @@ const parsePageParam = (value: string | null) => {
   return Number.isInteger(page) && page > 0 ? page : 1;
 };
 
-const createQueryString = (
-  pathname: string,
-  params: URLSearchParams
-): string => {
-  const queryString = params.toString();
-
-  return queryString ? `${pathname}?${queryString}` : pathname;
-};
-
 const ACTIVITY_GRID_CLASS_NAME = cn(
   'grid w-full grid-cols-1 gap-4 gap-y-6',
   'xs:grid-cols-2',
@@ -87,9 +79,8 @@ export function AllActivitySection({
   isSearchMode = false,
   onResetSearchInput,
 }: AllActivitySectionProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const updateSearchParams = useUpdateSearchParams();
 
   const { scrollRef, events } = useDragScroll<HTMLUListElement>();
 
@@ -125,17 +116,6 @@ export function AllActivitySection({
   const sortParam = searchParams.get('sort');
   const selectedSort =
     sortParam && isActivitySort(sortParam) ? sortParam : 'latest';
-
-  const updateSearchParams = useCallback(
-    (updateParams: (params: URLSearchParams) => void) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      updateParams(params);
-
-      router.replace(createQueryString(pathname, params), { scroll: false });
-    },
-    [pathname, router, searchParams]
-  );
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
