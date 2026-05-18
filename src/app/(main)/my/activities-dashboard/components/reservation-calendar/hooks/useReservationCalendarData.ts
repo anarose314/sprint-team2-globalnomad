@@ -227,7 +227,6 @@ export const useReservationCalendarData = ({
   ]);
 
   const { eventCountsByDate, notificationDotByDate } = useMemo(() => {
-    const todayKey = formatDateKey(new Date());
     const notificationDotByDate: Record<string, boolean> = {};
 
     const eventCounts = reservationDashboard.reduce<
@@ -238,7 +237,7 @@ export const useReservationCalendarData = ({
       const confirmed = Math.max(r.confirmed ?? 0, 0);
       const pending = Math.max(r.pending ?? 0, 0);
       const declined = Math.max(r.declined ?? 0, 0);
-      const isPastDate = item.date < todayKey;
+      const isPastDate = item.date < todayDateKey;
       const pendingForDisplay = isPastDate ? 0 : pending;
       const rawTotal = pendingForDisplay + confirmed + completed + declined;
       if (rawTotal > 0) {
@@ -271,7 +270,7 @@ export const useReservationCalendarData = ({
       fetchTodayScheduleInBackground &&
       hasReservedSlotActivity(reservedSchedulesToday)
     ) {
-      notificationDotByDate[todayKey] = true;
+      notificationDotByDate[todayDateKey] = true;
     }
 
     const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
@@ -284,9 +283,9 @@ export const useReservationCalendarData = ({
     if (
       fetchTodayScheduleInBackground &&
       reservedSchedulesToday.length > 0 &&
-      todayKey !== reservedScheduleDateKey
+      todayDateKey !== reservedScheduleDateKey
     ) {
-      scheduleDataByDate.set(todayKey, reservedSchedulesToday);
+      scheduleDataByDate.set(todayDateKey, reservedSchedulesToday);
     }
 
     const nowForSchedules = new Date();
@@ -309,6 +308,7 @@ export const useReservationCalendarData = ({
     reservedScheduleDateKey,
     reservedSchedulesSelected,
     reservedSchedulesToday,
+    todayDateKey,
   ]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
