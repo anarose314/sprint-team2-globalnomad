@@ -26,7 +26,7 @@ export function ActivityDetailContent({
     <section className={cn('w-full', className)}>
       <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-10 2xl:pb-10">
         <Heading as="h3">체험 설명</Heading>
-        <p className="typo-lg-medium mt-4 whitespace-pre-line text-gray-950">
+        <p className="typo-lg-medium mt-4 wrap-anywhere whitespace-pre-line text-gray-950">
           {description}
         </p>
       </div>

@@ -21,6 +21,105 @@
 
   /* Focus ring */
   --color-ring: var(--color-primary-500);
+
+  /* Animation */
+  --animate-toast-slide-up: toast-slide-up 0.3s ease-out forwards;
+  --animate-toast-slide-down: toast-slide-down 0.3s ease-out forwards;
+
+  /* Keyframes */
+  @keyframes toast-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(1.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toast-slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-1.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 공통 모달: 오버레이·패널 */
+  --animate-modal-backdrop-in: modal-backdrop-in 0.22s ease-out forwards;
+  --animate-modal-backdrop-out: modal-backdrop-out 0.2s ease-in forwards;
+  --animate-modal-content-in: modal-content-in 0.32s
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-modal-content-out: modal-content-out 0.2s ease-in forwards;
+  --animate-modal-footer-button-in: modal-footer-button-in 0.28s
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes modal-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modal-backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes modal-content-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.5rem, 0) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes modal-content-out {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, 0.35rem, 0) scale(0.985);
+    }
+  }
+
+  @keyframes modal-footer-button-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.35rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* 공통 드롭다운: transform 없이 opacity만 (fieldInput 결합 테두리·ring 정렬 유지) */
+  --animate-dropdown-menu-in: dropdown-menu-in 0.2s ease-out forwards;
+
+  @keyframes dropdown-menu-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {
@@ -40,6 +139,29 @@
   }
 }
 
+/* 체험 상세 이미지 라이트박스: 좌우 전환 시 짧은 슬라이드 인 */
+@keyframes lightbox-enter-from-right {
+  from {
+    opacity: 0.82;
+    transform: translate3d(12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lightbox-enter-from-left {
+  from {
+    opacity: 0.82;
+    transform: translate3d(-12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @utility skeleton-shimmer {
   /* 모바일·Safari에서도 그라데이션 애니메이션이 안정적으로 보이도록 레이어 분리 */
   transform: translateZ(0);
@@ -54,6 +176,16 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* 긴 연속 문자·URL도 컨테이너 폭 안에서 줄바꿈 (체험 제목/설명 등) */
+@utility wrap-anywhere {
+  overflow-wrap: anywhere;
+}
+
+/* 체험 상세,예약 현황 스켈레톤: 기본보다 조금 느린 shimmer */
+.skeleton-shimmer-scope-slow .skeleton-shimmer {
+  animation-duration: 3s;
+}
+
 /* 브라우저별 기본 스크롤바를 숨기는 유틸리티 클래스 */
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
@@ -62,4 +194,23 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* FilterButton: 탭 투 클릭·초 단축 클릭에서도 눌림이 보이도록 짧은 키프레임(상태 클래스는 JS에서 토글) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes filter-button-press {
+    0% {
+      transform: translate3d(0, 1px, 0) scale(0.96);
+    }
+    50% {
+      transform: translate3d(0, 1px, 0) scale(0.96);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .filter-button-press-animate {
+    animation: filter-button-press 0.14s ease-out both;
+  }
 }

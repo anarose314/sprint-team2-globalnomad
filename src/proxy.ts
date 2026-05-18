@@ -108,7 +108,7 @@ const tryRefreshTokens = async (
  *
  * @see fetchInstance.client.ts — API 호출 시점의 토큰 갱신 (이 미들웨어와 별개 흐름)
  */
-export const middleware = async (request: NextRequest) => {
+export const proxy = async (request: NextRequest) => {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME);
 
   if (accessToken) {
@@ -116,7 +116,14 @@ export const middleware = async (request: NextRequest) => {
   }
 
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE_NAME);
+
+  // 인증 실패 시 redirect할 로그인 URL.
+  // 사용자가 원래 가려던 경로를 from query로 보존하여 로그인 후 그 경로로 돌아갈 수 있도록 한다.
   const loginUrl = new URL(LOGIN_PATH, request.url);
+  loginUrl.searchParams.set(
+    'from',
+    request.nextUrl.pathname + request.nextUrl.search
+  );
 
   if (!refreshToken) {
     return NextResponse.redirect(loginUrl);
@@ -132,5 +139,5 @@ export const middleware = async (request: NextRequest) => {
 };
 
 export const config = {
-  matcher: ['/my', '/my/:path*'],
+  matcher: ['/my', '/my/:path*', '/activity/add', '/activity/:id/edit'],
 };

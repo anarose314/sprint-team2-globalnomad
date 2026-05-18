@@ -13,6 +13,8 @@ import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
 interface ActivityDetailPageClientProps {
   activity: ActivityDetailResponse;
   isOwner: boolean;
+  /** 로그인한 사용자만 내 예약 조회 API를 호출한다(비로그인 시 401 → 로그인 리다이렉트 방지). */
+  isAuthenticated: boolean;
 }
 
 /**
@@ -24,6 +26,7 @@ interface ActivityDetailPageClientProps {
 export function ActivityDetailPageClient({
   activity,
   isOwner,
+  isAuthenticated,
 }: ActivityDetailPageClientProps) {
   const subImageUrls = Array.isArray(activity.subImages)
     ? activity.subImages.map((image) => image.imageUrl)
@@ -46,7 +49,7 @@ export function ActivityDetailPageClient({
       {/* 피그마 레이아웃 폭 기준: 모바일 327 / 태블릿 684 / PC 1200 (+좌우 40px) */}
       <div className="mx-auto w-full">
         <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-5 2xl:items-start 2xl:gap-10">
-          <div className="2xl:col-span-3">
+          <div className="min-w-0 2xl:col-span-3">
             <ActivityImageGallery
               bannerImageUrl={activity.bannerImageUrl}
               subImageUrls={subImageUrls}
@@ -74,7 +77,7 @@ export function ActivityDetailPageClient({
             <ActivityReviewsSection activityId={activity.id} />
           </div>
 
-          <div className="2xl:col-span-2 2xl:self-stretch">
+          <div className="min-w-0 2xl:col-span-2 2xl:self-stretch">
             <div className="mb-8 hidden w-full max-w-103 2xl:block">
               <ActivityInfoHeader
                 category={activity.category}
@@ -93,6 +96,7 @@ export function ActivityDetailPageClient({
                   activityId={activity.id}
                   pricePerPerson={activity.price}
                   schedules={activity.schedules}
+                  isAuthenticated={isAuthenticated}
                 />
               </div>
             )}

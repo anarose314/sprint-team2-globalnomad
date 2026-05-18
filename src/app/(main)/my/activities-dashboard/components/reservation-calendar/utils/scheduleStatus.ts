@@ -4,6 +4,18 @@ const normalizeTimeWithSeconds = (time: string) => {
 };
 
 /**
+ * 날짜/시작 시각 기준으로 체험 시작 시각이 도래했는지(현재 시각이 시작 이후인지) 판단한다.
+ */
+export const isScheduleStartReached = (
+  dateKey: string,
+  startTime: string,
+  now: Date
+) => {
+  const startAt = new Date(`${dateKey}T${normalizeTimeWithSeconds(startTime)}`);
+  return !Number.isNaN(startAt.getTime()) && startAt.getTime() <= now.getTime();
+};
+
+/**
  * 날짜/종료 시각 기준으로 체험 종료 여부를 판단한다.
  */
 export const isScheduleEnded = (

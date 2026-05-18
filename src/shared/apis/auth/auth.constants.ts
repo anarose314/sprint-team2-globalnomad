@@ -54,3 +54,26 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS = {
  * 콜백 페이지에서 이 경로로 redirect한다.
  */
 export const KAKAO_SIGNUP_NICKNAME_PATH = '/signup/kakao';
+
+/**
+ * 인증 실패 및 비로그인 상태 시 리다이렉트할 기본 로그인 페이지 경로.
+ *
+ * @example
+ * redirect(`${LOGIN_PATH}?from=/activity/${activityId}/edit`);
+ */
+export const LOGIN_PATH = '/login';
+
+/**
+ * 회원가입 페이지 경로.
+ *
+ * 카카오 로그인 시도한 미가입 사용자 안내, 로그인 페이지의 회원가입 링크 등에 사용.
+ */
+export const SIGNUP_PATH = '/signup';
+
+/**
+ * 메인 페이지(홈) 경로.
+ *
+ * 로그인/회원가입 성공 후 기본 진입 경로, "홈으로" 버튼 등에 사용.
+ * from query 등으로 redirect 대상이 지정된 경우 그 경로가 우선한다.
+ */
+export const MAIN_PATH = '/';

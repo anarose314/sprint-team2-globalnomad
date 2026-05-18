@@ -5,11 +5,7 @@ import {
   BUTTON_VARIANTS,
   ICON_SIZE_CLASS,
 } from '@/shared/components/buttons/button/button.constants';
-import type {
-  ButtonProps,
-  PrimaryButtonProps,
-  SecondaryButtonProps,
-} from '@/shared/components/buttons/button/button.types';
+import type { ButtonProps } from '@/shared/components/buttons/button/button.types';
 import { cn } from '@/shared/utils/cn';
 
 export type { ButtonProps };
@@ -44,11 +40,18 @@ export type { ButtonProps };
 export function Button<T extends React.ElementType = 'button'>(
   props: ButtonProps<T>
 ) {
-  const { as, variant = 'primary', icon, className, children, ...rest } = props;
-  const Component = as ?? 'button';
+  const {
+    as,
+    variant = 'primary',
+    icon,
+    size,
+    className,
+    children,
+    ...rest
+  } = props;
 
-  const resolvedSize =
-    (rest as PrimaryButtonProps<T> | SecondaryButtonProps<T>).size ?? 'lg';
+  const Component = as ?? 'button';
+  const resolvedSize = size ?? 'lg';
   const iconClass = ICON_SIZE_CLASS[resolvedSize];
 
   const styledIcon =
@@ -66,40 +69,13 @@ export function Button<T extends React.ElementType = 'button'>(
         )
       : icon;
 
-  /* ── Secondary Button ── */
-  if (variant === 'secondary') {
-    const { size, ...buttonRest } = rest as SecondaryButtonProps<T>;
-
-    return (
-      <Component
-        className={cn(
-          BUTTON_VARIANTS({ variant: 'secondary', size }),
-          className
-        )}
-        {...buttonRest}
-      >
-        {styledIcon && (
-          <span
-            className={cn(
-              'flex shrink-0 items-center justify-center',
-              iconClass
-            )}
-          >
-            {styledIcon}
-          </span>
-        )}
-        <span className="truncate">{children}</span>
-      </Component>
-    );
-  }
-
-  /* ── Primary Button ── */ const { size, ...buttonRest } =
-    rest as PrimaryButtonProps<T>;
-
   return (
     <Component
-      className={cn(BUTTON_VARIANTS({ variant: 'primary', size }), className)}
-      {...buttonRest}
+      className={cn(
+        BUTTON_VARIANTS({ variant, size: resolvedSize }),
+        className
+      )}
+      {...rest}
     >
       {styledIcon && (
         <span

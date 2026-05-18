@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
@@ -19,12 +19,14 @@ interface UseActivityReservationCardStateProps {
   activityId: number;
   pricePerPerson: number;
   schedules: ActivitySchedule[];
+  isAuthenticated: boolean;
 }
 
 export const useActivityReservationCardState = ({
   activityId,
   pricePerPerson,
   schedules,
+  isAuthenticated,
 }: UseActivityReservationCardStateProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -46,6 +48,7 @@ export const useActivityReservationCardState = ({
     activityId,
     schedules,
     reservedScheduleIds,
+    isAuthenticated,
   });
 
   const availableDateKeys = useMemo(
@@ -54,6 +57,46 @@ export const useActivityReservationCardState = ({
   );
 
   const hasSelectableDate = availableDateKeys.length > 0;
+  const availableDateKeysSignature = availableDateKeys.join(',');
+
+  useEffect(() => {
+    if (!availableDateKeysSignature) {
+      return;
+    }
+
+    const earliestDateKey = availableDateKeys[0];
+    if (!earliestDateKey) {
+      return;
+    }
+
+    const now = new Date();
+    const todayKey = formatDateKey(now);
+
+    if (earliestDateKey !== todayKey) {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      setSelectedDateKey((prev) => (prev !== null ? prev : todayKey));
+
+      setCurrentDate((prev) => {
+        if (prev !== null) {
+          return prev;
+        }
+
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+    /**
+     * 예약 성공 후 setSelectedDateKey(null)로 초기화되면 가용 날짜 시그니처가
+     * 그대로인 경우 effect가 재실행되지 않아 오늘 자동선택이 복구되지 않는다.
+     * selectedDateKey를 함께 구독해 null로 돌아온 뒤에도 동일 규칙으로 적용
+     */
+  }, [availableDateKeys, selectedDateKey]);
   const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
@@ -134,6 +177,7 @@ export const useActivityReservationCardState = ({
               scheduleId: activeSelectedTimeSlot.id,
               headCount,
             },
+            skipSessionExpiredRedirect: true,
           }
         );
       },

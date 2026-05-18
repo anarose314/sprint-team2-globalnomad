@@ -13,6 +13,30 @@ const formatCount = (count: number) => count.toLocaleString('ko-KR');
 const formatRating = (rating: number) =>
   Number.isFinite(rating) ? rating.toFixed(1) : '0.0';
 
+/** 평균 평점(0~5) 구간별 만족도 문구 */
+const getRatingSatisfactionLabel = (rating: number): string => {
+  if (!Number.isFinite(rating)) {
+    return '보통';
+  }
+
+  // formatRating과 동일하게 소수점 첫째 자리까지 반올림하여 비교
+  const roundedRating = Number(rating.toFixed(1));
+
+  if (roundedRating < 2) {
+    return '매우 불만족';
+  }
+  if (roundedRating < 3) {
+    return '불만족';
+  }
+  if (roundedRating < 4) {
+    return '보통';
+  }
+  if (roundedRating < 4.8) {
+    return '만족';
+  }
+  return '매우 만족';
+};
+
 const renderStars = (rating: number) => {
   const filledStars = Math.max(0, Math.min(MAX_RATING, Math.round(rating)));
 
@@ -40,8 +64,8 @@ export function ActivityReviews({
   className,
 }: ActivityReviewsProps) {
   const safeAverageRating = formatRating(averageRating);
-  // TODO: 평균 평점 구간에 따라 만족도 문구를 동적으로 노출하도록 구현
-  const ratingLabel = '매우 만족';
+  const ratingLabel =
+    totalCount > 0 ? getRatingSatisfactionLabel(averageRating) : null;
 
   return (
     <section className={cn('w-full', className)}>
@@ -58,9 +82,11 @@ export function ActivityReviews({
         <strong className="typo-2xl-semibold md:typo-3xl-bold text-center leading-8 tracking-tight text-gray-950 md:leading-10.5">
           {safeAverageRating}
         </strong>
-        <p className="typo-md-bold md:typo-lg-bold mt-1 text-center leading-6 tracking-tight text-gray-950 md:leading-none">
-          {ratingLabel}
-        </p>
+        {ratingLabel ? (
+          <p className="typo-md-bold md:typo-lg-bold mt-1 text-center leading-6 tracking-tight text-gray-950 md:leading-none">
+            {ratingLabel}
+          </p>
+        ) : null}
         <div className="mt-1 flex items-center gap-1">
           <IcStar
             aria-hidden="true"

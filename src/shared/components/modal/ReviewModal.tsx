@@ -116,7 +116,7 @@ export function ReviewModal({
             variant="primary"
             size="lg"
             onClick={onSubmit}
-            className="w-full"
+            className="motion-safe:animate-modal-footer-button-in w-full motion-safe:delay-100"
             disabled={isPending}
           >
             {isPending ? '리뷰 작성 중...' : '작성하기'}

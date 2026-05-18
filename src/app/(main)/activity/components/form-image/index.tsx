@@ -34,6 +34,7 @@ export function FormImage({
         url,
       }));
   });
+  const [isPending, setIsPending] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +46,8 @@ export function FormImage({
   const isMaxReached = isMultiple && imageFiles.length >= MAX_IMAGE_COUNT;
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isPending) return;
+
     const files = e.target.files ? Array.from(e.target.files) : null;
     if (!files || files.length === 0) return;
 
@@ -71,6 +74,7 @@ export function FormImage({
     }
 
     try {
+      setIsPending(true);
       // S3 업로드 병렬 요청
       const results = await Promise.allSettled(
         filesToAdd.map((file) => postActivityImage(file))
@@ -127,6 +131,7 @@ export function FormImage({
         message: '이미지 처리 중 예기치 못한 오류가 발생했습니다.',
       });
     } finally {
+      setIsPending(false);
       if (inputRef.current) inputRef.current.value = '';
     }
   };
@@ -151,14 +156,16 @@ export function FormImage({
         <AddImageButton
           errorId={errorId}
           errorMessage={errorMessage}
-          disabled={isMaxReached}
+          disabled={isMaxReached || isPending}
           inputRef={inputRef}
           onDisabledClick={() => {
+            if (isPending) return;
             showToast({
               theme: 'error',
               message: `이미지는 최대 ${MAX_IMAGE_COUNT}장까지만 등록 가능합니다.`,
             });
           }}
+          isPending={isPending}
         />
         <input
           type="file"
@@ -168,6 +175,7 @@ export function FormImage({
           onChange={handleImageChange}
           ref={inputRef}
           multiple={isMultiple}
+          disabled={isPending}
           {...props}
         />
         {imageFiles.map((image) => (

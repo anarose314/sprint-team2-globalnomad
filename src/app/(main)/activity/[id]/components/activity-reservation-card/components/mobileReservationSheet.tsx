@@ -1,13 +1,25 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   CalendarValue,
   MobileSheetStep,
   TimeSlot,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
+import { HeadCountStepperIconButton } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/headCountStepperIconButton';
 import { ReservationCalendarView } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/reservationCalendarView';
 import { TimeSlotButton } from '@/app/(main)/activity/[id]/components/time-slot-button';
 import { IcArrowLeft, IcMinus, IcPlus } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons/button';
 import { Heading } from '@/shared/components/heading';
+import { cn } from '@/shared/utils/cn';
+
+const MOBILE_RESERVATION_SHEET_CLOSE_MS = 320;
+
+function getMobileReservationSheetCloseMs() {
+  if (typeof window === 'undefined') return MOBILE_RESERVATION_SHEET_CLOSE_MS;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 0
+    : MOBILE_RESERVATION_SHEET_CLOSE_MS;
+}
 
 interface MobileReservationSheetProps {
   isOpen: boolean;
@@ -63,15 +75,57 @@ export function MobileReservationSheet({
   onSubmitReservation,
   tileDisabled,
 }: MobileReservationSheetProps) {
+  const isClosingRef = useRef(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const requestClose = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    setIsClosing(true);
+    const durationMs = getMobileReservationSheetCloseMs();
+    closeTimerRef.current = setTimeout(() => {
+      onClose();
+    }, durationMs);
+  }, [onClose]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    isClosingRef.current = false;
+    if (!isOpen && closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    // effect 본문에서 동기 setState는 React Compiler 경고 대상 → 다음 마이크로태스크로 미룸
+    queueMicrotask(() => {
+      setIsClosing(false);
+    });
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
     <div
-      className="z-modal-backdrop animate-reservation-sheet-backdrop-in fixed inset-0 bg-black/60 2xl:hidden"
-      onClick={onClose}
+      className={cn(
+        'z-modal-backdrop fixed inset-0 bg-black/60 2xl:hidden',
+        isClosing
+          ? 'animate-reservation-sheet-backdrop-out'
+          : 'animate-reservation-sheet-backdrop-in'
+      )}
+      onClick={requestClose}
     >
       <section
-        className="animate-reservation-sheet-in shadow-review-card absolute right-0 bottom-0 left-0 max-h-dvh w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5"
+        className={cn(
+          'shadow-review-card absolute right-0 bottom-0 left-0 max-h-dvh w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pt-14 pb-5 md:pt-7 md:pb-5',
+          isClosing
+            ? 'animate-reservation-sheet-out'
+            : 'animate-reservation-sheet-in'
+        )}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mx-auto w-full max-w-186">
@@ -156,25 +210,21 @@ export function MobileReservationSheet({
                 <div className="mb-8 flex items-center justify-between">
                   <p className="typo-lg-bold text-gray-950">참여 인원 수</p>
                   <div className="flex h-12 w-36 items-center justify-between rounded-2xl border border-gray-100 px-4">
-                    <button
-                      type="button"
+                    <HeadCountStepperIconButton
                       aria-label="인원 감소"
                       onClick={onDecreaseHeadCount}
-                      className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                     >
                       <IcMinus className="h-4 w-4" />
-                    </button>
+                    </HeadCountStepperIconButton>
                     <span className="typo-lg-bold text-gray-800">
                       {headCount}
                     </span>
-                    <button
-                      type="button"
+                    <HeadCountStepperIconButton
                       aria-label="인원 증가"
                       onClick={onIncreaseHeadCount}
-                      className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                     >
                       <IcPlus className="h-4 w-4" />
-                    </button>
+                    </HeadCountStepperIconButton>
                   </div>
                 </div>
 
@@ -230,25 +280,21 @@ export function MobileReservationSheet({
                 <div className="mt-7">
                   <p className="typo-lg-bold text-gray-950">참여 인원 수</p>
                   <div className="mt-3 flex h-12 w-full items-center justify-between rounded-2xl border border-gray-200 px-5">
-                    <button
-                      type="button"
+                    <HeadCountStepperIconButton
                       aria-label="인원 감소"
                       onClick={onDecreaseHeadCount}
-                      className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                     >
                       <IcMinus className="h-4 w-4" />
-                    </button>
+                    </HeadCountStepperIconButton>
                     <span className="typo-2lg-bold text-gray-800">
                       {headCount}
                     </span>
-                    <button
-                      type="button"
+                    <HeadCountStepperIconButton
                       aria-label="인원 증가"
                       onClick={onIncreaseHeadCount}
-                      className="inline-flex h-6 w-6 cursor-pointer items-center justify-center text-gray-800"
                     >
                       <IcPlus className="h-4 w-4" />
-                    </button>
+                    </HeadCountStepperIconButton>
                   </div>
                 </div>
               </div>

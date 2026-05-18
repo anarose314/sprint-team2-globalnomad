@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
+  FILTER_BUTTON_CLASS,
   FILTER_ORDER,
   SCROLL_END_THRESHOLD,
 } from '@/app/(main)/my/reservations/components/reserve-filter/reserveFilter.constants';
@@ -48,6 +49,18 @@ export function ReserveFilter() {
     [currentStatus, pathname, router, searchParams]
   );
 
+  const handleFilterReset = useCallback(() => {
+    if (!currentStatus) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('status');
+
+    const queryString = params.toString();
+    const href = queryString ? `${pathname}?${queryString}` : pathname;
+
+    router.replace(href, { scroll: false });
+  }, [currentStatus, pathname, router, searchParams]);
+
   return (
     <div className="relative -mx-6 mt-3.5">
       <ul
@@ -56,6 +69,14 @@ export function ReserveFilter() {
         onScroll={handleScroll}
         className="scrollbar-hide flex gap-2 overflow-x-auto px-6"
       >
+        <li className="shrink-0">
+          <FilterButton
+            label="전체"
+            state={currentStatus ? 'normal' : 'active'}
+            className={FILTER_BUTTON_CLASS}
+            onClick={handleFilterReset}
+          />
+        </li>
         {FILTER_ORDER.map((label) => {
           const isSelected = currentStatus === label;
 
@@ -63,9 +84,8 @@ export function ReserveFilter() {
             <li key={label} className="shrink-0">
               <FilterButton
                 label={STATUS_TEXT[label]}
-                showIcon={false}
                 state={isSelected ? 'active' : 'normal'}
-                className="h-10"
+                className={FILTER_BUTTON_CLASS}
                 onClick={() => handleFilterClick(label)}
               />
             </li>

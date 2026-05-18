@@ -1,26 +1,11 @@
-import { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
-import { VariantProps } from 'class-variance-authority';
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { BUTTON_VARIANTS } from '@/shared/components/buttons/button/button.constants';
 
-type CustomButtonProps<T extends ElementType> = {
+type ButtonVariantKeys = keyof VariantProps<typeof BUTTON_VARIANTS>;
+
+export type ButtonProps<T extends ElementType = 'button'> = {
   as?: T;
-  /** 버튼 왼쪽에 표시할 아이콘 */
   icon?: ReactNode;
-} & Omit<VariantProps<typeof BUTTON_VARIANTS>, 'variant'>;
-
-export type BaseButtonProps<T extends ElementType> = CustomButtonProps<T> &
-  Omit<ComponentPropsWithoutRef<T>, keyof CustomButtonProps<T>>;
-
-export type PrimaryButtonProps<T extends ElementType = 'button'> =
-  BaseButtonProps<T> & {
-    variant?: 'primary';
-  };
-
-export type SecondaryButtonProps<T extends ElementType = 'button'> =
-  BaseButtonProps<T> & {
-    variant: 'secondary';
-  };
-
-export type ButtonProps<T extends ElementType = 'button'> =
-  | PrimaryButtonProps<T>
-  | SecondaryButtonProps<T>;
+} & VariantProps<typeof BUTTON_VARIANTS> &
+  Omit<ComponentPropsWithoutRef<T>, 'as' | 'icon' | ButtonVariantKeys>;

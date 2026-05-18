@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { UpdateMyInfoBody } from '@/app/(main)/my/profile/apis/myInfo';
@@ -10,7 +10,6 @@ import {
 } from '@/app/(main)/my/profile/components/profile-form/profile-form.schema';
 import { useMyInfo } from '@/app/(main)/my/profile/hooks/useMyInfo';
 import { useUpdateMyInfoMutation } from '@/app/(main)/my/profile/hooks/useUpdateMyInfoMutation';
-import { IcEyeOff, IcEyeOn } from '@/shared/assets/icons';
 import { Button } from '@/shared/components/buttons';
 import { Input } from '@/shared/components/input';
 
@@ -21,16 +20,12 @@ import { Input } from '@/shared/components/input';
  * - 닉네임은 수정 가능, 이메일은 읽기 전용
  * - 비밀번호는 변경 시에만 입력 (빈 문자열 허용)
  * - dirtyFields 기준으로 변경된 필드만 PATCH 페이로드에 포함
- *
- * TODO: 프로필 이미지 업로드 UI 추가 (별도 단계)
- * TODO: 공통 Input에 비밀번호 토글 기능 통합되면 인라인 토글 제거
+ * - 비밀번호 토글은 공통 Input(type="password") 의 내장 기능 사용
+ * - 성공/실패 토스트는 useUpdateMyInfoMutation 내부에서 처리
  */
 export function ProfileForm() {
   const { data: user } = useMyInfo();
   const { mutate, isPending } = useUpdateMyInfoMutation();
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isPasswordConfirmVisible, setIsPasswordConfirmVisible] =
-    useState(false);
 
   const {
     register,
@@ -74,6 +69,7 @@ export function ProfileForm() {
     mutate(payload, {
       onSuccess: (updatedUser) => {
         // 폼 상태를 새 값으로 리셋 → isDirty 다시 false → 저장 버튼 비활성화
+        // 성공 토스트는 useUpdateMyInfoMutation 에서 처리
         reset({
           nickname: updatedUser.nickname,
           newPassword: '',
@@ -82,10 +78,6 @@ export function ProfileForm() {
       },
     });
   };
-
-  const handlePasswordToggle = () => setIsPasswordVisible((prev) => !prev);
-  const handlePasswordConfirmToggle = () =>
-    setIsPasswordConfirmVisible((prev) => !prev);
 
   return (
     <form
@@ -102,43 +94,20 @@ export function ProfileForm() {
 
       <Input label="이메일" type="email" value={user.email} disabled />
 
-      {/* TODO: 추후 공통 컴포넌트로 변경 */}
       <Input
         label="비밀번호"
-        type={isPasswordVisible ? 'text' : 'password'}
+        type="password"
         placeholder="8자 이상 입력해 주세요"
         errorMessage={errors.newPassword?.message}
         {...register('newPassword')}
-        rightIcon={
-          <button
-            type="button"
-            onClick={handlePasswordToggle}
-            aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 표시'}
-            className="cursor-pointer"
-          >
-            {isPasswordVisible ? <IcEyeOn /> : <IcEyeOff />}
-          </button>
-        }
       />
 
       <Input
         label="비밀번호 확인"
-        type={isPasswordConfirmVisible ? 'text' : 'password'}
+        type="password"
         placeholder="비밀번호를 한 번 더 입력해 주세요"
         errorMessage={errors.newPasswordConfirm?.message}
         {...register('newPasswordConfirm')}
-        rightIcon={
-          <button
-            type="button"
-            onClick={handlePasswordConfirmToggle}
-            aria-label={
-              isPasswordConfirmVisible ? '비밀번호 숨기기' : '비밀번호 표시'
-            }
-            className="cursor-pointer"
-          >
-            {isPasswordConfirmVisible ? <IcEyeOn /> : <IcEyeOff />}
-          </button>
-        }
       />
 
       <Button
