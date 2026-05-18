@@ -92,11 +92,11 @@ export const useActivityReservationCardState = ({
       cancelAnimationFrame(frameId);
     };
     /**
-     * 예약 성공 후 `setSelectedDateKey(null)`로 초기화되면, 가용 날짜 시그니처가
+     * 예약 성공 후 setSelectedDateKey(null)로 초기화되면 가용 날짜 시그니처가
      * 그대로인 경우 effect가 재실행되지 않아 오늘 자동선택이 복구되지 않는다.
-     * `selectedDateKey`를 함께 구독해 null로 돌아온 뒤에도 동일 규칙으로 다시 잡는다.
+     * selectedDateKey를 함께 구독해 null로 돌아온 뒤에도 동일 규칙으로 적용
      */
-  }, [availableDateKeysSignature, selectedDateKey]);
+  }, [availableDateKeys, selectedDateKey]);
   const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
