@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  type CSSProperties,
   type UIEvent,
   useCallback,
   useRef,
@@ -35,6 +36,13 @@ const POPULAR_ACTIVITY_LIST_CLASS_NAME = cn(
 );
 
 const SCROLL_LOAD_THRESHOLD = 80;
+
+/** 데스크톱 인기 체험 캐러셀 — Style Guide: 동적 값은 CSS 변수로만 전달 */
+const POPULAR_DESKTOP_CAROUSEL_CSS_VARS = {
+  trackWidth: '--popular-desktop-carousel-track-w',
+  translateX: '--popular-desktop-carousel-translate-x',
+  slideWidth: '--popular-desktop-carousel-slide-w',
+} as const;
 
 const subscribeDesktopLayout = (onStoreChange: () => void) => {
   if (typeof window === 'undefined') {
@@ -176,6 +184,12 @@ export function PopularActivitySection() {
   const desktopCarouselPageCount = Math.max(desktopPages.length, 1);
   const desktopCarouselSlideFraction = 100 / desktopCarouselPageCount;
 
+  const popularDesktopCarouselTrackStyle = {
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.trackWidth]: `${desktopCarouselPageCount * 100}%`,
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.translateX]: `-${safeDesktopPageIndex * desktopCarouselSlideFraction}%`,
+    [POPULAR_DESKTOP_CAROUSEL_CSS_VARS.slideWidth]: `${desktopCarouselSlideFraction}%`,
+  } as CSSProperties;
+
   return (
     <section>
       <Heading
@@ -208,22 +222,19 @@ export function PopularActivitySection() {
       {!isPending && !isError && activities.length > 0 && (
         <div className="relative">
           {isDesktopLayout ? (
-            <div className="w-full overflow-hidden pb-4">
+            <div className="w-full overflow-hidden pt-2 pb-4">
               <div
                 className={cn(
-                  'flex motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out',
+                  'flex w-(--popular-desktop-carousel-track-w) translate-x-(--popular-desktop-carousel-translate-x)',
+                  'motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out',
                   'motion-reduce:transition-none'
                 )}
-                style={{
-                  width: `${desktopCarouselPageCount * 100}%`,
-                  transform: `translateX(-${safeDesktopPageIndex * desktopCarouselSlideFraction}%)`,
-                }}
+                style={popularDesktopCarouselTrackStyle}
               >
                 {desktopPages.map((page) => (
                   <ul
-                    key={`popular-desktop-${page.activities[0].id}`}
-                    className="grid shrink-0 grid-cols-4 gap-6"
-                    style={{ width: `${desktopCarouselSlideFraction}%` }}
+                    key={'popular-desktop-' + page.activities[0].id}
+                    className="grid w-(--popular-desktop-carousel-slide-w) shrink-0 grid-cols-4 gap-6"
                   >
                     {page.activities.map((activity) => (
                       <li key={activity.id} className="min-w-0">
@@ -258,7 +269,7 @@ export function PopularActivitySection() {
               aria-label="이전 인기 체험 보기"
               className={cn(
                 'shadow-card absolute top-1/2 left-0 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
-                'hover:text-gray-800 disabled:hover:text-gray-300',
+                'hover:text-gray-800',
                 '2xl:flex'
               )}
             />
@@ -274,7 +285,7 @@ export function PopularActivitySection() {
               aria-label="인기 체험 더 불러오기"
               className={cn(
                 'shadow-card absolute top-1/2 right-0 hidden translate-x-1/2 -translate-y-1/2 rounded-full bg-white text-gray-950',
-                'hover:text-gray-800 disabled:hover:text-gray-300',
+                'hover:text-gray-800',
                 '2xl:flex'
               )}
             />
