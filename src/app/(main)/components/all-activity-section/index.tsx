@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type {
   ActivityCategory,
@@ -103,6 +103,20 @@ export function AllActivitySection({
     getDesktopPageSizeSnapshot,
     getServerDesktopPageSizeSnapshot
   );
+
+  const previousIsDesktopPageSizeRef = useRef(isDesktopPageSize);
+
+  useEffect(() => {
+    if (previousIsDesktopPageSizeRef.current === isDesktopPageSize) {
+      return;
+    }
+
+    previousIsDesktopPageSizeRef.current = isDesktopPageSize;
+
+    updateSearchParams((params) => {
+      params.delete('page');
+    });
+  }, [isDesktopPageSize, updateSearchParams]);
 
   const pageSize = isDesktopPageSize ? MAIN_DESKTOP_PAGE_SIZE : MAIN_PAGE_SIZE;
   const currentPage = parsePageParam(searchParams.get('page'));
