@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   CalendarValue,
@@ -29,6 +29,7 @@ export const useActivityReservationCardState = ({
   isAuthenticated,
 }: UseActivityReservationCardStateProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [headCount, setHeadCount] = useState(1);
@@ -259,7 +260,7 @@ export const useActivityReservationCardState = ({
 
   const handleConfirmLoginRequired = () => {
     setIsLoginRequiredModalOpen(false);
-    router.push('/login');
+    router.push(`/login?from=${encodeURIComponent(pathname)}`);
   };
 
   const handleMoveToHeadCountStep = () => {
