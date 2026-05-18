@@ -24,6 +24,14 @@ const ACTIVITY_RESERVATION_CACHE_ROOTS = [
   QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD[0],
 ] as const;
 
+const hasReservedSlotActivity = (schedules: ReservedScheduleItem[]) =>
+  schedules.some((schedule) => {
+    const pending = Math.max(schedule.count.pending, 0);
+    const confirmed = Math.max(schedule.count.confirmed, 0);
+    const declined = Math.max(schedule.count.declined, 0);
+    return pending + confirmed + declined > 0;
+  });
+
 interface UseReservationCalendarDataProps {
   activityId: number | null;
   currentYear: number;
@@ -34,8 +42,9 @@ interface UseReservationCalendarDataProps {
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
  *
- * 월간 `reservation-dashboard`로 달력 배지·알림 도트를 구성하고, 상세 패널이 연 선택일에 한해
- * `reserved-schedule`을 조회해 배지 집계를 스케줄 단위로 보정
+ * 월간 reservation-dashboard로 달력 배지·알림 도트를 구성
+ * URL로 연 선택일,현재 보이는 달에 포함된 오늘 날짜에 대해 reserved-schedule을 조회해 배지 집계를 스케줄 단위로 보정
+ * (오늘만 선택하지 않아도 지난 슬롯의 pending이 대시보드에 남는 문제를 막기 위함)
  * 대시보드에 없는 날을 URL로만 열었을 때의 도트는 선택일 스케줄 응답으로만 보강
  *
  * 선택한 날짜의 스케줄을 조회한 뒤 체험 시작 시각이 지난 슬롯의 대기(pending) 예약을 클라이언트에서 자동 거절
@@ -54,6 +63,19 @@ export const useReservationCalendarData = ({
   /** 선택일·체험이 바뀌기 전까지 자동 거절을 이미 시도한 `scheduleId` (무한 invalidate 루프 방지) */
   const autoDeclineAttemptedScheduleIdsRef = useRef<Set<number>>(new Set());
 
+  const todayDateKey = formatDateKey(new Date());
+  const isTodayInVisibleMonth = useMemo(() => {
+    const now = new Date();
+    return (
+      now.getFullYear() === currentYear && now.getMonth() + 1 === currentMonth
+    );
+  }, [currentYear, currentMonth, todayDateKey]);
+
+  const fetchTodayScheduleInBackground =
+    isTodayInVisibleMonth &&
+    (reservedScheduleDateKey === null ||
+      reservedScheduleDateKey !== todayDateKey);
+
   const { data: reservationDashboard = [] } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
@@ -71,7 +93,7 @@ export const useReservationCalendarData = ({
     refetchInterval: activityId !== null ? 60_000 : false,
   });
 
-  const { data: reservedSchedules = [] } = useQuery({
+  const { data: reservedSchedulesSelected = [] } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
       activityId,
@@ -87,26 +109,71 @@ export const useReservationCalendarData = ({
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
+  const { data: reservedSchedulesToday = [] } = useQuery({
+    queryKey: [
+      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+      activityId,
+      todayDateKey,
+    ],
+    queryFn: () =>
+      fetchReservedSchedule({
+        activityId: activityId as number,
+        date: todayDateKey,
+      }),
+    enabled: activityId !== null && fetchTodayScheduleInBackground,
+    refetchInterval:
+      activityId !== null && fetchTodayScheduleInBackground ? 60_000 : false,
+  });
+
   useEffect(() => {
     autoDeclineAttemptedScheduleIdsRef.current.clear();
-  }, [activityId, reservedScheduleDateKey]);
+  }, [activityId, reservedScheduleDateKey, todayDateKey]);
 
   useEffect(() => {
-    if (activityId === null || reservedScheduleDateKey === null) return;
-    if (reservedSchedules.length === 0) return;
+    if (activityId === null) return;
+
+    const scheduleLoads: {
+      dateKey: string;
+      schedules: ReservedScheduleItem[];
+    }[] = [];
+
+    if (reservedScheduleDateKey && reservedSchedulesSelected.length > 0) {
+      scheduleLoads.push({
+        dateKey: reservedScheduleDateKey,
+        schedules: reservedSchedulesSelected,
+      });
+    }
+
+    if (
+      fetchTodayScheduleInBackground &&
+      reservedSchedulesToday.length > 0 &&
+      !scheduleLoads.some((entry) => entry.dateKey === todayDateKey)
+    ) {
+      scheduleLoads.push({
+        dateKey: todayDateKey,
+        schedules: reservedSchedulesToday,
+      });
+    }
+
+    if (scheduleLoads.length === 0) return;
 
     const now = new Date();
-    const startPassedWithPending = reservedSchedules.filter(
-      (schedule) =>
-        Math.max(schedule.count.pending ?? 0, 0) > 0 &&
-        isScheduleStartReached(reservedScheduleDateKey, schedule.startTime, now)
-    );
+    const candidatesByScheduleId = new Map<
+      number,
+      { dateKey: string; schedule: ReservedScheduleItem }
+    >();
 
-    const candidates = startPassedWithPending.filter(
-      (schedule) =>
-        !autoDeclineAttemptedScheduleIdsRef.current.has(schedule.scheduleId)
-    );
+    for (const { dateKey, schedules } of scheduleLoads) {
+      for (const schedule of schedules) {
+        if (Math.max(schedule.count.pending, 0) <= 0) continue;
+        if (!isScheduleStartReached(dateKey, schedule.startTime, now)) continue;
+        if (autoDeclineAttemptedScheduleIdsRef.current.has(schedule.scheduleId))
+          continue;
+        candidatesByScheduleId.set(schedule.scheduleId, { dateKey, schedule });
+      }
+    }
 
+    const candidates = [...candidatesByScheduleId.values()];
     if (candidates.length === 0) return;
 
     let cancelled = false;
@@ -114,7 +181,7 @@ export const useReservationCalendarData = ({
     void (async () => {
       let declinedAny = false;
 
-      for (const schedule of candidates) {
+      for (const { schedule } of candidates) {
         if (cancelled) return;
 
         try {
@@ -149,10 +216,17 @@ export const useReservationCalendarData = ({
     return () => {
       cancelled = true;
     };
-  }, [activityId, queryClient, reservedScheduleDateKey, reservedSchedules]);
+  }, [
+    activityId,
+    fetchTodayScheduleInBackground,
+    queryClient,
+    reservedScheduleDateKey,
+    reservedSchedulesSelected,
+    reservedSchedulesToday,
+    todayDateKey,
+  ]);
 
   const { eventCountsByDate, notificationDotByDate } = useMemo(() => {
-    const todayDateKey = formatDateKey(new Date());
     const notificationDotByDate: Record<string, boolean> = {};
 
     const eventCounts = reservationDashboard.reduce<
@@ -163,17 +237,18 @@ export const useReservationCalendarData = ({
       const confirmed = Math.max(r.confirmed ?? 0, 0);
       const pending = Math.max(r.pending ?? 0, 0);
       const declined = Math.max(r.declined ?? 0, 0);
-      const rawTotal = pending + confirmed + completed + declined;
+      const isPastDate = item.date < todayDateKey;
+      const pendingForDisplay = isPastDate ? 0 : pending;
+      const rawTotal = pendingForDisplay + confirmed + completed + declined;
       if (rawTotal > 0) {
         notificationDotByDate[item.date] = true;
       }
 
-      const isPastDate = item.date < todayDateKey;
       const shiftedCompleted = isPastDate ? completed + confirmed : completed;
       const shiftedConfirmed = isPastDate ? 0 : confirmed;
 
       const dailyEventCounts: ReservationEventCounts = {};
-      if (pending > 0) dailyEventCounts.pending = pending;
+      if (pendingForDisplay > 0) dailyEventCounts.pending = pendingForDisplay;
       if (shiftedConfirmed > 0) dailyEventCounts.confirmed = shiftedConfirmed;
       if (shiftedCompleted > 0) dailyEventCounts.completed = shiftedCompleted;
 
@@ -184,21 +259,33 @@ export const useReservationCalendarData = ({
       return accumulator;
     }, {});
 
-    if (reservedScheduleDateKey) {
-      const hasSelectedDaySlotActivity = reservedSchedules.some((schedule) => {
-        const pending = Math.max(schedule.count.pending ?? 0, 0);
-        const confirmed = Math.max(schedule.count.confirmed ?? 0, 0);
-        const declined = Math.max(schedule.count.declined ?? 0, 0);
-        return pending + confirmed + declined > 0;
-      });
-      if (hasSelectedDaySlotActivity) {
-        notificationDotByDate[reservedScheduleDateKey] = true;
-      }
+    if (
+      reservedScheduleDateKey &&
+      hasReservedSlotActivity(reservedSchedulesSelected)
+    ) {
+      notificationDotByDate[reservedScheduleDateKey] = true;
+    }
+
+    if (
+      fetchTodayScheduleInBackground &&
+      hasReservedSlotActivity(reservedSchedulesToday)
+    ) {
+      notificationDotByDate[todayDateKey] = true;
     }
 
     const scheduleDataByDate = new Map<string, ReservedScheduleItem[]>();
-    if (reservedScheduleDateKey) {
-      scheduleDataByDate.set(reservedScheduleDateKey, reservedSchedules);
+    if (reservedScheduleDateKey && reservedSchedulesSelected.length > 0) {
+      scheduleDataByDate.set(
+        reservedScheduleDateKey,
+        reservedSchedulesSelected
+      );
+    }
+    if (
+      fetchTodayScheduleInBackground &&
+      reservedSchedulesToday.length > 0 &&
+      todayDateKey !== reservedScheduleDateKey
+    ) {
+      scheduleDataByDate.set(todayDateKey, reservedSchedulesToday);
     }
 
     const nowForSchedules = new Date();
@@ -215,13 +302,20 @@ export const useReservationCalendarData = ({
     });
 
     return { eventCountsByDate: eventCounts, notificationDotByDate };
-  }, [reservationDashboard, reservedScheduleDateKey, reservedSchedules]);
+  }, [
+    fetchTodayScheduleInBackground,
+    reservationDashboard,
+    reservedScheduleDateKey,
+    reservedSchedulesSelected,
+    reservedSchedulesToday,
+    todayDateKey,
+  ]);
 
   const detailData = useMemo<ReservationDetailData>(() => {
     return buildReservationDetailData({
-      reservedSchedules,
+      reservedSchedules: reservedSchedulesSelected,
     });
-  }, [reservedSchedules]);
+  }, [reservedSchedulesSelected]);
 
   return {
     detailData,
