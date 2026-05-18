@@ -42,8 +42,8 @@ interface UseReservationCalendarDataProps {
 /**
  * 예약 캘린더 화면에서 필요한 조회 데이터를 한 번에 조합
  *
- * 월간 `reservation-dashboard`로 달력 배지·알림 도트를 구성하고, URL로 연 선택일·그리고
- * 현재 보이는 달에 포함된 오늘 날짜에 대해 `reserved-schedule`을 조회해 배지 집계를 스케줄 단위로 보정
+ * 월간 reservation-dashboard로 달력 배지·알림 도트를 구성
+ * URL로 연 선택일,현재 보이는 달에 포함된 오늘 날짜에 대해 reserved-schedule을 조회해 배지 집계를 스케줄 단위로 보정
  * (오늘만 선택하지 않아도 지난 슬롯의 pending이 대시보드에 남는 문제를 막기 위함)
  * 대시보드에 없는 날을 URL로만 열었을 때의 도트는 선택일 스케줄 응답으로만 보강
  *
