@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type {
   ActivityCategory,
   ActivitySort,
@@ -34,8 +35,27 @@ const getDesktopPageSizeSnapshot = () => {
 
 const getServerDesktopPageSizeSnapshot = () => false;
 
+const isActivityCategory = (value: string): value is ActivityCategory => {
+  return MAIN_CATEGORIES.some((category) => category.apiValue === value);
+};
+
 const isActivitySort = (value: string): value is ActivitySort => {
   return MAIN_SORT_OPTIONS.some((option) => option.value === value);
+};
+
+const parsePageParam = (value: string | null) => {
+  const page = Number(value);
+
+  return Number.isInteger(page) && page > 0 ? page : 1;
+};
+
+const createQueryString = (
+  pathname: string,
+  params: URLSearchParams
+): string => {
+  const queryString = params.toString();
+
+  return queryString ? `${pathname}?${queryString}` : pathname;
 };
 
 const ACTIVITY_GRID_CLASS_NAME = cn(
@@ -51,6 +71,7 @@ const ACTIVITY_GRID_CLASS_NAME = cn(
  * - 검색어, 카테고리, 가격 정렬 조건으로 모든 체험 목록을 조회한다.
  * - 검색 시 카테고리와 가격 정렬 조건은 초기화된다.
  * - 카테고리와 가격 정렬은 함께 적용할 수 있다.
+ * - 페이지, 카테고리, 정렬 상태를 URL query string과 동기화한다.
  *
  * @example
  * <AllActivitySection
@@ -63,9 +84,10 @@ export function AllActivitySection({
   isSearchMode = false,
   onResetSearchInput,
 }: AllActivitySectionProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory>();
-  const [selectedSort, setSelectedSort] = useState<ActivitySort>('latest');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const hasMountedRef = useRef(false);
 
   const { scrollRef, events } = useDragScroll<HTMLUListElement>();
 
@@ -76,15 +98,10 @@ export function AllActivitySection({
 
     const mediaQuery = window.matchMedia(MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY);
 
-    const handleMediaQueryChange = () => {
-      setCurrentPage(1);
-      onStoreChange();
-    };
-
-    mediaQuery.addEventListener('change', handleMediaQueryChange);
+    mediaQuery.addEventListener('change', onStoreChange);
 
     return () => {
-      mediaQuery.removeEventListener('change', handleMediaQueryChange);
+      mediaQuery.removeEventListener('change', onStoreChange);
     };
   }, []);
 
@@ -94,7 +111,40 @@ export function AllActivitySection({
     getServerDesktopPageSizeSnapshot
   );
 
+  const updateSearchParams = useCallback(
+    (updateParams: (params: URLSearchParams) => void) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      updateParams(params);
+
+      router.replace(createQueryString(pathname, params), { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    updateSearchParams((params) => {
+      params.delete('page');
+    });
+  }, [isDesktopPageSize, updateSearchParams]);
+
   const pageSize = isDesktopPageSize ? MAIN_DESKTOP_PAGE_SIZE : MAIN_PAGE_SIZE;
+  const currentPage = parsePageParam(searchParams.get('page'));
+
+  const categoryParam = searchParams.get('category');
+  const selectedCategory =
+    categoryParam && isActivityCategory(categoryParam)
+      ? categoryParam
+      : undefined;
+
+  const sortParam = searchParams.get('sort');
+  const selectedSort =
+    sortParam && isActivitySort(sortParam) ? sortParam : 'latest';
 
   const { data, isPending, isError } = useActivities({
     method: 'offset',
@@ -109,10 +159,29 @@ export function AllActivitySection({
   const totalCount = data?.totalCount ?? 0;
   const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
 
-  const handleCategoryClick = (category: ActivityCategory) => {
-    setSelectedCategory((prev) => (prev === category ? undefined : category));
+  const handleAllCategoryClick = () => {
+    updateSearchParams((params) => {
+      params.delete('category');
+      params.delete('keyword');
+      params.delete('page');
+    });
+
     onResetSearchInput();
-    setCurrentPage(1);
+  };
+
+  const handleCategoryClick = (category: ActivityCategory) => {
+    updateSearchParams((params) => {
+      if (selectedCategory === category) {
+        params.delete('category');
+      } else {
+        params.set('category', category);
+      }
+
+      params.delete('keyword');
+      params.delete('page');
+    });
+
+    onResetSearchInput();
   };
 
   const handleSortChange = (value: string) => {
@@ -120,13 +189,33 @@ export function AllActivitySection({
       return;
     }
 
-    setSelectedSort(value);
+    updateSearchParams((params) => {
+      if (value === 'latest') {
+        params.delete('sort');
+      } else {
+        params.set('sort', value);
+      }
+
+      if (!isSearchMode) {
+        params.delete('keyword');
+      }
+
+      params.delete('page');
+    });
 
     if (!isSearchMode) {
       onResetSearchInput();
     }
+  };
 
-    setCurrentPage(1);
+  const handlePageChange = (nextPage: number) => {
+    updateSearchParams((params) => {
+      if (nextPage === 1) {
+        params.delete('page');
+      } else {
+        params.set('page', String(nextPage));
+      }
+    });
   };
 
   return (
@@ -178,6 +267,16 @@ export function AllActivitySection({
           {...events}
           className="scrollbar-hide mb-5 flex cursor-grab gap-3 overflow-x-auto select-none active:cursor-grabbing"
         >
+          <li className="shrink-0">
+            <FilterButton
+              label="전체"
+              state={!selectedCategory ? 'active' : 'normal'}
+              showIcon={false}
+              className="whitespace-nowrap"
+              onClick={handleAllCategoryClick}
+            />
+          </li>
+
           {MAIN_CATEGORIES.map((category) => (
             <li key={category.value} className="shrink-0">
               <FilterButton
@@ -234,7 +333,7 @@ export function AllActivitySection({
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                onPageChange={handlePageChange}
               />
             </div>
           )}
