@@ -195,3 +195,22 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+/* FilterButton: 탭 투 클릭·초 단축 클릭에서도 눌림이 보이도록 짧은 키프레임(상태 클래스는 JS에서 토글) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes filter-button-press {
+    0% {
+      transform: translate3d(0, 1px, 0) scale(0.96);
+    }
+    50% {
+      transform: translate3d(0, 1px, 0) scale(0.96);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .filter-button-press-animate {
+    animation: filter-button-press 0.14s ease-out both;
+  }
+}
