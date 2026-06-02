@@ -10,14 +10,12 @@ function GalleryImageSlotInner({
   alt,
   sizes,
   priority = false,
-  fetchPriority = 'auto',
   loading,
 }: {
   src: string;
   alt: string;
   sizes: string;
   priority?: boolean;
-  fetchPriority?: 'high' | 'low' | 'auto';
   loading?: 'eager' | 'lazy';
 }) {
   /**
@@ -59,7 +57,6 @@ function GalleryImageSlotInner({
         alt={alt}
         fill
         priority={priority}
-        fetchPriority={fetchPriority}
         loading={normalizedLoading}
         sizes={sizes}
         className={cn(
@@ -83,7 +80,6 @@ export function GalleryImageSlot({
   sizes = '(max-width: 768px) 100vw, 50vw',
   onOpen,
   priority = false,
-  fetchPriority = 'auto',
   loading,
 }: {
   src?: string;
@@ -92,7 +88,6 @@ export function GalleryImageSlot({
   sizes?: string;
   onOpen?: () => void;
   priority?: boolean;
-  fetchPriority?: 'high' | 'low' | 'auto';
   loading?: 'eager' | 'lazy';
 }) {
   const mergedClass = cn(gallerySlotClassName, className);
@@ -115,7 +110,6 @@ export function GalleryImageSlot({
             alt={alt}
             sizes={sizes}
             priority={priority}
-            fetchPriority={fetchPriority}
             loading={loading}
           />
         ) : null}
@@ -132,7 +126,6 @@ export function GalleryImageSlot({
           alt={alt}
           sizes={sizes}
           priority={priority}
-          fetchPriority={fetchPriority}
           loading={loading}
         />
       ) : null}
