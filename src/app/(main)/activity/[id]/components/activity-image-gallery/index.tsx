@@ -82,7 +82,6 @@ export function ActivityImageGallery({
             sizes="(max-width: 768px) 100vw, 75vw"
             priority
             fetchPriority="high"
-            loading="eager"
             onOpen={() => setLightboxIndex(0)}
           />
         </div>
@@ -108,7 +107,6 @@ export function ActivityImageGallery({
             sizes="(max-width: 768px) 100vw, 75vw"
             priority
             fetchPriority="high"
-            loading="eager"
             onOpen={() => setLightboxIndex(0)}
           />
           <GalleryImageSlot
@@ -140,7 +138,6 @@ export function ActivityImageGallery({
             className="row-span-2 h-full min-h-0"
             priority
             fetchPriority="high"
-            loading="eager"
             onOpen={() => setLightboxIndex(0)}
           />
           <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
@@ -211,7 +208,6 @@ export function ActivityImageGallery({
             sizes="(max-width: 768px) 50vw, 38vw"
             priority
             fetchPriority="high"
-            loading="eager"
             onOpen={() => setLightboxIndex(0)}
           />
           <GalleryImageSlot
