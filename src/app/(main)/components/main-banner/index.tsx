@@ -23,6 +23,7 @@ export function MainBanner() {
           alt=""
           fill
           priority
+          fetchPriority="high"
           sizes={`${MAIN_DESKTOP_PAGE_SIZE_MEDIA_QUERY} 1120px, 100vw`}
           className="object-cover"
         />
