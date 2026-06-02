@@ -179,7 +179,7 @@ export function ActivityImageGallery({
               sizes="(max-width: 768px) 50vw, 38vw"
               priority={index === 0}
               fetchPriority={index === 0 ? 'high' : 'auto'}
-              loading={index === 0 ? 'eager' : 'lazy'}
+              loading={index === 0 ? undefined : 'lazy'}
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
