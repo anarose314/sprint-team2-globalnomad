@@ -9,22 +9,39 @@ function GalleryImageSlotInner({
   src,
   alt,
   sizes,
+  priority = false,
+  fetchPriority = 'auto',
+  loading,
 }: {
   src: string;
   alt: string;
   sizes: string;
+  priority?: boolean;
+  fetchPriority?: 'high' | 'low' | 'auto';
+  loading?: 'eager' | 'lazy';
 }) {
-  const [loaded, setLoaded] = useState(false);
+  /**
+   * LCP 후보(우선 로딩) 이미지는 첫 페인트에서 바로 보이게 처리해
+   * hydration 이후 onLoad/setState 대기 때문에 생기는 렌더 지연을 줄인다.
+   */
+  const shouldFadeIn = !(priority || loading === 'eager');
+  const [loaded, setLoaded] = useState(!shouldFadeIn);
 
-  const handleImgRef = useCallback((el: HTMLImageElement | null) => {
-    if (el?.complete && el.naturalWidth > 0) {
-      setLoaded(true);
-    }
-  }, []);
+  const handleImgRef = useCallback(
+    (el: HTMLImageElement | null) => {
+      if (!shouldFadeIn) {
+        return;
+      }
+      if (el?.complete && el.naturalWidth > 0) {
+        setLoaded(true);
+      }
+    },
+    [shouldFadeIn]
+  );
 
   return (
     <>
-      {!loaded ? (
+      {shouldFadeIn && !loaded ? (
         <div
           className="skeleton-shimmer pointer-events-none absolute inset-0 z-0"
           aria-hidden
@@ -35,13 +52,17 @@ function GalleryImageSlotInner({
         src={src}
         alt={alt}
         fill
+        priority={priority}
+        fetchPriority={fetchPriority}
+        loading={loading}
         sizes={sizes}
         className={cn(
-          'object-cover transition-opacity duration-300',
+          'object-cover',
+          shouldFadeIn && 'transition-opacity duration-300',
           loaded ? 'opacity-100' : 'opacity-0'
         )}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        onLoad={shouldFadeIn ? () => setLoaded(true) : undefined}
+        onError={shouldFadeIn ? () => setLoaded(true) : undefined}
       />
     </>
   );
@@ -55,12 +76,18 @@ export function GalleryImageSlot({
   className,
   sizes = '(max-width: 768px) 100vw, 50vw',
   onOpen,
+  priority = false,
+  fetchPriority = 'auto',
+  loading,
 }: {
   src?: string;
   alt: string;
   className?: string;
   sizes?: string;
   onOpen?: () => void;
+  priority?: boolean;
+  fetchPriority?: 'high' | 'low' | 'auto';
+  loading?: 'eager' | 'lazy';
 }) {
   const mergedClass = cn(gallerySlotClassName, className);
 
@@ -76,7 +103,15 @@ export function GalleryImageSlot({
         )}
       >
         {src ? (
-          <GalleryImageSlotInner key={src} src={src} alt={alt} sizes={sizes} />
+          <GalleryImageSlotInner
+            key={src}
+            src={src}
+            alt={alt}
+            sizes={sizes}
+            priority={priority}
+            fetchPriority={fetchPriority}
+            loading={loading}
+          />
         ) : null}
       </button>
     );
@@ -85,7 +120,15 @@ export function GalleryImageSlot({
   return (
     <div className={mergedClass}>
       {src ? (
-        <GalleryImageSlotInner key={src} src={src} alt={alt} sizes={sizes} />
+        <GalleryImageSlotInner
+          key={src}
+          src={src}
+          alt={alt}
+          sizes={sizes}
+          priority={priority}
+          fetchPriority={fetchPriority}
+          loading={loading}
+        />
       ) : null}
     </div>
   );
