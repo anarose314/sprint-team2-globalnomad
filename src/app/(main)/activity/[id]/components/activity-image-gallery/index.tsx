@@ -175,7 +175,7 @@ export function ActivityImageGallery({
               className="min-h-0"
               sizes="(max-width: 768px) 50vw, 38vw"
               priority={index === 0}
-              loading={index === 0 ? undefined : 'lazy'}
+              loading="lazy"
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
