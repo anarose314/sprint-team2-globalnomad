@@ -80,6 +80,7 @@ export function ActivityImageGallery({
             alt={title}
             className="h-full w-full"
             sizes="(max-width: 768px) 100vw, 75vw"
+            priority
             onOpen={() => setLightboxIndex(0)}
           />
         </div>
@@ -103,6 +104,7 @@ export function ActivityImageGallery({
             alt={`${title} 이미지 1`}
             className="min-h-0 flex-1"
             sizes="(max-width: 768px) 100vw, 75vw"
+            priority
             onOpen={() => setLightboxIndex(0)}
           />
           <GalleryImageSlot
@@ -132,6 +134,7 @@ export function ActivityImageGallery({
             src={imageUrls[0]}
             alt={title}
             className="row-span-2 h-full min-h-0"
+            priority
             onOpen={() => setLightboxIndex(0)}
           />
           <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
@@ -171,6 +174,8 @@ export function ActivityImageGallery({
               alt={`${title} 이미지 ${index + 1}`}
               className="min-h-0"
               sizes="(max-width: 768px) 50vw, 38vw"
+              priority={index === 0}
+              loading="lazy"
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
@@ -197,6 +202,7 @@ export function ActivityImageGallery({
             alt={`${title} 이미지 1`}
             className="min-h-0 flex-1"
             sizes="(max-width: 768px) 50vw, 38vw"
+            priority
             onOpen={() => setLightboxIndex(0)}
           />
           <GalleryImageSlot
