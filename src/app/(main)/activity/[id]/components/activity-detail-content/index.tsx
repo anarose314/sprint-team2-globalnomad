@@ -64,7 +64,7 @@ export function ActivityDetailContent({
             type="button"
             onClick={handleCopyAddress}
             aria-label="주소 복사"
-            className="text-gray-850 ml-1 inline-flex shrink-0 cursor-pointer items-center justify-center self-center rounded p-1 leading-none transition-colors hover:bg-gray-100"
+            className="text-gray-850 ml-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded p-1 transition-colors hover:bg-gray-100"
           >
             <IcCopy aria-hidden="true" className="block size-[14px] shrink-0" />
           </button>
