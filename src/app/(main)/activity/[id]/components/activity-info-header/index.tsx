@@ -74,6 +74,14 @@ export function ActivityInfoHeader({
       }
     }
 
+    if (!navigator.clipboard) {
+      showToast({
+        theme: 'error',
+        message: '클립보드 복사를 지원하지 않는 브라우저입니다.',
+      });
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(shareUrl);
       showToast({
@@ -83,7 +91,7 @@ export function ActivityInfoHeader({
     } catch {
       showToast({
         theme: 'error',
-        message: '공유에 실패했어요. 잠시 후 다시 시도해 주세요.',
+        message: '체험 링크 복사에 실패했어요. 잠시 후 다시 시도해 주세요.',
       });
     }
   };
