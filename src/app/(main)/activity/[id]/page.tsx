@@ -38,9 +38,9 @@ export const generateMetadata = async ({
     const description =
       activity.description?.trim().slice(0, 140) ||
       `${activity.category} 체험을 확인해보세요.`;
-    const pageUrl = `/activity/${activity.id}`;
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
+    const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
     const ogImageUrl =
       activity.bannerImageUrl?.trim() &&
       (activity.bannerImageUrl.startsWith('http://') ||

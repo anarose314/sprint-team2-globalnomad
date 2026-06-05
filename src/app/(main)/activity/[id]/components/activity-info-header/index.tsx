@@ -48,7 +48,11 @@ export function ActivityInfoHeader({
 
   const handleShare = async () => {
     const configuredBaseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
-    const baseUrl = configuredBaseUrl || window.location.origin;
+    const isLocalhost = window.location.hostname === 'localhost';
+    const baseUrl =
+      isLocalhost && configuredBaseUrl
+        ? configuredBaseUrl
+        : window.location.origin;
     const shareUrl = `${baseUrl.replace(/\/+$/, '')}/activity/${activityId}`;
     if (navigator.share) {
       try {
