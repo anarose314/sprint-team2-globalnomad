@@ -32,15 +32,13 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ko" className={'h-full antialiased'}>
-      <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
-        <noscript>
-          <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-          />
-        </noscript>
-      </head>
+      <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+      <noscript>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </noscript>
       <body className="flex min-h-full flex-col font-sans">
         <Script id="pretendard-font-loader" strategy="afterInteractive">
           {`(function(){var href='https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';if(document.querySelector('link[data-pretendard]'))return;var link=document.createElement('link');link.rel='stylesheet';link.href=href;link.setAttribute('data-pretendard','true');document.head.appendChild(link);})();`}
