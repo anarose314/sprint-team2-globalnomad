@@ -3,6 +3,7 @@
 import { IcCopy, IcMap } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 import { useKakaoMap } from '@/shared/hooks/useKakaoMap';
+import { useShowToast } from '@/shared/store/useToastStore';
 import { cn } from '@/shared/utils/cn';
 
 interface ActivityDetailContentProps {
@@ -16,13 +17,33 @@ export function ActivityDetailContent({
   address,
   className,
 }: ActivityDetailContentProps) {
+  const showToast = useShowToast();
   const appKey = (process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY ?? '').trim();
   const { mapContainerRef, isMapLoading, mapErrorMessage } = useKakaoMap({
     address,
     appKey,
   });
   const handleCopyAddress = async () => {
-    await navigator.clipboard.writeText(address);
+    if (!navigator.clipboard) {
+      showToast({
+        theme: 'error',
+        message: '클립보드 복사를 지원하지 않는 브라우저입니다.',
+      });
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(address);
+      showToast({
+        theme: 'success',
+        message: '주소가 복사되었습니다.',
+      });
+    } catch {
+      showToast({
+        theme: 'error',
+        message: '주소 복사에 실패했습니다.',
+      });
+    }
   };
 
   return (
