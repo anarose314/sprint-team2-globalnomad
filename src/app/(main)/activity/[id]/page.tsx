@@ -35,7 +35,43 @@ export const generateMetadata = async ({
 
   try {
     const activity = await getActivityDetail(activityId);
-    return { title: activity.title };
+    const description =
+      activity.description?.trim().slice(0, 140) ||
+      `${activity.category} 체험을 확인해보세요.`;
+    const pageUrl = `/activity/${activity.id}`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
+    const ogImageUrl =
+      activity.bannerImageUrl?.trim() &&
+      (activity.bannerImageUrl.startsWith('http://') ||
+        activity.bannerImageUrl.startsWith('https://'))
+        ? activity.bannerImageUrl
+        : new URL(
+            activity.bannerImageUrl || '/og-image.png',
+            baseUrl
+          ).toString();
+
+    return {
+      title: activity.title,
+      description,
+      openGraph: {
+        title: activity.title,
+        description,
+        url: pageUrl,
+        images: [
+          {
+            url: ogImageUrl,
+            alt: `${activity.title} 대표 이미지`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: activity.title,
+        description,
+        images: [ogImageUrl],
+      },
+    };
   } catch {
     return { title: '체험 상세' };
   }

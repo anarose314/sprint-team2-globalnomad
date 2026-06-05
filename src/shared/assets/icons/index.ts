@@ -27,6 +27,7 @@ import IcPlus from '@/shared/assets/icons/ic-plus.svg?react';
 import IcProfile from '@/shared/assets/icons/ic-profile.svg?react';
 import IcSearch from '@/shared/assets/icons/ic-search.svg?react';
 import IcSetting from '@/shared/assets/icons/ic-setting.svg?react';
+import IcShare from '@/shared/assets/icons/ic-share.svg?react';
 import IcSport from '@/shared/assets/icons/ic-sport.svg?react';
 import IcStar from '@/shared/assets/icons/ic-star.svg?react';
 import IcToastError from '@/shared/assets/icons/ic-toast-error.svg?react';
@@ -67,6 +68,7 @@ export {
   IcProfile,
   IcSearch,
   IcSetting,
+  IcShare,
   IcSport,
   IcStar,
   IcToastError,
