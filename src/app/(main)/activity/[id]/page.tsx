@@ -41,15 +41,17 @@ export const generateMetadata = async ({
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
     const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
-    const ogImageUrl =
-      activity.bannerImageUrl?.trim() &&
-      (activity.bannerImageUrl.startsWith('http://') ||
-        activity.bannerImageUrl.startsWith('https://'))
-        ? activity.bannerImageUrl
-        : new URL(
-            activity.bannerImageUrl || '/og-image.png',
-            baseUrl
-          ).toString();
+    const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL;
+    const bannerImageUrl = activity.bannerImageUrl?.trim();
+    const isAbsoluteImageUrl =
+      !!bannerImageUrl &&
+      (bannerImageUrl.startsWith('http://') ||
+        bannerImageUrl.startsWith('https://'));
+    const ogImageUrl = bannerImageUrl
+      ? isAbsoluteImageUrl
+        ? bannerImageUrl
+        : new URL(bannerImageUrl, imageBaseUrl?.trim() || baseUrl).toString()
+      : new URL('/og-image.png', baseUrl).toString();
 
     return {
       title: activity.title,
@@ -62,6 +64,8 @@ export const generateMetadata = async ({
           {
             url: ogImageUrl,
             alt: `${activity.title} 대표 이미지`,
+            width: 1200,
+            height: 630,
           },
         ],
       },
