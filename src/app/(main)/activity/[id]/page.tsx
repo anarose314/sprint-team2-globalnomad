@@ -41,16 +41,19 @@ export const generateMetadata = async ({
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
     const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
-    const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL;
     const bannerImageUrl = activity.bannerImageUrl?.trim();
-    const isAbsoluteImageUrl =
-      !!bannerImageUrl &&
-      (bannerImageUrl.startsWith('http://') ||
-        bannerImageUrl.startsWith('https://'));
-    const ogImageUrl = bannerImageUrl
-      ? isAbsoluteImageUrl
+    const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL?.trim();
+    const resolvedBannerImageUrl = bannerImageUrl
+      ? bannerImageUrl.startsWith('http://') ||
+        bannerImageUrl.startsWith('https://')
         ? bannerImageUrl
-        : new URL(bannerImageUrl, imageBaseUrl?.trim() || baseUrl).toString()
+        : new URL(bannerImageUrl, imageBaseUrl || baseUrl).toString()
+      : null;
+    const ogImageUrl = resolvedBannerImageUrl
+      ? new URL(
+          `/api/og-image?src=${encodeURIComponent(resolvedBannerImageUrl)}&v=${encodeURIComponent(activity.updatedAt)}`,
+          baseUrl
+        ).toString()
       : new URL('/og-image.png', baseUrl).toString();
 
     return {
