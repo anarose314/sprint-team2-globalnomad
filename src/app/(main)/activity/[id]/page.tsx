@@ -20,6 +20,15 @@ const getActivityDetail = cache(async (activityId: number) => {
   );
 });
 
+const getSiteUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return (
+    process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app'
+  );
+};
+
 /**
  * 체험 상세 페이지 메타데이터를 동적으로 생성
  */
@@ -38,8 +47,7 @@ export const generateMetadata = async ({
     const description =
       activity.description?.trim().slice(0, 140) ||
       `${activity.category} 체험을 확인해보세요.`;
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
+    const baseUrl = getSiteUrl();
     const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
     const bannerImageUrl = activity.bannerImageUrl?.trim();
     const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL?.trim();
