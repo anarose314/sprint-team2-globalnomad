@@ -20,6 +20,15 @@ const getActivityDetail = cache(async (activityId: number) => {
   );
 });
 
+const getSiteUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return (
+    process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app'
+  );
+};
+
 /**
  * 체험 상세 페이지 메타데이터를 동적으로 생성
  */
@@ -35,7 +44,49 @@ export const generateMetadata = async ({
 
   try {
     const activity = await getActivityDetail(activityId);
-    return { title: activity.title };
+    const description =
+      activity.description?.trim().slice(0, 140) ||
+      `${activity.category} 체험을 확인해보세요.`;
+    const baseUrl = getSiteUrl();
+    const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
+    const bannerImageUrl = activity.bannerImageUrl?.trim();
+    const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL?.trim();
+    const resolvedBannerImageUrl = bannerImageUrl
+      ? bannerImageUrl.startsWith('http://') ||
+        bannerImageUrl.startsWith('https://')
+        ? bannerImageUrl
+        : new URL(bannerImageUrl, imageBaseUrl || baseUrl).toString()
+      : null;
+    const ogImageUrl = resolvedBannerImageUrl
+      ? new URL(
+          `/api/og-image?src=${encodeURIComponent(resolvedBannerImageUrl)}&v=${encodeURIComponent(activity.updatedAt)}`,
+          baseUrl
+        ).toString()
+      : new URL('/og-image.png', baseUrl).toString();
+
+    return {
+      title: activity.title,
+      description,
+      openGraph: {
+        title: activity.title,
+        description,
+        url: pageUrl,
+        images: [
+          {
+            url: ogImageUrl,
+            alt: `${activity.title} 대표 이미지`,
+            width: 1200,
+            height: 630,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: activity.title,
+        description,
+        images: [ogImageUrl],
+      },
+    };
   } catch {
     return { title: '체험 상세' };
   }

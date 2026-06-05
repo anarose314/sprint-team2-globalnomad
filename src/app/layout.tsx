@@ -3,10 +3,12 @@ import { QueryProvider } from '@/shared/components/query-provider';
 import { ToastContainer } from '@/shared/components/toast/toast-container';
 import '@/app/styles/globals.css';
 
+const siteUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app'
-  ),
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'Global Nomad',
     template: '%s | Global Nomad',
