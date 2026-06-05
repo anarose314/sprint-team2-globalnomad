@@ -1,6 +1,6 @@
 'use client';
 
-import { IcMap } from '@/shared/assets/icons';
+import { IcCopy, IcMap } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 import { useKakaoMap } from '@/shared/hooks/useKakaoMap';
 import { cn } from '@/shared/utils/cn';
@@ -21,6 +21,9 @@ export function ActivityDetailContent({
     address,
     appKey,
   });
+  const handleCopyAddress = async () => {
+    await navigator.clipboard.writeText(address);
+  };
 
   return (
     <section className={cn('w-full', className)}>
@@ -36,6 +39,14 @@ export function ActivityDetailContent({
         <div className="mt-2 flex items-center gap-1">
           <IcMap aria-hidden="true" className="size-4 shrink-0 text-black" />
           <p className="typo-md-semibold text-gray-950">{address}</p>
+          <button
+            type="button"
+            onClick={handleCopyAddress}
+            aria-label="주소 복사"
+            className="text-gray-850 ml-1 inline-flex shrink-0 cursor-pointer items-center justify-center self-center rounded p-1 leading-none transition-colors hover:bg-gray-100"
+          >
+            <IcCopy aria-hidden="true" className="block size-[14px] shrink-0" />
+          </button>
         </div>
 
         <div

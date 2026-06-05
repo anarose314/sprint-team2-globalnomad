@@ -11,6 +11,7 @@ import IcBellOn from '@/shared/assets/icons/ic-bell-on.svg?react';
 import IcBus from '@/shared/assets/icons/ic-bus.svg?react';
 import IcCalendar from '@/shared/assets/icons/ic-calendar.svg?react';
 import IcClose from '@/shared/assets/icons/ic-close.svg?react';
+import IcCopy from '@/shared/assets/icons/ic-copy.svg?react';
 import IcEdit from '@/shared/assets/icons/ic-edit.svg?react';
 import IcEmpty from '@/shared/assets/icons/ic-empty.svg?react';
 import IcEyeOff from '@/shared/assets/icons/ic-eye-off.svg?react';
@@ -50,6 +51,7 @@ export {
   IcBus,
   IcCalendar,
   IcClose,
+  IcCopy,
   IcEdit,
   IcEmpty,
   IcEyeOff,
