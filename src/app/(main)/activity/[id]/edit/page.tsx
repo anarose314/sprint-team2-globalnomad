@@ -19,6 +19,14 @@ export async function generateMetadata({
   const { id } = await params;
   const activityId = Number(id);
 
+  if (!Number.isFinite(activityId)) {
+    return {
+      title: '체험 수정',
+      description:
+        '등록한 체험의 상세 정보와 스케줄을 수정할 수 있는 페이지입니다.',
+    };
+  }
+
   try {
     const activity = await fetchInstanceServer<ActivityDetailResponse>(
       `/activities/${activityId}`
