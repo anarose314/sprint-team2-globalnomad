@@ -26,7 +26,7 @@ export interface ReserveTimeListProps {
 }
 
 /** 날짜별로 schedules를 그룹핑 */
-function groupByDate(schedules: Schedule[]): Record<string, Schedule[]> {
+const groupByDate = (schedules: Schedule[]): Record<string, Schedule[]> => {
   const sortedSchedules = [...schedules].sort((a, b) =>
     a.startTime.localeCompare(b.startTime)
   );
@@ -36,7 +36,7 @@ function groupByDate(schedules: Schedule[]): Record<string, Schedule[]> {
     acc[key].push(schedule);
     return acc;
   }, {});
-}
+};
 
 /**
  * 예약 가능한 시간대 목록을 렌더링하고 추가, 수정, 삭제를 관리하는 컴포넌트
@@ -79,7 +79,8 @@ export function ReserveTimeList({
   };
 
   /** 개별 시간대 삭제 */
-  const handleDeleteOne = (id: string) => {
+  const handleDeleteOne = (id?: string) => {
+    if (!id) return;
     onSchedulesChange(schedules.filter((s) => s.id !== id));
   };
 
@@ -135,7 +136,7 @@ export function ReserveTimeList({
                 {schedule.startTime} ~ {schedule.endTime}
                 <button
                   type="button"
-                  onClick={() => handleDeleteOne(schedule.id!)}
+                  onClick={() => handleDeleteOne(schedule.id)}
                   className="cursor-pointer"
                   aria-label="시간대 삭제"
                 >
