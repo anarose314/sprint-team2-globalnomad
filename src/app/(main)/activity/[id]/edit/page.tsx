@@ -24,9 +24,18 @@ export async function generateMetadata({
     const activity = await fetchInstanceServer<ActivityDetailResponse>(
       `/activities/${id}`
     );
-    return { title: `${activity.title} - 수정` };
+    return {
+      title: `${activity.title} - 수정`,
+      description: activity.description
+        ? `${activity.title} 체험의 상세 정보와 스케줄을 수정합니다.`
+        : '등록한 체험의 상세 정보와 스케줄을 수정할 수 있는 페이지입니다.',
+    };
   } catch {
-    return { title: '체험 수정' };
+    return {
+      title: '체험 수정',
+      description:
+        '등록한 체험의 상세 정보와 스케줄을 수정할 수 있는 페이지입니다.',
+    };
   }
 }
 
