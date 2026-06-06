@@ -10,6 +10,7 @@ import IcBellOff from '@/shared/assets/icons/ic-bell-off.svg?react';
 import IcBellOn from '@/shared/assets/icons/ic-bell-on.svg?react';
 import IcBus from '@/shared/assets/icons/ic-bus.svg?react';
 import IcCalendar from '@/shared/assets/icons/ic-calendar.svg?react';
+import IcCalendarSimple from '@/shared/assets/icons/ic-calendar-simple.svg?react';
 import IcClose from '@/shared/assets/icons/ic-close.svg?react';
 import IcCopy from '@/shared/assets/icons/ic-copy.svg?react';
 import IcEdit from '@/shared/assets/icons/ic-edit.svg?react';
@@ -35,6 +36,7 @@ import IcToastInfo from '@/shared/assets/icons/ic-toast-info.svg?react';
 import IcToastSuccess from '@/shared/assets/icons/ic-toast-success.svg?react';
 import IcToastWarning from '@/shared/assets/icons/ic-toast-warning.svg?react';
 import IcTour from '@/shared/assets/icons/ic-tour.svg?react';
+import IcTrash from '@/shared/assets/icons/ic-trash.svg?react';
 import IcUser from '@/shared/assets/icons/ic-user.svg?react';
 import IcWellbeing from '@/shared/assets/icons/ic-wellbeing.svg?react';
 
@@ -51,6 +53,7 @@ export {
   IcBellOn,
   IcBus,
   IcCalendar,
+  IcCalendarSimple,
   IcClose,
   IcCopy,
   IcEdit,
@@ -76,6 +79,7 @@ export {
   IcToastSuccess,
   IcToastWarning,
   IcTour,
+  IcTrash,
   IcUser,
   IcWellbeing,
 };

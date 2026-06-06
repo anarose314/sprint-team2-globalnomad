@@ -36,3 +36,19 @@ export const formatDate = (isoDate: string) => {
 export const formatDateKey = (date: Date) => {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 };
+
+/**
+ * `YYYY-MM-DD` 형식의 날짜 문자열을 `YYYY년 MM월 DD일 (요일)` 포맷으로 변환
+ *
+ * @example
+ * formatDateKorean('2026-06-04') // "2026년 06월 04일 (목)"
+ */
+export const formatDateKorean = (dateStr: string): string => {
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return '-';
+  const [, year, month, day] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const dayLabel = days[date.getDay()];
+  return `${year}년 ${month}월 ${day}일 (${dayLabel})`;
+};
