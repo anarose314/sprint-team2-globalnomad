@@ -47,8 +47,7 @@ export const formatDateKorean = (dateStr: string): string => {
   const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (!match) return '-';
   const [, year, month, day] = match;
-  const date = new Date(`${year}-${month}-${day}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return '-';
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const dayLabel = days[date.getDay()];
   return `${year}년 ${month}월 ${day}일 (${dayLabel})`;
