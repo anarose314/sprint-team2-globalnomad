@@ -89,8 +89,11 @@ export function ReserveTimeList({
     onSchedulesChange(schedules.filter((s) => s.date !== date));
   };
 
-  const grouped = useMemo(() => groupByDate(schedules), [schedules]);
-  const sortedDates = useMemo(() => Object.keys(grouped).sort(), [grouped]);
+  const { grouped, sortedDates } = useMemo(() => {
+    const groupedData = groupByDate(schedules);
+    const sorted = Object.keys(groupedData).sort();
+    return { grouped: groupedData, sortedDates: sorted };
+  }, [schedules]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -121,7 +124,7 @@ export function ReserveTimeList({
             type="button"
             onClick={() => handleDeleteGroup(date)}
             className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center self-start"
-            aria-label="날짜 전체 삭제"
+            aria-label={`${formatDateKorean(date)} 일정 전체 삭제`}
           >
             <IcTrash className="h-full w-full text-red-500 hover:text-red-700" />
           </button>
@@ -138,7 +141,7 @@ export function ReserveTimeList({
                   type="button"
                   onClick={() => handleDeleteOne(schedule.id)}
                   className="cursor-pointer"
-                  aria-label="시간대 삭제"
+                  aria-label={`${schedule.startTime} ~ ${schedule.endTime} 시간대 삭제`}
                 >
                   <IcClose className="h-4 w-4 text-gray-400 hover:text-gray-600" />
                 </button>

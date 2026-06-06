@@ -53,7 +53,7 @@ export const validateSchedule = (
   // CASE 4: 중복 유효성 검사
   const isOverlapping = existingSchedules.some(
     (existing) =>
-      existing.id !== currentId &&
+      (!currentId || existing.id !== currentId) &&
       existing.date === date &&
       existing.startTime < endTime &&
       existing.endTime > startTime
