@@ -51,16 +51,16 @@ export const validateSchedule = (
   }
 
   // CASE 4: 중복 유효성 검사
-  const isDuplicate = existingSchedules.some(
+  const isOverlapping = existingSchedules.some(
     (existing) =>
       existing.id !== currentId &&
       existing.date === date &&
-      existing.startTime === startTime &&
-      existing.endTime === endTime
+      existing.startTime < endTime &&
+      existing.endTime > startTime
   );
 
-  if (isDuplicate) {
-    return { isValid: false, errorMessage: '이미 등록된 일정입니다.' };
+  if (isOverlapping) {
+    return { isValid: false, errorMessage: '기존 일정과 시간이 겹칩니다.' };
   }
 
   return { isValid: true };
