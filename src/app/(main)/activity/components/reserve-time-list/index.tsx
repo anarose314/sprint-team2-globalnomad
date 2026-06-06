@@ -61,7 +61,6 @@ export function ReserveTimeList({
     };
 
     onSchedulesChange([...schedules, newSchedule]);
-    setInputSchedule(INITIAL_SCHEDULE);
   };
 
   const handleDelete = (id?: string) => {
