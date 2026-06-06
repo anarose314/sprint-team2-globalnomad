@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ReserveTime } from '@/app/(main)/activity/components/reserve-time';
 import { Schedule } from '@/app/(main)/activity/components/reserve-time/reserveTime.types';
 import { validateSchedule } from '@/app/(main)/activity/components/reserve-time-list/validateSchedule';
@@ -27,11 +27,13 @@ export interface ReserveTimeListProps {
 
 /** 날짜별로 schedules를 그룹핑 */
 function groupByDate(schedules: Schedule[]): Record<string, Schedule[]> {
-  return schedules.reduce<Record<string, Schedule[]>>((acc, schedule) => {
+  const sortedSchedules = [...schedules].sort((a, b) =>
+    a.startTime.localeCompare(b.startTime)
+  );
+  return sortedSchedules.reduce<Record<string, Schedule[]>>((acc, schedule) => {
     const key = schedule.date;
     if (!acc[key]) acc[key] = [];
     acc[key].push(schedule);
-    acc[key].sort((a, b) => a.startTime.localeCompare(b.startTime));
     return acc;
   }, {});
 }
@@ -86,8 +88,8 @@ export function ReserveTimeList({
     onSchedulesChange(schedules.filter((s) => s.date !== date));
   };
 
-  const grouped = groupByDate(schedules);
-  const sortedDates = Object.keys(grouped).sort();
+  const grouped = useMemo(() => groupByDate(schedules), [schedules]);
+  const sortedDates = useMemo(() => Object.keys(grouped).sort(), [grouped]);
 
   return (
     <div className="flex flex-col gap-5">
