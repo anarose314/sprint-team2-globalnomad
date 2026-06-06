@@ -1,6 +1,7 @@
 'use client';
 
 import { Controller, useForm } from 'react-hook-form';
+import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   activityFormSchema,
@@ -9,12 +10,19 @@ import {
 import { ActivityFormProps } from '@/app/(main)/activity/components/activity-form/activityForm.types';
 import { FormImage } from '@/app/(main)/activity/components/form-image';
 import { FormTitle } from '@/app/(main)/activity/components/form-title';
-import { KakaoPostcode } from '@/app/(main)/activity/components/kakao-postcode';
 import { ReserveTimeList } from '@/app/(main)/activity/components/reserve-time-list';
 import { Dropdown } from '@/shared/components/dropdown';
 import { Input } from '@/shared/components/input';
 import { Textarea } from '@/shared/components/textarea';
 import { CATEGORY_OPTIONS } from '@/shared/constants/category.constants';
+
+const KakaoPostcode = dynamic(
+  () =>
+    import('@/app/(main)/activity/components/kakao-postcode').then(
+      (mod) => mod.KakaoPostcode
+    ),
+  { ssr: false }
+);
 
 export function ActivityForm({
   children,
