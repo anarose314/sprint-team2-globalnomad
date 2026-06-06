@@ -126,7 +126,7 @@ export function ReserveTimeList({
             className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center self-start"
             aria-label={`${formatDateKorean(date)} 일정 전체 삭제`}
           >
-            <IcTrash className="h-full w-full text-red-500 hover:text-red-700" />
+            <IcTrash className="h-full w-full text-red-500 hover:text-red-800" />
           </button>
 
           {/* 시간 태그들 */}
