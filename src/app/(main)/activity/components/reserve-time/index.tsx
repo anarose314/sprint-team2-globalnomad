@@ -56,6 +56,7 @@ export function ReserveTime({
         {/* 버튼 */}
         <button
           type="button"
+          aria-label={isAddAction ? '시간대 추가' : '시간대 삭제'}
           className={cn(
             BUTTON_VARIANTS({ variant: isAddAction ? 'primary' : 'secondary' }),
             'relative h-10.5 shrink-0 p-0!',

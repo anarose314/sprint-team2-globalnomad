@@ -89,8 +89,10 @@ export function FormCalendar({
         className={cn('cursor-pointer', isError && INPUT_ERROR_STYLE)}
         required
         readOnly
+        role="combobox"
         aria-haspopup="grid"
         aria-expanded={isOpen}
+        aria-label="날짜 선택"
       />
       {isOpen && (
         <div className="z-dropdown absolute mt-2">
