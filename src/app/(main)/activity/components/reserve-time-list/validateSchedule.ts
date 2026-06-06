@@ -11,7 +11,7 @@ interface ValidationResult {
  *
  * @example
  * ```ts
- * const { isValid, errorMessage } = validateSchedule(newSchedule, schedules, currentId);
+ * const { isValid, errorMessage } = validateSchedule(newSchedule, schedules);
  *
  * if (!isValid) {
  * showToast({ theme: 'error', message: errorMessage! });
@@ -21,8 +21,7 @@ interface ValidationResult {
  */
 export const validateSchedule = (
   target: Schedule,
-  existingSchedules: Schedule[],
-  currentId?: string
+  existingSchedules: Schedule[]
 ): ValidationResult => {
   const { date, startTime, endTime } = target;
 
@@ -53,7 +52,6 @@ export const validateSchedule = (
   // CASE 4: 중복 유효성 검사
   const isOverlapping = existingSchedules.some(
     (existing) =>
-      (!currentId || existing.id !== currentId) &&
       existing.date === date &&
       existing.startTime < endTime &&
       existing.endTime > startTime
