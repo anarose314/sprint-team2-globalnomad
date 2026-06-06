@@ -25,7 +25,7 @@ export function ActivityEditForm({
   const defaultValues = useMemo<Partial<ActivityFormValues>>(
     () => ({
       title: initialData.title,
-      category: initialData.category,
+      category: initialData.category as ActivityFormValues['category'],
       description: initialData.description,
       price: initialData.price,
       address: initialData.address,

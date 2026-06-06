@@ -29,7 +29,8 @@ export async function generateMetadata({
 
   try {
     const activity = await fetchInstanceServer<ActivityDetailResponse>(
-      `/activities/${activityId}`
+      `/activities/${activityId}`,
+      { cache: 'no-store' }
     );
     return {
       title: `${activity.title} - 수정`,
