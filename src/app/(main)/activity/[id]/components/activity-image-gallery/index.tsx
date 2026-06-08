@@ -13,6 +13,13 @@ interface ActivityImageGalleryProps {
   className?: string;
 }
 
+const DESKTOP_MAIN_IMAGE_SIZES =
+  '(max-width: 768px) 100vw, (max-width: 1536px) 75vw, 672px';
+const DESKTOP_GRID_IMAGE_SIZES =
+  '(max-width: 768px) 50vw, (max-width: 1536px) 38vw, 336px';
+const LCP_IMAGE_QUALITY = 75;
+const REGULAR_IMAGE_QUALITY = 68;
+
 /**
  * 체험 상세 페이지 이미지 갤러리
  *
@@ -79,7 +86,8 @@ export function ActivityImageGallery({
             src={imageUrls[0]}
             alt={title}
             className="h-full w-full"
-            sizes="(max-width: 768px) 100vw, 75vw"
+            sizes={DESKTOP_MAIN_IMAGE_SIZES}
+            quality={LCP_IMAGE_QUALITY}
             priority
             onOpen={() => setLightboxIndex(0)}
           />
@@ -103,7 +111,8 @@ export function ActivityImageGallery({
             src={imageUrls[0]}
             alt={`${title} 이미지 1`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 100vw, 75vw"
+            sizes={DESKTOP_MAIN_IMAGE_SIZES}
+            quality={LCP_IMAGE_QUALITY}
             priority
             onOpen={() => setLightboxIndex(0)}
           />
@@ -111,7 +120,8 @@ export function ActivityImageGallery({
             src={imageUrls[1]}
             alt={`${title} 이미지 2`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 100vw, 75vw"
+            sizes={DESKTOP_MAIN_IMAGE_SIZES}
+            quality={REGULAR_IMAGE_QUALITY}
             onOpen={() => setLightboxIndex(1)}
           />
         </div>
@@ -134,6 +144,8 @@ export function ActivityImageGallery({
             src={imageUrls[0]}
             alt={title}
             className="row-span-2 h-full min-h-0"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={LCP_IMAGE_QUALITY}
             priority
             onOpen={() => setLightboxIndex(0)}
           />
@@ -142,12 +154,16 @@ export function ActivityImageGallery({
               src={imageUrls[1]}
               alt={`${title} 추가 이미지 1`}
               className="min-h-0 flex-1"
+              sizes={DESKTOP_GRID_IMAGE_SIZES}
+              quality={REGULAR_IMAGE_QUALITY}
               onOpen={() => setLightboxIndex(1)}
             />
             <GalleryImageSlot
               src={imageUrls[2]}
               alt={`${title} 추가 이미지 2`}
               className="min-h-0 flex-1"
+              sizes={DESKTOP_GRID_IMAGE_SIZES}
+              quality={REGULAR_IMAGE_QUALITY}
               onOpen={() => setLightboxIndex(2)}
             />
           </div>
@@ -173,9 +189,9 @@ export function ActivityImageGallery({
               src={url}
               alt={`${title} 이미지 ${index + 1}`}
               className="min-h-0"
-              sizes="(max-width: 768px) 50vw, 38vw"
+              sizes={DESKTOP_GRID_IMAGE_SIZES}
+              quality={index === 0 ? LCP_IMAGE_QUALITY : REGULAR_IMAGE_QUALITY}
               priority={index === 0}
-              loading="lazy"
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
@@ -201,7 +217,8 @@ export function ActivityImageGallery({
             src={five[0]}
             alt={`${title} 이미지 1`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 50vw, 38vw"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={LCP_IMAGE_QUALITY}
             priority
             onOpen={() => setLightboxIndex(0)}
           />
@@ -209,7 +226,8 @@ export function ActivityImageGallery({
             src={five[1]}
             alt={`${title} 이미지 2`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 50vw, 38vw"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={REGULAR_IMAGE_QUALITY}
             onOpen={() => setLightboxIndex(1)}
           />
         </div>
@@ -218,21 +236,24 @@ export function ActivityImageGallery({
             src={five[2]}
             alt={`${title} 이미지 3`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 50vw, 38vw"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={REGULAR_IMAGE_QUALITY}
             onOpen={() => setLightboxIndex(2)}
           />
           <GalleryImageSlot
             src={five[3]}
             alt={`${title} 이미지 4`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 50vw, 38vw"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={REGULAR_IMAGE_QUALITY}
             onOpen={() => setLightboxIndex(3)}
           />
           <GalleryImageSlot
             src={five[4]}
             alt={`${title} 이미지 5`}
             className="min-h-0 flex-1"
-            sizes="(max-width: 768px) 50vw, 38vw"
+            sizes={DESKTOP_GRID_IMAGE_SIZES}
+            quality={REGULAR_IMAGE_QUALITY}
             onOpen={() => setLightboxIndex(4)}
           />
         </div>

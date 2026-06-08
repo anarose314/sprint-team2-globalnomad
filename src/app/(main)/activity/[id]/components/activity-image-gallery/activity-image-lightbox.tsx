@@ -236,7 +236,8 @@ export function ActivityImageLightbox({
                 alt={`${title} 이미지 ${index + 1}`}
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 100vw, 1152px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 84vw, 1152px"
+                quality={80}
                 priority
                 draggable={false}
               />
