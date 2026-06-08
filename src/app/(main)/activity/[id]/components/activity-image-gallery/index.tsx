@@ -13,6 +13,26 @@ interface ActivityImageGalleryProps {
   className?: string;
 }
 
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('http://')) {
+    return trimmed.replace(/^http:\/\//, 'https://');
+  }
+
+  if (trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  return null;
+};
+
 const DESKTOP_MAIN_IMAGE_SIZES =
   '(max-width: 768px) 100vw, (max-width: 1536px) 75vw, 672px';
 const DESKTOP_GRID_IMAGE_SIZES =
@@ -36,9 +56,13 @@ export function ActivityImageGallery({
   title = '체험',
   className,
 }: ActivityImageGalleryProps) {
+  const normalizedBannerUrl = normalizeImageUrl(bannerImageUrl);
+  const normalizedSubImageUrls = subImageUrls
+    .map((url) => normalizeImageUrl(url))
+    .filter((url): url is string => Boolean(url));
   const imageUrls = [
-    ...(bannerImageUrl ? [bannerImageUrl] : []),
-    ...subImageUrls.filter(Boolean),
+    ...(normalizedBannerUrl ? [normalizedBannerUrl] : []),
+    ...normalizedSubImageUrls,
   ];
   const count = imageUrls.length;
   /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */

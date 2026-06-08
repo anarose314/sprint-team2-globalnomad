@@ -29,6 +29,24 @@ const getSiteUrl = () => {
   );
 };
 
+const resolveSafeImageUrl = (
+  imageUrl: string | null | undefined,
+  fallbackBaseUrl: string
+) => {
+  const raw = imageUrl?.trim();
+  if (!raw) return null;
+
+  if (raw.startsWith('http://')) {
+    return raw.replace(/^http:\/\//, 'https://');
+  }
+
+  if (raw.startsWith('https://')) {
+    return raw;
+  }
+
+  return new URL(raw, fallbackBaseUrl).toString();
+};
+
 /**
  * 체험 상세 페이지 메타데이터를 동적으로 생성
  */
@@ -51,12 +69,10 @@ export const generateMetadata = async ({
     const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
     const bannerImageUrl = activity.bannerImageUrl?.trim();
     const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL?.trim();
-    const resolvedBannerImageUrl = bannerImageUrl
-      ? bannerImageUrl.startsWith('http://') ||
-        bannerImageUrl.startsWith('https://')
-        ? bannerImageUrl
-        : new URL(bannerImageUrl, imageBaseUrl || baseUrl).toString()
-      : null;
+    const resolvedBannerImageUrl = resolveSafeImageUrl(
+      bannerImageUrl,
+      imageBaseUrl || baseUrl
+    );
     const ogImageUrl = resolvedBannerImageUrl
       ? new URL(
           `/api/og-image?src=${encodeURIComponent(resolvedBannerImageUrl)}&v=${encodeURIComponent(activity.updatedAt)}`,
