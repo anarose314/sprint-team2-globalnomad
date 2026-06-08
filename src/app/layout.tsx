@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { QueryProvider } from '@/shared/components/query-provider';
 import { ToastContainer } from '@/shared/components/toast/toast-container';
 import '@/app/styles/globals.css';
@@ -32,29 +31,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ko" className={'h-full antialiased'}>
-      <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
-      <noscript>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-      </noscript>
       <body className="flex min-h-full flex-col font-sans">
-        <Script id="pretendard-font-loader" strategy="afterInteractive">
-          {`
-            (function () {
-              const href =
-                'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
-              if (document.querySelector('link[data-pretendard]')) return;
-
-              const link = document.createElement('link');
-              link.rel = 'stylesheet';
-              link.href = href;
-              link.setAttribute('data-pretendard', 'true');
-              document.head.appendChild(link);
-            })();
-          `}
-        </Script>
         <ToastContainer />
         <QueryProvider>{children}</QueryProvider>
         <div id="modal-root" />
