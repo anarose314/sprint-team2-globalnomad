@@ -1,0 +1,1 @@
+export const MY_NOTIFICATIONS_SIZE = 10;
