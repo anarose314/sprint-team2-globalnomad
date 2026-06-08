@@ -19,7 +19,7 @@ if (!imageUrl) {
 
 const imageHostname = parseImageHostname(imageUrl);
 
-const securityHeaders = [
+const SECURITY_HEADERS = [
   {
     key: 'Content-Security-Policy',
     value: [
@@ -63,7 +63,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/:path*',
-        headers: securityHeaders,
+        headers: SECURITY_HEADERS,
       },
     ];
   },
