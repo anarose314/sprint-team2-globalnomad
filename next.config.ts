@@ -40,6 +40,8 @@ const nextConfig: NextConfig = {
 
   images: {
     dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: 'https',

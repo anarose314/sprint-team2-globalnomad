@@ -9,12 +9,14 @@ function GalleryImageSlotInner({
   src,
   alt,
   sizes,
+  quality = 70,
   priority = false,
   loading,
 }: {
   src: string;
   alt: string;
   sizes: string;
+  quality?: number;
   priority?: boolean;
   loading?: 'eager' | 'lazy';
 }) {
@@ -59,6 +61,7 @@ function GalleryImageSlotInner({
         priority={priority}
         loading={normalizedLoading}
         sizes={sizes}
+        quality={quality}
         className={cn(
           'object-cover',
           shouldFadeIn && 'transition-opacity duration-300',
@@ -78,6 +81,7 @@ export function GalleryImageSlot({
   alt,
   className,
   sizes = '(max-width: 768px) 100vw, 50vw',
+  quality = 70,
   onOpen,
   priority = false,
   loading,
@@ -86,6 +90,7 @@ export function GalleryImageSlot({
   alt: string;
   className?: string;
   sizes?: string;
+  quality?: number;
   onOpen?: () => void;
   priority?: boolean;
   loading?: 'eager' | 'lazy';
@@ -109,6 +114,7 @@ export function GalleryImageSlot({
             src={src}
             alt={alt}
             sizes={sizes}
+            quality={quality}
             priority={priority}
             loading={loading}
           />
@@ -125,6 +131,7 @@ export function GalleryImageSlot({
           src={src}
           alt={alt}
           sizes={sizes}
+          quality={quality}
           priority={priority}
           loading={loading}
         />
