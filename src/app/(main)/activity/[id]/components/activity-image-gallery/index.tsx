@@ -192,7 +192,6 @@ export function ActivityImageGallery({
               sizes={DESKTOP_GRID_IMAGE_SIZES}
               quality={index === 0 ? LCP_IMAGE_QUALITY : REGULAR_IMAGE_QUALITY}
               priority={index === 0}
-              loading="lazy"
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
