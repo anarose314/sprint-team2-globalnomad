@@ -200,7 +200,7 @@ export function MobileReservationSheet({
                   <span className="typo-md-bold text-gray-950">
                     {selectedDateText}
                   </span>
-                  <span className="typo-xs-medium text-gray-400">
+                  <span className="typo-xs-medium text-gray-600">
                     {selectedTimeSlot
                       ? `${selectedTimeSlot.startTime} ~ ${selectedTimeSlot.endTime}`
                       : '-'}

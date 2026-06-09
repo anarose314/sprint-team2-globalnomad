@@ -25,6 +25,8 @@ export type HeadCountStepperIconButtonProps = Omit<
   ComponentPropsWithoutRef<'button'>,
   'type'
 > & {
+  /** 아이콘 버튼 접근성 이름(스크린리더 전용) */
+  'aria-label': string;
   children: ReactNode;
 };
 

@@ -43,6 +43,7 @@ interface KakaoMapNamespace {
 interface UseKakaoMapParams {
   address: string;
   appKey: string;
+  isEnabled?: boolean;
 }
 
 const KAKAO_MAP_SCRIPT_ID = 'kakao-map-sdk';
@@ -110,7 +111,11 @@ const loadKakaoMapSdk = (appKey: string) => {
 /**
  * 주소 문자열 기준으로 카카오 지도, 마커 렌더링
  */
-export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
+export const useKakaoMap = ({
+  address,
+  appKey,
+  isEnabled = true,
+}: UseKakaoMapParams) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<{
     setCenter: (position: unknown) => void;
@@ -126,6 +131,14 @@ export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
     let isCancelled = false;
 
     const initializeMap = async () => {
+      if (!isEnabled) {
+        setMapErrorMessage(
+          '현재 환경에서는 지도 미리보기를 지원하지 않습니다.'
+        );
+        setIsMapLoading(false);
+        return;
+      }
+
       if (!appKey) {
         setMapErrorMessage('지도 정보를 불러올 수 없습니다.');
         return;
@@ -194,7 +207,7 @@ export const useKakaoMap = ({ address, appKey }: UseKakaoMapParams) => {
       markerRef.current = null;
       mapRef.current = null;
     };
-  }, [address, appKey]);
+  }, [address, appKey, isEnabled]);
 
   return {
     mapContainerRef,
