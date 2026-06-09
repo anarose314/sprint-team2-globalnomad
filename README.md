@@ -77,7 +77,7 @@
   </thead>
   <tbody>
     <tr>
-      <td align="center"><b>김예지</b></td>
+      <td align="center"><b>김예지<br />(팀장)</b></td>
       <td align="left">환경 세팅 총괄, 체험 등록 및 수정, 예약 내역 및 내 체험 관리 개발</td>
       <td align="center"><a href="#김예지-상세">보기</a></td>
     </tr>
@@ -88,12 +88,12 @@
     </tr>
     <tr>
       <td align="center"><b>양하늘</b></td>
-      <td align="left">체험 상세 페이지 구현 및 예약 현황 자동화 로직 설계</td>
+      <td align="left">체험 상세 페이지 구현, 예약 현황 자동화 로직 설계 및 사이트 성능 최적화</td>
       <td align="center"><a href="#양하늘-상세">보기</a></td>
     </tr>
     <tr>
       <td align="center"><b>이승미</b></td>
-      <td align="left">공통 레이아웃 및 네비게이션 시스템 구축, 메인 화면 구현</td>
+      <td align="left">공통 레이아웃 및 네비게이션 시스템 구축, 알림 기능 및 메인 화면 구현</td>
       <td align="center"><a href="#이승미-상세">보기</a></td>
     </tr>
   </tbody>
@@ -119,6 +119,7 @@
   - 이미지 업로드 및 프리뷰 기능
   - 캘린더 / 다음 우편번호 API 연동
   - 지난 날짜 시간 등록 방지 및 접근 제한 처리
+  - 날짜 및 시간대 선택 UI 사용성 편의성 개선
 - **사용자 경험(UX) 및 품질 개선:**
   - Dropdown 사용성 개선
   - `proxy route` 작성
@@ -162,7 +163,14 @@
   - 캘린더 및 이벤트 뱃지 상태 관리
   - 동시간대 예약 자동 거절 처리
   - 체험 시간 경과 시 자동 상태 변경
+- **웹 성능 최적화 (Performance):**
+  - 상세 페이지 LCP 이미지 로딩 우선순위 및 렌더 지연 개선
+  - 체험 상세 이미지 전달 최적화 (압축/포맷/사이즈)
+  - 렌더 차단 리소스 축소 (폰트 로딩 전략 개선)
+  - Lighthouse Best Practices 향상을 위한 보안 헤더 적용
 - **사용자 경험(UX) 및 품질 개선:**
+  - 예약현황 캘린더 버튼 접근성 이름 개선
+  - 상세 페이지 복사/공유, 주소 복사 기능 추가
   - Dropdown / Modal 애니메이션
   - `proxy route` 리팩토링
   - UI 및 상태 처리 버그 수정
@@ -177,6 +185,8 @@
   - Header / Footer
   - 로그인 상태 기반 Header 연동
   - 모바일 Side Drawer
+- **알림 기능 구현:**
+  - 실시간 내 알림 내역 조회 및 확인 처리
 - **메인 페이지 기능 구현:**
   - 인기 체험 슬라이드
   - 전체 체험 페이지네이션
@@ -214,6 +224,11 @@
 | :---: | :---: |
 | <img src="https://github.com/user-attachments/assets/25cd854c-ef4d-426a-abdc-88c0094e66ee" width="100%" alt="예약현황_이미지" /> | <img src="https://github.com/user-attachments/assets/b6374191-c35f-45b6-8a04-8be7d571b35f" width="100%" alt="체험등록_이미지" /> |
 | • 캘린더 대시보드<br>• 예약 승인 및 거절 | • 카카오 우편번호 API 연동<br>• 폼 유효성 검사 및 이미지 프리뷰 |
+
+| 🔔 실시간 알림 내역 | 📱 반응형 UI 및 네비게이션 |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/d805d664-8a81-45f6-95bb-10e1db51d99a" width="100%" alt="알림_이미지" /> | <img src="https://github.com/user-attachments/assets/5b1bce6a-81ee-448a-8fb9-e078480eaa22" width="100%" alt="모바일_이미지" /> |
+| • 글로벌 알림 수신 및 미확인 뱃지 표시<br>• 실시간 알림 내역 조회 및 확인 처리 | • 디바이스 해상도별 최적화 레이아웃<br>• 모바일 전용 Side Drawer 네비게이션 |
 
 ---
 
