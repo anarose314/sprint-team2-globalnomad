@@ -70,9 +70,9 @@ export function ActivityReviews({
   return (
     <section className={cn('w-full', className)}>
       <div className="flex items-center gap-2">
-        <h3 className="typo-md-bold md:typo-2lg-bold leading-none tracking-tight text-gray-950">
+        <h2 className="typo-md-bold md:typo-2lg-bold leading-none tracking-tight text-gray-950">
           체험 후기
-        </h3>
+        </h2>
         <span className="typo-md-semibold md:typo-lg-bold leading-6 tracking-tight text-gray-600 md:leading-none">
           {formatCount(totalCount)}개
         </span>

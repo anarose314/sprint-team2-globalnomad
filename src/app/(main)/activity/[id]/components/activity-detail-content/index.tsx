@@ -63,14 +63,14 @@ export function ActivityDetailContent({
   return (
     <section className={cn('w-full', className)}>
       <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-10 2xl:pb-10">
-        <Heading as="h3">체험 설명</Heading>
+        <Heading as="h2">체험 설명</Heading>
         <p className="typo-lg-medium mt-4 wrap-anywhere whitespace-pre-line text-gray-950">
           {description}
         </p>
       </div>
 
       <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:mb-10 2xl:pb-10">
-        <Heading as="h3">오시는 길</Heading>
+        <Heading as="h2">오시는 길</Heading>
         <div className="mt-2 flex items-center gap-1">
           <IcMap aria-hidden="true" className="size-4 shrink-0 text-black" />
           <p className="typo-md-semibold text-gray-950">{address}</p>
