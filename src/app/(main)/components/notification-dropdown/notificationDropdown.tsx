@@ -1,8 +1,7 @@
 'use client';
 
-import { type KeyboardEvent, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { NotificationDropdownProps } from '@/app/(main)/components/notification-dropdown/notificationDropdown.types';
-import type { MyNotification } from '@/app/(main)/notifications/apis/myNotifications.types';
 import { IcClose } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 import { cn } from '@/shared/utils/cn';
@@ -39,6 +38,8 @@ const formatNotificationTime = (createdAt: string) => {
 };
 
 const formatNotificationContentLines = (content: string) => {
+  if (!content) return [];
+
   return content
     .replace(/\)\s*(예약이\s+(승인|거절)되었습니다\.?)/, ')\n$1')
     .split('\n');
@@ -70,19 +71,6 @@ const renderNotificationContent = (
       {restTexts.join(highlightWord)}
     </>
   );
-};
-
-const handleNotificationKeyDown = (
-  event: KeyboardEvent<HTMLDivElement>,
-  notification: MyNotification,
-  onNotificationClick: (notification: MyNotification) => void
-) => {
-  if (event.key !== 'Enter' && event.key !== ' ') {
-    return;
-  }
-
-  event.preventDefault();
-  onNotificationClick(notification);
 };
 
 /**
@@ -203,60 +191,51 @@ export function NotificationDropdown({
 
               return (
                 <li key={notification.id}>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`${notification.content} 알림 상세 보기`}
-                    onClick={() => onNotificationClick(notification)}
-                    onKeyDown={(event) =>
-                      handleNotificationKeyDown(
-                        event,
-                        notification,
-                        onNotificationClick
-                      )
-                    }
-                    className="shadow-card cursor-pointer rounded-xl bg-white px-4 py-4 transition-colors outline-none hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-gray-950"
-                  >
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'mt-1.5 size-1.5 shrink-0 rounded-full',
-                          status === 'approved' && 'bg-primary-500',
-                          status === 'declined' && 'bg-red-500',
-                          status === 'default' && 'bg-gray-400'
-                        )}
-                      />
+                  <div className="shadow-card relative rounded-xl bg-white transition-colors hover:bg-gray-50">
+                    <button
+                      type="button"
+                      aria-label={`${notification.content} 알림 상세 보기`}
+                      onClick={() => onNotificationClick(notification)}
+                      className="block w-full cursor-pointer rounded-xl px-4 py-4 pr-12 text-left outline-none focus-visible:ring-2 focus-visible:ring-gray-950"
+                    >
+                      <div className="mb-3 flex items-start gap-3">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'mt-1.5 size-1.5 shrink-0 rounded-full',
+                            status === 'approved' && 'bg-primary-500',
+                            status === 'declined' && 'bg-red-500',
+                            status === 'default' && 'bg-gray-400'
+                          )}
+                        />
+                      </div>
 
-                      <button
-                        type="button"
-                        aria-label="알림 삭제"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onDeleteClick(notification.id);
-                        }}
-                        className="flex size-7 shrink-0 cursor-pointer items-center justify-center text-gray-400 transition-colors hover:text-gray-950"
-                      >
-                        <IcClose aria-hidden="true" className="size-5" />
-                      </button>
-                    </div>
-
-                    <p className="typo-md-medium leading-normal text-gray-950">
-                      {formatNotificationContentLines(notification.content).map(
-                        (line, lineIndex) => (
+                      <p className="typo-md-medium leading-normal text-gray-950">
+                        {formatNotificationContentLines(
+                          notification.content
+                        ).map((line, lineIndex) => (
                           <span
                             key={`${notification.id}-${lineIndex}`}
                             className="block"
                           >
                             {renderNotificationContent(line, status)}
                           </span>
-                        )
-                      )}
-                    </p>
+                        ))}
+                      </p>
 
-                    <p className="typo-sm-medium mt-2 text-gray-400">
-                      {formatNotificationTime(notification.createdAt)}
-                    </p>
+                      <p className="typo-sm-medium mt-2 text-gray-400">
+                        {formatNotificationTime(notification.createdAt)}
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-label="알림 삭제"
+                      onClick={() => onDeleteClick(notification.id)}
+                      className="absolute top-4 right-4 flex size-7 cursor-pointer items-center justify-center rounded-md text-gray-400 transition-colors hover:text-gray-950 focus-visible:ring-2 focus-visible:ring-gray-950"
+                    >
+                      <IcClose aria-hidden="true" className="size-5" />
+                    </button>
                   </div>
                 </li>
               );
