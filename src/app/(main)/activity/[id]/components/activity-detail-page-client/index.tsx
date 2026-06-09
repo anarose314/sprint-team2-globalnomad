@@ -59,6 +59,7 @@ export function ActivityDetailPageClient({
 
             <div className="mb-5 border-b border-gray-100 pb-5 md:mb-8 md:pb-8 2xl:hidden">
               <ActivityInfoHeader
+                activityId={activity.id}
                 category={activity.category}
                 title={activity.title}
                 rating={activity.rating}
@@ -80,6 +81,7 @@ export function ActivityDetailPageClient({
           <div className="min-w-0 2xl:col-span-2 2xl:self-stretch">
             <div className="mb-8 hidden w-full max-w-103 2xl:block">
               <ActivityInfoHeader
+                activityId={activity.id}
                 category={activity.category}
                 title={activity.title}
                 rating={activity.rating}

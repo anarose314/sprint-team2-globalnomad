@@ -89,8 +89,10 @@ export function FormCalendar({
         className={cn('cursor-pointer', isError && INPUT_ERROR_STYLE)}
         required
         readOnly
+        role="combobox"
         aria-haspopup="grid"
         aria-expanded={isOpen}
+        aria-label="날짜 선택"
       />
       {isOpen && (
         <div className="z-dropdown absolute mt-2">
@@ -100,6 +102,9 @@ export function FormCalendar({
             className="form-calendar"
             onChange={handleClick}
             value={date ? new Date(date + 'T00:00:00') : null}
+            navigationAriaLabel="월 선택"
+            prevAriaLabel="이전 달"
+            nextAriaLabel="다음 달"
             prev2Label={null}
             next2Label={null}
             prevLabel={

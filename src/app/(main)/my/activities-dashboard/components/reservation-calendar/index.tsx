@@ -116,6 +116,9 @@ export function ReservationCalendar({ activityId }: ReservationCalendarProps) {
           if (activeStartDate) setCurrentDate(activeStartDate);
         }}
         showNeighboringMonth
+        navigationAriaLabel="월 선택"
+        prevAriaLabel="이전 달"
+        nextAriaLabel="다음 달"
         prevLabel={
           <span className="inline-flex h-6 w-6 items-center justify-center text-gray-950">
             <IcArrowLeft className="h-6 w-6" />
