@@ -37,8 +37,10 @@ export function ActivityDetailContent({
 
   const currentHostname =
     typeof window === 'undefined' ? '' : window.location.hostname;
+  const isVercelPreviewHostname = currentHostname.endsWith('.vercel.app');
   const isMapEnabled =
-    currentHostname !== '' && allowedHostnames.has(currentHostname);
+    currentHostname !== '' &&
+    (allowedHostnames.has(currentHostname) || isVercelPreviewHostname);
   const { mapContainerRef, isMapLoading, mapErrorMessage } = useKakaoMap({
     address,
     appKey,
