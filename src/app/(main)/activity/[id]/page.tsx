@@ -6,6 +6,7 @@ import { ApiError } from '@/shared/apis/apiError';
 import { User } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
+import { resolveSafeImageUrl } from '@/shared/utils/resolveSafeImageUrl';
 
 interface ActivityDetailPageProps {
   params: Promise<{ id: string }>;
@@ -51,12 +52,10 @@ export const generateMetadata = async ({
     const pageUrl = new URL(`/activity/${activity.id}`, baseUrl).toString();
     const bannerImageUrl = activity.bannerImageUrl?.trim();
     const imageBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL?.trim();
-    const resolvedBannerImageUrl = bannerImageUrl
-      ? bannerImageUrl.startsWith('http://') ||
-        bannerImageUrl.startsWith('https://')
-        ? bannerImageUrl
-        : new URL(bannerImageUrl, imageBaseUrl || baseUrl).toString()
-      : null;
+    const resolvedBannerImageUrl = resolveSafeImageUrl(
+      bannerImageUrl,
+      imageBaseUrl || baseUrl
+    );
     const ogImageUrl = resolvedBannerImageUrl
       ? new URL(
           `/api/og-image?src=${encodeURIComponent(resolvedBannerImageUrl)}&v=${encodeURIComponent(activity.updatedAt)}`,

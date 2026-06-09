@@ -5,6 +5,7 @@ import { ActivityImageLightbox } from '@/app/(main)/activity/[id]/components/act
 import { GalleryImageSlot } from '@/app/(main)/activity/[id]/components/activity-image-gallery/gallery-image-slot';
 import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
 import { cn } from '@/shared/utils/cn';
+import { resolveSafeImageUrl } from '@/shared/utils/resolveSafeImageUrl';
 
 interface ActivityImageGalleryProps {
   bannerImageUrl?: string;
@@ -36,9 +37,17 @@ export function ActivityImageGallery({
   title = '체험',
   className,
 }: ActivityImageGalleryProps) {
+  const imageBaseUrl =
+    process.env.NEXT_PUBLIC_IMAGE_URL?.trim() ??
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ??
+    'https://globalnomad-team2.vercel.app';
+  const normalizedBannerUrl = resolveSafeImageUrl(bannerImageUrl, imageBaseUrl);
+  const normalizedSubImageUrls = subImageUrls
+    .map((url) => resolveSafeImageUrl(url, imageBaseUrl))
+    .filter((url): url is string => Boolean(url));
   const imageUrls = [
-    ...(bannerImageUrl ? [bannerImageUrl] : []),
-    ...subImageUrls.filter(Boolean),
+    ...(normalizedBannerUrl ? [normalizedBannerUrl] : []),
+    ...normalizedSubImageUrls,
   ];
   const count = imageUrls.length;
   /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */
