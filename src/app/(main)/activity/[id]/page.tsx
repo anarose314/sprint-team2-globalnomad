@@ -6,6 +6,7 @@ import { ApiError } from '@/shared/apis/apiError';
 import { User } from '@/shared/apis/auth/auth.types';
 import { fetchInstanceServer } from '@/shared/apis/fetchInstance.server';
 import { ActivityDetailResponse } from '@/shared/types/activityDetail.types';
+import { resolveSafeImageUrl } from '@/shared/utils/resolveSafeImageUrl';
 
 interface ActivityDetailPageProps {
   params: Promise<{ id: string }>;
@@ -27,24 +28,6 @@ const getSiteUrl = () => {
   return (
     process.env.NEXT_PUBLIC_APP_URL || 'https://globalnomad-team2.vercel.app'
   );
-};
-
-const resolveSafeImageUrl = (
-  imageUrl: string | null | undefined,
-  fallbackBaseUrl: string
-) => {
-  const raw = imageUrl?.trim();
-  if (!raw) return null;
-
-  if (raw.startsWith('http://')) {
-    return raw.replace(/^http:\/\//, 'https://');
-  }
-
-  if (raw.startsWith('https://')) {
-    return raw;
-  }
-
-  return new URL(raw, fallbackBaseUrl).toString();
 };
 
 /**

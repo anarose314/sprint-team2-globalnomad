@@ -5,6 +5,7 @@ import { ActivityImageLightbox } from '@/app/(main)/activity/[id]/components/act
 import { GalleryImageSlot } from '@/app/(main)/activity/[id]/components/activity-image-gallery/gallery-image-slot';
 import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
 import { cn } from '@/shared/utils/cn';
+import { resolveSafeImageUrl } from '@/shared/utils/resolveSafeImageUrl';
 
 interface ActivityImageGalleryProps {
   bannerImageUrl?: string;
@@ -12,26 +13,6 @@ interface ActivityImageGalleryProps {
   title?: string;
   className?: string;
 }
-
-const normalizeImageUrl = (url?: string | null) => {
-  if (!url) return null;
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-
-  if (trimmed.startsWith('/')) {
-    return trimmed;
-  }
-
-  if (trimmed.startsWith('http://')) {
-    return trimmed.replace(/^http:\/\//, 'https://');
-  }
-
-  if (trimmed.startsWith('https://')) {
-    return trimmed;
-  }
-
-  return null;
-};
 
 const DESKTOP_MAIN_IMAGE_SIZES =
   '(max-width: 768px) 100vw, (max-width: 1536px) 75vw, 672px';
@@ -56,9 +37,13 @@ export function ActivityImageGallery({
   title = '체험',
   className,
 }: ActivityImageGalleryProps) {
-  const normalizedBannerUrl = normalizeImageUrl(bannerImageUrl);
+  const imageBaseUrl =
+    process.env.NEXT_PUBLIC_IMAGE_URL?.trim() ??
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ??
+    'https://globalnomad-team2.vercel.app';
+  const normalizedBannerUrl = resolveSafeImageUrl(bannerImageUrl, imageBaseUrl);
   const normalizedSubImageUrls = subImageUrls
-    .map((url) => normalizeImageUrl(url))
+    .map((url) => resolveSafeImageUrl(url, imageBaseUrl))
     .filter((url): url is string => Boolean(url));
   const imageUrls = [
     ...(normalizedBannerUrl ? [normalizedBannerUrl] : []),
