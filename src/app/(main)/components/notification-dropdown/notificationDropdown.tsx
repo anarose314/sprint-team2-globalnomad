@@ -38,6 +38,12 @@ const formatNotificationTime = (createdAt: string) => {
   return `${diffDays}일 전`;
 };
 
+const formatNotificationContentLines = (content: string) => {
+  return content
+    .replace(/\)\s*(예약이\s+(승인|거절)되었습니다\.?)/, ')\n$1')
+    .split('\n');
+};
+
 const renderNotificationContent = (
   content: string,
   status: NotificationStatus
@@ -55,7 +61,7 @@ const renderNotificationContent = (
       {firstText}
       <span
         className={cn(
-          status === 'approved' && 'text-blue-500',
+          status === 'approved' && 'text-primary-500',
           status === 'declined' && 'text-red-500'
         )}
       >
@@ -149,7 +155,7 @@ export function NotificationDropdown({
       role="dialog"
       aria-label="알림 목록"
       className={cn(
-        'shadow-custom z-dropdwon bg-primary-50 fixed inset-x-0 top-14 bottom-0 flex flex-col px-5 py-10',
+        'shadow-custom z-dropdown bg-primary-50 fixed inset-x-0 top-14 bottom-0 flex flex-col px-5 py-10',
         'md:absolute md:top-14 md:right-0 md:bottom-auto md:left-auto md:h-117.25 md:w-92 md:rounded-2xl md:p-5'
       )}
     >
@@ -216,7 +222,7 @@ export function NotificationDropdown({
                         aria-hidden="true"
                         className={cn(
                           'mt-1.5 size-1.5 shrink-0 rounded-full',
-                          status === 'approved' && 'bg-blue-500',
+                          status === 'approved' && 'bg-primary-500',
                           status === 'declined' && 'bg-red-500',
                           status === 'default' && 'bg-gray-400'
                         )}
@@ -236,7 +242,16 @@ export function NotificationDropdown({
                     </div>
 
                     <p className="typo-md-medium leading-normal text-gray-950">
-                      {renderNotificationContent(notification.content, status)}
+                      {formatNotificationContentLines(notification.content).map(
+                        (line, lineIndex) => (
+                          <span
+                            key={`${notification.id}-${lineIndex}`}
+                            className="block"
+                          >
+                            {renderNotificationContent(line, status)}
+                          </span>
+                        )
+                      )}
                     </p>
 
                     <p className="typo-sm-medium mt-2 text-gray-400">

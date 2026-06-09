@@ -168,7 +168,7 @@ export function MainHeaderWithDrawer({
         user={user}
         hasNotification={hasNotification}
         onNotificationClick={toggleNotification}
-        onNotificationClose={closeNotification}
+        onNotificationClose={isOpen ? undefined : closeNotification}
         isNotificationOpen={isNotificationOpen}
         notificationMenuId={
           isNotificationOpen ? NOTIFICATION_MENU_ID : undefined
