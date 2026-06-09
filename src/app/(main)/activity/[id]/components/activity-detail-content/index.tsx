@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { IcCopy, IcMap } from '@/shared/assets/icons';
 import { Heading } from '@/shared/components/heading';
 import { useKakaoMap } from '@/shared/hooks/useKakaoMap';
@@ -19,15 +20,21 @@ export function ActivityDetailContent({
 }: ActivityDetailContentProps) {
   const showToast = useShowToast();
   const appKey = (process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY ?? '').trim();
-  const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
-  const allowedHostnames = new Set<string>(['localhost', '127.0.0.1']);
-  if (appBaseUrl) {
-    try {
-      allowedHostnames.add(new URL(appBaseUrl).hostname);
-    } catch {
-      // 잘못된 환경 변수 형식은 런타임 오류 대신 기본 허용 호스트만 사용한다.
+  const allowedHostnames = useMemo(() => {
+    const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
+    const hostnames = new Set<string>(['localhost', '127.0.0.1']);
+
+    if (appBaseUrl) {
+      try {
+        hostnames.add(new URL(appBaseUrl).hostname);
+      } catch {
+        // 잘못된 환경 변수 형식은 런타임 오류 대신 기본 허용 호스트만 사용한다.
+      }
     }
-  }
+
+    return hostnames;
+  }, []);
+
   const currentHostname =
     typeof window === 'undefined' ? '' : window.location.hostname;
   const isMapEnabled =
