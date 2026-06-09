@@ -17,7 +17,15 @@ if (!imageUrl) {
   );
 }
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+if (!apiBaseUrl) {
+  throw new Error(
+    '🚨 NEXT_PUBLIC_API_BASE_URL 환경 변수가 누락되었습니다. .env 파일을 확인해주세요!'
+  );
+}
+
 const imageHostname = parseImageHostname(imageUrl);
+const apiHostname = parseImageHostname(apiBaseUrl);
 
 const SECURITY_HEADERS = [
   {
@@ -25,10 +33,10 @@ const SECURITY_HEADERS = [
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net",
-      "style-src 'self' 'unsafe-inline' https:",
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data: https:",
-      "connect-src 'self' https: wss:",
+      "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+      `img-src 'self' data: blob: https://${imageHostname} https://t1.daumcdn.net https://*.daumcdn.net`,
+      "font-src 'self' data: https://cdn.jsdelivr.net",
+      `connect-src 'self' https://${apiHostname} https://dapi.kakao.com wss:`,
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
