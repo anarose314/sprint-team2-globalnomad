@@ -1,20 +1,15 @@
-export interface NotificationItem {
-  id: number;
-  teamId: string;
-  userId: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-
-export interface NotificationResponse {
-  cursorId: number;
-  notifications: NotificationItem[];
-  totalCount: number;
-}
+import type { MyNotification } from '@/app/(main)/notifications/apis/myNotifications.types';
 
 export interface NotificationDropdownProps {
-  data?: NotificationResponse;
-  onClose?: () => void;
+  id?: string;
+  notifications: MyNotification[];
+  totalCount: number;
+  isPending?: boolean;
+  isError?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onClose: () => void;
+  onLoadMore?: () => void;
+  onNotificationClick: (notification: MyNotification) => void;
+  onDeleteClick: (notificationId: number) => void;
 }

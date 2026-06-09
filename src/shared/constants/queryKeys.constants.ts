@@ -10,6 +10,7 @@ export const QUERY_KEYS = {
   MY_ACTIVITY_RESERVED_SCHEDULE: ['myActivityReservedSchedule'],
   MY_ACTIVITY_RESERVATIONS: ['myActivityReservations'],
   MY_INFO: ['myInfo'],
+  MY_NOTIFICATIONS: ['myNotifications'],
 } as const;
 
 export const URL_QUERY_ERRORS = {
