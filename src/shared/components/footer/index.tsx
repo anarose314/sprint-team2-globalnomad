@@ -28,7 +28,7 @@ export function Footer() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="팀 GitHub 저장소 새 탭에서 열기"
-          className="flex h-8 w-8 shrink-0 items-center justify-center"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md"
         >
           <IcGithub className="h-6 w-6 text-gray-600" aria-hidden="true" />
         </a>
