@@ -102,6 +102,9 @@ export function FormCalendar({
             className="form-calendar"
             onChange={handleClick}
             value={date ? new Date(date + 'T00:00:00') : null}
+            navigationAriaLabel="월 선택"
+            prevAriaLabel="이전 달"
+            nextAriaLabel="다음 달"
             prev2Label={null}
             next2Label={null}
             prevLabel={
