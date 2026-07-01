@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
+
+const EMPTY_SCHEDULES: ReservedScheduleItem[] = [];
 
 interface UseReservationCalendarQueriesProps {
   activityId: number | null;
@@ -37,7 +40,7 @@ export const useReservationCalendarQueries = ({
     refetchInterval: activityId !== null ? 60_000 : false,
   });
 
-  const { data: reservedSchedulesSelected = [] } = useQuery({
+  const { data: reservedSchedulesSelected = EMPTY_SCHEDULES } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
       activityId,
@@ -53,7 +56,7 @@ export const useReservationCalendarQueries = ({
       activityId !== null && Boolean(reservedScheduleDateKey) ? 60_000 : false,
   });
 
-  const { data: reservedSchedulesToday = [] } = useQuery({
+  const { data: reservedSchedulesToday = EMPTY_SCHEDULES } = useQuery({
     queryKey: [
       ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
       activityId,

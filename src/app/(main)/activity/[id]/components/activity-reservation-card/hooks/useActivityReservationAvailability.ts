@@ -3,11 +3,16 @@
 import { useMemo } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
-import { fetchMyReservedSchedules } from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
+import {
+  fetchMyReservedSchedules,
+  type MyReservedScheduleItem,
+} from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
 import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
+
+const EMPTY_RESERVED_SCHEDULES: MyReservedScheduleItem[] = [];
 
 interface UseActivityReservationAvailabilityProps {
   activityId: number;
@@ -144,7 +149,7 @@ export const useActivityReservationAvailability = ({
     (query) => query.isError
   );
 
-  const { data: myReservedSchedules = [] } = useQuery({
+  const { data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES } = useQuery({
     queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
     queryFn: fetchMyReservedSchedules,
     enabled: isAuthenticated,
