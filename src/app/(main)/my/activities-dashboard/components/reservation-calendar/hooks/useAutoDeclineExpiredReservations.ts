@@ -87,13 +87,13 @@ export const useAutoDeclineExpiredReservations = ({
     const candidates = [...candidatesByScheduleId.values()];
     if (candidates.length === 0) return;
 
-    let cancelled = false;
+    let isCancelled = false;
 
     void (async () => {
-      let declinedAny = false;
+      let hasDeclinedAny = false;
 
       for (const { schedule } of candidates) {
-        if (cancelled) return;
+        if (isCancelled) return;
 
         try {
           const ids = await collectPendingReservationIdsForSchedule({
@@ -101,10 +101,10 @@ export const useAutoDeclineExpiredReservations = ({
             scheduleId: schedule.scheduleId,
           });
           if (ids.length === 0) continue;
-          if (cancelled) return;
+          if (isCancelled) return;
 
           // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
-          declinedAny = true;
+          hasDeclinedAny = true;
           await declinePendingReservationIds(activityId, ids);
         } catch {
           // 다음 스케줄 처리 계속
@@ -113,7 +113,7 @@ export const useAutoDeclineExpiredReservations = ({
         }
       }
 
-      if (cancelled || !declinedAny) return;
+      if (isCancelled || !hasDeclinedAny) return;
 
       await Promise.all(
         ACTIVITY_RESERVATION_CACHE_ROOTS.map((root) =>
@@ -125,7 +125,7 @@ export const useAutoDeclineExpiredReservations = ({
     })();
 
     return () => {
-      cancelled = true;
+      isCancelled = true;
     };
   }, [
     activityId,
