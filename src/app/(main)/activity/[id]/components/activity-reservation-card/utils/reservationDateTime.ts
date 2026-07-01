@@ -18,7 +18,11 @@ const toKstDateKey = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-export const normalizeDateKey = (rawDate: string) => {
+export const normalizeDateKey = (rawDate: unknown) => {
+  if (typeof rawDate !== 'string' || rawDate.length === 0) {
+    return '';
+  }
+
   const trimmed = rawDate.trim();
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {

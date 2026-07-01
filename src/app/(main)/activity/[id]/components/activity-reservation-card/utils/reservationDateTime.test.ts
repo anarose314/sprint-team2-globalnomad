@@ -5,6 +5,12 @@ import {
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
 
 describe('normalizeDateKey', () => {
+  it('null/undefined 등 유효하지 않은 입력은 빈 문자열을 반환한다', () => {
+    expect(normalizeDateKey(null)).toBe('');
+    expect(normalizeDateKey(undefined)).toBe('');
+    expect(normalizeDateKey(1234)).toBe('');
+  });
+
   it('시간 정보가 포함된 ISO 문자열은 KST 기준 날짜로 변환한다', () => {
     expect(normalizeDateKey('2026-06-30T15:00:00.000Z')).toBe('2026-07-01');
   });
