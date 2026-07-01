@@ -2,10 +2,9 @@ import { formatDateKey } from '@/shared/utils/formatDate';
 
 export const normalizeDateKey = (rawDate: string) => {
   const trimmed = rawDate.trim();
-  const shortDate = trimmed.slice(0, 10);
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
-    return shortDate;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return trimmed;
   }
 
   const parsed = new Date(trimmed);

@@ -3,10 +3,18 @@ import {
   normalizeDateKey,
   parseTimeToHourMinute,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
+import { formatDateKey } from '@/shared/utils/formatDate';
 
 describe('normalizeDateKey', () => {
-  it('ISO 형식 문자열에서 날짜 부분만 추출한다', () => {
-    expect(normalizeDateKey(' 2026-06-30T14:30:00.000Z ')).toBe('2026-06-30');
+  it('시간 정보가 포함된 ISO 문자열은 로컬 타임존 기준 날짜로 변환한다', () => {
+    const isoDateTime = '2026-06-30T15:00:00.000Z';
+    const expected = formatDateKey(new Date(isoDateTime));
+
+    expect(normalizeDateKey(` ${isoDateTime} `)).toBe(expected);
+  });
+
+  it('순수 날짜 문자열은 그대로 유지한다', () => {
+    expect(normalizeDateKey('2026-06-30')).toBe('2026-06-30');
   });
 
   it('파싱 가능한 문자열은 YYYY-MM-DD로 정규화한다', () => {
