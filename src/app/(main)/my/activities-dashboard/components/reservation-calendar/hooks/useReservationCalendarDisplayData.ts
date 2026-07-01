@@ -5,7 +5,7 @@ import {
 } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
 import { buildReservationDetailData } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeReservationDetailData';
 import { mergeScheduleOverlayIntoEventCounts } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/mergeScheduleOverlayIntoEventCounts';
-import type { ReservationDashboardItem } from '@/shared/types/reservationDashboard.types';
+import type { ReservationDashboardDailyItem } from '@/shared/types/reservationDashboard.types';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 
 const hasReservedSlotActivity = (schedules: ReservedScheduleItem[]) =>
@@ -17,7 +17,7 @@ const hasReservedSlotActivity = (schedules: ReservedScheduleItem[]) =>
   });
 
 interface UseReservationCalendarDisplayDataProps {
-  reservationDashboard: ReservationDashboardItem[];
+  reservationDashboard: ReservationDashboardDailyItem[];
   reservedScheduleDateKey: string | null;
   reservedSchedulesSelected: ReservedScheduleItem[];
   reservedSchedulesToday: ReservedScheduleItem[];
