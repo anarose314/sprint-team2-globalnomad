@@ -37,7 +37,11 @@ export const normalizeDateKey = (rawDate: unknown) => {
   return toKstDateKey(parsed) || trimmed;
 };
 
-export const parseTimeToHourMinute = (time: string) => {
+export const parseTimeToHourMinute = (time: unknown) => {
+  if (typeof time !== 'string' || time.length === 0) {
+    return null;
+  }
+
   const [hourText, minuteText] = time.split(':');
   const hour = Number(hourText);
   const minute = Number(minuteText);

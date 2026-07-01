@@ -29,6 +29,13 @@ describe('normalizeDateKey', () => {
 });
 
 describe('parseTimeToHourMinute', () => {
+  it('null/undefined 등 유효하지 않은 입력은 null을 반환한다', () => {
+    expect(parseTimeToHourMinute(null)).toBeNull();
+    expect(parseTimeToHourMinute(undefined)).toBeNull();
+    expect(parseTimeToHourMinute(930)).toBeNull();
+    expect(parseTimeToHourMinute('')).toBeNull();
+  });
+
   it('정상 시각 문자열을 시/분 객체로 반환한다', () => {
     expect(parseTimeToHourMinute('09:30')).toEqual({ hour: 9, minute: 30 });
   });
