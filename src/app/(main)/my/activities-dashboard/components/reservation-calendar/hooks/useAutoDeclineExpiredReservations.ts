@@ -113,7 +113,7 @@ export const useAutoDeclineExpiredReservations = ({
         }
       }
 
-      if (isCancelled || !hasDeclinedAny) return;
+      if (!hasDeclinedAny) return;
 
       await Promise.all(
         ACTIVITY_RESERVATION_CACHE_ROOTS.map((root) =>
