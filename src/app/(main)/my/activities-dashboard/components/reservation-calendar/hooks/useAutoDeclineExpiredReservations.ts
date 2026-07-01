@@ -93,7 +93,7 @@ export const useAutoDeclineExpiredReservations = ({
       let hasDeclinedAny = false;
 
       for (const { schedule } of candidates) {
-        if (isCancelled) return;
+        if (isCancelled) break;
 
         try {
           const ids = await collectPendingReservationIdsForSchedule({
@@ -101,7 +101,7 @@ export const useAutoDeclineExpiredReservations = ({
             scheduleId: schedule.scheduleId,
           });
           if (ids.length === 0) continue;
-          if (isCancelled) return;
+          if (isCancelled) break;
 
           // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
           hasDeclinedAny = true;
