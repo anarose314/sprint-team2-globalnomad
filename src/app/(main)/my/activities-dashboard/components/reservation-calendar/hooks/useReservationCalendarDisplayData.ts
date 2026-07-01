@@ -21,7 +21,7 @@ interface UseReservationCalendarDisplayDataProps {
   reservedScheduleDateKey: string | null;
   reservedSchedulesSelected: ReservedScheduleItem[];
   reservedSchedulesToday: ReservedScheduleItem[];
-  fetchTodayScheduleInBackground: boolean;
+  isTodayScheduleFetchRequired: boolean;
   todayDateKey: string;
 }
 
@@ -30,7 +30,7 @@ export const useReservationCalendarDisplayData = ({
   reservedScheduleDateKey,
   reservedSchedulesSelected,
   reservedSchedulesToday,
-  fetchTodayScheduleInBackground,
+  isTodayScheduleFetchRequired,
   todayDateKey,
 }: UseReservationCalendarDisplayDataProps) => {
   const { eventCountsByDate, notificationDotByDate } = useMemo(() => {
@@ -74,7 +74,7 @@ export const useReservationCalendarDisplayData = ({
     }
 
     if (
-      fetchTodayScheduleInBackground &&
+      isTodayScheduleFetchRequired &&
       hasReservedSlotActivity(reservedSchedulesToday)
     ) {
       notificationDotByDate[todayDateKey] = true;
@@ -88,7 +88,7 @@ export const useReservationCalendarDisplayData = ({
       );
     }
     if (
-      fetchTodayScheduleInBackground &&
+      isTodayScheduleFetchRequired &&
       reservedSchedulesToday.length > 0 &&
       todayDateKey !== reservedScheduleDateKey
     ) {
@@ -110,7 +110,7 @@ export const useReservationCalendarDisplayData = ({
 
     return { eventCountsByDate: eventCounts, notificationDotByDate };
   }, [
-    fetchTodayScheduleInBackground,
+    isTodayScheduleFetchRequired,
     reservationDashboard,
     reservedScheduleDateKey,
     reservedSchedulesSelected,

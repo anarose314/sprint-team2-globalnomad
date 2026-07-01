@@ -39,7 +39,7 @@ export const useReservationCalendarData = ({
     );
   }, [currentYear, currentMonth]);
 
-  const fetchTodayScheduleInBackground =
+  const isTodayScheduleFetchRequired =
     isTodayInVisibleMonth &&
     (reservedScheduleDateKey === null ||
       reservedScheduleDateKey !== todayDateKey);
@@ -54,14 +54,14 @@ export const useReservationCalendarData = ({
     currentMonth,
     reservedScheduleDateKey,
     todayDateKey,
-    fetchTodayScheduleInBackground,
+    isTodayScheduleFetchRequired,
   });
 
   useAutoDeclineExpiredReservations({
     activityId,
     reservedScheduleDateKey,
     todayDateKey,
-    fetchTodayScheduleInBackground,
+    isTodayScheduleFetchRequired,
     reservedSchedulesSelected,
     reservedSchedulesToday,
   });
@@ -72,7 +72,7 @@ export const useReservationCalendarData = ({
       reservedScheduleDateKey,
       reservedSchedulesSelected,
       reservedSchedulesToday,
-      fetchTodayScheduleInBackground,
+      isTodayScheduleFetchRequired,
       todayDateKey,
     });
 

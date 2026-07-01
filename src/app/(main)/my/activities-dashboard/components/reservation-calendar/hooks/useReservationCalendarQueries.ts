@@ -12,7 +12,7 @@ interface UseReservationCalendarQueriesProps {
   currentMonth: number;
   reservedScheduleDateKey: string | null;
   todayDateKey: string;
-  fetchTodayScheduleInBackground: boolean;
+  isTodayScheduleFetchRequired: boolean;
 }
 
 export const useReservationCalendarQueries = ({
@@ -21,7 +21,7 @@ export const useReservationCalendarQueries = ({
   currentMonth,
   reservedScheduleDateKey,
   todayDateKey,
-  fetchTodayScheduleInBackground,
+  isTodayScheduleFetchRequired,
 }: UseReservationCalendarQueriesProps) => {
   const { data: reservationDashboard = [] } = useQuery({
     queryKey: [
@@ -67,9 +67,9 @@ export const useReservationCalendarQueries = ({
         activityId: activityId as number,
         date: todayDateKey,
       }),
-    enabled: activityId !== null && fetchTodayScheduleInBackground,
+    enabled: activityId !== null && isTodayScheduleFetchRequired,
     refetchInterval:
-      activityId !== null && fetchTodayScheduleInBackground ? 60_000 : false,
+      activityId !== null && isTodayScheduleFetchRequired ? 60_000 : false,
   });
 
   return {

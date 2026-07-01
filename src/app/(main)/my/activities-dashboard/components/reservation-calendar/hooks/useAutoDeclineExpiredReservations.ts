@@ -19,7 +19,7 @@ interface UseAutoDeclineExpiredReservationsProps {
   activityId: number | null;
   reservedScheduleDateKey: string | null;
   todayDateKey: string;
-  fetchTodayScheduleInBackground: boolean;
+  isTodayScheduleFetchRequired: boolean;
   reservedSchedulesSelected: ReservedScheduleItem[];
   reservedSchedulesToday: ReservedScheduleItem[];
 }
@@ -28,7 +28,7 @@ export const useAutoDeclineExpiredReservations = ({
   activityId,
   reservedScheduleDateKey,
   todayDateKey,
-  fetchTodayScheduleInBackground,
+  isTodayScheduleFetchRequired,
   reservedSchedulesSelected,
   reservedSchedulesToday,
 }: UseAutoDeclineExpiredReservationsProps) => {
@@ -56,7 +56,7 @@ export const useAutoDeclineExpiredReservations = ({
     }
 
     if (
-      fetchTodayScheduleInBackground &&
+      isTodayScheduleFetchRequired &&
       reservedSchedulesToday.length > 0 &&
       !scheduleLoads.some((entry) => entry.dateKey === todayDateKey)
     ) {
@@ -129,7 +129,7 @@ export const useAutoDeclineExpiredReservations = ({
     };
   }, [
     activityId,
-    fetchTodayScheduleInBackground,
+    isTodayScheduleFetchRequired,
     queryClient,
     reservedScheduleDateKey,
     reservedSchedulesSelected,
