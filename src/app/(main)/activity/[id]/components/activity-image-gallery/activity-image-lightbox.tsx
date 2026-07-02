@@ -155,8 +155,23 @@ export function ActivityImageLightbox({
         const panel = panelRef.current;
         if (!panel) return;
         const focusableElements = [
-          ...panel.querySelectorAll<HTMLButtonElement>('button'),
-        ].filter((element) => !element.disabled);
+          ...panel.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]'
+          ),
+        ].filter((element) => {
+          if (element.tabIndex === -1) return false;
+
+          if (
+            element instanceof HTMLButtonElement ||
+            element instanceof HTMLInputElement ||
+            element instanceof HTMLSelectElement ||
+            element instanceof HTMLTextAreaElement
+          ) {
+            return !element.disabled;
+          }
+
+          return true;
+        });
         if (focusableElements.length === 0) return;
 
         const first = focusableElements[0];
