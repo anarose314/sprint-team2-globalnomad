@@ -119,9 +119,28 @@ export function ModalOverlay({
   useEffect(() => {
     if (!portalRoot) return;
 
-    const backgroundElements = [...document.body.children].filter(
-      (element) => element !== portalRoot && !element.contains(portalRoot)
-    ) as HTMLElement[];
+    const backgroundElements: HTMLElement[] = [];
+    const collectBackgroundElements = (element: Element) => {
+      if (element === portalRoot) {
+        return;
+      }
+
+      if (element.contains(portalRoot)) {
+        [...element.children].forEach((child) =>
+          collectBackgroundElements(child)
+        );
+        return;
+      }
+
+      if (element instanceof HTMLElement) {
+        backgroundElements.push(element);
+      }
+    };
+
+    [...document.body.children].forEach((child) =>
+      collectBackgroundElements(child)
+    );
+
     const prevState = backgroundElements.map((element) => ({
       element,
       ariaHidden: element.getAttribute('aria-hidden'),
