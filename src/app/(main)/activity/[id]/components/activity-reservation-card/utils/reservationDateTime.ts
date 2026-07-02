@@ -18,7 +18,21 @@ const toKstDateKey = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+/**
+ * 입력값을 KST 기준 `YYYY-MM-DD` 날짜 키로 정규화한다.
+ *
+ * @example
+ * normalizeDateKey('2026-06-30T15:00:00.000Z') // '2026-07-01'
+ */
 export const normalizeDateKey = (rawDate: unknown) => {
+  if (rawDate instanceof Date) {
+    if (Number.isNaN(rawDate.getTime())) {
+      return '';
+    }
+
+    return toKstDateKey(rawDate);
+  }
+
   if (typeof rawDate !== 'string' || rawDate.length === 0) {
     return '';
   }
