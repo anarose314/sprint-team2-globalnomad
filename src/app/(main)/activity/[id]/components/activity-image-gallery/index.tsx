@@ -135,7 +135,7 @@ export function ActivityImageGallery({
             className
           )}
         >
-          {slots.map((slot) => renderSlot(slot))}
+          {slots.map(renderSlot)}
         </div>
         {lightbox}
       </>
@@ -170,7 +170,7 @@ export function ActivityImageGallery({
             className
           )}
         >
-          {slots.map((slot) => renderSlot(slot))}
+          {slots.map(renderSlot)}
         </div>
         {lightbox}
       </>
@@ -214,7 +214,7 @@ export function ActivityImageGallery({
         >
           {renderSlot(mainSlot)}
           <div className="row-span-2 flex h-full min-h-0 flex-col gap-2">
-            {rightSlots.map((slot) => renderSlot(slot))}
+            {rightSlots.map(renderSlot)}
           </div>
         </div>
         {lightbox}
@@ -241,7 +241,7 @@ export function ActivityImageGallery({
             className
           )}
         >
-          {slots.map((slot) => renderSlot(slot))}
+          {slots.map(renderSlot)}
         </div>
         {lightbox}
       </>
