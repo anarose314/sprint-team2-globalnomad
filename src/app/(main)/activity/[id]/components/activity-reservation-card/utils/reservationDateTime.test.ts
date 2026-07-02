@@ -38,6 +38,7 @@ describe('parseTimeToHourMinute', () => {
 
   it('정상 시각 문자열을 시/분 객체로 반환한다', () => {
     expect(parseTimeToHourMinute('09:30')).toEqual({ hour: 9, minute: 30 });
+    expect(parseTimeToHourMinute('09:30:59')).toEqual({ hour: 9, minute: 30 });
   });
 
   it('허용 범위를 벗어난 시각은 null을 반환한다', () => {
@@ -45,7 +46,10 @@ describe('parseTimeToHourMinute', () => {
     expect(parseTimeToHourMinute('10:60')).toBeNull();
   });
 
-  it('숫자로 파싱되지 않는 값은 null을 반환한다', () => {
+  it('형식이 잘못된 값은 null을 반환한다', () => {
+    expect(parseTimeToHourMinute(':')).toBeNull();
+    expect(parseTimeToHourMinute('12:')).toBeNull();
+    expect(parseTimeToHourMinute(':30')).toBeNull();
     expect(parseTimeToHourMinute('aa:bb')).toBeNull();
   });
 });

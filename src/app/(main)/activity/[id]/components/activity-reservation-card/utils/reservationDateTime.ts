@@ -37,23 +37,25 @@ export const normalizeDateKey = (rawDate: unknown) => {
   return toKstDateKey(parsed) || trimmed;
 };
 
+/**
+ * `HH:MM` 또는 `HH:MM:SS` 형식의 시간 문자열을 파싱해 시/분 반환
+ * 형식이 올바르지 않거나 범위를 벗어나면 null을 반환
+ */
 export const parseTimeToHourMinute = (time: unknown) => {
   if (typeof time !== 'string' || time.length === 0) {
     return null;
   }
 
-  const [hourText, minuteText] = time.split(':');
+  const trimmed = time.trim();
+  if (!/^\d{1,2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+    return null;
+  }
+
+  const [hourText, minuteText] = trimmed.split(':');
   const hour = Number(hourText);
   const minute = Number(minuteText);
 
-  if (
-    !Number.isInteger(hour) ||
-    !Number.isInteger(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
     return null;
   }
 
