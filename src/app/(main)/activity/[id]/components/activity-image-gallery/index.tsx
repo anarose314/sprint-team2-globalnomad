@@ -248,7 +248,6 @@ export function ActivityImageGallery({
     );
   }
 
-  const five = imageUrls.slice(0, 5);
   const leftSlots: GallerySlotConfig[] = [
     {
       index: 0,
@@ -300,14 +299,10 @@ export function ActivityImageGallery({
         )}
       >
         <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
-          {leftSlots.map((slot) =>
-            five[slot.index] ? renderSlot(slot) : null
-          )}
+          {leftSlots.map(renderSlot)}
         </div>
         <div className="flex min-h-0 w-1/2 min-w-0 flex-1 flex-col gap-2">
-          {rightSlots.map((slot) =>
-            five[slot.index] ? renderSlot(slot) : null
-          )}
+          {rightSlots.map(renderSlot)}
         </div>
       </div>
       {lightbox}
