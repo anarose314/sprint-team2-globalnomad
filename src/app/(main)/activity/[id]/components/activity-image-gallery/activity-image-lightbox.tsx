@@ -155,7 +155,7 @@ export function ActivityImageLightbox({
         const panel = panelRef.current;
         if (!panel) return;
         const focusableElements = [
-          ...panel.querySelectorAll<HTMLElement>('button'),
+          ...panel.querySelectorAll<HTMLButtonElement>('button'),
         ].filter((element) => !element.disabled);
         if (focusableElements.length === 0) return;
 
