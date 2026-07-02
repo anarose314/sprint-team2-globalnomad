@@ -79,6 +79,7 @@ export function ActivityImageGallery({
         key={`${url}-${index}`}
         src={url}
         alt={alt}
+        ariaLabel={`${alt} 크게 보기`}
         className={slotClassName}
         sizes={sizes}
         quality={quality}
