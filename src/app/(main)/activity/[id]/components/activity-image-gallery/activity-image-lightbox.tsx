@@ -63,8 +63,11 @@ export function ActivityImageLightbox({
   const url = urls[index];
   const total = urls.length;
   const canNavigate = total > 1;
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const imageSlotRef = useRef<HTMLDivElement>(null);
   const prevIndexRef = useRef<number | null>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
   const [slideAnim, setSlideAnim] = useState<'from-right' | 'from-left' | null>(
     null
@@ -129,7 +132,57 @@ export function ActivityImageLightbox({
   );
 
   useEffect(() => {
+    lastFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const rafId = requestAnimationFrame(() => {
+      closeButtonRef.current?.focus();
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      const restoreTarget = lastFocusedElementRef.current;
+      if (restoreTarget && restoreTarget.isConnected) {
+        restoreTarget.focus();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        const panel = panelRef.current;
+        if (!panel) return;
+        const focusableElements = [
+          ...panel.querySelectorAll<HTMLElement>('button'),
+        ].filter((element) => !element.disabled);
+        if (focusableElements.length === 0) return;
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+        const activeElement =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+        const isFocusInside =
+          activeElement !== null && panel.contains(activeElement);
+
+        if (event.shiftKey) {
+          if (!isFocusInside || activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          }
+          return;
+        }
+
+        if (!isFocusInside || activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+        return;
+      }
+
       if (!canNavigate) return;
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
@@ -177,11 +230,16 @@ export function ActivityImageLightbox({
       className="px-3 py-6 sm:px-6 md:px-10 md:py-10"
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${title} 이미지 라이트박스`}
         className="mx-auto flex w-full max-w-7xl flex-col lg:max-w-screen-2xl"
         onPointerDown={handlePanelPointerDown}
       >
         <div className="mb-2 flex shrink-0 justify-end md:mb-3">
           <button
+            ref={closeButtonRef}
             type="button"
             aria-label="닫기"
             onClick={requestDismiss}
