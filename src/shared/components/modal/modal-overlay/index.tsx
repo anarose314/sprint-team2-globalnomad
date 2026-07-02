@@ -120,7 +120,7 @@ export function ModalOverlay({
     if (!portalRoot) return;
 
     const backgroundElements = [...document.body.children].filter(
-      (element) => element !== portalRoot
+      (element) => element !== portalRoot && !element.contains(portalRoot)
     ) as HTMLElement[];
     const prevState = backgroundElements.map((element) => ({
       element,
