@@ -3,11 +3,19 @@
 import { useMemo } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
-import { fetchMyReservedSchedules } from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
+import {
+  fetchMyReservedSchedules,
+  type MyReservedScheduleItem,
+} from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
 import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
+import {
+  normalizeDateKey,
+  parseTimeToHourMinute,
+} from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
-import { formatDateKey } from '@/shared/utils/formatDate';
+
+const EMPTY_RESERVED_SCHEDULES: MyReservedScheduleItem[] = [];
 
 interface UseActivityReservationAvailabilityProps {
   activityId: number;
@@ -17,44 +25,9 @@ interface UseActivityReservationAvailabilityProps {
   isAuthenticated: boolean;
 }
 
-const normalizeDateKey = (rawDate: string) => {
-  const trimmed = rawDate.trim();
-  const shortDate = trimmed.slice(0, 10);
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(shortDate)) {
-    return shortDate;
-  }
-
-  const parsed = new Date(trimmed);
-  if (Number.isNaN(parsed.getTime())) {
-    return trimmed;
-  }
-
-  return formatDateKey(parsed);
-};
-
 const parseYearMonthFromDateKey = (dateKey: string) => {
   const [year, month] = dateKey.split('-').map(Number);
   return { year, month };
-};
-
-const parseTimeToHourMinute = (time: string) => {
-  const [hourText, minuteText] = time.split(':');
-  const hour = Number(hourText);
-  const minute = Number(minuteText);
-
-  if (
-    !Number.isInteger(hour) ||
-    !Number.isInteger(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
-    return null;
-  }
-
-  return { hour, minute };
 };
 
 const isUpcomingTimeSlot = (dateKey: string, startTime: string, now: Date) => {
@@ -144,7 +117,7 @@ export const useActivityReservationAvailability = ({
     (query) => query.isError
   );
 
-  const { data: myReservedSchedules = [] } = useQuery({
+  const { data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES } = useQuery({
     queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
     queryFn: fetchMyReservedSchedules,
     enabled: isAuthenticated,

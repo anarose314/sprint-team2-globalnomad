@@ -9,6 +9,9 @@ import { ReservationCalendarClient } from '@/app/(main)/my/activities-dashboard/
 import { Dropdown } from '@/shared/components/dropdown';
 import { DropdownOption } from '@/shared/components/dropdown/dropdown.types';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import type { Activities } from '@/shared/types/myActivities.types';
+
+const EMPTY_ACTIVITIES: Activities[] = [];
 
 /**
  * 예약 현황 페이지의 체험 선택 / 캘린더 영역 렌더링
@@ -21,7 +24,7 @@ export function MyActivitiesDashboardContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const { data: activities = [], isLoading } = useQuery({
+  const { data: activities = EMPTY_ACTIVITIES, isLoading } = useQuery({
     queryKey: QUERY_KEYS.MY_ACTIVITIES_DASHBOARD,
     queryFn: fetchMyActivitiesForDashboard,
   });

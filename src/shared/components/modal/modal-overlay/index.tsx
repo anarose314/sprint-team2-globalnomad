@@ -115,6 +115,58 @@ export function ModalOverlay({
     };
   }, []);
 
+  // 모달이 열린 동안 배경 영역을 탐색하지 않도록 비활성화합니다.
+  useEffect(() => {
+    if (!portalRoot) return;
+
+    const backgroundElements: HTMLElement[] = [];
+    const collectBackgroundElements = (element: Element) => {
+      if (element === portalRoot) {
+        return;
+      }
+
+      if (element.contains(portalRoot)) {
+        [...element.children].forEach((child) =>
+          collectBackgroundElements(child)
+        );
+        return;
+      }
+
+      if (element instanceof HTMLElement) {
+        backgroundElements.push(element);
+      }
+    };
+
+    [...document.body.children].forEach((child) =>
+      collectBackgroundElements(child)
+    );
+
+    const prevState = backgroundElements.map((element) => ({
+      element,
+      ariaHidden: element.getAttribute('aria-hidden'),
+      hadInert: element.hasAttribute('inert'),
+    }));
+
+    backgroundElements.forEach((element) => {
+      element.setAttribute('aria-hidden', 'true');
+      element.setAttribute('inert', '');
+    });
+
+    return () => {
+      prevState.forEach(({ element, ariaHidden, hadInert }) => {
+        if (ariaHidden === null) {
+          element.removeAttribute('aria-hidden');
+        } else {
+          element.setAttribute('aria-hidden', ariaHidden);
+        }
+
+        if (!hadInert) {
+          element.removeAttribute('inert');
+        }
+      });
+    };
+  }, [portalRoot]);
+
   // ESC 닫기를 옵션으로 제공하며, 이벤트 리스너는 unmount 시 제거합니다.
   useEffect(() => {
     if (!closeOnEscape) return;
