@@ -53,7 +53,12 @@ export const useReservationRequests = ({
   });
 
   const requests = useMemo<ReservationRequestItem[]>(() => {
-    const baseRequests = data?.pages.flatMap((page) => page.reservations) ?? [];
+    const baseRequests = (
+      data?.pages.flatMap((page) => page.reservations) ?? []
+    ).sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     if (activeTab !== 'confirmed' || !isSelectedTimeSlotEnded) {
       return baseRequests;
