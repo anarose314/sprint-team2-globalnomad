@@ -1,4 +1,3 @@
-import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 
 const RESERVATION_PAGE_SIZE = 10;
@@ -36,16 +35,23 @@ interface UpdateActivityReservationStatusProps {
   status: 'confirmed' | 'declined';
 }
 
-interface ApproveReservationWithAutoDeclineProps {
+interface ConfirmReservationAndDeclinePendingProps {
   activityId: number;
   reservationId: number;
-  scheduleId: number;
+  scheduleId: number | null;
 }
 
 interface ActivityReservationsResponseLike {
   cursorId?: unknown;
   totalCount?: unknown;
   reservations?: unknown;
+}
+
+export class MissingReservationScheduleError extends Error {
+  constructor() {
+    super('예약 시간 정보를 확인할 수 없습니다.');
+    this.name = 'MissingReservationScheduleError';
+  }
 }
 
 /**
@@ -248,30 +254,33 @@ export const declinePendingReservationIds = async (
 };
 
 /**
- * 승인 시 동시간대 대기 예약 자동 거절을 백엔드 단일 트랜잭션으로 시도
- * - 미지원(404/405/501)인 경우 false를 반환하고, 호출부에서 클라이언트 폴백 수행
+ * 예약 승인 후 같은 스케줄의 나머지 대기 예약을 조회해 거절
+ *
+ * 백엔드가 제공하는 예약 상태 변경 API만 사용하며
+ * 존재 여부가 불명확한 별도 승인 API로 우회하지 않는다.
  */
-export const approveReservationWithAutoDecline = async ({
+export const confirmReservationAndDeclinePending = async ({
   activityId,
   reservationId,
   scheduleId,
-}: ApproveReservationWithAutoDeclineProps): Promise<boolean> => {
-  try {
-    await fetchInstanceClient(
-      `/api/proxy/my-activities/${activityId}/reservations/${reservationId}/approve`,
-      {
-        method: 'PATCH',
-        body: { scheduleId },
-      }
-    );
-    return true;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      const unsupportedStatuses = [404, 405, 501];
-      if (unsupportedStatuses.includes(error.status)) {
-        return false;
-      }
-    }
-    throw error;
+}: ConfirmReservationAndDeclinePendingProps): Promise<void> => {
+  if (scheduleId === null) {
+    throw new MissingReservationScheduleError();
+  }
+
+  await updateActivityReservationStatus({
+    activityId,
+    reservationId,
+    status: 'confirmed',
+  });
+
+  const autoDeclineTargets = await collectPendingReservationIdsForSchedule({
+    activityId,
+    scheduleId,
+    excludeReservationId: reservationId,
+  });
+
+  if (autoDeclineTargets.length > 0) {
+    await declinePendingReservationIds(activityId, autoDeclineTargets);
   }
 };

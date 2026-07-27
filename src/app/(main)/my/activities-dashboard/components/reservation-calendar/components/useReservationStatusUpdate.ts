@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  approveReservationWithAutoDecline,
-  collectPendingReservationIdsForSchedule,
-  declinePendingReservationIds,
+  confirmReservationAndDeclinePending,
+  MissingReservationScheduleError,
   updateActivityReservationStatus,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
@@ -54,39 +53,11 @@ export const useReservationStatusUpdate = ({
           return;
         }
 
-        if (scheduleId === null) {
-          await updateActivityReservationStatus({
-            activityId,
-            reservationId,
-            status,
-          });
-          return;
-        }
-
-        const backendHandled = await approveReservationWithAutoDecline({
+        await confirmReservationAndDeclinePending({
           activityId,
           reservationId,
           scheduleId,
         });
-
-        if (backendHandled) return;
-
-        await updateActivityReservationStatus({
-          activityId,
-          reservationId,
-          status,
-        });
-
-        const autoDeclineTargets =
-          await collectPendingReservationIdsForSchedule({
-            activityId,
-            scheduleId,
-            excludeReservationId: reservationId,
-          });
-
-        if (autoDeclineTargets.length > 0) {
-          await declinePendingReservationIds(activityId, autoDeclineTargets);
-        }
       },
       onSuccess: async (_, variables) => {
         showToast({
@@ -113,14 +84,17 @@ export const useReservationStatusUpdate = ({
           }),
         ]);
       },
-      onError: () => {
+      onError: (error) => {
+        const errorMessage =
+          error instanceof MissingReservationScheduleError
+            ? '예약 시간 정보를 확인할 수 없습니다. 새로고침 후 다시 시도해주세요.'
+            : '예약 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
         showToast({
           theme: 'error',
-          message: '예약 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          message: errorMessage,
         });
-        setFeedbackModalMessage(
-          '예약 상태 변경에 실패했습니다.\n잠시 후 다시 시도해주세요.'
-        );
+        setFeedbackModalMessage(errorMessage);
       },
     });
 
