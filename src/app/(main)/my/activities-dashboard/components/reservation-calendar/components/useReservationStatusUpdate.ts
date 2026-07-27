@@ -16,6 +16,9 @@ type ReservationStatusUpdateAction = {
   scheduleId: number | null;
 } | null;
 
+const MISSING_RESERVATION_SCHEDULE_MESSAGE =
+  '예약 시간 정보를 확인할 수 없습니다. 새로고침 후 다시 시도해주세요.';
+
 interface UseReservationStatusUpdateParams {
   activityId: number;
   selectedScheduleId: number | null;
@@ -87,7 +90,7 @@ export const useReservationStatusUpdate = ({
       onError: (error) => {
         const errorMessage =
           error instanceof MissingReservationScheduleError
-            ? '예약 시간 정보를 확인할 수 없습니다. 새로고침 후 다시 시도해주세요.'
+            ? MISSING_RESERVATION_SCHEDULE_MESSAGE
             : '예약 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.';
 
         showToast({
@@ -107,6 +110,15 @@ export const useReservationStatusUpdate = ({
   }, [pendingStatusUpdateAction]);
 
   const handleApproveReservation = (reservationId: number) => {
+    if (selectedScheduleId === null) {
+      showToast({
+        theme: 'error',
+        message: MISSING_RESERVATION_SCHEDULE_MESSAGE,
+      });
+      setFeedbackModalMessage(MISSING_RESERVATION_SCHEDULE_MESSAGE);
+      return;
+    }
+
     setPendingStatusUpdateAction({
       reservationId,
       status: 'confirmed',
