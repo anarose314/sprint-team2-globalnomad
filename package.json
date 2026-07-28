@@ -14,7 +14,9 @@
     "test:run": "vitest run",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "seed": "node scripts/seed-data/seed.mjs",
+    "seed:cleanup": "node scripts/seed-data/cleanup.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
