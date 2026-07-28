@@ -1,17 +1,17 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
 import {
   fetchMyReservedSchedules,
   type MyReservedScheduleItem,
 } from '@/app/(main)/activity/[id]/apis/myReservedSchedules';
-import type { TimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import {
-  normalizeDateKey,
-  parseTimeToHourMinute,
-} from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
+  type AvailableScheduleQueryStatus,
+  buildReservationAvailability,
+} from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationAvailability';
+import { normalizeDateKey } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
 import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 
@@ -28,42 +28,6 @@ interface UseActivityReservationAvailabilityProps {
 const parseYearMonthFromDateKey = (dateKey: string) => {
   const [year, month] = dateKey.split('-').map(Number);
   return { year, month };
-};
-
-const isUpcomingTimeSlot = (dateKey: string, startTime: string, now: Date) => {
-  const [yearText, monthText, dayText] = dateKey.split('-');
-  const year = Number(yearText);
-  const month = Number(monthText);
-  const day = Number(dayText);
-  const parsedTime = parseTimeToHourMinute(startTime);
-
-  if (!parsedTime) {
-    return true;
-  }
-
-  if (
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    !Number.isInteger(day)
-  ) {
-    return true;
-  }
-
-  const startDateTime = new Date(
-    year,
-    month - 1,
-    day,
-    parsedTime.hour,
-    parsedTime.minute,
-    0,
-    0
-  );
-
-  if (Number.isNaN(startDateTime.getTime())) {
-    return true;
-  }
-
-  return startDateTime.getTime() > now.getTime();
 };
 
 export const useActivityReservationAvailability = ({
@@ -110,12 +74,17 @@ export const useActivityReservationAvailability = ({
     () => availableScheduleQueries.flatMap((query) => query.data ?? []),
     [availableScheduleQueries]
   );
-  const isAvailableSchedulesLoading = availableScheduleQueries.some(
-    (query) => query.isLoading
-  );
-  const isAvailableSchedulesError = availableScheduleQueries.some(
-    (query) => query.isError
-  );
+
+  const availableScheduleQueryStatus =
+    useMemo<AvailableScheduleQueryStatus>(() => {
+      if (availableScheduleQueries.some((query) => query.isLoading)) {
+        return 'loading';
+      }
+      if (availableScheduleQueries.some((query) => query.isError)) {
+        return 'error';
+      }
+      return 'success';
+    }, [availableScheduleQueries]);
 
   const { data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES } = useQuery({
     queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
@@ -135,84 +104,36 @@ export const useActivityReservationAvailability = ({
     );
   }, [myReservedScheduleIds, reservedScheduleIds]);
 
-  const fallbackScheduleByDate = useMemo(() => {
-    const now = new Date();
+  const { availableScheduleByDate, usesFallbackSchedule } = useMemo(
+    () =>
+      buildReservationAvailability({
+        schedules,
+        availableSchedules,
+        availableScheduleQueryStatus,
+        blockedScheduleIds,
+        now: new Date(),
+      }),
+    [
+      availableScheduleQueryStatus,
+      availableSchedules,
+      blockedScheduleIds,
+      schedules,
+    ]
+  );
 
-    return schedules.reduce<Record<string, TimeSlot[]>>(
-      (accumulator, schedule) => {
-        if (blockedScheduleIds.includes(schedule.id)) {
-          return accumulator;
-        }
-
-        const dateKey = normalizeDateKey(schedule.date);
-        if (!isUpcomingTimeSlot(dateKey, schedule.startTime, now)) {
-          return accumulator;
-        }
-
-        const nextSlot: TimeSlot = {
-          id: schedule.id,
-          startTime: schedule.startTime,
-          endTime: schedule.endTime,
-        };
-
-        if (!accumulator[dateKey]) {
-          accumulator[dateKey] = [nextSlot];
-        } else {
-          accumulator[dateKey].push(nextSlot);
-        }
-
-        return accumulator;
-      },
-      {}
-    );
-  }, [blockedScheduleIds, schedules]);
-
-  const availableScheduleByDate = useMemo(() => {
-    const now = new Date();
-
-    const fromAvailableApi = availableSchedules.reduce<
-      Record<string, (typeof availableSchedules)[number]['times']>
-    >((accumulator, item) => {
-      const dateKey = normalizeDateKey(item.date);
-      const filteredTimes = item.times.filter(
-        (time) =>
-          !blockedScheduleIds.includes(time.id) &&
-          isUpcomingTimeSlot(dateKey, time.startTime, now)
-      );
-
-      if (filteredTimes.length > 0) {
-        accumulator[dateKey] = filteredTimes;
-      }
-
-      return accumulator;
-    }, {});
-
-    if (
-      isAvailableSchedulesLoading ||
-      isAvailableSchedulesError ||
-      Object.keys(fromAvailableApi).length === 0
-    ) {
-      return fallbackScheduleByDate;
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
     }
 
-    return Object.entries(fromAvailableApi).reduce<Record<string, TimeSlot[]>>(
-      (accumulator, [dateKey, times]) => {
-        accumulator[dateKey] = times.map((time) => ({
-          id: time.id,
-          startTime: time.startTime,
-          endTime: time.endTime,
-        }));
-        return accumulator;
-      },
-      {}
-    );
-  }, [
-    availableSchedules,
-    blockedScheduleIds,
-    fallbackScheduleByDate,
-    isAvailableSchedulesError,
-    isAvailableSchedulesLoading,
-  ]);
+    if (!usesFallbackSchedule || availableScheduleQueryStatus === 'loading') {
+      return;
+    }
 
-  return { availableScheduleByDate };
+    console.warn(
+      `[useActivityReservationAvailability] activityId=${activityId}: 예약 가능 시간 API 대신 원본 스케줄로 대체 표시 중 (status=${availableScheduleQueryStatus})`
+    );
+  }, [activityId, availableScheduleQueryStatus, usesFallbackSchedule]);
+
+  return { availableScheduleByDate, usesFallbackSchedule };
 };
