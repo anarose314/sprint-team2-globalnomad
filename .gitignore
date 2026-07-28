@@ -38,6 +38,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# seed data script output (계정 비밀번호 등 민감 정보 포함)
+/scripts/seed-data/output/*.json
 next-env.d.ts
 
 # IDE / Editor
