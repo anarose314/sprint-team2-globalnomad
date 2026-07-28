@@ -103,7 +103,7 @@ export const useAutoDeclineExpiredReservations = ({
           if (ids.length === 0) continue;
           if (isCancelled) break;
 
-          // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
+          // 일부 요청만 성공할 수 있으므로 거절 시도 직전에 무효화 여부를 반영
           hasDeclinedAny = true;
           await declinePendingReservationIds(activityId, ids);
         } catch {

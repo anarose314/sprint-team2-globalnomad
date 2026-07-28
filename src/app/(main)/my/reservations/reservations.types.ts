@@ -1,3 +1,7 @@
+export type MyReservationsSearchParams = {
+  [key: string]: string | string[] | undefined;
+};
+
 export interface MyReservationsPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<MyReservationsSearchParams>;
 }
