@@ -6,7 +6,7 @@ import {
   MissingReservationScheduleError,
   updateActivityReservationStatus,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import { useShowToast } from '@/shared/store/useToastStore';
 
 type ReservationUpdateStatus = 'confirmed' | 'declined';
@@ -108,16 +108,13 @@ export const useReservationStatusUpdate = ({
       onSettled: async () => {
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS, activityId],
+            queryKey: reservationKeys.requests.byActivity(activityId),
           }),
           queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE, activityId],
+            queryKey: reservationKeys.reservedSchedule.byActivity(activityId),
           }),
           queryClient.invalidateQueries({
-            queryKey: [
-              ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-              activityId,
-            ],
+            queryKey: reservationKeys.dashboard.byActivity(activityId),
           }),
         ]);
       },
