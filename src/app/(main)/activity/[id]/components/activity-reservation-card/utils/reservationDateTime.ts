@@ -75,3 +75,47 @@ export const parseTimeToHourMinute = (time: unknown) => {
 
   return { hour, minute };
 };
+
+/**
+ * `dateKey`(`YYYY-MM-DD`)와 `startTime`이 `now` 기준 아직 지나지 않은 시각인지 판단한다.
+ * 날짜/시각 형식이 유효하지 않으면 판단할 수 없으므로 안전하게 true를 반환한다.
+ */
+export const isUpcomingTimeSlot = (
+  dateKey: string,
+  startTime: string,
+  now: Date
+) => {
+  const [yearText, monthText, dayText] = dateKey.split('-');
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const parsedTime = parseTimeToHourMinute(startTime);
+
+  if (!parsedTime) {
+    return true;
+  }
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return true;
+  }
+
+  const startDateTime = new Date(
+    year,
+    month - 1,
+    day,
+    parsedTime.hour,
+    parsedTime.minute,
+    0,
+    0
+  );
+
+  if (Number.isNaN(startDateTime.getTime())) {
+    return true;
+  }
+
+  return startDateTime.getTime() > now.getTime();
+};
