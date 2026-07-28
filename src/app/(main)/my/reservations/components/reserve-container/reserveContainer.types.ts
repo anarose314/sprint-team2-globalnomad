@@ -1,3 +1,5 @@
+import { MyReservationsSearchParams } from '@/app/(main)/my/reservations/reservations.types';
+
 export interface ReserveContainerProps {
-  searchParams?: { status?: string };
+  searchParams: Promise<MyReservationsSearchParams>;
 }

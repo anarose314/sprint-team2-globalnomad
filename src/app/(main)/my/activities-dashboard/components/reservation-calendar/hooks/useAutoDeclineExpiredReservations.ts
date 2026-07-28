@@ -103,9 +103,18 @@ export const useAutoDeclineExpiredReservations = ({
           if (ids.length === 0) continue;
           if (isCancelled) break;
 
-          // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
+          // 일부 요청만 성공할 수 있으므로 거절 시도 직전에 무효화 여부를 반영
           hasDeclinedAny = true;
-          await declinePendingReservationIds(activityId, ids);
+          const { failed } = await declinePendingReservationIds(
+            activityId,
+            ids
+          );
+          if (failed.length > 0) {
+            console.error(
+              `[자동 거절] 스케줄 ${schedule.scheduleId}의 예약 ${failed.length}건 거절 실패:`,
+              failed
+            );
+          }
         } catch {
           // 다음 스케줄 처리 계속
         } finally {
