@@ -11,7 +11,7 @@ import type {
 import { useActivityReservationAvailability } from '@/app/(main)/activity/[id]/components/activity-reservation-card/hooks/useActivityReservationAvailability';
 import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
@@ -153,14 +153,10 @@ export const useActivityReservationCardState = ({
   );
 
   const refreshAvailableSchedule = async () => {
-    await queryClient.invalidateQueries({
-      queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
-    });
+    const queryKey = reservationKeys.availableSchedule.byActivity(activityId);
 
-    await queryClient.refetchQueries({
-      queryKey: [...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE, activityId],
-      type: 'active',
-    });
+    await queryClient.invalidateQueries({ queryKey });
+    await queryClient.refetchQueries({ queryKey, type: 'active' });
   };
 
   const { mutate: submitReservation, isPending: isReservationSubmitting } =

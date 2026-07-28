@@ -12,7 +12,7 @@ import {
   buildReservationAvailability,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationAvailability';
 import { normalizeDateKey } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 
 const EMPTY_RESERVED_SCHEDULES: MyReservedScheduleItem[] = [];
@@ -55,12 +55,11 @@ export const useActivityReservationAvailability = ({
 
   const availableScheduleQueries = useQueries({
     queries: queryTargetMonths.map(({ year, month }) => ({
-      queryKey: [
-        ...QUERY_KEYS.ACTIVITY_AVAILABLE_SCHEDULE,
+      queryKey: reservationKeys.availableSchedule.byMonth(
         activityId,
         year,
-        month,
-      ],
+        month
+      ),
       queryFn: () =>
         fetchActivityAvailableSchedule({
           activityId,
@@ -87,7 +86,7 @@ export const useActivityReservationAvailability = ({
     }, [availableScheduleQueries]);
 
   const { data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES } = useQuery({
-    queryKey: [...QUERY_KEYS.MY_RESERVATIONS, 'reservedSchedules'],
+    queryKey: reservationKeys.myReservations.reservedSchedules(),
     queryFn: fetchMyReservedSchedules,
     enabled: isAuthenticated,
   });

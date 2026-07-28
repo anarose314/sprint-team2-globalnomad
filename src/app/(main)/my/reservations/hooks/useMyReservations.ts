@@ -1,6 +1,6 @@
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { fetchMyReservations } from '@/app/(main)/my/reservations/apis/myReservations';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import { createCursorInfiniteOptions } from '@/shared/utils/createCursorInfiniteOptions';
 
 /**
@@ -8,7 +8,7 @@ import { createCursorInfiniteOptions } from '@/shared/utils/createCursorInfinite
  */
 export const myReservationsOptions = (status?: string | null) =>
   createCursorInfiniteOptions(
-    [QUERY_KEYS.MY_RESERVATIONS, status],
+    reservationKeys.myReservations.list(status),
     ({ pageParam }) => fetchMyReservations({ pageParam, status })
   );
 

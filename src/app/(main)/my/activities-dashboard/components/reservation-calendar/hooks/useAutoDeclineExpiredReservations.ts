@@ -5,15 +5,8 @@ import {
   declinePendingReservationIds,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { isScheduleStartReached } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
-
-/** 자동 거절 후 접두 `[root, activityId]`로 무효화할 쿼리 루트 */
-const ACTIVITY_RESERVATION_CACHE_ROOTS = [
-  QUERY_KEYS.MY_ACTIVITY_RESERVATIONS[0],
-  QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE[0],
-  QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD[0],
-] as const;
 
 interface UseAutoDeclineExpiredReservationsProps {
   activityId: number | null;
@@ -125,11 +118,11 @@ export const useAutoDeclineExpiredReservations = ({
       if (!hasDeclinedAny) return;
 
       await Promise.all(
-        ACTIVITY_RESERVATION_CACHE_ROOTS.map((root) =>
-          queryClient.invalidateQueries({
-            queryKey: [root, activityId],
-          })
-        )
+        [
+          reservationKeys.requests.byActivity(activityId),
+          reservationKeys.reservedSchedule.byActivity(activityId),
+          reservationKeys.dashboard.byActivity(activityId),
+        ].map((queryKey) => queryClient.invalidateQueries({ queryKey }))
       );
     })();
 
