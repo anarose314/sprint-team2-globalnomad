@@ -42,3 +42,15 @@ export interface ReservationTimeSlotOption {
 export interface ReservationDetailData {
   timeSlots: ReservationTimeSlotOption[];
 }
+
+/** 캘린더 한 날짜의 표시 상태(상태별 배지 집계, 알림 도트 노출 여부) */
+export interface ReservationCalendarDateDisplayState {
+  eventCounts: ReservationEventCounts;
+  hasNotificationDot: boolean;
+}
+
+/** 날짜(`YYYY-MM-DD`)별 캘린더 표시 상태 */
+export type ReservationCalendarDisplayByDate = Record<
+  string,
+  ReservationCalendarDateDisplayState
+>;
