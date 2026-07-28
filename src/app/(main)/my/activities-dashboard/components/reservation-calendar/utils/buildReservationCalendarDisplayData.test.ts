@@ -155,6 +155,23 @@ describe('buildReservationCalendarDisplayData', () => {
     expect(result.eventCountsByDate['2026-07-18']).toEqual({ pending: 1 });
   });
 
+  it('선택 날짜 스케줄이 거절만 있으면 배지는 비고 알림 도트만 켠다', () => {
+    const result = buildReservationCalendarDisplayData({
+      reservationDashboard: [],
+      reservedScheduleDateKey: '2026-07-18',
+      reservedSchedulesSelected: [
+        schedule({ count: { declined: 2, confirmed: 0, pending: 0 } }),
+      ],
+      reservedSchedulesToday: [],
+      isTodayScheduleFetchRequired: false,
+      todayDateKey: TODAY,
+      now: NOW,
+    });
+
+    expect(result.notificationDotByDate['2026-07-18']).toBe(true);
+    expect(result.eventCountsByDate['2026-07-18']).toBeUndefined();
+  });
+
   it('대시보드 응답 일부가 비어 있어도 reserved-schedule로 배지 집계를 보정한다', () => {
     const result = buildReservationCalendarDisplayData({
       reservationDashboard: [dashboardItem('2026-07-18', { pending: 0 })],
