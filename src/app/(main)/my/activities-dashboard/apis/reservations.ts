@@ -8,6 +8,7 @@ const DECLINE_PENDING_RESERVATIONS_CONCURRENCY = 5;
 const DECLINE_PENDING_RESERVATIONS_MAX_RETRIES = 2;
 /** 거절 재시도 전 기본 대기 시간(ms) */
 const DECLINE_PENDING_RESERVATIONS_RETRY_DELAY_MS = 300;
+
 type ReservationRequestStatus = 'pending' | 'confirmed' | 'declined';
 
 interface ReservationRequestItem {
