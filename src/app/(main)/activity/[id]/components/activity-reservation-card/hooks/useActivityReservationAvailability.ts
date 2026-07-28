@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
 import {
@@ -120,6 +120,20 @@ export const useActivityReservationAvailability = ({
       schedules,
     ]
   );
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+
+    if (!usesFallbackSchedule || availableScheduleQueryStatus === 'loading') {
+      return;
+    }
+
+    console.warn(
+      `[useActivityReservationAvailability] activityId=${activityId}: 예약 가능 시간 API 대신 원본 스케줄로 대체 표시 중 (status=${availableScheduleQueryStatus})`
+    );
+  }, [activityId, availableScheduleQueryStatus, usesFallbackSchedule]);
 
   return { availableScheduleByDate, usesFallbackSchedule };
 };
