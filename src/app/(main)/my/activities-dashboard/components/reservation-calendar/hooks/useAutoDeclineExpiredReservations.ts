@@ -5,15 +5,8 @@ import {
   declinePendingReservationIds,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import { isScheduleStartReached } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/utils/scheduleStatus';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
-
-/** 자동 거절 후 접두 `[root, activityId]`로 무효화할 쿼리 루트 */
-const ACTIVITY_RESERVATION_CACHE_ROOTS = [
-  QUERY_KEYS.MY_ACTIVITY_RESERVATIONS[0],
-  QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE[0],
-  QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD[0],
-] as const;
 
 interface UseAutoDeclineExpiredReservationsProps {
   activityId: number | null;
@@ -103,9 +96,18 @@ export const useAutoDeclineExpiredReservations = ({
           if (ids.length === 0) continue;
           if (isCancelled) break;
 
-          // `declinePendingReservationIds`는 일부만 거절돼도 실패분이 있으면 throw하므로 무효화 여부는 거절 시도 직전에 반영
+          // 일부 요청만 성공할 수 있으므로 거절 시도 직전에 무효화 여부를 반영
           hasDeclinedAny = true;
-          await declinePendingReservationIds(activityId, ids);
+          const { failed } = await declinePendingReservationIds(
+            activityId,
+            ids
+          );
+          if (failed.length > 0) {
+            console.error(
+              `[자동 거절] 스케줄 ${schedule.scheduleId}의 예약 ${failed.length}건 거절 실패:`,
+              failed
+            );
+          }
         } catch {
           // 다음 스케줄 처리 계속
         } finally {
@@ -116,11 +118,11 @@ export const useAutoDeclineExpiredReservations = ({
       if (!hasDeclinedAny) return;
 
       await Promise.all(
-        ACTIVITY_RESERVATION_CACHE_ROOTS.map((root) =>
-          queryClient.invalidateQueries({
-            queryKey: [root, activityId],
-          })
-        )
+        [
+          reservationKeys.requests.byActivity(activityId),
+          reservationKeys.reservedSchedule.byActivity(activityId),
+          reservationKeys.dashboard.byActivity(activityId),
+        ].map((queryKey) => queryClient.invalidateQueries({ queryKey }))
       );
     })();
 

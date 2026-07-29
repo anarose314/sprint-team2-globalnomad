@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchReservationDashboard } from '@/app/(main)/my/activities-dashboard/apis/reservationDashboard';
 import { fetchReservedSchedule } from '@/app/(main)/my/activities-dashboard/apis/reservedSchedule';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ReservationDashboardDailyItem } from '@/shared/types/reservationDashboard.types';
 import type { ReservedScheduleItem } from '@/shared/types/reservedSchedule.types';
 
@@ -26,12 +26,11 @@ export const useReservationCalendarQueries = ({
   isTodayScheduleFetchRequired,
 }: UseReservationCalendarQueriesProps) => {
   const { data: reservationDashboard = EMPTY_DASHBOARD } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
+    queryKey: reservationKeys.dashboard.byMonth(
       activityId,
       currentYear,
-      currentMonth,
-    ],
+      currentMonth
+    ),
     queryFn: () =>
       fetchReservationDashboard({
         activityId: activityId as number,
@@ -43,11 +42,10 @@ export const useReservationCalendarQueries = ({
   });
 
   const { data: reservedSchedulesSelected = EMPTY_SCHEDULES } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
+    queryKey: reservationKeys.reservedSchedule.byDate(
       activityId,
-      reservedScheduleDateKey,
-    ],
+      reservedScheduleDateKey
+    ),
     queryFn: () =>
       fetchReservedSchedule({
         activityId: activityId as number,
@@ -59,11 +57,7 @@ export const useReservationCalendarQueries = ({
   });
 
   const { data: reservedSchedulesToday = EMPTY_SCHEDULES } = useQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE,
-      activityId,
-      todayDateKey,
-    ],
+    queryKey: reservationKeys.reservedSchedule.byDate(activityId, todayDateKey),
     queryFn: () =>
       fetchReservedSchedule({
         activityId: activityId as number,

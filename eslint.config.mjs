@@ -60,6 +60,13 @@ const eslintConfig = defineConfig([
       'simple-import-sort/exports': 'warn',
     },
   },
+  {
+    files: ['scripts/**/*.mjs'],
+    rules: {
+      'no-console': 'off',
+      'no-restricted-imports': 'off',
+    },
+  },
   eslintConfigPrettier,
 ]);
 

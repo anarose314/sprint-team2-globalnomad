@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postReviews } from '@/app/(main)/my/reservations/apis/myReservations';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import { useShowToast } from '@/shared/store/useToastStore';
 
 /**
@@ -19,7 +19,7 @@ export const useReviewMutation = (onCloseModal: () => void) => {
     mutationFn: postReviews,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.MY_RESERVATIONS],
+        queryKey: reservationKeys.myReservations.all,
       });
       showToast({
         theme: 'success',

@@ -3,7 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchActivityReservations } from '@/app/(main)/my/activities-dashboard/apis/reservations';
 import type { ReservationTab } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/components/reservationDetailSheet.constants';
 import type { ReservationRequestItem } from '@/app/(main)/my/activities-dashboard/components/reservation-calendar/reservationCalendar.types';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 
 interface UseReservationRequestsParams {
   activityId: number;
@@ -33,12 +33,11 @@ export const useReservationRequests = ({
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: [
-      ...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS,
+    queryKey: reservationKeys.requests.bySchedule(
       activityId,
       selectedScheduleId,
-      activeTab,
-    ],
+      activeTab
+    ),
     queryFn: ({ pageParam }) =>
       fetchActivityReservations({
         activityId,
@@ -53,7 +52,12 @@ export const useReservationRequests = ({
   });
 
   const requests = useMemo<ReservationRequestItem[]>(() => {
-    const baseRequests = data?.pages.flatMap((page) => page.reservations) ?? [];
+    const baseRequests = (
+      data?.pages.flatMap((page) => page.reservations) ?? []
+    ).sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     if (activeTab !== 'confirmed' || !isSelectedTimeSlotEnded) {
       return baseRequests;

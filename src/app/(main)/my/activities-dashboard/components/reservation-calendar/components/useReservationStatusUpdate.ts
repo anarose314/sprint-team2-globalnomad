@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  approveReservationWithAutoDecline,
-  collectPendingReservationIdsForSchedule,
-  declinePendingReservationIds,
+  confirmReservationAndDeclinePending,
+  type ConfirmReservationAndDeclinePendingResult,
+  MissingReservationScheduleError,
   updateActivityReservationStatus,
 } from '@/app/(main)/my/activities-dashboard/apis/reservations';
-import { QUERY_KEYS } from '@/shared/constants/queryKeys.constants';
+import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import { useShowToast } from '@/shared/store/useToastStore';
 
 type ReservationUpdateStatus = 'confirmed' | 'declined';
@@ -16,6 +16,14 @@ type ReservationStatusUpdateAction = {
   status: ReservationUpdateStatus;
   scheduleId: number | null;
 } | null;
+
+const MISSING_RESERVATION_SCHEDULE_MESSAGE =
+  '예약 시간 정보를 확인할 수 없습니다. 새로고침 후 다시 시도해주세요.';
+const AUTO_DECLINE_LOOKUP_FAILED_MESSAGE =
+  '예약 승인은 완료됐지만 같은 시간대의 대기 예약을 확인하지 못했습니다. 최신 상태를 확인한 뒤 다시 시도해주세요.';
+
+const getAutoDeclineFailedMessage = (failedCount: number) =>
+  `예약 승인은 완료됐지만 같은 시간대 예약 ${failedCount}건을 자동으로 거절하지 못했습니다. 최신 상태를 확인해주세요.`;
 
 interface UseReservationStatusUpdateParams {
   activityId: number;
@@ -51,76 +59,80 @@ export const useReservationStatusUpdate = ({
             reservationId,
             status,
           });
-          return;
+          return null;
         }
 
-        if (scheduleId === null) {
-          await updateActivityReservationStatus({
-            activityId,
-            reservationId,
-            status,
-          });
-          return;
-        }
-
-        const backendHandled = await approveReservationWithAutoDecline({
+        return confirmReservationAndDeclinePending({
           activityId,
           reservationId,
           scheduleId,
         });
-
-        if (backendHandled) return;
-
-        await updateActivityReservationStatus({
-          activityId,
-          reservationId,
-          status,
-        });
-
-        const autoDeclineTargets =
-          await collectPendingReservationIdsForSchedule({
-            activityId,
-            scheduleId,
-            excludeReservationId: reservationId,
-          });
-
-        if (autoDeclineTargets.length > 0) {
-          await declinePendingReservationIds(activityId, autoDeclineTargets);
-        }
       },
-      onSuccess: async (_, variables) => {
+      onSuccess: (
+        result: ConfirmReservationAndDeclinePendingResult | null,
+        variables
+      ) => {
+        setPendingStatusUpdateAction(null);
+
+        if (variables.status !== 'confirmed' || result === null) {
+          showToast({
+            theme: 'success',
+            message: '해당 예약신청을 거절했습니다.',
+          });
+          setFeedbackModalMessage(null);
+          return;
+        }
+
+        const partialFailureMessage =
+          result.pendingCollectionError !== null
+            ? AUTO_DECLINE_LOOKUP_FAILED_MESSAGE
+            : result.autoDecline.failed.length > 0
+              ? getAutoDeclineFailedMessage(result.autoDecline.failed.length)
+              : null;
+
+        if (partialFailureMessage) {
+          showToast({
+            theme: 'warning',
+            message: partialFailureMessage,
+          });
+          setFeedbackModalMessage(partialFailureMessage);
+          return;
+        }
+
         showToast({
           theme: 'success',
-          message:
-            variables.status === 'confirmed'
-              ? '승인이 완료되었습니다.'
-              : '해당 예약신청을 거절했습니다.',
+          message: '승인이 완료되었습니다.',
         });
         setFeedbackModalMessage(null);
-
+      },
+      onSettled: async () => {
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVATIONS, activityId],
+            queryKey: reservationKeys.requests.byActivity(activityId),
           }),
           queryClient.invalidateQueries({
-            queryKey: [...QUERY_KEYS.MY_ACTIVITY_RESERVED_SCHEDULE, activityId],
+            queryKey: reservationKeys.reservedSchedule.byActivity(activityId),
           }),
           queryClient.invalidateQueries({
-            queryKey: [
-              ...QUERY_KEYS.MY_ACTIVITY_RESERVATION_DASHBOARD,
-              activityId,
-            ],
+            queryKey: reservationKeys.dashboard.byActivity(activityId),
           }),
         ]);
       },
-      onError: () => {
+      onError: (error) => {
+        const errorMessage =
+          error instanceof MissingReservationScheduleError
+            ? MISSING_RESERVATION_SCHEDULE_MESSAGE
+            : '예약 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
         showToast({
           theme: 'error',
-          message: '예약 상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          message: errorMessage,
         });
-        setFeedbackModalMessage(
-          '예약 상태 변경에 실패했습니다.\n잠시 후 다시 시도해주세요.'
-        );
+        setFeedbackModalMessage(errorMessage);
+
+        if (error instanceof MissingReservationScheduleError) {
+          setPendingStatusUpdateAction(null);
+        }
       },
     });
 
@@ -133,6 +145,15 @@ export const useReservationStatusUpdate = ({
   }, [pendingStatusUpdateAction]);
 
   const handleApproveReservation = (reservationId: number) => {
+    if (selectedScheduleId === null) {
+      showToast({
+        theme: 'error',
+        message: MISSING_RESERVATION_SCHEDULE_MESSAGE,
+      });
+      setFeedbackModalMessage(MISSING_RESERVATION_SCHEDULE_MESSAGE);
+      return;
+    }
+
     setPendingStatusUpdateAction({
       reservationId,
       status: 'confirmed',
@@ -161,8 +182,6 @@ export const useReservationStatusUpdate = ({
         status: pendingStatusUpdateAction.status,
         scheduleId: pendingStatusUpdateAction.scheduleId,
       });
-
-      setPendingStatusUpdateAction(null);
     } catch {
       // 실패 시 확인 모달을 유지해 사용자가 재시도/취소를 선택할 수 있게 한다.
     }
