@@ -56,8 +56,8 @@ export const useActivityReservationCardState = ({
     isAuthenticated,
   });
 
-  const scheduleDateKeys = useMemo(
-    () => Object.keys(scheduleByDate).sort(),
+  const earliestScheduleDateKey = useMemo(
+    () => Object.keys(scheduleByDate).sort()[0] ?? null,
     [scheduleByDate]
   );
 
@@ -69,22 +69,15 @@ export const useActivityReservationCardState = ({
     [scheduleByDate]
   );
 
-  const scheduleDateKeysSignature = scheduleDateKeys.join(',');
-
   useEffect(() => {
-    if (!scheduleDateKeysSignature) {
-      return;
-    }
-
-    const earliestDateKey = scheduleDateKeys[0];
-    if (!earliestDateKey) {
+    if (!earliestScheduleDateKey) {
       return;
     }
 
     const now = new Date();
     const todayKey = formatDateKey(now);
 
-    if (earliestDateKey !== todayKey) {
+    if (earliestScheduleDateKey !== todayKey) {
       return;
     }
 
@@ -103,7 +96,7 @@ export const useActivityReservationCardState = ({
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [scheduleDateKeys]);
+  }, [earliestScheduleDateKey]);
   const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
