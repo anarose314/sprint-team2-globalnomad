@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const timeSlotVariants = cva(
-  'inline-flex w-full cursor-pointer items-center justify-center rounded-xl border font-medium transition-colors duration-200',
+  'inline-flex w-full items-center justify-center gap-1.5 rounded-xl border font-medium transition-colors duration-200 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:hover:border-gray-200 disabled:hover:bg-gray-50 disabled:hover:text-gray-400',
   {
     variants: {
       /**
@@ -15,9 +15,9 @@ export const timeSlotVariants = cva(
         mb: 'text-md h-12 px-3',
       },
       isActive: {
-        true: 'border-primary-500 bg-primary-100 text-primary-500',
+        true: 'border-primary-500 bg-primary-100 text-primary-500 cursor-pointer',
         false:
-          'hover:border-primary-500 hover:bg-primary-100 hover:text-primary-500 border-gray-300 bg-white text-gray-950',
+          'hover:border-primary-500 hover:bg-primary-100 hover:text-primary-500 cursor-pointer border-gray-300 bg-white text-gray-950',
       },
     },
     defaultVariants: { size: 'pc', isActive: false },

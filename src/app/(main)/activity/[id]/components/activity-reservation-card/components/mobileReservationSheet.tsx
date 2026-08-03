@@ -3,6 +3,7 @@ import type {
   CalendarValue,
   MobileSheetStep,
   TimeSlot,
+  TimeSlotWithStatus,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { HeadCountStepperIconButton } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/headCountStepperIconButton';
 import { ReservationCalendarView } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/reservationCalendarView';
@@ -24,13 +25,13 @@ function getMobileReservationSheetCloseMs() {
 interface MobileReservationSheetProps {
   isOpen: boolean;
   mobileSheetStep: MobileSheetStep;
-  hasSelectableDate: boolean;
+  hasBookableSlot: boolean;
   selectedDate: Date | null;
   currentDate: Date;
   monthTitle: string;
   selectedDateText: string;
   selectedTimeSlot: TimeSlot | null;
-  availableTimeSlots: TimeSlot[];
+  timeSlots: TimeSlotWithStatus[];
   headCount: number;
   totalPrice: number;
   isReservationAvailable: boolean;
@@ -53,13 +54,13 @@ interface MobileReservationSheetProps {
 export function MobileReservationSheet({
   isOpen,
   mobileSheetStep,
-  hasSelectableDate,
+  hasBookableSlot,
   selectedDate,
   currentDate,
   monthTitle,
   selectedDateText,
   selectedTimeSlot,
-  availableTimeSlots,
+  timeSlots,
   headCount,
   totalPrice,
   isReservationAvailable,
@@ -145,12 +146,14 @@ export function MobileReservationSheet({
                 <div className="mt-6">
                   <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
                   <div className="mt-3 flex flex-col gap-3">
-                    {availableTimeSlots.length > 0 ? (
-                      availableTimeSlots.map((slot) => (
+                    {timeSlots.length > 0 ? (
+                      timeSlots.map((slot) => (
                         <TimeSlotButton
                           key={slot.id}
                           size="tb"
                           isActive={selectedTimeSlot?.id === slot.id}
+                          isMine={slot.status === 'mine'}
+                          disabled={slot.status !== 'available'}
                           onClick={onSelectTimeSlot(slot)}
                           className="w-full"
                         >
@@ -159,7 +162,7 @@ export function MobileReservationSheet({
                       ))
                     ) : selectedDate ? (
                       <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
-                        {hasSelectableDate
+                        {hasBookableSlot
                           ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                           : '예약 가능한 날짜가 없습니다.'}
                       </p>
@@ -257,12 +260,14 @@ export function MobileReservationSheet({
               <div className="shadow-review-card h-102 w-75 overflow-y-auto overscroll-contain rounded-3xl bg-white p-5">
                 <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
                 <div className="mt-3 flex flex-col gap-3">
-                  {availableTimeSlots.length > 0 ? (
-                    availableTimeSlots.map((slot) => (
+                  {timeSlots.length > 0 ? (
+                    timeSlots.map((slot) => (
                       <TimeSlotButton
                         key={slot.id}
                         size="tb"
                         isActive={selectedTimeSlot?.id === slot.id}
+                        isMine={slot.status === 'mine'}
+                        disabled={slot.status !== 'available'}
                         onClick={onSelectTimeSlot(slot)}
                         className="w-full"
                       >
@@ -271,7 +276,7 @@ export function MobileReservationSheet({
                     ))
                   ) : selectedDate ? (
                     <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
-                      {hasSelectableDate
+                      {hasBookableSlot
                         ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                         : '예약 가능한 날짜가 없습니다.'}
                     </p>

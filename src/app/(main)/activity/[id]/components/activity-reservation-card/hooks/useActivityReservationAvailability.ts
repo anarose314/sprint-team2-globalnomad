@@ -97,27 +97,22 @@ export const useActivityReservationAvailability = ({
       .map((reservation) => reservation.scheduleId);
   }, [activityId, myReservedSchedules]);
 
-  const blockedScheduleIds = useMemo(() => {
+  const myScheduleIds = useMemo(() => {
     return Array.from(
       new Set([...myReservedScheduleIds, ...reservedScheduleIds])
     );
   }, [myReservedScheduleIds, reservedScheduleIds]);
 
-  const { availableScheduleByDate, usesFallbackSchedule } = useMemo(
+  const { scheduleByDate } = useMemo(
     () =>
       buildReservationAvailability({
         schedules,
         availableSchedules,
         availableScheduleQueryStatus,
-        blockedScheduleIds,
+        myScheduleIds,
         now: new Date(),
       }),
-    [
-      availableScheduleQueryStatus,
-      availableSchedules,
-      blockedScheduleIds,
-      schedules,
-    ]
+    [availableScheduleQueryStatus, availableSchedules, myScheduleIds, schedules]
   );
 
   useEffect(() => {
@@ -125,14 +120,14 @@ export const useActivityReservationAvailability = ({
       return;
     }
 
-    if (!usesFallbackSchedule || availableScheduleQueryStatus === 'loading') {
+    if (availableScheduleQueryStatus === 'success') {
       return;
     }
 
     console.warn(
-      `[useActivityReservationAvailability] activityId=${activityId}: 예약 가능 시간 API 대신 원본 스케줄로 대체 표시 중 (status=${availableScheduleQueryStatus})`
+      `[useActivityReservationAvailability] activityId=${activityId}: 예약 가능 시간 조회가 ${availableScheduleQueryStatus} 상태라 원본 시간대를 비활성화 상태로 표시 중`
     );
-  }, [activityId, availableScheduleQueryStatus, usesFallbackSchedule]);
+  }, [activityId, availableScheduleQueryStatus]);
 
-  return { availableScheduleByDate, usesFallbackSchedule };
+  return { scheduleByDate };
 };
