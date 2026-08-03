@@ -1,25 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(git fetch *)",
-      "Bash(npm run *)",
-      "Bash(gh api *)",
-      "Bash(gh label *)",
-      "Bash(ls scripts *)",
-      "Bash(SEED_USER_COUNT=2 SEED_ACTIVITY_COUNT=1 node scripts/seed-data/seed.mjs)",
-      "Bash(node -e \"console.log\\(typeof FormData, typeof Blob\\)\")",
-      "Bash(node scripts/seed-data/cleanup.mjs scripts/seed-data/output/seed1785252218125.json)",
-      "Bash(rm -f /tmp/seedrun.log scripts/seed-data/output/*.json; rm -rf scripts/seed-data/output; mkdir -p scripts/seed-data/output; git status)",
-      "Bash(npx prettier *)",
-      "Bash(lsof -nP -iTCP:3000 -sTCP:LISTEN)",
-      "Bash(curl -sS -o /dev/null -w \"http_code:%{http_code} time:%{time_total}\\\\n\" --max-time 5 http://localhost:3000)",
-      "Bash(ps -p 75805 -o pid,ppid,%cpu,%mem,etime,command)",
-      "Bash(curl -sS -o /dev/null -w \"http_code:%{http_code} time:%{time_total}\\\\n\" --max-time 30 http://localhost:3000)",
-      "Bash(sample 75805 2 -f)"
-    ],
-    "additionalDirectories": [
-      "/Users/yanghaneul/Desktop/globalnomad/sprint-team2-globalnomad/scripts/seed-data",
-      "/private/tmp"
-    ]
+    "allow": ["Bash(git fetch *)"]
   }
 }
