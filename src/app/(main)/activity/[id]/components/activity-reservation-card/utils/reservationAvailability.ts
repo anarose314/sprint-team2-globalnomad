@@ -16,14 +16,18 @@ import type {
  * loading/error 시에는 원본 시간대를 예약 가능으로 활성화하지 않고 `unavailable`로 표시한다.
  */
 export type AvailableScheduleQueryStatus = 'loading' | 'error' | 'success';
+export type AvailableScheduleQueryStatusByMonth = Record<
+  string,
+  AvailableScheduleQueryStatus
+>;
 
 export interface BuildReservationAvailabilityParams {
   /** 체험 상세에 포함된 원본 스케줄(표시할 시간대의 기준) */
   schedules: ActivitySchedule[];
   /** 월별 예약 가능 시간 조회 API 응답을 합친 목록 */
   availableSchedules: ActivityAvailableScheduleItem[];
-  /** 예약 가능 시간 조회 API의 상태 */
-  availableScheduleQueryStatus: AvailableScheduleQueryStatus;
+  /** 예약 가능 시간 조회 API의 연월(`YYYY-MM`)별 상태 */
+  availableScheduleQueryStatusByMonth: AvailableScheduleQueryStatusByMonth;
   /** 이미 내가 예약한(또는 이번 세션에 예약 완료한) 스케줄 ID */
   myScheduleIds: number[];
   /** 지난 시간 판단 기준 시각 */
@@ -80,12 +84,12 @@ const resolveTimeSlotStatus = ({
  * - 오늘 이전 날짜는 결과에서 완전히 제외한다(달력에서 선택 불가).
  * - 오늘 날짜에 속한 시간대는 시작 시간이 지났더라도 표시하되, 지난 시간대는 `unavailable`로
  *   처리해 선택할 수 없게 한다(내 예약이면 지난 시간대여도 `mine`을 유지한다).
- * - 조회가 loading/error이면 원본 시간대를 예약 가능으로 활성화하지 않는다.
+ * - 해당 연월의 조회가 loading/error이면 그 연월의 원본 시간대를 예약 가능으로 활성화하지 않는다.
  */
 export const buildReservationAvailability = ({
   schedules,
   availableSchedules,
-  availableScheduleQueryStatus,
+  availableScheduleQueryStatusByMonth,
   myScheduleIds,
   now,
 }: BuildReservationAvailabilityParams): ReservationAvailabilityResult => {
@@ -100,6 +104,10 @@ export const buildReservationAvailability = ({
       if (dateKey < todayKey) {
         return accumulator;
       }
+
+      const yearMonthKey = dateKey.slice(0, 7);
+      const availableScheduleQueryStatus =
+        availableScheduleQueryStatusByMonth[yearMonthKey] ?? 'loading';
 
       const status = resolveTimeSlotStatus({
         scheduleId: schedule.id,
