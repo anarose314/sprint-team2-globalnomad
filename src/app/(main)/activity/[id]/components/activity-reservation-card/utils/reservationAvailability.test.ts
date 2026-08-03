@@ -27,6 +27,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules,
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -35,12 +36,45 @@ describe('buildReservationAvailability', () => {
     ]);
   });
 
+  it('내 예약 조회가 끝나지 않았거나 실패하면 예약 가능 응답이 있어도 unavailable이다', () => {
+    const availableSchedules: ActivityAvailableScheduleItem[] = [
+      {
+        date: '2026-07-20',
+        times: [{ id: 2, startTime: '09:00', endTime: '10:00' }],
+      },
+    ];
+    const baseParams = {
+      schedules,
+      availableSchedules,
+      availableScheduleQueryStatusByMonth: { '2026-07': 'success' } as const,
+      myScheduleIds: [],
+      now: NOW,
+    };
+
+    const loadingResult = buildReservationAvailability({
+      ...baseParams,
+      myScheduleQueryStatus: 'loading',
+    });
+    const errorResult = buildReservationAvailability({
+      ...baseParams,
+      myScheduleQueryStatus: 'error',
+    });
+
+    expect(loadingResult.scheduleByDate['2026-07-20'][0].status).toBe(
+      'unavailable'
+    );
+    expect(errorResult.scheduleByDate['2026-07-20'][0].status).toBe(
+      'unavailable'
+    );
+  });
+
   it('원본 스케줄에는 있지만 예약 가능 결과에는 없는 시간은 unavailable이다', () => {
     const result = buildReservationAvailability({
       schedules,
       availableSchedules: [],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -65,6 +99,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules,
       availableScheduleQueryStatusByMonth: { '2026-07': 'loading' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
     const errorResult = buildReservationAvailability({
@@ -72,6 +107,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules,
       availableScheduleQueryStatusByMonth: { '2026-07': 'error' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -89,6 +125,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules: [],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -112,6 +149,7 @@ describe('buildReservationAvailability', () => {
       ],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now,
     });
 
@@ -132,6 +170,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules: [],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [10],
+      myScheduleQueryStatus: 'success',
       now,
     });
 
@@ -153,6 +192,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules,
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [2],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -167,6 +207,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules: [],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [3],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -181,6 +222,7 @@ describe('buildReservationAvailability', () => {
       availableSchedules: [],
       availableScheduleQueryStatusByMonth: { '2026-07': 'success' },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 
@@ -214,6 +256,7 @@ describe('buildReservationAvailability', () => {
         '2026-08': 'error',
       },
       myScheduleIds: [],
+      myScheduleQueryStatus: 'success',
       now: NOW,
     });
 

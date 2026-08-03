@@ -30,6 +30,8 @@ export interface BuildReservationAvailabilityParams {
   availableScheduleQueryStatusByMonth: AvailableScheduleQueryStatusByMonth;
   /** 이미 내가 예약한(또는 이번 세션에 예약 완료한) 스케줄 ID */
   myScheduleIds: number[];
+  /** 내 예약 목록 조회 상태(비로그인 사용자는 `success`) */
+  myScheduleQueryStatus: AvailableScheduleQueryStatus;
   /** 지난 시간 판단 기준 시각 */
   now: Date;
 }
@@ -53,12 +55,14 @@ const resolveTimeSlotStatus = ({
   scheduleId,
   isUpcoming,
   myScheduleIdSet,
+  myScheduleQueryStatus,
   availableScheduleIdSet,
   availableScheduleQueryStatus,
 }: {
   scheduleId: number;
   isUpcoming: boolean;
   myScheduleIdSet: Set<number>;
+  myScheduleQueryStatus: AvailableScheduleQueryStatus;
   availableScheduleIdSet: Set<number>;
   availableScheduleQueryStatus: AvailableScheduleQueryStatus;
 }): TimeSlotAvailability => {
@@ -67,6 +71,10 @@ const resolveTimeSlotStatus = ({
   }
 
   if (!isUpcoming) {
+    return 'unavailable';
+  }
+
+  if (myScheduleQueryStatus !== 'success') {
     return 'unavailable';
   }
 
@@ -85,12 +93,14 @@ const resolveTimeSlotStatus = ({
  * - 오늘 날짜에 속한 시간대는 시작 시간이 지났더라도 표시하되, 지난 시간대는 `unavailable`로
  *   처리해 선택할 수 없게 한다(내 예약이면 지난 시간대여도 `mine`을 유지한다).
  * - 해당 연월의 조회가 loading/error이면 그 연월의 원본 시간대를 예약 가능으로 활성화하지 않는다.
+ * - 로그인 사용자의 내 예약 조회가 끝나지 않았거나 실패하면 중복 예약 방지를 위해 시간대를 활성화하지 않는다.
  */
 export const buildReservationAvailability = ({
   schedules,
   availableSchedules,
   availableScheduleQueryStatusByMonth,
   myScheduleIds,
+  myScheduleQueryStatus,
   now,
 }: BuildReservationAvailabilityParams): ReservationAvailabilityResult => {
   const myScheduleIdSet = new Set(myScheduleIds);
@@ -113,6 +123,7 @@ export const buildReservationAvailability = ({
         scheduleId: schedule.id,
         isUpcoming: isUpcomingTimeSlot(dateKey, schedule.startTime, now),
         myScheduleIdSet,
+        myScheduleQueryStatus,
         availableScheduleIdSet,
         availableScheduleQueryStatus,
       });

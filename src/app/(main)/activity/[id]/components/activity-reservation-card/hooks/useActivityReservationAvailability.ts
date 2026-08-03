@@ -128,11 +128,23 @@ export const useActivityReservationAvailability = ({
       );
     }, [availableScheduleQueries, queryTargetMonths]);
 
-  const { data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES } = useQuery({
+  const {
+    data: myReservedSchedules = EMPTY_RESERVED_SCHEDULES,
+    isLoading: isMyScheduleLoading,
+    isError: isMyScheduleError,
+  } = useQuery({
     queryKey: reservationKeys.myReservations.reservedSchedules(),
     queryFn: fetchMyReservedSchedules,
     enabled: isAuthenticated,
   });
+
+  const myScheduleQueryStatus: AvailableScheduleQueryStatus = !isAuthenticated
+    ? 'success'
+    : isMyScheduleLoading
+      ? 'loading'
+      : isMyScheduleError
+        ? 'error'
+        : 'success';
 
   const myReservedScheduleIds = useMemo(() => {
     return myReservedSchedules
@@ -153,12 +165,14 @@ export const useActivityReservationAvailability = ({
         availableSchedules,
         availableScheduleQueryStatusByMonth,
         myScheduleIds,
+        myScheduleQueryStatus,
         now,
       }),
     [
       availableScheduleQueryStatusByMonth,
       availableSchedules,
       myScheduleIds,
+      myScheduleQueryStatus,
       now,
       schedules,
     ]
