@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { fetchActivityAvailableSchedule } from '@/app/(main)/activity/[id]/apis/activityAvailableSchedule';
 import {
@@ -17,6 +17,7 @@ import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 
 const EMPTY_RESERVED_SCHEDULES: MyReservedScheduleItem[] = [];
+const MINUTE_IN_MILLISECONDS = 60_000;
 
 interface UseActivityReservationAvailabilityProps {
   activityId: number;
@@ -37,6 +38,37 @@ export const useActivityReservationAvailability = ({
   reservedScheduleIds,
   isAuthenticated,
 }: UseActivityReservationAvailabilityProps) => {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    let minuteIntervalId: ReturnType<typeof setInterval> | null = null;
+    const millisecondsUntilNextMinute =
+      MINUTE_IN_MILLISECONDS - (Date.now() % MINUTE_IN_MILLISECONDS);
+
+    const minuteTimeoutId = setTimeout(() => {
+      setNow(new Date());
+      minuteIntervalId = setInterval(() => {
+        setNow(new Date());
+      }, MINUTE_IN_MILLISECONDS);
+    }, millisecondsUntilNextMinute);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setNow(new Date());
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearTimeout(minuteTimeoutId);
+      if (minuteIntervalId) {
+        clearInterval(minuteIntervalId);
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const queryTargetMonths = useMemo(() => {
     const uniqueYearMonth = new Set<string>();
 
@@ -121,12 +153,13 @@ export const useActivityReservationAvailability = ({
         availableSchedules,
         availableScheduleQueryStatusByMonth,
         myScheduleIds,
-        now: new Date(),
+        now,
       }),
     [
       availableScheduleQueryStatusByMonth,
       availableSchedules,
       myScheduleIds,
+      now,
       schedules,
     ]
   );

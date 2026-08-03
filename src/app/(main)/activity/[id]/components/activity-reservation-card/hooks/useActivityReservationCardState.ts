@@ -10,9 +10,11 @@ import type {
   TimeSlotWithStatus,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { useActivityReservationAvailability } from '@/app/(main)/activity/[id]/components/activity-reservation-card/hooks/useActivityReservationAvailability';
+import { isUpcomingTimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
 import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
+import { useShowToast } from '@/shared/store/useToastStore';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
@@ -32,6 +34,7 @@ export const useActivityReservationCardState = ({
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const showToast = useShowToast();
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [headCount, setHeadCount] = useState(1);
   const [reservedScheduleIds, setReservedScheduleIds] = useState<number[]>([]);
@@ -307,9 +310,27 @@ export const useActivityReservationCardState = ({
   };
 
   const handleSubmitReservation = () => {
-    if (!isReservationAvailable || isReservationSubmitting) {
+    if (!activeSelectedTimeSlot || isReservationSubmitting) {
       return;
     }
+
+    if (
+      !effectiveSelectedDateKey ||
+      !isUpcomingTimeSlot(
+        effectiveSelectedDateKey,
+        activeSelectedTimeSlot.startTime,
+        new Date()
+      )
+    ) {
+      setSelectedTimeSlot(null);
+      showToast({
+        theme: 'warning',
+        message:
+          '선택한 시간이 지나 예약할 수 없습니다. 다른 시간을 선택해주세요.',
+      });
+      return;
+    }
+
     submitReservation();
   };
 
