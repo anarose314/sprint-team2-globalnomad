@@ -1,6 +1,7 @@
 import type {
   CalendarValue,
   TimeSlot,
+  TimeSlotWithStatus,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { HeadCountStepperIconButton } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/headCountStepperIconButton';
 import { ReservationCalendarView } from '@/app/(main)/activity/[id]/components/activity-reservation-card/components/reservationCalendarView';
@@ -16,8 +17,8 @@ interface DesktopReservationCardProps {
   headCount: number;
   totalPrice: number;
   selectedTimeSlot: TimeSlot | null;
-  availableTimeSlots: TimeSlot[];
-  hasSelectableDate: boolean;
+  timeSlots: TimeSlotWithStatus[];
+  hasBookableSlot: boolean;
   isReservationAvailable: boolean;
   isReservationSubmitting: boolean;
   onDateChange: (value: CalendarValue) => void;
@@ -40,8 +41,8 @@ export function DesktopReservationCard({
   headCount,
   totalPrice,
   selectedTimeSlot,
-  availableTimeSlots,
-  hasSelectableDate,
+  timeSlots,
+  hasBookableSlot,
   isReservationAvailable,
   isReservationSubmitting,
   onDateChange,
@@ -98,12 +99,14 @@ export function DesktopReservationCard({
             <div className="mt-6">
               <p className="typo-lg-bold text-gray-950">예약 가능한 시간</p>
               <div className="mt-3.5 mb-6 flex flex-col gap-3">
-                {availableTimeSlots.length > 0 ? (
-                  availableTimeSlots.map((slot) => (
+                {timeSlots.length > 0 ? (
+                  timeSlots.map((slot) => (
                     <TimeSlotButton
                       key={slot.id}
                       size="pc"
                       isActive={selectedTimeSlot?.id === slot.id}
+                      isMine={slot.status === 'mine'}
+                      disabled={slot.status !== 'available'}
                       onClick={onSelectTimeSlot(slot)}
                     >
                       {slot.startTime} ~ {slot.endTime}
@@ -111,7 +114,7 @@ export function DesktopReservationCard({
                   ))
                 ) : selectedDate ? (
                   <p className="typo-md-medium rounded-xl border border-gray-100 px-4 py-3 text-gray-500">
-                    {hasSelectableDate
+                    {hasBookableSlot
                       ? '선택한 날짜에 예약 가능한 시간이 없습니다.'
                       : '예약 가능한 날짜가 없습니다.'}
                   </p>

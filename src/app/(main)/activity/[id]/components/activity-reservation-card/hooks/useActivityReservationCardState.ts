@@ -7,11 +7,14 @@ import type {
   CalendarValue,
   MobileSheetStep,
   TimeSlot,
+  TimeSlotWithStatus,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/activityReservationCard.types';
 import { useActivityReservationAvailability } from '@/app/(main)/activity/[id]/components/activity-reservation-card/hooks/useActivityReservationAvailability';
+import { isUpcomingTimeSlot } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
 import { ApiError } from '@/shared/apis/apiError';
 import { fetchInstanceClient } from '@/shared/apis/fetchInstance.client';
 import { reservationKeys } from '@/shared/queryKeys/reservationKeys';
+import { useShowToast } from '@/shared/store/useToastStore';
 import type { ActivitySchedule } from '@/shared/types/activityDetail.types';
 import { formatDateKey } from '@/shared/utils/formatDate';
 
@@ -31,6 +34,7 @@ export const useActivityReservationCardState = ({
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
+  const showToast = useShowToast();
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [headCount, setHeadCount] = useState(1);
   const [reservedScheduleIds, setReservedScheduleIds] = useState<number[]>([]);
@@ -45,35 +49,35 @@ export const useActivityReservationCardState = ({
   const [mobileSheetStep, setMobileSheetStep] =
     useState<MobileSheetStep>('dateTime');
 
-  const { availableScheduleByDate } = useActivityReservationAvailability({
+  const { scheduleByDate } = useActivityReservationAvailability({
     activityId,
     schedules,
     reservedScheduleIds,
     isAuthenticated,
   });
 
-  const availableDateKeys = useMemo(
-    () => Object.keys(availableScheduleByDate).sort(),
-    [availableScheduleByDate]
+  const earliestScheduleDateKey = useMemo(
+    () => Object.keys(scheduleByDate).sort()[0] ?? null,
+    [scheduleByDate]
   );
 
-  const hasSelectableDate = availableDateKeys.length > 0;
-  const availableDateKeysSignature = availableDateKeys.join(',');
+  const hasBookableSlot = useMemo(
+    () =>
+      Object.values(scheduleByDate).some((slots) =>
+        slots.some((slot) => slot.status === 'available')
+      ),
+    [scheduleByDate]
+  );
 
   useEffect(() => {
-    if (!availableDateKeysSignature) {
-      return;
-    }
-
-    const earliestDateKey = availableDateKeys[0];
-    if (!earliestDateKey) {
+    if (!earliestScheduleDateKey) {
       return;
     }
 
     const now = new Date();
     const todayKey = formatDateKey(now);
 
-    if (earliestDateKey !== todayKey) {
+    if (earliestScheduleDateKey !== todayKey) {
       return;
     }
 
@@ -92,12 +96,7 @@ export const useActivityReservationCardState = ({
     return () => {
       cancelAnimationFrame(frameId);
     };
-    /**
-     * 예약 성공 후 setSelectedDateKey(null)로 초기화되면 가용 날짜 시그니처가
-     * 그대로인 경우 effect가 재실행되지 않아 오늘 자동선택이 복구되지 않는다.
-     * selectedDateKey를 함께 구독해 null로 돌아온 뒤에도 동일 규칙으로 적용
-     */
-  }, [availableDateKeys, selectedDateKey]);
+  }, [earliestScheduleDateKey]);
   const effectiveSelectedDateKey = selectedDateKey;
 
   const parsedSelectedDate = useMemo(() => {
@@ -111,27 +110,37 @@ export const useActivityReservationCardState = ({
 
   const selectedDate = useMemo(() => parsedSelectedDate, [parsedSelectedDate]);
 
-  const availableTimeSlots = useMemo<TimeSlot[]>(() => {
+  const timeSlots = useMemo<TimeSlotWithStatus[]>(() => {
     if (!effectiveSelectedDateKey) {
       return [];
     }
 
-    return availableScheduleByDate[effectiveSelectedDateKey] ?? [];
-  }, [availableScheduleByDate, effectiveSelectedDateKey]);
+    return scheduleByDate[effectiveSelectedDateKey] ?? [];
+  }, [scheduleByDate, effectiveSelectedDateKey]);
 
-  const activeSelectedTimeSlot = useMemo(() => {
-    if (availableTimeSlots.length === 0) {
-      return null;
-    }
-
+  /**
+   * 선택한 시간대가 데이터 갱신 후 예약 불가 상태(`mine`/`unavailable`)로 바뀌면
+   * 선택을 해제하기 위해 최신 timeSlots에서 `available` 상태만 유효한 선택으로 인정한다.
+   */
+  const activeSelectedTimeSlot = useMemo<TimeSlot | null>(() => {
     if (!selectedTimeSlot) {
       return null;
     }
 
-    return (
-      availableTimeSlots.find((slot) => slot.id === selectedTimeSlot.id) ?? null
+    const matchedSlot = timeSlots.find(
+      (slot) => slot.id === selectedTimeSlot.id
     );
-  }, [availableTimeSlots, selectedTimeSlot]);
+
+    if (!matchedSlot || matchedSlot.status !== 'available') {
+      return null;
+    }
+
+    return {
+      id: matchedSlot.id,
+      startTime: matchedSlot.startTime,
+      endTime: matchedSlot.endTime,
+    };
+  }, [timeSlots, selectedTimeSlot]);
 
   const displayCurrentDate = useMemo(
     () => currentDate ?? selectedDate ?? new Date(),
@@ -148,9 +157,7 @@ export const useActivityReservationCardState = ({
     () => pricePerPerson * headCount,
     [headCount, pricePerPerson]
   );
-  const isReservationAvailable = Boolean(
-    activeSelectedTimeSlot && hasSelectableDate
-  );
+  const isReservationAvailable = Boolean(activeSelectedTimeSlot);
 
   const refreshAvailableSchedule = async () => {
     const queryKey = reservationKeys.availableSchedule.byActivity(activityId);
@@ -189,7 +196,6 @@ export const useActivityReservationCardState = ({
 
         await refreshAvailableSchedule();
 
-        setSelectedDateKey(null);
         setSelectedTimeSlot(null);
         setHeadCount(1);
         setIsDateSheetOpen(false);
@@ -205,14 +211,11 @@ export const useActivityReservationCardState = ({
           return;
         }
 
-        if (activeSelectedTimeSlot) {
-          setReservedScheduleIds((prev) =>
-            prev.includes(activeSelectedTimeSlot.id)
-              ? prev
-              : [...prev, activeSelectedTimeSlot.id]
-          );
-        }
-
+        /**
+         * 409는 "내가 예약했다"가 아니라 "이 시간대가 더 이상 예약 가능하지 않다"는 뜻이므로
+         * reservedScheduleIds(=내 예약)에 넣지 않는다. 선택만 해제하고 최신 예약 가능 목록을
+         * 다시 받아오면 해당 슬롯은 자연히 unavailable로 반영된다.
+         */
         setSelectedTimeSlot(null);
         await refreshAvailableSchedule();
       },
@@ -300,19 +303,41 @@ export const useActivityReservationCardState = ({
   };
 
   const handleSubmitReservation = () => {
-    if (!isReservationAvailable || isReservationSubmitting) {
+    if (!activeSelectedTimeSlot || isReservationSubmitting) {
       return;
     }
+
+    if (
+      !effectiveSelectedDateKey ||
+      !isUpcomingTimeSlot(
+        effectiveSelectedDateKey,
+        activeSelectedTimeSlot.startTime,
+        new Date()
+      )
+    ) {
+      setSelectedTimeSlot(null);
+      showToast({
+        theme: 'warning',
+        message:
+          '선택한 시간이 지나 예약할 수 없습니다. 다른 시간을 선택해주세요.',
+      });
+      return;
+    }
+
     submitReservation();
   };
 
+  /**
+   * 원본 일정이 있는 날짜는 예약 가능한 시간이 없어도 선택해 시간표를 확인할 수 있도록,
+   * 스케줄 존재 여부만으로 판단한다(예약 가능 여부는 시간대 단위에서 개별적으로 표시).
+   */
   const tileDisabled = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') {
       return false;
     }
 
     const dateKey = formatDateKey(date);
-    return !Boolean(availableScheduleByDate[dateKey]);
+    return !Boolean(scheduleByDate[dateKey]);
   };
 
   return {
@@ -320,7 +345,7 @@ export const useActivityReservationCardState = ({
     isSuccessModalOpen,
     isLoginRequiredModalOpen,
     mobileSheetStep,
-    hasSelectableDate,
+    hasBookableSlot,
     isReservationAvailable,
     isReservationSubmitting,
     selectedDate,
@@ -328,7 +353,7 @@ export const useActivityReservationCardState = ({
     monthTitle,
     selectedDateText,
     activeSelectedTimeSlot,
-    availableTimeSlots,
+    timeSlots,
     headCount,
     totalPrice,
     handleOpenDateSheet,

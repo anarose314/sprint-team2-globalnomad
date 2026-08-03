@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isUpcomingTimeSlot,
   normalizeDateKey,
   parseTimeToHourMinute,
 } from '@/app/(main)/activity/[id]/components/activity-reservation-card/utils/reservationDateTime';
@@ -58,5 +59,18 @@ describe('parseTimeToHourMinute', () => {
     expect(parseTimeToHourMinute('12:')).toBeNull();
     expect(parseTimeToHourMinute(':30')).toBeNull();
     expect(parseTimeToHourMinute('aa:bb')).toBeNull();
+  });
+});
+
+describe('isUpcomingTimeSlot', () => {
+  const now = new Date(2026, 6, 15, 12, 0, 0);
+
+  it('현재 시각보다 뒤에 시작하는 시간은 true를 반환한다', () => {
+    expect(isUpcomingTimeSlot('2026-07-15', '12:01', now)).toBe(true);
+  });
+
+  it('현재 시각과 같거나 이미 지난 시간은 false를 반환한다', () => {
+    expect(isUpcomingTimeSlot('2026-07-15', '12:00', now)).toBe(false);
+    expect(isUpcomingTimeSlot('2026-07-15', '11:59', now)).toBe(false);
   });
 });

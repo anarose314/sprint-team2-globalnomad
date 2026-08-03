@@ -34,7 +34,7 @@ export function ActivityReservationCard({
     isSuccessModalOpen,
     isLoginRequiredModalOpen,
     mobileSheetStep,
-    hasSelectableDate,
+    hasBookableSlot,
     isReservationAvailable,
     isReservationSubmitting,
     selectedDate,
@@ -42,7 +42,7 @@ export function ActivityReservationCard({
     monthTitle,
     selectedDateText,
     activeSelectedTimeSlot,
-    availableTimeSlots,
+    timeSlots,
     headCount,
     totalPrice,
     handleOpenDateSheet,
@@ -75,13 +75,13 @@ export function ActivityReservationCard({
       <MobileReservationSheet
         isOpen={isDateSheetOpen}
         mobileSheetStep={mobileSheetStep}
-        hasSelectableDate={hasSelectableDate}
+        hasBookableSlot={hasBookableSlot}
         selectedDate={selectedDate}
         currentDate={displayCurrentDate}
         monthTitle={monthTitle}
         selectedDateText={selectedDateText}
         selectedTimeSlot={activeSelectedTimeSlot}
-        availableTimeSlots={availableTimeSlots}
+        timeSlots={timeSlots}
         headCount={headCount}
         totalPrice={totalPrice}
         isReservationAvailable={isReservationAvailable}
@@ -106,8 +106,8 @@ export function ActivityReservationCard({
         headCount={headCount}
         totalPrice={totalPrice}
         selectedTimeSlot={activeSelectedTimeSlot}
-        availableTimeSlots={availableTimeSlots}
-        hasSelectableDate={hasSelectableDate}
+        timeSlots={timeSlots}
+        hasBookableSlot={hasBookableSlot}
         isReservationAvailable={isReservationAvailable}
         isReservationSubmitting={isReservationSubmitting}
         onDateChange={handleDateChange}
