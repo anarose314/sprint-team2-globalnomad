@@ -11,6 +11,7 @@ const MODAL_EXIT_MS = 220;
 interface ModalOverlayProps {
   children: ReactNode;
   onClose: () => void;
+  returnFocusTo?: HTMLElement | null;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
   className?: string;
@@ -38,6 +39,7 @@ interface ModalOverlayProps {
 export function ModalOverlay({
   children,
   onClose,
+  returnFocusTo,
   closeOnOverlayClick = true,
   closeOnEscape = true,
   className,
@@ -51,6 +53,13 @@ export function ModalOverlay({
   /** SSR과 첫 클라이언트 렌더를 맞추기 위해 초기값은 false, 마운트 후 rAF로 동기화 */
   const [reduceMotion, setReduceMotion] = useState(false);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restoreFocusTargetRef = useRef<HTMLElement | null>(
+    returnFocusTo ??
+      (typeof document !== 'undefined' &&
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null)
+  );
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -119,6 +128,7 @@ export function ModalOverlay({
   useEffect(() => {
     if (!portalRoot) return;
 
+    const restoreFocusTarget = restoreFocusTargetRef.current;
     const backgroundElements: HTMLElement[] = [];
     const collectBackgroundElements = (element: Element) => {
       if (element === portalRoot) {
@@ -164,6 +174,11 @@ export function ModalOverlay({
           element.removeAttribute('inert');
         }
       });
+
+      // inert가 해제된 뒤에 포커스를 복원해야 브라우저가 focus()를 무시하지 않습니다.
+      if (restoreFocusTarget?.isConnected) {
+        restoreFocusTarget.focus();
+      }
     };
   }, [portalRoot]);
 

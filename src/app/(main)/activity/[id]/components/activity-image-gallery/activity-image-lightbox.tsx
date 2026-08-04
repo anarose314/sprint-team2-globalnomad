@@ -40,6 +40,7 @@ export interface ActivityImageLightboxProps {
   urls: string[];
   title: string;
   index: number;
+  returnFocusTo: HTMLElement | null;
   onClose: () => void;
   onNavigate: (nextIndex: number) => void;
 }
@@ -48,6 +49,7 @@ export function ActivityImageLightbox({
   urls,
   title,
   index,
+  returnFocusTo,
   onClose,
   onNavigate,
 }: ActivityImageLightboxProps) {
@@ -67,7 +69,6 @@ export function ActivityImageLightbox({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const imageSlotRef = useRef<HTMLDivElement>(null);
   const prevIndexRef = useRef<number | null>(null);
-  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
   const [slideAnim, setSlideAnim] = useState<'from-right' | 'from-left' | null>(
     null
@@ -132,20 +133,12 @@ export function ActivityImageLightbox({
   );
 
   useEffect(() => {
-    lastFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
     const rafId = requestAnimationFrame(() => {
       closeButtonRef.current?.focus();
     });
 
     return () => {
       cancelAnimationFrame(rafId);
-      const restoreTarget = lastFocusedElementRef.current;
-      if (restoreTarget && restoreTarget.isConnected) {
-        restoreTarget.focus();
-      }
     };
   }, []);
 
@@ -242,6 +235,7 @@ export function ActivityImageLightbox({
   return (
     <ModalOverlay
       onClose={onClose}
+      returnFocusTo={returnFocusTo}
       className="px-3 py-6 sm:px-6 md:px-10 md:py-10"
     >
       <div

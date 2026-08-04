@@ -62,7 +62,10 @@ export function ActivityImageGallery({
   /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */
   const lightboxUrls = imageUrls;
 
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [lightboxState, setLightboxState] = useState<{
+    index: number;
+    returnFocusTo: HTMLElement | null;
+  } | null>(null);
   const renderSlot = ({
     index,
     alt,
@@ -84,19 +87,26 @@ export function ActivityImageGallery({
         sizes={sizes}
         quality={quality}
         priority={priority}
-        onOpen={() => setLightboxIndex(index)}
+        onOpen={(returnFocusTo) => {
+          setLightboxState({ index, returnFocusTo });
+        }}
       />
     );
   };
 
   const lightbox =
-    lightboxIndex !== null && lightboxUrls[lightboxIndex] ? (
+    lightboxState && lightboxUrls[lightboxState.index] ? (
       <ActivityImageLightbox
         urls={lightboxUrls}
         title={title}
-        index={lightboxIndex}
-        onClose={() => setLightboxIndex(null)}
-        onNavigate={setLightboxIndex}
+        index={lightboxState.index}
+        returnFocusTo={lightboxState.returnFocusTo}
+        onClose={() => setLightboxState(null)}
+        onNavigate={(index) => {
+          setLightboxState((current) =>
+            current ? { ...current, index } : current
+          );
+        }}
       />
     ) : null;
 
