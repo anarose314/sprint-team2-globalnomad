@@ -1,6 +1,6 @@
 'use client';
 
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactNode, RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ModalOverlayCloseContext } from '@/shared/components/modal/modal-overlay/modal-overlay-close-context';
@@ -11,7 +11,7 @@ const MODAL_EXIT_MS = 220;
 interface ModalOverlayProps {
   children: ReactNode;
   onClose: () => void;
-  returnFocusTo?: HTMLElement | null;
+  returnFocusRef?: RefObject<HTMLElement | null>;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
   className?: string;
@@ -39,7 +39,7 @@ interface ModalOverlayProps {
 export function ModalOverlay({
   children,
   onClose,
-  returnFocusTo,
+  returnFocusRef,
   closeOnOverlayClick = true,
   closeOnEscape = true,
   className,
@@ -53,13 +53,6 @@ export function ModalOverlay({
   /** SSR과 첫 클라이언트 렌더를 맞추기 위해 초기값은 false, 마운트 후 rAF로 동기화 */
   const [reduceMotion, setReduceMotion] = useState(false);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const restoreFocusTargetRef = useRef<HTMLElement | null>(
-    returnFocusTo ??
-      (typeof document !== 'undefined' &&
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null)
-  );
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -128,7 +121,11 @@ export function ModalOverlay({
   useEffect(() => {
     if (!portalRoot) return;
 
-    const restoreFocusTarget = restoreFocusTargetRef.current;
+    const restoreFocusTarget =
+      returnFocusRef?.current ??
+      (document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null);
     const backgroundElements: HTMLElement[] = [];
     const collectBackgroundElements = (element: Element) => {
       if (element === portalRoot) {
@@ -180,7 +177,7 @@ export function ModalOverlay({
         restoreFocusTarget.focus();
       }
     };
-  }, [portalRoot]);
+  }, [portalRoot, returnFocusRef]);
 
   // ESC 닫기를 옵션으로 제공하며, 이벤트 리스너는 unmount 시 제거합니다.
   useEffect(() => {

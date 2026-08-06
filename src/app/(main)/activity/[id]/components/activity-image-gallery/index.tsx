@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityImageLightbox } from '@/app/(main)/activity/[id]/components/activity-image-gallery/activity-image-lightbox';
 import { GalleryImageSlot } from '@/app/(main)/activity/[id]/components/activity-image-gallery/gallery-image-slot';
 import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
@@ -62,10 +62,8 @@ export function ActivityImageGallery({
   /** 갤러리에 최대 5장만 노출; 라이트박스도 동일 목록 사용 */
   const lightboxUrls = imageUrls;
 
-  const [lightboxState, setLightboxState] = useState<{
-    index: number;
-    returnFocusTo: HTMLElement | null;
-  } | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const renderSlot = ({
     index,
     alt,
@@ -88,25 +86,22 @@ export function ActivityImageGallery({
         quality={quality}
         priority={priority}
         onOpen={(returnFocusTo) => {
-          setLightboxState({ index, returnFocusTo });
+          returnFocusRef.current = returnFocusTo;
+          setLightboxIndex(index);
         }}
       />
     );
   };
 
   const lightbox =
-    lightboxState && lightboxUrls[lightboxState.index] ? (
+    lightboxIndex !== null && lightboxUrls[lightboxIndex] ? (
       <ActivityImageLightbox
         urls={lightboxUrls}
         title={title}
-        index={lightboxState.index}
-        returnFocusTo={lightboxState.returnFocusTo}
-        onClose={() => setLightboxState(null)}
-        onNavigate={(index) => {
-          setLightboxState((current) =>
-            current ? { ...current, index } : current
-          );
-        }}
+        index={lightboxIndex}
+        returnFocusRef={returnFocusRef}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={setLightboxIndex}
       />
     ) : null;
 

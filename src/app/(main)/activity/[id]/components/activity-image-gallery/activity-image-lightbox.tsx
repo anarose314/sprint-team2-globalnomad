@@ -1,6 +1,6 @@
 'use client';
 
-import type { MouseEvent, PointerEvent } from 'react';
+import type { MouseEvent, PointerEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import {
@@ -40,7 +40,7 @@ export interface ActivityImageLightboxProps {
   urls: string[];
   title: string;
   index: number;
-  returnFocusTo: HTMLElement | null;
+  returnFocusRef: RefObject<HTMLElement | null>;
   onClose: () => void;
   onNavigate: (nextIndex: number) => void;
 }
@@ -49,7 +49,7 @@ export function ActivityImageLightbox({
   urls,
   title,
   index,
-  returnFocusTo,
+  returnFocusRef,
   onClose,
   onNavigate,
 }: ActivityImageLightboxProps) {
@@ -235,7 +235,7 @@ export function ActivityImageLightbox({
   return (
     <ModalOverlay
       onClose={onClose}
-      returnFocusTo={returnFocusTo}
+      returnFocusRef={returnFocusRef}
       className="px-3 py-6 sm:px-6 md:px-10 md:py-10"
     >
       <div

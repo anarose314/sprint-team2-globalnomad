@@ -77,6 +77,14 @@ function GalleryImageSlotInner({
 
 const gallerySlotClassName = 'relative min-h-0 overflow-hidden bg-gray-100';
 
+function getCurrentFocusTarget(): HTMLElement | null {
+  const activeElement = document.activeElement;
+
+  return activeElement instanceof HTMLElement && activeElement !== document.body
+    ? activeElement
+    : null;
+}
+
 export function GalleryImageSlot({
   src,
   alt,
@@ -101,19 +109,19 @@ export function GalleryImageSlot({
   const mergedClass = cn(gallerySlotClassName, className);
   const focusBeforePointerDownRef = useRef<HTMLElement | null>(null);
 
-  const getCurrentFocus = () => {
-    const activeElement = document.activeElement;
-    return activeElement instanceof HTMLElement &&
-      activeElement !== document.body
-      ? activeElement
-      : null;
+  const handlePointerDown = () => {
+    focusBeforePointerDownRef.current = getCurrentFocusTarget();
+  };
+
+  const handlePointerCancel = () => {
+    focusBeforePointerDownRef.current = null;
   };
 
   const handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
     const returnFocusTo =
       event.detail > 0
         ? (focusBeforePointerDownRef.current ?? event.currentTarget)
-        : (getCurrentFocus() ?? event.currentTarget);
+        : (getCurrentFocusTarget() ?? event.currentTarget);
 
     focusBeforePointerDownRef.current = null;
     onOpen?.(returnFocusTo);
@@ -123,12 +131,8 @@ export function GalleryImageSlot({
     return (
       <button
         type="button"
-        onPointerDown={() => {
-          focusBeforePointerDownRef.current = getCurrentFocus();
-        }}
-        onPointerCancel={() => {
-          focusBeforePointerDownRef.current = null;
-        }}
+        onPointerDown={handlePointerDown}
+        onPointerCancel={handlePointerCancel}
         onClick={handleOpen}
         aria-label={ariaLabel ?? '이미지 크게 보기'}
         className={cn(
