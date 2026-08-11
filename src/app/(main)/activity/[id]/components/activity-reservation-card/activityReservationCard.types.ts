@@ -17,3 +17,15 @@ export interface TimeSlot {
   startTime: string;
   endTime: string;
 }
+
+/**
+ * @description 시간대의 예약 가능 상태
+ * - `available` : 예약 가능(선택 가능)
+ * - `mine` : 내가 이미 예약한 시간대
+ * - `unavailable` : 그 외 예약할 수 없는 시간대(이유 표시 없이 비활성화)
+ */
+export type TimeSlotAvailability = 'available' | 'mine' | 'unavailable';
+
+export interface TimeSlotWithStatus extends TimeSlot {
+  status: TimeSlotAvailability;
+}

@@ -12,4 +12,10 @@ export interface TimeSlotButtonProps
    * @defaultValue `false`
    */
   isActive?: boolean;
+  /**
+   * 내가 이미 예약한 시간대 여부
+   * `true`이면 비활성화 스타일에 '내 예약' 표시가 추가된다.
+   * @defaultValue `false`
+   */
+  isMine?: boolean;
 }

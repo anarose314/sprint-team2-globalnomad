@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityImageLightbox } from '@/app/(main)/activity/[id]/components/activity-image-gallery/activity-image-lightbox';
 import { GalleryImageSlot } from '@/app/(main)/activity/[id]/components/activity-image-gallery/gallery-image-slot';
 import { ACTIVITY_IMAGE_GALLERY_FRAME_CLASS } from '@/shared/constants/activityImageGallery.constants';
@@ -63,6 +63,7 @@ export function ActivityImageGallery({
   const lightboxUrls = imageUrls;
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const renderSlot = ({
     index,
     alt,
@@ -84,7 +85,10 @@ export function ActivityImageGallery({
         sizes={sizes}
         quality={quality}
         priority={priority}
-        onOpen={() => setLightboxIndex(index)}
+        onOpen={(returnFocusTo) => {
+          returnFocusRef.current = returnFocusTo;
+          setLightboxIndex(index);
+        }}
       />
     );
   };
@@ -95,6 +99,7 @@ export function ActivityImageGallery({
         urls={lightboxUrls}
         title={title}
         index={lightboxIndex}
+        returnFocusRef={returnFocusRef}
         onClose={() => setLightboxIndex(null)}
         onNavigate={setLightboxIndex}
       />
